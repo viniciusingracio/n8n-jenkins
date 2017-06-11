@@ -1,0 +1,35 @@
+- name: Create remote user
+  become: true
+  user:
+    name: '{{ remote_user }}'
+    shell: /bin/bash
+    groups: adm,sudo
+    append: yes
+
+- name: Set up authorized keys
+  become: true
+  authorized_key:
+    user: '{{ remote_user }}'
+    state: present
+    key: '{{ item }}'
+  with_file:
+    - public_keys/daronco.pub
+
+- name: Add to sudoers
+  become: true
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^{{ remote_user }}\s'
+    line: '{{ remote_user }} ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+
+- name: Install common packages
+  become: true
+  apt:
+    name: '{{ item }}'
+    state: present
+  with_items:
+    - curl
+    - git
+    - wget
