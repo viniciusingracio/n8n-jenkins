@@ -1,7 +1,7 @@
 - name: Create remote user
   become: true
   user:
-    name: '{{ remote_user }}'
+    name: '{{ deploy_user }}'
     shell: /bin/bash
     groups: adm,sudo
     append: yes
@@ -9,7 +9,7 @@
 - name: Set up authorized keys
   become: true
   authorized_key:
-    user: '{{ remote_user }}'
+    user: '{{ deploy_user }}'
     state: present
     key: '{{ item }}'
   with_file:
@@ -20,8 +20,8 @@
   lineinfile:
     dest: /etc/sudoers
     state: present
-    regexp: '^{{ remote_user }}\s'
-    line: '{{ remote_user }} ALL=(ALL) NOPASSWD: ALL'
+    regexp: '^{{ deploy_user }}\s'
+    line: '{{ deploy_user }} ALL=(ALL) NOPASSWD: ALL'
     validate: 'visudo -cf %s'
 
 - name: Install common packages

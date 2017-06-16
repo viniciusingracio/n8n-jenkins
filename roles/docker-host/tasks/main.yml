@@ -23,6 +23,6 @@
 - name: Add user to docker group
   become: true
   user:
-    name: '{{ remote_user }}'
+    name: '{{ deploy_user }}'
     groups: docker
     append: yes

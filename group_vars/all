@@ -1,8 +1,14 @@
 ---
 # Variables here are applicable to all host groups
 
+# default connection type
 ansible_connection: ssh
-ansible_user: mconf
+
+# default python
 ansible_python_interpreter: /usr/bin/python3 # ubuntu >= 16.04
 
-remote_user: mconf
+# user used to ssh into the servers
+ansible_user: mconf
+
+# user used to deploy the applications
+deploy_user: mconf
