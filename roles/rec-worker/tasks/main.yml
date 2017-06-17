@@ -1,0 +1,27 @@
+- name: Download rec-worker source code
+  git:
+    repo: '{{ repo_url }}'
+    dest: ~/src/rec-worker
+    version: '{{ repo_ref }}'
+  when: build_from_source
+
+- name: Build the rec-worker docker image
+  docker_image:
+    build_path: ~/src/rec-worker/record-and-playback/
+    name: mconf/bbb-rap
+    # force: true
+  when: build_from_source
+
+- name: Start the rec-worker container
+  docker_container:
+    name: rec-worker
+    image: mconf/bbb-rap:latest
+    restart_policy: unless-stopped
+    # command: ["sleep", "infinity"]
+    volumes:
+      - /var/bigbluebutton:/var/bigbluebutton
+      - /var/log/bigbluebutton:/var/log/bigbluebutton
+      # - /home/ubuntu/.ssh:/root/.ssh
+    env:
+      REDIS_HOST: '{{ redis_host }}'
+      REDIS_PORT: '{{ redis_port }}'

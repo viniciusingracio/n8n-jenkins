@@ -24,6 +24,10 @@
     line: '{{ deploy_user }} ALL=(ALL) NOPASSWD: ALL'
     validate: 'visudo -cf %s'
 
+- name: Update apt
+  become: true
+  apt: update_cache=yes
+
 - name: Install common packages
   become: true
   apt:
@@ -33,3 +37,5 @@
     - curl
     - git
     - wget
+    - htop
+    - vim

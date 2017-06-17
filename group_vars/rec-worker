@@ -1,0 +1,12 @@
+---
+
+# Build docker image from src, otherwise will try to pull from hub
+build_from_source: true
+
+# Fetch source code from
+repo_url: https://github.com/daronco/bigbluebutton.git
+repo_ref: rap-on-docker
+
+# Redis connection
+redis_host: 10.0.3.91
+redis_port: 6379
