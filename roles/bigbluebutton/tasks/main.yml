@@ -40,11 +40,15 @@
     name: bigbluebutton
     state: present
 
-# TODO: should not do this every time
+- name: Get IP set on BigBlueButton
+  command: bbb-conf --secret
+  register: bbbip
+
 - name: Set IP on BigBlueButton
   become: true
   command: bbb-conf --setip '{{ inventory_hostname }}'
   # notify: restart bigbluebutton
+  when: not bbbip.stdout | search("http[s]?://" + inventory_hostname)
 
 - name: Install demos
   become: true
