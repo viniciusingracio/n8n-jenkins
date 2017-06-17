@@ -39,3 +39,5 @@
     - wget
     - htop
     - vim
+
+- include: ufw.yml tags=ufw,firewall

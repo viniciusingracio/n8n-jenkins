@@ -40,17 +40,18 @@
     name: bigbluebutton
     state: present
 
+# TODO: should not do this every time
 - name: Set IP on BigBlueButton
   become: true
   command: bbb-conf --setip '{{ inventory_hostname }}'
-  notify: restart bigbluebutton
+  # notify: restart bigbluebutton
 
 - name: Install demos
   become: true
   apt:
     name: bbb-demo
     state: present
-  when: use_demos
+  when: bigbluebutton_demos
   notify: restart bigbluebutton
 
 - name: Remove demos
@@ -58,17 +59,17 @@
   apt:
     name: bbb-demo
     state: absent
-  when: not use_demos
+  when: not bigbluebutton_demos
   notify: restart bigbluebutton
 
-- name: Open redis
+- name: Open/close redis
   become: true
   lineinfile:
     dest: /etc/redis/redis.conf
     state: present
     regexp: '^bind\s'
-    line: 'bind {{ redis_bind | join(" ") }}'
-  when: redis_bind
+    line: 'bind {{ bigbluebutton_redis_bind | join(" ") }}'
+  when: bigbluebutton_redis_bind
   notify: restart redis
 
 - name: Close redis to localhost
@@ -78,5 +79,7 @@
     state: present
     regexp: '^bind\s'
     line: 'bind 127.0.0.1'
-  when: not redis_bind
+  when: not bigbluebutton_redis_bind
   notify: restart redis
+
+- include: ufw.yml tags=ufw,firewall

@@ -1,8 +1,5 @@
 ---
 
-# Install/remove demos
-use_demos: true
-
-# Open redis to external access. Set to false to close.
-redis_bind:
+bigbluebutton_demos: true
+bigbluebutton_redis_bind:
   - 0.0.0.0

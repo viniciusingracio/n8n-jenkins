@@ -1,0 +1,10 @@
+---
+
+# Install/remove demos
+bigbluebutton_demos: false
+
+# Open redis to external access. Set to false remove external access.
+bigbluebutton_redis_bind: false
+# To open use:
+# bigbluebutton_redis_bind:
+#   - 0.0.0.0
