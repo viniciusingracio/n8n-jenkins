@@ -1,2 +1,5 @@
 [rec-worker]
 10.0.3.186
+
+[bigbluebutton]
+10.0.3.105 ansible_user=ubuntu deploy_user=ubuntu

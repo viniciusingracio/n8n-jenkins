@@ -8,3 +8,8 @@
   roles:
   - docker-host
   - rec-worker
+
+# BigBlueButton
+- hosts: bigbluebutton
+  roles:
+  - bigbluebutton

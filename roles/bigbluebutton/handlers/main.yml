@@ -1,0 +1,7 @@
+- name: restart bigbluebutton
+  become: true
+  command: bbb-conf --restart
+
+- name: restart redis
+  become: true
+  service: name=redis state=restarted

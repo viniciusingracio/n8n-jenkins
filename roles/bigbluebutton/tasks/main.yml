@@ -1,0 +1,82 @@
+- name: Update apt (if older than 5m)
+  become: true
+  apt: update_cache=yes cache_valid_time=300
+
+- name: Install language pack
+  become: true
+  apt:
+    name: language-pack-en
+    state: present
+
+- name: Set default locale
+  become: true
+  command: update-locale LANG=en_US.UTF-8
+
+- name: Add BigBlueButton apt key
+  become: true
+  apt_key:
+    url: "http://ubuntu.bigbluebutton.org/repo/bigbluebutton.asc"
+    state: present
+  register: aptkey
+
+- name: Add multiverse and BigBlueButton repos to apt
+  become: true
+  apt_repository:
+    repo: '{{ item }}'
+    state: present
+  register: aptrepos
+  with_items:
+    - 'deb http://archive.ubuntu.com/ubuntu/ xenial multiverse'
+    - 'deb http://ubuntu.bigbluebutton.org/xenial-110/ bigbluebutton-xenial main'
+
+- name: Update apt if keys changed
+  become: true
+  apt: update_cache=yes
+  when: aptkey|changed or aptrepos|changed
+
+- name: Install BigBlueButton
+  become: true
+  apt:
+    name: bigbluebutton
+    state: present
+
+- name: Set IP on BigBlueButton
+  become: true
+  command: bbb-conf --setip '{{ inventory_hostname }}'
+  notify: restart bigbluebutton
+
+- name: Install demos
+  become: true
+  apt:
+    name: bbb-demo
+    state: present
+  when: use_demos
+  notify: restart bigbluebutton
+
+- name: Remove demos
+  become: true
+  apt:
+    name: bbb-demo
+    state: absent
+  when: not use_demos
+  notify: restart bigbluebutton
+
+- name: Open redis
+  become: true
+  lineinfile:
+    dest: /etc/redis/redis.conf
+    state: present
+    regexp: '^bind\s'
+    line: 'bind {{ redis_bind | join(" ") }}'
+  when: redis_bind
+  notify: restart redis
+
+- name: Close redis to localhost
+  become: true
+  lineinfile:
+    dest: /etc/redis/redis.conf
+    state: present
+    regexp: '^bind\s'
+    line: 'bind 127.0.0.1'
+  when: not redis_bind
+  notify: restart redis
