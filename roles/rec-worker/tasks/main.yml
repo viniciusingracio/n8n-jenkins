@@ -3,6 +3,7 @@
     repo: '{{ repo_url }}'
     dest: ~/src/rec-worker
     version: '{{ repo_ref }}'
+    depth: 1 # just a snapshot
   when: build_from_source
 
 - name: Build the rec-worker docker image
