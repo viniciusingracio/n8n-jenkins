@@ -1,0 +1,13 @@
+---
+
+# Build docker image from src, otherwise will try to pull from hub
+rec_proxy_build_from_source: true
+
+# Fetch source code from
+rec_proxy_repo_url: git@github.com:mconftec/mconf-rec-proxy.git
+rec_proxy_repo_ref: master
+
+# Domain nginx will respond to
+rec_proxy_nginx_host: rec.mconf.com
+# S3 URL to proxy requests to
+rec_proxy_nginx_s3_url: rec.mconf.com.s3-sa-east-1.amazonaws.com

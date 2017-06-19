@@ -22,5 +22,9 @@ ansible-playbook -i hosts provision.yml
 Setting up an lxc
 
 ```
-ansible-playbook -i 10.0.3.105, setup.yml --ask-pass --ask-sudo-pass --extra-vars "ansible_user=ubuntu deploy_user=ubuntu"
+ansible-playbook -l 10.0.3.105 setup.yml --ask-pass --ask-sudo-pass --extra-vars "ansible_user=ubuntu deploy_user=ubuntu"
 ```
+
+Utils:
+
+* Start at a given point: `ansible-playbook -l rec-proxy --start-at-task="rec-proxy : Download rec-proxy source code" provision.ym

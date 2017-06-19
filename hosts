@@ -1,5 +1,8 @@
 [rec-worker]
 10.0.3.186
 
+[rec-proxy]
+104.131.94.162 ansible_user=root
+
 [bigbluebutton]
 10.0.3.105 ansible_user=ubuntu deploy_user=ubuntu common_ufw_ipv6=false
