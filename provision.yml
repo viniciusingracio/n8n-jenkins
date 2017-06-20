@@ -1,3 +1,7 @@
+- hosts: all
+  roles:
+  - common
+
 # Recording workers
 - hosts: rec-worker
   roles:

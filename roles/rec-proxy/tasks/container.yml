@@ -1,0 +1,30 @@
+- name: Download rec-proxy source code
+  git:
+    repo: '{{ rec_proxy_repo_url }}'
+    dest: ~/src/rec-proxy
+    version: '{{ rec_proxy_repo_ref }}'
+    depth: 1 # just a snapshot
+    accept_hostkey: true
+  when: rec_proxy_build_from_source
+  register: recproxycode
+
+- name: Build the rec-proxy docker image
+  docker_image:
+    build_path: ~/src/rec-proxy/
+    name: mconf/mconf-rec-proxy
+    force: true
+  when: rec_proxy_build_from_source and recproxycode|changed
+
+- name: Start the rec-proxy container
+  docker_container:
+    name: mconf-rec-proxy
+    image: mconf/mconf-rec-proxy:latest
+    # restart_policy: unless-stopped
+    volumes:
+      - /var/log/nginx:/var/log/nginx
+    published_ports:
+      - 80:80
+      - 443:443
+    env:
+      NGINX_HOST: '{{ rec_proxy_nginx_host }}'
+      S3_URL: '{{ rec_proxy_nginx_s3_url }}'
