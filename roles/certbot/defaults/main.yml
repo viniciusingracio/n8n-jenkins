@@ -11,3 +11,6 @@ certbot_standalone_cmd: '{{ certbot_base_cmd }} --standalone'
 # So other roles can pick up on this to point to certificates
 certbot_cert_path_root: '/etc/letsencrypt'
 certbot_cert_path: '{{ certbot_cert_path_root }}/live/{{ certbot_domain }}'
+
+# Cronjob options
+certbot_cron_special_time: daily

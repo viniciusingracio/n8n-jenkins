@@ -1,0 +1,6 @@
+- name: Install crontab for certbot
+  cron:
+    name: run certbot
+    special_time: '{{ certbot_cron_special_time }}'
+    user: '{{ deploy_user }}'
+    job: 'docker run --rm -v /var/www:/var/www -v /etc/letsencrypt:/etc/letsencrypt certbot/certbot {{ certbot_webroot_cmd }} 2>&1 | /usr/bin/logger -t certbot_cron'
