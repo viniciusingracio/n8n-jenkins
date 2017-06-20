@@ -1,4 +1,6 @@
 ---
 
+certbot_domain: rec-test.mconf.com
+
 rec_proxy_nginx_host: rec.mconf.com
 rec_proxy_nginx_s3_url: rec.mconf.com.s3-sa-east-1.amazonaws.com

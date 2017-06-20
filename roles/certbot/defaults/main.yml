@@ -1,0 +1,4 @@
+---
+
+# Domain get a certificate to
+certbot_domain: change-me.mconf.com

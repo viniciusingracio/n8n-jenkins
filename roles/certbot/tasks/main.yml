@@ -1,0 +1,12 @@
+# TODO: first deploy, if not running nginx yet, use --standalone
+#       or on deploy always --standalone, on cron --webroot
+# TODO: setup cron
+
+- name: Start the certbot container
+  docker_container:
+    name: certbot
+    image: certbot/certbot
+    command: 'certonly --webroot -w /var/www --non-interactive --register-unsafely-without-email --agree-tos --expand --domain {{ certbot_domain }}'
+    volumes:
+      - /var/www:/var/www # webroot
+      - /etc/letsencrypt:/etc/letsencrypt

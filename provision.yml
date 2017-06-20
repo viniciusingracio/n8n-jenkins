@@ -12,6 +12,7 @@
 - hosts: rec-proxy
   roles:
   - docker-host
+  - certbot
   - rec-proxy
 
 # BigBlueButton

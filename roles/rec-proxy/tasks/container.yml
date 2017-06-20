@@ -19,9 +19,10 @@
   docker_container:
     name: mconf-rec-proxy
     image: mconf/mconf-rec-proxy:latest
-    # restart_policy: unless-stopped
+    restart_policy: unless-stopped
     volumes:
       - /var/log/nginx:/var/log/nginx
+      - /var/www:/usr/share/nginx/html # for certbot --webroot
     published_ports:
       - 80:80
       - 443:443
