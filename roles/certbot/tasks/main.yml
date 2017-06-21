@@ -1,23 +1,27 @@
 # TODO: make a module with this?
-- name: Check if port 80 is used
+- name: check if port 80 is used
   become: true
   shell: netstat -tuln | grep :80
   register: port_80
   failed_when: False # never fail
 
+- name: check if port 80 open on ufw
+  become: true
+  shell: ufw status verbose | grep "80/tcp.*ALLOW IN"
+  register: ufw_port_80
+  failed_when: False # never fail
 
 #
 # If nothing binding to port 80, use certbot standalone
 #
 
-- name: Open firewall for certbot standalone
+- name: open firewall for certbot standalone
   become: true
   ufw: rule=allow port=80 proto=tcp
   notify: restart ufw
-  register: certbot_standalone_fw
-  when: port_80.rc == 1
+  when: port_80.rc == 1 and ufw_port_80.rc == 1 # port not used and not open yet
 
-- name: Start the certbot container standalone
+- name: start the certbot container standalone
   docker_container:
     name: certbot
     image: certbot/certbot
@@ -29,21 +33,20 @@
       - 80:80
     # auto_remove: true # on ansible 2.4
     detach: false
-  when: port_80.rc == 1
-  register: certb
+  when: port_80.rc == 1 # port not used
 
-- name: Close firewall after certbot standalone
+- name: close firewall after certbot standalone
   become: true
   ufw: rule=allow port=80 proto=tcp delete=true
   notify: restart ufw
-  when: port_80.rc == 1 and certbot_standalone_fw.changed
+  when: ufw_port_80.rc == 1 # port was not open before
 
 
 #
 # If something already using port 80, try webroot
 #
 
-- name: Start the certbot container webroot
+- name: start the certbot container webroot
   docker_container:
     name: certbot
     image: certbot/certbot
