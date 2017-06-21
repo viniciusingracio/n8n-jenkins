@@ -6,7 +6,7 @@ certbot_domain: change-me.mconf.com
 # Certbot commands
 certbot_base_cmd: 'certonly --non-interactive --register-unsafely-without-email --agree-tos --expand --domain {{ certbot_domain }}'
 certbot_webroot_cmd: '{{ certbot_base_cmd }} --webroot -w /var/www'
-certbot_standalone_cmd: '{{ certbot_base_cmd }} --standalone'
+certbot_standalone_cmd: '{{ certbot_base_cmd }} --standalone --preferred-challenges http'
 
 # So other roles can pick up on this to point to certificates
 certbot_cert_path_root: '/etc/letsencrypt'

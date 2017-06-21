@@ -24,6 +24,7 @@
     command: '{{ certbot_standalone_cmd }}'
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt
+      - /var/log/letsencrypt:/var/log/letsencrypt
     published_ports:
       - 80:80
     # auto_remove: true # on ansible 2.4
@@ -50,6 +51,7 @@
     volumes:
       - /var/www:/var/www # webroot
       - /etc/letsencrypt:/etc/letsencrypt
+      - /var/log/letsencrypt:/var/log/letsencrypt
     # auto_remove: true # on ansible 2.4
     detach: false
   when: port_80.rc == 0
