@@ -1,14 +1,20 @@
+- hosts: with-certbot
+  roles:
+  - certbot
+
 # Recording workers
 - hosts: rec-worker
   roles:
-  - docker-host
   - rec-worker
 
 # Recording proxies
 - hosts: rec-proxy
   roles:
-  - docker-host
   - certbot
+  - rec-proxy
+- hosts: rec-proxy-self-signed
+  roles:
+  # - self-signed-cert
   - rec-proxy
 
 # BigBlueButton

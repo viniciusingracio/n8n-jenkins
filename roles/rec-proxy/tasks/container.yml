@@ -23,12 +23,12 @@
     restart_policy: unless-stopped
     volumes:
       - /var/log/nginx:/var/log/nginx
-      - /var/www:/usr/share/nginx/html # for certbot --webroot
-      - '{{ certbot_cert_path_root }}:{{ certbot_cert_path_root }}'
+      - /var/www:/usr/share/nginx/html # for certbot --webroot and static pages
+      - '{{ rec_proxy_cert_path_root }}:{{ rec_proxy_cert_path_root }}'
     published_ports:
       - 80:80
       - 443:443
     env:
       NGINX_HOST: '{{ rec_proxy_nginx_host }}'
-      NGINX_CERT_PATH: '{{ certbot_cert_path }}'
+      NGINX_CERT_PATH: '{{ rec_proxy_cert_path }}'
       NGINX_S3_URL: '{{ rec_proxy_nginx_s3_url }}'

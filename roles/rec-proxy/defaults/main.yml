@@ -8,6 +8,10 @@ rec_proxy_repo_url: git@github.com:mconftec/mconf-rec-proxy.git
 rec_proxy_repo_ref: master
 
 # Domain nginx will respond to
-rec_proxy_nginx_host: rec.mconf.com
+rec_proxy_nginx_host: '{{ inventory_hostname }}'
 # S3 URL to proxy requests to
-rec_proxy_nginx_s3_url: rec.mconf.com.s3-sa-east-1.amazonaws.com
+rec_proxy_nginx_s3_url: something-valid.s3-sa-east-1.amazonaws.com
+
+# Host paths that have the HTTPS certificates to be used
+rec_proxy_cert_path_root: /etc/nginx/ssl
+rec_proxy_cert_path: /etc/nginx/ssl/live
