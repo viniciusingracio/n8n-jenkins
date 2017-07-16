@@ -11,16 +11,16 @@ First run
 
 ```bash
 # lxc
-ansible-playbook -i hosts -l rec-proxy setup.yml --ask-pass --ask-sudo-pass --extra-vars "ansible_user=ubuntu common_ufw_ipv6=false"
+ansible-playbook -i envs/dev -l rec-proxy setup.yml --ask-pass --ask-sudo-pass --extra-vars "ansible_user=ubuntu common_ufw_ipv6=false"
 
 # digital ocean
-ansible-playbook -i hosts -l rec-proxy setup.yml --extra-vars "ansible_user=root"
+ansible-playbook -i envs/dev -l rec-proxy setup.yml --extra-vars "ansible_user=root"
 ```
 
 Provisioning
 
 ```bash
-ansible-playbook -i hosts -l rec-proxy provision.yml
+ansible-playbook -i envs/dev -l rec-proxy provision.yml
 ```
 
 Setting up an lxc, using just the `ubuntu` user
@@ -31,9 +31,9 @@ ansible-playbook -l 10.0.3.105 setup.yml --ask-pass --ask-sudo-pass --extra-vars
 
 Utils:
 
-* Start at a given point: `ansible-playbook -i hosts -l rec-proxy --start-at-task="rec-proxy : Download rec-proxy source code" provision.yml`
-* List hosts only (don't actually run anything in the server): `ansible-playbook -i hosts -l rec-proxy --list-hosts`
-* List tasks only (don't actually run anything in the server): `ansible-playbook -i hosts -l rec-proxy --list-tasks`
+* Start at a given point: `ansible-playbook -i envs/dev -l rec-proxy --start-at-task="rec-proxy : Download rec-proxy source code" provision.yml`
+* List hosts only (don't actually run anything in the server): `ansible-playbook -i envs/dev -l rec-proxy --list-hosts`
+* List tasks only (don't actually run anything in the server): `ansible-playbook -i envs/dev -l rec-proxy --list-tasks`
 * To debug something, add a task like: `- debug: var=my_registered_var`
 * Run setup for a new local lxc server: `ansible-playbook -i '10.0.3.187,' setup.yml --extra-vars="ansible_user=ubuntu deploy_user=ubuntu" --ask-pass --ask-sudo`
 
