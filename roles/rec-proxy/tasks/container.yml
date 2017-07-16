@@ -5,8 +5,16 @@
     version: '{{ rec_proxy_repo_ref }}'
     depth: 1 # just a snapshot
     accept_hostkey: true
+    force: yes
   when: rec_proxy_build_from_source
   register: rec_proxy_code
+
+# - name: Copy local rec-proxy source code
+#   synchronize:
+#     src: /home/leonardo/Dev/mconftec/mconf-rec-proxy/
+#     dest: ~/src/rec-proxy
+#   when: rec_proxy_build_from_source
+#   register: rec_proxy_code
 
 # TODO: remove old images
 - name: Build the rec-proxy docker image
