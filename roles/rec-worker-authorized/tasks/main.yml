@@ -1,0 +1,15 @@
+- name: Create the rec-worker user on the server
+  become: true
+  user:
+    name: '{{ rec_worker_authorized_user }}'
+    shell: /bin/bash
+    groups: tomcat7 # this gives the user permission to read raw recordings
+    append: yes
+
+- name: Set up authorized keys
+  become: true
+  authorized_key:
+    user: '{{ rec_worker_authorized_user }}'
+    state: present
+    exclusive: yes
+    key: "{{ lookup('file', rec_worker_authorized_ssh_key_pub) }}"

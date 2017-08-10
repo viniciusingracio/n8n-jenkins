@@ -21,3 +21,4 @@
 - hosts: bigbluebutton
   roles:
   - bigbluebutton
+  - rec-worker-authorized

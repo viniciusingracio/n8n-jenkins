@@ -9,3 +9,6 @@ ansible_user: mconf
 
 # user used to deploy the applications
 deploy_user: mconf
+# to upload a local ssh key for the deploy user
+# deploy_user_ssh_key: "envs/{{ env }}/files/id_rsa"
+# deploy_user_ssh_key_pub: "envs/{{ env }}/files/id_rsa.pub"

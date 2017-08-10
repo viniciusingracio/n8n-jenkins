@@ -29,11 +29,26 @@ Setting up an lxc, using just the `ubuntu` user
 ansible-playbook -l 10.0.3.105 setup.yml --ask-pass --ask-sudo-pass --extra-vars "ansible_user=ubuntu deploy_user=ubuntu"
 ```
 
-Utils:
+### Other plays
+
+#### authorize-rec-worker
+
+Creates a user in a web conference server and allows it to be accessed by a given ssh key. Example:
+
+```
+# set up the user
+ansible-playbook -i envs/dev/hosts authorize-rec-worker.yml
+
+# test the access
+ssh -tA rec-worker@10.0.3.245 -i envs/dev/files/rec_worker
+```
+
+### Utils
 
 * Start at a given point: `ansible-playbook -i envs/dev -l rec-proxy --start-at-task="rec-proxy : Download rec-proxy source code" provision.yml`
 * List hosts only (don't actually run anything in the server): `ansible-playbook -i envs/dev -l rec-proxy --list-hosts`
 * List tasks only (don't actually run anything in the server): `ansible-playbook -i envs/dev -l rec-proxy --list-tasks`
+* Dry-run, check mode (don't actually run anything in the server): `ansible-playbook -i envs/dev -l rec-proxy --check`
 * To debug something, add a task like: `- debug: var=my_registered_var`
 * Run setup for a new local lxc server: `ansible-playbook -i '10.0.3.187,' setup.yml --extra-vars="ansible_user=ubuntu deploy_user=ubuntu" --ask-pass --ask-sudo`
 

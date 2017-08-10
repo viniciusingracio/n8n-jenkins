@@ -1,0 +1,4 @@
+---
+rec_worker_authorized_user: rec-worker
+rec_worker_authorized_ssh_key: "envs/{{ env }}/files/rec_worker"
+rec_worker_authorized_ssh_key_pub: "envs/{{ env }}/files/rec_worker.pub"

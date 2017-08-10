@@ -1,0 +1,3 @@
+- hosts: bigbluebutton
+  roles:
+  - rec-worker-authorized

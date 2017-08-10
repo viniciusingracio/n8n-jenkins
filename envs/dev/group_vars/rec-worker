@@ -1,4 +1,5 @@
 ---
-
+deploy_user_ssh_key: "envs/{{ env }}/files/rec_worker"
+deploy_user_ssh_key_pub: "envs/{{ env }}/files/rec_worker.pub"
 rec_worker_redis_host: 10.0.3.245
 rec_worker_repo_ref: v1.1.0-rap-on-resque-with-docker

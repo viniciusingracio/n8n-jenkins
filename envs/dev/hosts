@@ -5,4 +5,4 @@
 10.0.3.5
 
 [bigbluebutton]
-10.0.3.105 ansible_user=ubuntu deploy_user=ubuntu common_ufw_ipv6=false
+10.0.3.245 ansible_user=ubuntu deploy_user=ubuntu common_ufw_ipv6=false
