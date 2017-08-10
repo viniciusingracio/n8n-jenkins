@@ -1,4 +1,4 @@
 ---
 
-redis_host: 10.0.3.105
-redis_port: 6379
+rec_worker_redis_host: 10.0.3.245
+rec_worker_repo_ref: v1.1.0-rap-on-resque-with-docker
