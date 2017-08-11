@@ -1,0 +1,16 @@
+- name: Update apt
+  become: true
+  apt: update_cache=yes
+
+- name: Install common packages
+  become: true
+  apt:
+    name: '{{ item }}'
+    state: present
+  with_items:
+    - curl
+    - git
+    - wget
+    - htop
+    - vim
+    - tree

@@ -1,0 +1,45 @@
+- name: Create remote user
+  become: true
+  user:
+    name: '{{ deploy_user }}'
+    shell: /bin/bash
+    groups: adm,sudo,syslog
+    append: yes
+
+- name: Set up authorized keys
+  become: true
+  authorized_key:
+    user: '{{ deploy_user }}'
+    state: present
+    key: '{{ item }}'
+  with_file: # TODO: this should be configurable
+    - public_keys/daronco.pub
+
+- name: Add to sudoers
+  become: true
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^{{ deploy_user }}\s'
+    line: '{{ deploy_user }} ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+
+# For some servers we want to upload an specific ssh key for the deploy user
+- name: Set up ssh key (private)
+  become: true
+  copy:
+    src: '{{ deploy_user_ssh_key }}'
+    dest: '/home/{{ deploy_user }}/.ssh/id_rsa'
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_user }}'
+    mode: 0600
+  when: deploy_user_ssh_key is defined
+- name: Set up ssh key (public)
+  become: true
+  copy:
+    src: '{{ deploy_user_ssh_key_pub }}'
+    dest: '/home/{{ deploy_user }}/.ssh/id_rsa.pub'
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_user }}'
+    mode: 0644
+  when: deploy_user_ssh_key_pub is defined
