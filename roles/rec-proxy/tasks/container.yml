@@ -3,7 +3,7 @@
     repo: '{{ rec_proxy_repo_url }}'
     dest: ~/src/rec-proxy
     version: '{{ rec_proxy_repo_ref }}'
-    depth: 1 # just a snapshot
+    # depth: 1 # can't use it otherwise won't update the code
     accept_hostkey: true
     force: yes
   when: rec_proxy_build_from_source

@@ -3,8 +3,7 @@
     repo: '{{ rec_worker_repo_url }}'
     dest: ~/src/rec-worker
     version: '{{ rec_worker_repo_ref }}'
-    # update: yes
-    depth: 1 # just a snapshot
+    # depth: 1 # can't use it otherwise won't update the code
     accept_hostkey: true
     force: true
   when: rec_worker_build_from_source

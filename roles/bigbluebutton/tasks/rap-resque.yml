@@ -23,7 +23,7 @@
     repo: '{{ bigbluebutton_external_rap_repo }}'
     dest: ~/src/bigbluebutton
     version: '{{ bigbluebutton_external_rap_ref }}'
-    depth: 1 # just a snapshot
+    # depth: 1 # can't use it otherwise won't update the code
   when: bigbluebutton_external_rap
 
 - name: Install new rap scripts
