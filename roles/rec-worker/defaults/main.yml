@@ -8,8 +8,8 @@ rec_worker_redis_port: 6379
 rec_worker_build_from_source: true
 
 # Fetch source code from
-rec_worker_repo_url: https://github.com/daronco/bigbluebutton.git
-rec_worker_repo_ref: v1.1.0-rap-on-resque
+rec_worker_repo_url: git@github.com:mconftec/bigbluebutton.git
+rec_worker_repo_ref: v1.1.0-rap-on-resque-with-docker
 
 # Queues that the worker will process
 rec_worker_queues: 'rap:publish,rap:process'

@@ -1,3 +1,20 @@
+# this would not be necessary if the rap scripts created the directories they use
+- name: Create shared directories
+  become: true
+  file:
+    path: '{{ item }}'
+    state: directory
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_user }}'
+    mode: 0755
+  with_items:
+    - /var/bigbluebutton/recording/raw
+    - /var/bigbluebutton/recording/status/archived
+    - /var/bigbluebutton/recording/status/processed
+    - /var/bigbluebutton/recording/status/published
+    - /var/bigbluebutton/recording/status/recorded
+    - /var/bigbluebutton/recording/status/sanity
+
 - name: Download rec-worker source code
   git:
     repo: '{{ rec_worker_repo_url }}'
