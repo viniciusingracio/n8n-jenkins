@@ -47,10 +47,11 @@ ssh -tA rec-worker@10.0.3.245 -i envs/dev/files/rec_worker
 
 * Start at a given point: `ansible-playbook -i envs/dev -l rec-proxy --start-at-task="rec-proxy : Download rec-proxy source code" provision.yml`
 * List hosts only (don't actually run anything in the server): `ansible-playbook -i envs/dev -l rec-proxy --list-hosts`
-* List tasks only (don't actually run anything in the server): `ansible-playbook -i envs/dev -l rec-proxy --list-tasks`
+* List tasks and hosts only (don't actually run anything in the server): `ansible-playbook -i envs/dev -l rec-proxy --list-tasks --list-hosts`
 * Dry-run, check mode (don't actually run anything in the server): `ansible-playbook -i envs/dev -l rec-proxy --check`
 * To debug something, add a task like: `- debug: var=my_registered_var`
 * Run setup for a new local lxc server: `ansible-playbook -i '10.0.3.187,' setup.yml --extra-vars="ansible_user=ubuntu deploy_user=ubuntu" --ask-pass --ask-sudo`
+* Run just a set of commands (e.g. the firewall): `ansible-playbook -i envs/com/hosts setup.yml --tags ufw`
 
 ### Notes
 

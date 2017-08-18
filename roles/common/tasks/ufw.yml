@@ -1,5 +1,7 @@
 # to verify ufw configuration run:
-# sudo ufw status verbose
+#   sudo ufw status verbose
+# and all rules with
+#   sudo iptables -S
 
 - name: Install ufw
   become: true
@@ -21,20 +23,20 @@
   notify:
     - restart ufw
 
-- name: Configure ufw defaults
+- name: Configure default rules
+  become: true
+  ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
+  with_items:
+    - { rule: 'limit', port: '{{ ansible_port | default("22") }}', proto: 'tcp' }
+  notify:
+    - restart ufw
+
+- name: Block all incoming and allow all outgoing
   become: true
   ufw: direction={{ item.direction }} policy={{ item.policy }}
   with_items:
     - { direction: 'incoming', policy: 'deny' }
     - { direction: 'outgoing', policy: 'allow' }
-  notify:
-    - restart ufw
-
-- name: Configure ufw rules
-  become: true
-  ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
-  with_items:
-    - { rule: 'limit', port: '{{ ansible_port | default("22") }}', proto: 'tcp' }
   notify:
     - restart ufw
 

@@ -86,6 +86,8 @@
   when: not bigbluebutton_redis_bind
   notify: restart redis
 
-- include: ufw.yml tags=ufw,firewall
+- include: ufw.yml
+  tags: [ufw,firewall]
 
-- include: rap-resque.yml tags=rap
+# - include: rap-resque.yml
+#   tags: [rap]

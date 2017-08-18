@@ -1,4 +1,4 @@
 ---
 
-# Enable IPv6 on ufw
+# Enable (true) or disable IPv6 on ufw
 common_ufw_ipv6: true

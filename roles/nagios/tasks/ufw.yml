@@ -1,0 +1,8 @@
+- name: Configure ufw rules for Nagios
+  become: true
+  ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
+  with_items:
+    - { rule: 'allow', port: 8080, proto: 'tcp' }
+    - { rule: 'allow', port: 5667, proto: 'tcp' }
+  notify:
+    - restart ufw

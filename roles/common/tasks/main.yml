@@ -1,3 +1,5 @@
 - include: deploy-user.yml
-- include: apt-packages.yml tags=apt
-- include: ufw.yml tags=ufw,firewall
+- include: apt-packages.yml
+  tags: [apt]
+- include: ufw.yml
+  tags: [ufw,firewall]

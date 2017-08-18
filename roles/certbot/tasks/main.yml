@@ -60,4 +60,5 @@
   when: port_80.rc == 0
 
 
-- include: cron.yml tags=cron
+- include: cron.yml
+  tags: [cron]

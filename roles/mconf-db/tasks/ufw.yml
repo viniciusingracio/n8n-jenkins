@@ -1,0 +1,8 @@
+- name: Configure ufw rules for the database and redis
+  become: true
+  ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
+  with_items:
+    - { rule: 'allow', port: 3306, proto: 'tcp' } # mysql
+    - { rule: 'allow', port: 6379, proto: 'tcp' } # redis
+  notify:
+    - restart ufw

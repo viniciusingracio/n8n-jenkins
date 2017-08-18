@@ -17,6 +17,36 @@
   # - self-signed-cert
   - rec-proxy
 
+# WordPress sites
+- hosts: wp
+  roles:
+  - wp
+
+# Mconf-DB
+- hosts: mconf-db
+  roles:
+  - mconf-db
+
+# Mconf-Web
+- hosts: mconf-web
+  roles:
+  - mconf-web
+
+# Mconf-LB
+- hosts: mconf-lb
+  roles:
+  - mconf-lb
+
+# Mconf-Console
+- hosts: mconf-console
+  roles:
+  - mconf-console
+
+# Nagios
+- hosts: nagios
+  roles:
+  - nagios
+
 # BigBlueButton
 - hosts: bigbluebutton
   roles:

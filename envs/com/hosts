@@ -1,2 +1,17 @@
+[mconf-db]
+db.mconf.com
+
+[mconf-console]
+console.mconf.com
+
+[mconf-lb]
+cloud.mconf.com
+
+[nagios]
+cloud.mconf.com
+
 [rec-proxy]
-rec.mconf.com # 192.241.169.115
+rec.mconf.com
+
+[wp]
+mconf.com

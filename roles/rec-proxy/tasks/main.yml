@@ -1,2 +1,4 @@
-- include: container.yml tags=container,docker
-- include: ufw.yml tags=ufw,firewall
+- include: container.yml
+  tags: [container,docker]
+- include: ufw.yml
+  tags: [ufw,firewall]
