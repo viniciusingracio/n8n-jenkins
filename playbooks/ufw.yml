@@ -1,0 +1,22 @@
+# This playbook installs ufw with default configurations, blocking
+# all incoming traffic except for the port being used by ssh.
+# Then it applies all rules specified in `ufw_rules`.
+
+- name: Install ufw with default configurations
+  hosts: all
+  tasks:
+    - include_vars: ../roles/common/defaults/main.yml
+    - include: ../roles/common/tasks/ufw.yml
+
+- name: Configure custom ufw rules
+  hosts: all
+  handlers:
+    - include: ../roles/handlers/handlers/main.yml
+  tasks:
+    - name: Configure custom ufw rules
+      become: true
+      ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
+      with_items: "{{ ufw_rules }}"
+      when: ufw_rules is defined
+      notify:
+        - restart ufw

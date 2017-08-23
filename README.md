@@ -7,29 +7,39 @@
 
 ### Run
 
-First run
+There are two main playbooks: `setup.yml` and `provision.yml`. The first one will a basic setup of the server, creating the deploy user, installing some basic packages and other common tasks. The second playbook is used to provision and deploy an application to the servers.
+
+On the irst run, use `setup.yml`. Examples:
 
 ```bash
-# lxc
+# lxc, all 'rec-proxy' servers
 ansible-playbook -i envs/dev -l rec-proxy setup.yml --ask-pass --ask-sudo-pass --extra-vars "ansible_user=ubuntu common_ufw_ipv6=false"
 
-# digital ocean
+# lxc, a single server by IP
+ansible-playbook -l 10.0.3.105 setup.yml --ask-pass --ask-sudo-pass --extra-vars "ansible_user=ubuntu deploy_user=ubuntu"
+
+# digital ocean, all 'rec-proxy' servers
 ansible-playbook -i envs/dev -l rec-proxy setup.yml --extra-vars "ansible_user=root"
 ```
 
-Provisioning
+Then, to provision and deploy an application, use `provision.yml`. Examples:
 
 ```bash
 ansible-playbook -i envs/dev -l rec-proxy provision.yml
 ```
 
-Setting up an lxc, using just the `ubuntu` user
+### Other playbooks
+
+#### ufw
+
+Install ufw installs ufw with default configurations, blocking all incoming traffic except for the port being used by ssh. Then it applies all rules specified in `ufw_rules` to, for example, open other ports.
+
+Example:
 
 ```
-ansible-playbook -l 10.0.3.105 setup.yml --ask-pass --ask-sudo-pass --extra-vars "ansible_user=ubuntu deploy_user=ubuntu"
+# set up the user
+ansible-playbook -i "10.0.3.186," playbooks/ufw.yml --ask-pass --ask-sudo-pass --extra-vars '{"ansible_user": "ubuntu", "common_ufw_ipv6": false, "ufw_rules": [{"rule": "allow", "port": 80, "proto": "tcp"}, {"rule": "reject", "port": 3000, "proto": "tcp"}]}'
 ```
-
-### Other plays
 
 #### authorize-rec-worker
 
@@ -37,7 +47,7 @@ Creates a user in a web conference server and allows it to be accessed by a give
 
 ```
 # set up the user
-ansible-playbook -i envs/dev/hosts authorize-rec-worker.yml
+ansible-playbook -i envs/dev playbooks/authorize-rec-worker.yml
 
 # test the access
 ssh -tA rec-worker@10.0.3.245 -i envs/dev/files/rec_worker
