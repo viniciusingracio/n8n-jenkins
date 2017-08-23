@@ -3,3 +3,6 @@ lb2.mconf.org
 
 [mconf-web]
 mconf.org
+
+[nagios]
+lb2.mconf.org
