@@ -1,0 +1,17 @@
+- name: Configure ufw rules for Kurento
+  become: true
+  ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
+  with_items:
+    - { rule: 'allow', port: 5060, proto: 'tcp' } # sip
+    - { rule: 'allow', port: 5060, proto: 'udp' }
+    - { rule: 'allow', port: 8443, proto: 'tcp' } # secure websocket
+    - { rule: 'allow', port: 8443, proto: 'udp' }
+    - { rule: 'allow', port: 8889, proto: 'tcp' } # dev websocket
+    - { rule: 'allow', port: 8889, proto: 'udp' }
+    - { rule: 'allow', port: 8888, proto: 'tcp' } # bbb-web
+    - { rule: 'allow', port: 8888, proto: 'udp' }
+    - { rule: 'allow', port: 3008, proto: 'tcp' } # node server
+    - { rule: 'allow', port: 3008, proto: 'udp' }
+    - { rule: 'allow', port: '49152:65535', proto: 'udp' } # media
+  notify:
+    - restart ufw

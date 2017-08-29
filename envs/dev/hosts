@@ -6,3 +6,9 @@
 
 [rec-worker]
 10.0.3.200
+
+[kurento]
+kurento-desktopsharing.mconf.com ansible_user=root deploy_user=root
+
+[mconf-live]
+kurento-desktopsharing.mconf.com ansible_user=root deploy_user=root
