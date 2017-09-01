@@ -1,9 +1,0 @@
----
-
-certbot_domain: '{{ inventory_hostname }}'
-
-rec_proxy_nginx_host: '{{ inventory_hostname }}'
-rec_proxy_nginx_s3_url: rec.mconf.com.s3-sa-east-1.amazonaws.com
-
-rec_proxy_cert_path_root: '{{ certbot_cert_path_root }}'
-rec_proxy_cert_path: '{{ certbot_cert_path }}'
