@@ -47,6 +47,11 @@
   roles:
   - nagios
 
+# Zabbix
+- hosts: zabbix
+  roles:
+  - zabbix
+
 # BigBlueButton
 - hosts: bigbluebutton
   roles:

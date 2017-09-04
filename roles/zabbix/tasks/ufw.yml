@@ -1,0 +1,10 @@
+- name: Configure ufw rules for Zabbix
+  become: true
+  ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
+  with_items:
+    - { rule: 'allow', port: 80, proto: 'tcp' }
+    - { rule: 'allow', port: 443, proto: 'tcp' }
+    - { rule: 'allow', port: 10050, proto: 'tcp' } # passive checks
+    - { rule: 'allow', port: 10051, proto: 'tcp' } # active checks
+  notify:
+    - restart ufw
