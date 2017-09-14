@@ -1,0 +1,24 @@
+- name: Template sql script
+  hosts: all
+  tasks:
+    - name: Install python mysql bindings
+      become: yes
+      apt: name=python-mysqldb state=installed
+    - name: Compile the SQL from template
+      template:
+        src: "{{ sql_template }}"
+        dest: "/tmp/{{ sql_template | basename }}"
+    - name: Run the SQL file
+      mysql_db:
+        # credentials should be on ~/.my.cnf
+        # login_password: ""
+        # login_user: ""
+        login_host: "{{ sql_host | default('localhost') }}"
+        login_port: "{{ sql_port | default(3306) }}"
+        state: import
+        name: "{{ sql_db }}"
+        target: "/tmp/{{ sql_template | basename }}"
+    - name: Delete SQL script
+      file:
+        path: "/tmp/{{ sql_template | basename }}"
+        state: absent

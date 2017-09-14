@@ -53,6 +53,23 @@ ansible-playbook -i envs/dev playbooks/authorize-rec-worker.yml
 ssh -tA rec-worker@10.0.3.245 -i envs/dev/files/rec_worker
 ```
 
+#### run-sql
+
+Runs an SQL file from a template into a database server. Example:
+
+```
+ansible-playbook -i envs/prod/com-staging -l dev.mconf.com playbooks/run-sql.yml --extra-vars "sql_template=../files/templates/mconf-com-room.sql.j2 sql_db='dev_mconf_com' sql_host='123.123.123.123' sql_room='Comunidade EAD' sql_room_param='param-comunidade-ead' sql_moderator_pw='mod99281' sql_attendee_pw='convidado244' ansible_python_interpreter=/usr/bin/python"
+```
+
+The credentials to access the server should be set a the `~/.my.cnf` in the server being sshed to. Example:
+
+```
+[client]
+port=3306
+password=929dk92k29d29i
+user=mconf
+```
+
 ### Utils
 
 * Start at a given point: `ansible-playbook -i envs/dev -l rec-proxy --start-at-task="rec-proxy : Download rec-proxy source code" provision.yml`

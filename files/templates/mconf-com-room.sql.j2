@@ -1,0 +1,65 @@
+-- Vars:
+-- sql_room          : the name of the room e.g. "Comunidade Amigável"
+-- sql_room_param    : param in the URL e.g. "comunidade-amigavel"
+-- sql_moderator_pw  : moderator password
+-- sql_attendee_pw   : attendee password
+-- sql_post_template : post to be used as template e.g. "Sala: Template"
+
+{% set room = sql_room | default('test') %}
+{% set room_param = sql_room_param | default('test') %}
+{% set mod_pw = sql_moderator_pw | default('mod') %}
+{% set att_pw = sql_attendee_pw | default('att') %}
+{% set template_room = sql_post_template | default('Sala: Template') %}
+{% set meeting_id = room + ansible_date_time.epoch %}
+{% set meeting_id = meeting_id | hash('sha1') %}
+{% set meeting_id = meeting_id[0:12] %}
+
+{% macro page_content(name) -%}
+[section id="room-logo" color_set="0" separator="none" wrapper="true"]
+[spacer size="40px" class="hide-on-mobile"]
+[row]
+[column grid="8" offset="2"]
+<div id="room-name"><span>Sala virtual</span><h1>{{ name }}</h1></div>
+[/column]
+[/row]
+[/section]
+
+[section id="room-credentials" color_set="0" separator="none" wrapper="true"]
+
+[row]
+[column grid="4" offset="4"]
+
+[bigbluebutton token=@@@TOKEN@@@ submit="Entrar" name_label="Nome completo:" password_label="Senha:" waiting_text="Olá <strong>%USER%</strong>. A sessão ainda não começou, aguarde e você será redirecionado automaticamente assim que ela iniciar!<div class=\'loading\'><div class=\'rect1\'></div><div class=\'rect2\'></div><div class=\'rect3\'></div><div class=\'rect4\'></div><div class=\'rect5\'></div></div>" welcome="Olá, bem-vindo(a) à sala <b>%%CONFNAME%%</b>!"]
+
+<div class="powered-by-mconf-tec"><a href="/"><img src="/wp-content/uploads/2014/09/MconfTec-icon-small.png" alt="Mconf Tecnologia"/></a><span>Fornecido pela <a href="/">Mconf Tecnologia</a></span></div>
+
+[/column]
+[/row]
+
+[spacer size="30px"]
+[/section]
+{% endmacro -%}
+
+
+-- Create the room
+INSERT INTO wp_bigbluebutton(meetingID, meetingName, meetingVersion, attendeePW, moderatorPW, waitForModerator, recorded)
+VALUES ('{{ meeting_id }}', '{{ room }}', {{ ansible_date_time.epoch }}, '{{ att_pw }}', '{{ mod_pw }}', 1, 1);
+
+
+-- Create the post
+INSERT INTO wp_posts(post_author, post_date, post_date_gmt, post_content, post_title, post_status, comment_status, ping_status, post_password, post_name, post_modified, post_modified_gmt, post_parent, menu_order, post_type, post_excerpt, to_ping, pinged, post_content_filtered)
+VALUES (1, NOW(), NOW(), REPLACE('{{ page_content(room) }}', '@@@TOKEN@@@', (SELECT meetingID FROM wp_bigbluebutton ORDER BY id DESC LIMIT 1)), 'Sala: {{ room }}', 'publish', 'closed', 'closed', '', '{{ room_param }}', NOW(), NOW(), 0, 0, 'page', '', '', '', '');
+-- TODO: set guid to https://beta.mconf.com/?page_id=1227 ??
+
+
+-- Copy postmeta from a template and set it to the new post
+CREATE TEMPORARY TABLE tmp_posts SELECT * FROM wp_postmeta WHERE post_id = (SELECT id FROM wp_posts WHERE post_title = '{{ template_room }}' AND post_type = 'page');
+UPDATE tmp_posts SET post_id = (SELECT id FROM wp_posts ORDER BY id DESC LIMIT 1);
+INSERT INTO wp_postmeta(post_id, meta_key, meta_value) SELECT post_id, meta_key, meta_value FROM tmp_posts;
+DROP TEMPORARY TABLE IF EXISTS tmp_posts;
+
+-- Change the postmeta values that are relevant
+UPDATE wp_postmeta SET meta_value = '{{ room }}' WHERE meta_key = '_yoast_wpseo_focuskw_text_input';
+UPDATE wp_postmeta SET meta_value = '{{ room }}' WHERE meta_key = '_yoast_wpseo_focuskw';
+UPDATE wp_postmeta SET meta_value = 'Sala virtual: {{ room }} • Mconf.com' WHERE meta_key = '_yoast_wpseo_title';
+UPDATE wp_postmeta SET meta_value = 'Sala virtual {{ room }} no Mconf.com.' WHERE meta_key = '_yoast_wpseo_metadesc';
