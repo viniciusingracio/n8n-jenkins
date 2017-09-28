@@ -30,6 +30,14 @@ ansible-playbook -i envs/dev -l rec-proxy provision.yml
 
 ### Other playbooks
 
+#### upgrade-so
+
+Upgrades the packages in the server and cleans unused packages (basically "apt-get dist-upgrade" + "autoremove"):
+
+```
+ansible-playbook -i envs/prod/com-staging -l rec-proxy playbooks/upgrade-so.yml
+```
+
 #### ufw
 
 Install ufw installs ufw with default configurations, blocking all incoming traffic except for the port being used by ssh. Then it applies all rules specified in `ufw_rules` to, for example, open other ports.

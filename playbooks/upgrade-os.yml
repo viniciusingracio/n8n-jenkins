@@ -1,0 +1,16 @@
+- name: Upgrade the O.S.
+  hosts: all
+  tasks:
+    - name: Update and upgrade apt packages
+      become: true
+      apt:
+        upgrade: yes
+        update_cache: yes
+        cache_valid_time: 86400 # One day
+        autoremove: yes
+    - name: Remove dependencies that are no longer required
+      become: yes
+      # TODO: for some reason the apt module doesn't remove the packages
+      # might be related to https://github.com/ansible/ansible-modules-core/issues/4029
+      # apt: autoremove=yes
+      shell: apt-get -y autoremove --purge 
