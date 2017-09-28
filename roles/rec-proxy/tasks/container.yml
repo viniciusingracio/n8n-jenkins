@@ -40,3 +40,5 @@
       NGINX_HOST: '{{ rec_proxy_nginx_host }}'
       NGINX_CERT_PATH: '{{ rec_proxy_cert_path }}'
       NGINX_S3_URL: '{{ rec_proxy_nginx_s3_url }}'
+      NGINX_S3_PROTOCOL: '{{ rec_proxy_nginx_s3_protocol }}'
+      NGINX_S3_BUCKET: '{{ rec_proxy_nginx_s3_bucket }}'
