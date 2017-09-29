@@ -1,0 +1,11 @@
+---
+
+# Domain to use in the registry
+docker_registry_host: https://change-me.mconf.com
+
+# S3 configurations
+docker_registry_s3_accesskey: CHANGE-ME
+docker_registry_s3_secretkey: ChaNGe-ME-seCReT
+docker_registry_s3_region: us-east-1
+docker_registry_s3_bucket: change-me
+# docker_registry_s3_keyid: myrandomsecret

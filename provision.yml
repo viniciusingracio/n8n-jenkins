@@ -10,7 +10,6 @@
 # Recording proxies
 - hosts: rec-proxy
   roles:
-  - certbot
   - rec-proxy
 - hosts: rec-proxy-self-signed
   roles:
@@ -67,3 +66,8 @@
 - hosts: kurento
   roles:
   - kurento
+
+# Docker registry
+- hosts: docker-registry
+  roles:
+  - docker-registry
