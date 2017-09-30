@@ -10,6 +10,7 @@
 # Recording proxies
 - hosts: rec-proxy
   roles:
+  - { role: certbot, when: certbot_enabled }
   - rec-proxy
 - hosts: rec-proxy-self-signed
   roles:

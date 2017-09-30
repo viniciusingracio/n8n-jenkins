@@ -9,36 +9,29 @@
   when: rec_proxy_build_from_source
   register: rec_proxy_code
 
-# - name: Copy local rec-proxy source code
-#   synchronize:
-#     src: /home/leonardo/Dev/mconftec/mconf-rec-proxy/
-#     dest: ~/src/rec-proxy
-#   when: rec_proxy_build_from_source
-#   register: rec_proxy_code
-
 # TODO: remove old images
 - name: Build the rec-proxy docker image
   docker_image:
     build_path: ~/src/rec-proxy/
-    name: mconf/mconf-rec-proxy
+    name: '{{ rec_proxy_image }}'
+    tag: '{{ rec_proxy_image_version }}'
     force: true
   when: rec_proxy_build_from_source and rec_proxy_code.changed
 
 - name: Start the rec-proxy container
   docker_container:
     name: mconf-rec-proxy
-    image: mconf/mconf-rec-proxy:latest
+    image: '{{ rec_proxy_image }}:{{ rec_proxy_image_version }}'
     restart_policy: unless-stopped
     volumes:
-      - /var/log/nginx:/var/log/nginx
-      - /var/www:/usr/share/nginx/html # for certbot --webroot and static pages
-      - '{{ rec_proxy_cert_path_root }}:{{ rec_proxy_cert_path_root }}'
+      - /var/www:/usr/local/openresty/nginx/html # for certbot --webroot and static pages
+      - '{{ rec_proxy_certs_path_root }}:{{ rec_proxy_certs_path_root }}'
     published_ports:
       - 80:80
       - 443:443
     env:
-      NGINX_HOST: '{{ rec_proxy_nginx_host }}'
-      NGINX_CERT_PATH: '{{ rec_proxy_cert_path }}'
-      NGINX_S3_URL: '{{ rec_proxy_nginx_s3_url }}'
-      NGINX_S3_PROTOCOL: '{{ rec_proxy_nginx_s3_protocol }}'
-      NGINX_S3_BUCKET: '{{ rec_proxy_nginx_s3_bucket }}'
+      APP_HOST: '{{ rec_proxy_app_host }}'
+      CERTS_PATH: '{{ rec_proxy_certs_path }}'
+      MEDIA_HOST: '{{ rec_proxy_media_host }}'
+      MEDIA_PROTOCOL: '{{ rec_proxy_media_protocol }}'
+      S3_BUCKET: '{{ rec_proxy_s3_bucket }}'

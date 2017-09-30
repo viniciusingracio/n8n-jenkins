@@ -1,19 +1,23 @@
 ---
 
 # Build docker image from src, otherwise will try to pull from hub
-rec_proxy_build_from_source: true
+rec_proxy_build_from_source: false
 
 # Fetch source code from
 rec_proxy_repo_url: git@github.com:mconftec/mconf-rec-proxy.git
-rec_proxy_repo_ref: v0.1.0
+rec_proxy_repo_ref: master
+
+# Docker image name and version
+rec_proxy_image: '{{ docker_registry_mconf }}/mconf/rec-server-proxy-s3-noauth'
+rec_proxy_image_version: 'latest'
 
 # Domain nginx will respond to
-rec_proxy_nginx_host: '{{ inventory_hostname }}'
+rec_proxy_app_host: '{{ inventory_hostname }}'
 # S3 URL to proxy requests to
-rec_proxy_nginx_s3_url: s3-sa-east-1.amazonaws.com
-rec_proxy_nginx_s3_protocol: http
-rec_proxy_nginx_s3_bucket: some-bucket
+rec_proxy_media_host: s3-sa-east-1.amazonaws.com
+rec_proxy_media_protocol: http
+rec_proxy_s3_bucket: some-bucket
 
 # Host paths that have the HTTPS certificates to be used
-rec_proxy_cert_path_root: /etc/nginx/ssl
-rec_proxy_cert_path: /etc/nginx/ssl/live
+rec_proxy_certs_path_root: /etc/nginx/ssl
+rec_proxy_certs_path: /etc/nginx/ssl/live

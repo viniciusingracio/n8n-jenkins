@@ -1,14 +1,20 @@
 ---
 # Variables here are applicable to all host groups
 
-# default python
+# Default python
 ansible_python_interpreter: /usr/bin/python3 # ubuntu >= 16.04
 
-# user used to ssh into the servers
+# User used to ssh into the servers
 ansible_user: mconf
 
-# user used to deploy the applications
+# User used to deploy the applications
 deploy_user: mconf
 # to upload a local ssh key for the deploy user
 # deploy_user_ssh_key: "envs/{{ env }}/files/id_rsa"
 # deploy_user_ssh_key_pub: "envs/{{ env }}/files/id_rsa.pub"
+
+# Default registry where images for Mconf components are pulled from
+docker_registry_mconf: 'hub.docker.mconf.com'
+
+# Disable certbot by default, enabled for specific roles/hosts
+certbot_enabled: false

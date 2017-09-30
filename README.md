@@ -87,6 +87,13 @@ user=mconf
 * To debug something, add a task like: `- debug: var=my_registered_var`
 * Run setup for a new local lxc server: `ansible-playbook -i '10.0.3.187,' setup.yml --extra-vars="ansible_user=ubuntu deploy_user=ubuntu" --ask-pass --ask-sudo`
 * Run just a set of commands (e.g. the firewall): `ansible-playbook -i envs/com/hosts setup.yml --tags ufw`
+* To copy files from a local repository to the server, use something like:
+    ```
+- name: Copy local rec-proxy source code
+  synchronize:
+    src: /home/leonardo/Dev/mconftec/mconf-rec-proxy/
+    dest: ~/src/rec-proxy
+    ```
 
 ### Notes
 
