@@ -1,10 +1,44 @@
 - name: Create the directory to store images
   become: yes
   file: path=/var/lib/registry state=directory recurse=yes
+  when: not docker_registry_s3
 
 - name: Create the directory to store letsencrypt files
   become: yes
   file: path=/etc/letsencrypt state=directory recurse=yes
+
+- name: Create the directory to store authentication files
+  become: yes
+  file: path=/etc/docker-registry/auth state=directory recurse=yes
+  when: docker_registry_auth
+
+- name: install python libraries
+  pip:
+    name={{ item }}
+    state=present
+  with_items:
+    - bcrypt
+    - passlib
+  when: docker_registry_auth
+
+- name: Create the user and password to access the registry
+  become: yes
+  htpasswd:
+    path: /etc/docker-registry/auth/passwd
+    name: '{{ docker_registry_auth_user }}'
+    password: '{{ docker_registry_auth_password }}'
+    crypt_scheme: plaintext
+    owner: root
+    mode: 0644
+  when: docker_registry_auth
+
+- name: Create the env file
+  become: yes
+  template:
+    src: docker-env.j2
+    dest: /etc/docker-registry/env
+    owner: root
+    mode: 0644
 
 - name: Start the docker registry container
   docker_container:
@@ -14,21 +48,7 @@
     volumes:
       # - /var/lib/registry:/var/lib/registry
       - /etc/letsencrypt:/etc/letsencrypt
+      - /etc/docker-registry/auth:/etc/docker-registry/auth
     published_ports:
       - 443:5000
-    env:
-      REGISTRY_HTTP_ADDR: '0.0.0.0:5000'
-      REGISTRY_HTTP_HOST: '{{ docker_registry_host }}'
-      REGISTRY_HTTP_TLS_LETSENCRYPT_CACHEFILE: '/etc/letsencrypt/cachefile'
-      REGISTRY_HTTP_TLS_LETSENCRYPT_EMAIL: 'contact@mconf.com'
-      REGISTRY_HTTP_SECRET: '{{ 99999999999999999999999999999999 | random | to_uuid }}'
-      REGISTRY_STORAGE: 's3'
-      REGISTRY_STORAGE_S3_ACCESSKEY: '{{ docker_registry_s3_accesskey }}'
-      REGISTRY_STORAGE_S3_SECRETKEY: '{{ docker_registry_s3_secretkey }}'
-      REGISTRY_STORAGE_S3_REGION: '{{ docker_registry_s3_region }}'
-      REGISTRY_STORAGE_S3_BUCKET: '{{ docker_registry_s3_bucket }}'
-      REGISTRY_STORAGE_S3_SECURE: yes
-      REGISTRY_STORAGE_S3_V4AUTH: yes
-      # REGISTRY_STORAGE_S3_ENCRYPT: yes
-      # REGISTRY_STORAGE_S3_KEYID: '{{ docker_registry_s3_keyid }}'
-
+    env_file: /etc/docker-registry/env
