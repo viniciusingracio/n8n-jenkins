@@ -8,7 +8,7 @@ rec_proxy_repo_url: git@github.com:mconftec/mconf-rec-proxy.git
 rec_proxy_repo_ref: master
 
 # Docker image name and version
-rec_proxy_image: '{{ docker_registry_mconf }}/mconf/rec-server-proxy-s3-noauth'
+rec_proxy_image: '{{ mconf_registry_host }}/mconf/rec-server-proxy-s3-noauth'
 rec_proxy_image_version: 'latest'
 
 # Domain nginx will respond to

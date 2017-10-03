@@ -14,7 +14,9 @@ deploy_user: mconf
 # deploy_user_ssh_key_pub: "envs/{{ env }}/files/id_rsa.pub"
 
 # Default registry where images for Mconf components are pulled from
-docker_registry_mconf: 'hub.docker.mconf.com'
+mconf_registry_host: hub.docker.mconf.com
+mconf_registry_user: mconf
+mconf_registry_password: INCMc0nfito123
 
 # Disable certbot by default, enabled for specific roles/hosts
 certbot_enabled: false

@@ -12,7 +12,8 @@
   file: path=/etc/docker-registry/auth state=directory recurse=yes
   when: docker_registry_auth
 
-- name: install python libraries
+- name: Install python libraries for htpasswd
+  become: yes
   pip:
     name={{ item }}
     state=present
@@ -27,7 +28,7 @@
     path: /etc/docker-registry/auth/passwd
     name: '{{ docker_registry_auth_user }}'
     password: '{{ docker_registry_auth_password }}'
-    crypt_scheme: plaintext
+    crypt_scheme: bcrypt
     owner: root
     mode: 0644
   when: docker_registry_auth
@@ -48,7 +49,7 @@
     volumes:
       # - /var/lib/registry:/var/lib/registry
       - /etc/letsencrypt:/etc/letsencrypt
-      - /etc/docker-registry/auth:/etc/docker-registry/auth
+      - /etc/docker-registry:/etc/docker-registry
     published_ports:
       - 443:5000
     env_file: /etc/docker-registry/env

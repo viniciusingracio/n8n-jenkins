@@ -10,9 +10,9 @@
     repo: 'deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable'
     state: present
 
-- name: Update apt (if older than 5m)
+- name: Update apt
   become: true
-  apt: update_cache=yes cache_valid_time=300
+  apt: update_cache=yes
 
 - name: Install docker package
   become: true
@@ -38,3 +38,12 @@
     name: '{{ deploy_user }}'
     groups: docker
     append: yes
+
+- name: Log into private registry and force re-authorization
+  shell: "docker login -p {{ mconf_registry_password }} -u {{ mconf_registry_user }} {{ mconf_registry_host }}"
+  # TODO: can't use docker_login yet because it breaks with python3
+  # docker_login:
+  #   registry: '{{ mconf_registry_host }}'
+  #   username: mconf
+  #   password: INCMc0nfito123
+  #   reauthorize: yes

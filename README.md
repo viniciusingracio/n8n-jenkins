@@ -94,6 +94,7 @@ user=mconf
     src: /home/leonardo/Dev/mconftec/mconf-rec-proxy/
     dest: ~/src/rec-proxy
     ```
+* To run a single command (e.g. uptime) in all servers: `ansible all -i envs/dev -m command -a "uptime" -u mconf --extra-vars "ansible_python_interpreter=/usr/bin/python3"`
 
 ### Notes
 
