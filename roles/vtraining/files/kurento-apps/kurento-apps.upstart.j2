@@ -1,0 +1,30 @@
+# Upstart kurento-apps's script
+description "start/stop kurento-apps"
+version "0.0.1-dev"
+author "Mario Gasparoni"
+
+# When to start
+start on filesystem and started networking
+
+# When to stop
+stop on shutdown
+
+# Go to deploy path
+env APP_PATH={{ ansible_env.HOME }}/dev/kurento-apps
+env NODE_PATH=/opt/node-v{{ node_version }}-linux-x64/bin/node
+env LOG_PATH=/var/log/kurento-apps
+env LOG_FILENAME=kurento-apps.log
+env USER={{ ansible_user }}
+env NODE_ENV=default
+
+script
+    #create folder with user permission
+    if [ ! -e $LOG_PATH ]; then
+      /bin/mkdir $LOG_PATH
+      /bin/chown $USER:$USER $LOG_PATH
+    fi
+
+    # go to deploy path
+    chdir $APP_PATH
+    exec sudo -u $USER NODE_ENV=${NODE_ENV} ${NODE_PATH} server >> ${LOG_PATH}/$LOG_FILENAME 2>&1
+end script

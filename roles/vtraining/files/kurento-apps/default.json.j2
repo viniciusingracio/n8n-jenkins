@@ -1,0 +1,76 @@
+{
+  "kurento": {
+    "rtsp_network_cache": 200,
+    "balanced_servers": ["0"],
+    "servers" : {
+      "0" : {
+        "ws_uri": "ws://localhost:8888/kurento",
+        "local_ip_address": "{{ ansible_default_ipv4.address }}"
+      }
+    },
+    "status_file": "./temp/status.json",
+    "exit_timeout": 500,
+    "ignore_invalid_certificate": true,
+    "server_timeout" : 10000,
+    "recording_server": "0",
+    "recordings_path": "file:///opt/kurento-recordings/",
+    "recording_timeout": 15000
+  },
+
+  "media_sources": {
+    "url": "https://{{ ansible_default_ipv4.address }}/media_sources.json",
+    "media_initialized_timeout": 10000,
+    "server_video_timeout": 20000,
+    "client_video_timeout": 15000
+  },
+
+  "server": {
+    "port": 8443,
+    "prebuilt_assets": true,
+    "base_path": "/mosaic"
+  },
+
+  "portal_urls": [
+    "http://webdev:3000",
+    "https://127.0.0.1:8443",
+    "https://localhost:8443"
+  ],
+
+  "audio_bridge": {
+    "enabled": false
+  },
+
+  "sip":{
+    "enabled": false,
+    "local_ip_address" : "{{ ansible_default_ipv4.address }}",
+    "min_audio_port" : 7000,
+    "max_audio_port" : 9000,
+    "min_video_port" : 30000,
+    "max_video_port" : 33000,
+    "server" : "bbb-html5",
+    "server_port" : "5066"
+  },
+
+  "redis" : {
+    "host" : "localhost",
+    "port" : "6379",
+    "password" : "",
+    "subpattern" : "bigbluebutton:to-kurento:*",
+    "pubchannel" : "bigbluebutton:from-kurento:system"
+  },
+
+  "recorder": {
+    "missedKeepAlives": 3,
+    "keepAliveTimeout": 10000,
+    "timeoutCallbackUrl": "https://{{ ansible_default_ipv4.address }}/media_recordings/",
+    "timeoutCallbackMethod": "PUT",
+    "closeRecordingTimeout": 5000,
+    "postRecordingMaximumTime": 5
+  },
+
+  "freeswitch" : {
+    "ip": "{{ ansible_default_ipv4.address }}",
+    "port": 8021,
+    "conf_number": 9198
+  }
+}

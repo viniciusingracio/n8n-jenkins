@@ -72,3 +72,8 @@
 - hosts: docker-registry
   roles:
   - docker-registry
+
+# VTraining
+- hosts: vtraining
+  roles:
+  - vtraining

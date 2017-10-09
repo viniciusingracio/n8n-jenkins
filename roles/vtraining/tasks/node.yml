@@ -1,0 +1,20 @@
+- unarchive:
+    src: https://nodejs.org/dist/v{{ node_version }}/node-v{{ node_version }}-linux-x64.tar.xz
+    dest: /opt
+    remote_src: True
+    creates: /opt/node-v{{ node_version }}-linux-x64/bin/node
+  become: yes
+
+- name: Add node to .bashrc
+  blockinfile:
+    dest: "{{ ansible_env.HOME }}/.bashrc"
+    block: |
+      export PATH="/opt/node-v{{ node_version }}-linux-x64/bin:$PATH"
+    marker: '# {mark} ANSIBLE MANAGED BLOCK - node'
+    create: yes 
+
+- file:
+    src: /opt/node-v{{ node_version }}-linux-x64/bin/node
+    dest: /usr/bin/nodejs
+    state: link
+  become: yes

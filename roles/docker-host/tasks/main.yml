@@ -21,11 +21,7 @@
     state: present
 
 # Need pip and docker-py to manage this docker instance with ansible
-- name: Install pip
-  become: true
-  apt:
-    name: python3-pip
-    state: present
+# pip is now installed on setup.yml
 - name: Install docker-py
   become: true
   pip:

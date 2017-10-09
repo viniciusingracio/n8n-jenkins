@@ -1,17 +1,17 @@
 ---
 
 # Install/remove demos
-bigbluebutton_demos: false
+bigbluebutton_demos: False
 
 # Open redis to external access. Set to false remove external access.
-bigbluebutton_redis_bind: false
+bigbluebutton_redis_bind: False
 # To open use:
 # bigbluebutton_redis_bind:
 #   - 0.0.0.0
 
 # Set to false to have the default rap scripts.
 # Set to true to have process/publish scripts in separate resque workers.
-bigbluebutton_external_rap: false
+bigbluebutton_external_rap: False
 
 # Fetch source code from
 bigbluebutton_external_rap_repo: https://github.com/daronco/bigbluebutton.git
@@ -19,3 +19,8 @@ bigbluebutton_external_rap_ref: rap-on-docker
 
 ffmpeg_version: 2.8.2
 openh264_version: 1.4.0
+ruby_version: 2.1.2
+node_version: 6.11.0
+
+ssl_certificate: /etc/certs/{{ inventory_hostname }}.crt
+ssl_certificate_key: /etc/certs/{{ inventory_hostname }}.key

@@ -3,3 +3,32 @@
   tags: [apt]
 - include: ufw.yml
   tags: [ufw,firewall]
+
+- name: Install pip on Python 2
+  become: true
+  apt:
+    name: python-pip
+    state: present
+  when: ansible_python_interpreter == '/usr/bin/python2'
+
+- name: Install pip on Python 3
+  become: true
+  apt:
+    name: python3-pip
+    state: present
+  when: ansible_python_interpreter == '/usr/bin/python3'
+
+# https://urllib3.readthedocs.io/en/latest/user-guide.html#certificate-verification-in-python-2
+- name: Install python libraries for SSL
+  become: true
+  pip:
+    name: '{{ item }}'
+    state: present
+  with_items:
+    - urllib3[secure]
+    - pyOpenSSL
+    - ndg-httpsclient
+    - pyasn1
+  when: ansible_python_interpreter == '/usr/bin/python2'
+
+# TODO setup NTP

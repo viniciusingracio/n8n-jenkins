@@ -6,6 +6,12 @@
     groups: adm,sudo,syslog
     append: yes
 
+- name: Fix home directories ownership
+  become: true
+  file:
+    path: '/home/{{ deploy_user }}'
+    owner: '{{ deploy_user }}'
+
 - name: Set up authorized keys
   become: true
   authorized_key:
@@ -14,6 +20,7 @@
     key: '{{ item }}'
   with_file: # TODO: this should be configurable
     - public_keys/daronco.pub
+    - public_keys/fcecagno.pub
 
 - name: Add to sudoers
   become: true
