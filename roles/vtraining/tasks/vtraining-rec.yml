@@ -9,6 +9,8 @@
     mode: 0755
     recurse: yes
     state: directory
+    owner: 'kurento'
+    group: 'kurento'
   become: yes
   with_items:
     - /opt/kurento-recordings/video
@@ -24,7 +26,6 @@
   become: yes
 
 - name: Test mount
-  # command: bash -c 'mount | grep -qw /mnt/kurento-recordings'
   command: mountpoint -q -- /mnt/kurento-recordings
   register: recordings_mount
   ignore_errors: yes

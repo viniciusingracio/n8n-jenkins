@@ -1,10 +1,11 @@
 - git:
     repo: git@bitbucket.org:i9access/mirtrainer.git
     dest: '{{ ansible_env.HOME }}/dev/vtraining'
-    version: feature-rec
+    version: master-pg
     accept_hostkey: true
     recursive: false
-    update: false
+    update: true
+    force: true
 
 - name: Change bigbluebutton route
   lineinfile:
@@ -12,15 +13,6 @@
     state: present
     regexp: '^  bigbluebutton_routes :default'
     line: "  bigbluebutton_routes :default, scope: 'bbb_route', as: 'bigbluebutton'"
-
-- name: Add gem 'pg'
-  lineinfile:
-    dest: '{{ ansible_env.HOME }}/dev/vtraining/Gemfile'
-    state: present
-    regexp: ".*gem 'pg'"
-    line: "gem 'pg'"
-  tags:
-    - debug
 
 - template:
     src: files/vtraining-portal/secrets.yml.j2

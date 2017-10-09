@@ -1,10 +1,10 @@
 {
   "kurento": {
-    "rtsp_network_cache": 200,
+    "rtsp_network_cache": 0,
     "balanced_servers": ["0"],
     "servers" : {
       "0" : {
-        "ws_uri": "ws://localhost:8888/kurento",
+        "ws_uri": "ws://{{ inventory_hostname }}:8888/kurento",
         "local_ip_address": "{{ ansible_default_ipv4.address }}"
       }
     },
@@ -13,12 +13,13 @@
     "ignore_invalid_certificate": true,
     "server_timeout" : 10000,
     "recording_server": "0",
+    "recording_timeout": 30000,
     "recordings_path": "file:///opt/kurento-recordings/",
-    "recording_timeout": 15000
+    "server_timeout": 10000
   },
 
   "media_sources": {
-    "url": "https://{{ ansible_default_ipv4.address }}/media_sources.json",
+    "url": "https://{{ inventory_hostname }}/media_sources.json",
     "media_initialized_timeout": 10000,
     "server_video_timeout": 20000,
     "client_video_timeout": 15000
@@ -30,24 +31,34 @@
     "base_path": "/mosaic"
   },
 
-  "portal_urls": [
-    "http://webdev:3000",
-    "https://127.0.0.1:8443",
-    "https://localhost:8443"
-  ],
+  "portal_urls": "*",
+
+  "recorder": {
+    "missedKeepAlives": 3,
+    "keepAliveTimeout": 6000,
+    "timeoutCallbackUrl": "https://{{ inventory_hostname }}/media_recordings/",
+    "timeoutCallbackMethod": "PUT",
+    "closeRecordingTimeout": 5000,
+    "postRecordingMaximumTime": 60000
+  },
 
   "audio_bridge": {
-    "enabled": false
+    "enabled": true,
+    "silence_after_audio": 1500,
+    "concurrent_jobs": 1,
+    "delay_after_new_job": 500,
+    "delay_before_send_audio": 500,
+    "job_timeout": 30000
   },
 
   "sip":{
-    "enabled": false,
+    "enabled": true,
     "local_ip_address" : "{{ ansible_default_ipv4.address }}",
     "min_audio_port" : 7000,
     "max_audio_port" : 9000,
     "min_video_port" : 30000,
     "max_video_port" : 33000,
-    "server" : "bbb-html5",
+    "server" : "{{ ansible_default_ipv4.address }}",
     "server_port" : "5066"
   },
 
@@ -59,18 +70,17 @@
     "pubchannel" : "bigbluebutton:from-kurento:system"
   },
 
-  "recorder": {
-    "missedKeepAlives": 3,
-    "keepAliveTimeout": 10000,
-    "timeoutCallbackUrl": "https://{{ ansible_default_ipv4.address }}/media_recordings/",
-    "timeoutCallbackMethod": "PUT",
-    "closeRecordingTimeout": 5000,
-    "postRecordingMaximumTime": 5
-  },
-
   "freeswitch" : {
-    "ip": "{{ ansible_default_ipv4.address }}",
+    "ip": "localhost",
     "port": 8021,
     "conf_number": 9198
+  },
+
+  "cameras" : {
+    "user": "admin",
+    "password": "admin",
+    "port": 80,
+    "timeout": 4000,
+    "max_height": 1080
   }
 }
