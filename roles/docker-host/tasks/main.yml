@@ -44,6 +44,6 @@
   # TODO: can't use docker_login yet because it breaks with python3
   # docker_login:
   #   registry: '{{ mconf_registry_host }}'
-  #   username: mconf
-  #   password: INCMc0nfito123
+  #   username: '{{ mconf_registry_user }}'
+  #   password: '{{ mconf_registry_password }}'
   #   reauthorize: yes

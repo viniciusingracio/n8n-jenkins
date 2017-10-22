@@ -12,3 +12,6 @@ kurento-desktopsharing.mconf.com ansible_user=root deploy_user=root
 
 [mconf-live]
 kurento-desktopsharing.mconf.com ansible_user=root deploy_user=root
+
+[mconf-web-reports]
+10.0.3.173
