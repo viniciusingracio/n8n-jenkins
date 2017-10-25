@@ -91,13 +91,13 @@
     chdir: '{{ ansible_env.HOME }}/dev/tools/apache-flex-sdk-4.13.0-bin'
     creates: '{{ ansible_env.HOME }}/dev/tools/apache-flex-sdk-4.13.0-bin/in/osmf.swc'
 
-- name: Download flex player
+- name: Download flash player
   get_url:
     url: http://fpdownload.macromedia.com/get/flashplayer/installers/archive/playerglobal/playerglobal11_2.swc
     dest: '{{ ansible_env.HOME }}/dev/tools/apache-flex-sdk-4.13.0-bin/frameworks/libs/player/11.2/playerglobal.swc'
     mode: 0644
 
-- name:
+- name: Adjust permissions and versions on flex
   shell: |
     find -type d -exec chmod o+rx '{}' \;
     chmod 755 bin/*
