@@ -9,7 +9,7 @@
 
 There are two main playbooks: `setup.yml` and `provision.yml`. The first one will a basic setup of the server, creating the deploy user, installing some basic packages and other common tasks. The second playbook is used to provision and deploy an application to the servers.
 
-On the irst run, use `setup.yml`. Examples:
+On the first run, use `setup.yml`. Examples:
 
 ```bash
 # lxc, all 'rec-proxy' servers
@@ -78,6 +78,14 @@ password=929dk92k29d29i
 user=mconf
 ```
 
+#### aws-publisher
+
+In order to resync the aws-publishers, run:
+
+```
+ansible-playbook -i envs/prod/com/ -l aws-publisher provision.yml
+```
+
 ### Utils
 
 * Start at a given point: `ansible-playbook -i envs/dev -l rec-proxy --start-at-task="rec-proxy : Download rec-proxy source code" provision.yml`
@@ -111,4 +119,3 @@ lxc.aa_profile = unconfined
 lxc.cgroup.devices.allow = a
 lxc.cap.drop =
     ```
-

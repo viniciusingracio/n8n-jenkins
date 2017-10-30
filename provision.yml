@@ -76,3 +76,7 @@
 - hosts: docker-registry
   roles:
   - docker-registry
+
+- hosts: aws-publisher
+  roles:
+  - aws-publisher
