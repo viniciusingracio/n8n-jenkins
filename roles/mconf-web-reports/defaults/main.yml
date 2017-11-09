@@ -1,0 +1,18 @@
+---
+
+# Build docker image from src, otherwise will try to pull from hub
+mconf_web_reports_build_from_source: false
+
+# Fetch source code from
+mconf_web_reports_repo_url: git@github.com:mconftec/mconf-web-reports.git
+mconf_web_reports_repo_ref: master
+
+# Docker image name and version
+mconf_web_reports_image: '{{ mconf_registry_host }}/mconf/web-reports'
+mconf_web_reports_image_version: 'latest'
+
+# Env file with variables used when running the container
+mconf_web_reports_env_file: "envs/{{ env }}/files/mconf-web-reports/.env.local"
+
+# Where the reports will be saved to in the host
+mconf_web_reports_output_dir: /tmp/reports

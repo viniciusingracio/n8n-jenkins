@@ -1,0 +1,45 @@
+- name: Download the source code
+  git:
+    repo: '{{ mconf_web_reports_repo_url }}'
+    dest: ~/src/mconf-web-reports
+    version: '{{ mconf_web_reports_repo_ref }}'
+    # depth: 1 # can't use it otherwise won't update the code
+    accept_hostkey: true
+    force: yes
+  when: mconf_web_reports_build_from_source
+  register: mconf_web_reports_code
+
+# TODO: remove old images
+- name: Build the docker image
+  docker_image:
+    build_path: ~/src/mconf-web-reports/
+    name: '{{ mconf_web_reports_image }}:{{ mconf_web_reports_image_version }}'
+    tag: '{{ mconf_web_reports_image_version }}'
+    force: true
+  when: mconf_web_reports_build_from_source # and mconf_web_reports_code.changed
+
+- name: Pull the docker image
+  docker_image:
+    name: '{{ mconf_web_reports_image }}:{{ mconf_web_reports_image_version }}'
+  when: not mconf_web_reports_build_from_source
+
+- name: Copy env file with the variables to run the container
+  become: true
+  copy:
+    src: '{{ mconf_web_reports_env_file }}'
+    dest: '/root/mconf-web-reports.env.local'
+    owner: 'root'
+    group: 'root'
+    mode: 0600
+
+# TODO: configure container to run on cron
+
+# - name: Run the container
+#   docker_container:
+#     name: mconf-web-reports
+#     image: '{{ mconf_web_reports_image }}:{{ mconf_web_reports_image_version }}'
+#     volumes:
+#       - '{{ mconf_web_reports_output_dir }}:/usr/src/app/output'
+#       - /root/mconf-web-reports.env.local:/usr/src/app/.env.local
+#     env:
+#       SAVE_TO: /usr/src/app/output

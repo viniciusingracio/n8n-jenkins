@@ -31,6 +31,10 @@
 - hosts: mconf-web
   roles:
   - mconf-web
+# Mconf-Web-Reports
+- hosts: mconf-web-reports
+  roles:
+  - mconf-web-reports
 
 # Mconf-LB
 - hosts: mconf-lb
