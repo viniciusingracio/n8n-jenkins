@@ -1,0 +1,7 @@
+- name: restart vtraining
+  become: true
+  service: name=vtraining state=restarted
+
+- name: restart nginx
+  become: true
+  service: name=nginx state=restarted

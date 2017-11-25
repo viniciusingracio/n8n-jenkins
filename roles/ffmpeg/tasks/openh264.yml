@@ -1,0 +1,21 @@
+- unarchive:
+    src: https://github.com/cisco/openh264/archive/v{{ openh264_version }}.tar.gz
+    dest: /usr/local/src/
+    remote_src: True
+    creates: /usr/local/src/openh264-{{ openh264_version }}
+  become: yes
+
+- make:
+    chdir: /usr/local/src/openh264-{{ openh264_version }}
+  become: yes
+
+- make:
+    chdir: /usr/local/src/openh264-{{ openh264_version }}
+    target: install
+  become: yes
+
+- file:
+    src: /usr/local/lib/libopenh264.so.0
+    dest: /usr/lib/x86_64-linux-gnu/libopenh264.so.0
+    state: link
+  become: yes

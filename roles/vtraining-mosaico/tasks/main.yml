@@ -1,0 +1,41 @@
+- name: Update apt (if older than 5m)
+  become: yes
+  apt: update_cache=yes cache_valid_time=300
+
+# TODO mover setup do nginx pra um outro lugar a definir
+- name: Install nginx
+  become: yes
+  apt:
+    name: 'nginx'
+    state: present
+
+- template:
+    src: files/default.nginx.j2
+    dest: /etc/nginx/sites-available/default
+    mode: 0644
+    backup: yes
+  become: yes
+  notify: restart nginx
+
+- name: Create certs directory for nginx
+  file:
+    path: /etc/nginx/certs
+    mode: 0755
+    recurse: yes
+    state: directory
+  become: yes
+
+- name: Copy certificates
+  copy:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+  become: yes
+  with_items:
+    - { src: '{{ ssl_certificate }}', dest: '/etc/nginx/certs/server.crt' }
+    - { src: '{{ ssl_certificate_key }}', dest: '/etc/nginx/certs/server.key' }
+
+- include: kurento.yml
+  tags: [kurento]
+
+- include: ufw.yml
+  tags: [ufw,firewall]

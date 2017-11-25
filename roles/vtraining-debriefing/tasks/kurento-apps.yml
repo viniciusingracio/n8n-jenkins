@@ -1,0 +1,64 @@
+- git:
+    repo: git@github.com:mconftec/kurento-apps.git
+    dest: '{{ ansible_env.HOME }}/dev/kurento-apps'
+    accept_hostkey: true
+    update: false
+  notify: restart kurento-apps
+
+# TODO extract environment to specific file
+- name: Update npm
+  become: yes
+  command: npm install npm -g
+  environment:
+    PATH: '/opt/node-v{{ node_version }}-linux-x64/bin:{{ ansible_env.PATH }}'
+
+- name: Install node dependencies for kurento-apps
+  npm:
+    path: '{{ ansible_env.HOME }}/dev/kurento-apps'
+  environment:
+    PATH: '/opt/node-v{{ node_version }}-linux-x64/bin:{{ ansible_env.PATH }}'
+
+- name: Install global dependencies for kurento-apps
+  become: yes
+  npm:
+    name: '{{ item }}'
+    global: yes
+  with_items:
+    - grunt-cli
+    - babel-cli
+  environment:
+    PATH: '/opt/node-v{{ node_version }}-linux-x64/bin:{{ ansible_env.PATH }}'
+
+- template:
+    src: files/kurento-apps/default.json.j2
+    dest: '{{ ansible_env.HOME }}/dev/kurento-apps/config/default.json'
+    mode: '0644'
+    backup: yes
+  tags: [kurento-apps-conf]
+
+- name: Compile assets
+  command: grunt
+  args:
+    chdir: '{{ ansible_env.HOME }}/dev/kurento-apps'
+  environment:
+    PATH: '/opt/node-v{{ node_version }}-linux-x64/bin:{{ ansible_env.PATH }}'
+
+- template:
+    src: files/kurento-apps/kurento-apps.upstart.j2
+    dest: /etc/init/kurento-apps.conf
+    mode: 0644
+  become: yes
+
+- copy:
+    src: 'files/monit/{{ item }}'
+    dest: '/etc/monit/conf.d/'
+    mode: '0644'
+  become: yes
+  notify: restart monit
+  with_items:
+    - kurento-apps.conf
+    - redis.conf
+
+# TODO ajustar o tempo de daemon do monit
+# /etc/monit/monitrc
+# set daemon 10

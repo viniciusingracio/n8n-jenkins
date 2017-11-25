@@ -1,0 +1,27 @@
+- name: restart bigbluebutton
+  become: true
+  command: bbb-conf --restart
+
+- name: restart redis-server
+  become: true
+  service: name=redis-server state=restarted
+
+- name: restart monit
+  become: true
+  service: name=monit state=restarted
+
+- name: restart nginx
+  become: true
+  service: name=nginx state=restarted
+
+- name: restart tomcat7
+  become: true
+  service: name=tomcat7 state=restarted
+
+- name: restart kurento-apps
+  become: true
+  service: name=kurento-apps state=restarted
+
+- name: stop freeswitch
+  become: true
+  command: /opt/freeswitch/bin/fs_cli -x 'shutdown'

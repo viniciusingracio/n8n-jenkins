@@ -1,0 +1,9 @@
+# TODO sqlserver
+development:
+  adapter:  postgresql
+  database: {{ vtraining_database_name }}
+  username: {{ vtraining_database_username }}
+  password: {{ vtraining_database_password }}
+  host:     {{ vtraining_database_host }}
+
+# TODO quando host não for localhost, deve usar psql -h <host>

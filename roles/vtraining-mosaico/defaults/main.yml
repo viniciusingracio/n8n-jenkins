@@ -1,0 +1,4 @@
+---
+
+ssl_certificate: /etc/certs/{{ inventory_hostname }}.crt
+ssl_certificate_key: /etc/certs/{{ inventory_hostname }}.key

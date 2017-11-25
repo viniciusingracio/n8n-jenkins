@@ -1,0 +1,78 @@
+- name: Install Kurento dependencies
+  become: yes
+  apt:
+    name: '{{ item }}'
+    state: present
+  with_items:
+    - git-core
+    - monit
+    - build-essential
+
+- name: Add Kurento apt key
+  become: yes
+  apt_key:
+    url: "http://ubuntu.kurento.org/kurento.gpg.key"
+    state: present
+  register: aptkey
+
+- name: Add Kurento repo to apt
+  become: yes
+  apt_repository:
+    repo: '{{ item }}'
+    state: present
+  register: aptrepos
+  with_items:
+    - 'deb http://ubuntu.kurento.org {{ ansible_distribution_release }} kms6'
+
+- name: Update apt if keys changed
+  become: yes
+  apt: update_cache=yes
+  when: aptkey|changed or aptrepos|changed
+
+- name: Install Kurento
+  become: yes
+  apt:
+    name: '{{ item }}'
+    state: present
+  with_items:
+    - kurento-media-server-6.0
+    - openh264-gst-plugins-bad-1.5
+    - gnutls-bin
+
+- service:
+    name: kurento-media-server-6.0
+    # not sure why pattern is necessary
+    pattern: kurento-media-server-6.0
+    state: started
+    enabled: yes
+  become: yes
+
+- copy:
+    src: files/kurento.conf.json
+    dest: /etc/kurento/kurento.conf.json
+    owner: root
+    group: root
+    mode: '0644'
+    backup: yes
+  become: yes
+  notify: restart kms
+
+- copy:
+    src: 'files/kurento-media-server.conf'
+    dest: '/etc/monit/conf.d/'
+    mode: '0644'
+  become: yes
+  notify: restart monit
+
+- cron:
+    name: "Report"
+    minute: "55"
+    hour: "1"
+    job: "/usr/local/bin/slack/run-report.sh"
+    state: absent
+
+- cron:
+    name: "Restart Kurento"
+    minute: "0"
+    hour: "2"
+    job: "/usr/sbin/service kurento-media-server-6.0 force-stop"
