@@ -33,30 +33,60 @@
 - include: openh264.yml
   tags: [openh264]
 
+- name: Get FFmpeg version
+  shell: "ffmpeg -version | grep '^ffmpeg' | cut -d' ' -f 3"
+  register: reg_ffmpeg_version
+  ignore_errors: yes
+  tags:
+    - test_ffmpeg_version
+
+- name: Get FFmpeg configure flags
+  shell: "ffmpeg -version | grep '^configuration: ' | sed 's|^configuration: ||g'"
+  register: reg_ffmpeg_configure_flags
+  ignore_errors: yes
+  tags:
+    - test_ffmpeg_version
+
+- name: Decide if FFmpeg needs to be (re)built
+  set_fact:
+    build_ffmpeg: reg_ffmpeg_version|failed or reg_ffmpeg_version.stdout != '{{ ffmpeg_version }}' or reg_ffmpeg_configure_flags|failed or reg_ffmpeg_configure_flags.stdout != '{{ ffmpeg_configure_flags }}'
+  tags:
+    - test_ffmpeg_version
+
+- debug:
+    msg: "FFmpeg needs to be (re)built"
+  when: build_ffmpeg
+  tags:
+    - test_ffmpeg_version
+
 - name: Download and extract FFmpeg
   unarchive:
     src: http://ffmpeg.org/releases/ffmpeg-{{ ffmpeg_version }}.tar.bz2
     dest: /usr/local/src
     remote_src: True
   become: yes
+  when: build_ffmpeg
 
-# TODO do not if previous build was succeed
 - name: Configure FFmpeg
-  # command: ./configure --enable-x11grab --enable-gpl --enable-version3 --enable-postproc --enable-libvorbis --enable-libvpx --enable-librtmp --enable-libx264 --enable-libtheora --enable-libvpx --enable-libwebp --enable-lsp --enable-libmp3lame --enable-libopus --enable-libspeex --enable-avresample --enable-libopenh264 --enable-libfreetype
-  command: ./configure --toolchain=hardened --libdir=/usr/lib/x86_64-linux-gnu --incdir=/usr/include/x86_64-linux-gnu --enable-gpl --enable-shared --disable-stripping --enable-x11grab --enable-version3 --enable-postproc --enable-libvorbis --enable-librtmp --enable-libx264 --enable-libtheora --enable-libwebp --enable-lsp --enable-libmp3lame --enable-libopus --enable-libspeex --enable-avresample --enable-libopenh264 --enable-libfreetype
+  command: './configure {{ ffmpeg_configure_flags }}'
   args:
     chdir: /usr/local/src/ffmpeg-{{ ffmpeg_version }}
   become: yes
+  when: build_ffmpeg
 
-# TODO do not if previous build was succeed
 - name: Build FFmpeg
   make:
     chdir: /usr/local/src/ffmpeg-{{ ffmpeg_version }}
   become: yes
+  when: build_ffmpeg
 
-# TODO do not if previous build was succeed
 - name: Install FFmpeg
   command: checkinstall --pkgname=ffmpeg --pkgversion="5:${FFMPEG_VERSION}" --backup=no --deldoc=yes --default
   args:
     chdir: /usr/local/src/ffmpeg-{{ ffmpeg_version }}
+  become: yes
+  when: build_ffmpeg
+
+- name: Hold ffmpeg package
+  command: apt-mark hold ffmpeg
   become: yes

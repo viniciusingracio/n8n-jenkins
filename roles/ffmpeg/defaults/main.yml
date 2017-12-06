@@ -1,4 +1,5 @@
 ---
 
 ffmpeg_version: 2.8.2
+ffmpeg_configure_flags: --prefix=/usr --toolchain=hardened --libdir=/usr/lib/x86_64-linux-gnu --incdir=/usr/include/x86_64-linux-gnu --enable-gpl --enable-shared --disable-stripping --enable-x11grab --enable-version3 --enable-postproc --enable-libvorbis --enable-librtmp --enable-libx264 --enable-libtheora --enable-libwebp --enable-lsp --enable-libmp3lame --enable-libopus --enable-libspeex --enable-avresample --enable-libopenh264 --enable-libfreetype
 openh264_version: 1.4.0
