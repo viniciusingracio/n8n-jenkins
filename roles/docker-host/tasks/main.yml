@@ -34,6 +34,16 @@
     name: '{{ deploy_user }}'
     groups: docker
     append: yes
+  register: reg_docker
+
+# after installing docker, the docker command doesn't work within the current ssh session,
+# so we need to quit and log again
+# https://github.com/ansible/ansible-modules-core/issues/921#issuecomment-220513111
+- name: Reset SSH
+  shell: sleep 1; pkill -u {{ ansible_ssh_user }} sshd
+  async: 3
+  poll: 2
+  when: reg_docker|changed
 
 - name: Log into private registry and force re-authorization
   shell: "docker login -p {{ mconf_registry_password }} -u {{ mconf_registry_user }} {{ mconf_registry_host }}"
