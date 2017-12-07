@@ -62,6 +62,12 @@
   - bigbluebutton
   - rec-worker-authorized
 
+- hosts: bigbluebutton-dev
+  vars:
+    skip_ufw: yes
+  roles:
+  - bigbluebutton-dev
+
 # Mconf-Live
 - hosts: mconf-live
   roles:

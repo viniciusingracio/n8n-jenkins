@@ -1,0 +1,53 @@
+- name: Add publishTo on build.sbt
+  blockinfile:
+    dest: '{{ ansible_env.HOME }}/dev/bigbluebutton/{{ item }}/build.sbt'
+    block: |
+      publishTo := Some(Resolver.file("file",  new File(Path.userHome.absolutePath+"/.m2/repository")))
+    marker: '// {mark} ANSIBLE MANAGED BLOCK - bbb-dev'
+    create: yes 
+  with_items:
+    - bbb-common-message
+    - bbb-fsesl-client
+
+- name: Compile akka libraries
+  shell: |
+    sbt clean
+    sbt compile
+    sbt publish
+    sbt publishLocal
+  args:
+    chdir: '{{ ansible_env.HOME }}/dev/bigbluebutton/{{ item }}'
+  environment:
+    PATH: '{{ ansible_env.HOME }}/dev/tools/sbt/bin:{{ ansible_env.PATH }}'
+  with_items:
+    - bbb-common-message
+    - bbb-fsesl-client
+    - bbb-common-web
+
+- name: Compile akka apps
+  shell: |
+    sbt clean
+    sbt debian:packageBin
+  args:
+    chdir: '{{ ansible_env.HOME }}/dev/bigbluebutton/{{ item }}'
+  environment:
+    PATH: '{{ ansible_env.HOME }}/dev/tools/sbt/bin:{{ ansible_env.PATH }}'
+  with_items:
+    - akka-bbb-apps
+    - akka-bbb-fsesl
+    - akka-bbb-transcode
+    - bbb-screenshare/app
+
+- name: Install akka apps
+  shell: |
+    dpkg -i target/*.deb
+  become: yes
+  args:
+    chdir: '{{ ansible_env.HOME }}/dev/bigbluebutton/{{ item }}'
+  environment:
+    PATH: '{{ ansible_env.HOME }}/dev/tools/sbt/bin:{{ ansible_env.PATH }}'
+  with_items:
+    - akka-bbb-apps
+    - akka-bbb-fsesl
+    - akka-bbb-transcode
+    - bbb-screenshare/app

@@ -19,3 +19,6 @@ kurento-desktopsharing.mconf.com ansible_user=root deploy_user=root
 [vtraining]
 196.168.0.197
 196.168.0.198
+
+[bigbluebutton-dev]
+test-live110.mconf.com bigbluebutton_repo=git@github.com:mconftec/bigbluebutton.git bigbluebutton_repo_ref=mconf-commercial-1.1
