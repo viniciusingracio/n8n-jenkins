@@ -90,3 +90,7 @@
 - name: Hold ffmpeg package
   command: apt-mark hold ffmpeg
   become: yes
+
+- name: Hold ffmpeg package (with aptitude)
+  command: aptitude hold ffmpeg
+  become: yes
