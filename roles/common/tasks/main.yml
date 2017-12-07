@@ -3,6 +3,7 @@
   tags: [apt]
 - include: ufw.yml
   tags: [ufw,firewall]
+  when: not skip_ufw
 - include: python.yml
   tags: [python]
 
