@@ -5,11 +5,17 @@
   register: port_80
   failed_when: False # never fail
 
-- name: check if port 80 open on ufw
-  become: true
-  shell: ufw status verbose | grep "80/tcp.*ALLOW IN"
-  register: ufw_port_80
-  failed_when: False # never fail
+- name: check ufw status
+  become: yes
+  command: ufw status verbose
+  ignore_errors: yes
+  register: ufw_status
+
+- name: determine if firewall is running and blocking port 80
+  set_fact:
+    firewall_installed: '{{ ufw_status|succeeded }}'
+    firewall_running: '{{ ufw_status|succeeded and not ufw_status.stdout | match("Status: inactive") }}'
+    firewall_blocking_80: '{{ ufw_status|succeeded and ufw_status.stdout | search("80/tcp.*ALLOW IN") }}'
 
 #
 # If nothing binding to port 80, use certbot standalone
@@ -19,7 +25,7 @@
   become: true
   ufw: rule=allow port=80 proto=tcp
   notify: restart ufw
-  when: port_80.rc == 1 and ufw_port_80.rc == 1 # port not used and not open yet
+  when: port_80.rc == 1 and firewall_blocking_80 # port not used and not open yet
 
 - name: start the certbot container standalone
   docker_container:
@@ -39,7 +45,7 @@
   become: true
   ufw: rule=allow port=80 proto=tcp delete=true
   notify: restart ufw
-  when: ufw_port_80.rc == 1 # port was not open before
+  when: firewall_blocking_80 # port was not open before
 
 
 #
