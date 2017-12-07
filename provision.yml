@@ -69,6 +69,26 @@
   - bigbluebutton-dev
 
 # Mconf-Live
+- hosts: mconf-live110-certbot
+  vars:
+    skip_ufw: yes
+  roles:
+  - certbot
+  - bigbluebutton
+
+# Mconf-Live
+- hosts: mconf-live110
+  roles:
+#  - certbot
+  - bigbluebutton
+
+# Mconf-Live
+- hosts: mconf-live200
+  roles:
+#  - certbot
+  - bigbluebutton
+
+# Mconf-Live
 - hosts: mconf-live
   roles:
   - mconf-live

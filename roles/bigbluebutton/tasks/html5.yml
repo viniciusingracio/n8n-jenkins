@@ -1,0 +1,86 @@
+- name: Add mongo apt key
+  become: true
+  apt_key:
+    keyserver: keyserver.ubuntu.com
+    id: 0C49F3730359A14518585931BC711F9BA15703C6
+    state: present
+  register: aptkey
+
+- name: Add mongo repo to apt
+  become: true
+  apt_repository:
+    repo: 'deb [ arch=amd64,arm64 ] http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.4 multiverse'
+    state: present
+  register: aptrepos
+
+- name: Update apt if keys changed
+  become: true
+  apt: update_cache=yes
+  when: aptkey|changed or aptrepos|changed
+
+- name: Install mongo
+  become: true
+  apt:
+    name: '{{ item }}'
+    state: '{{ bigbluebutton_apt_state }}'
+  with_items:
+    - mongodb-org
+    - curl
+  notify: start mongo
+
+- name: Add node apt key
+  become: true
+  apt_key:
+    url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+    state: present
+  register: aptkey
+
+- name: Add node repo to apt
+  become: true
+  apt_repository:
+    repo: 'deb http://deb.nodesource.com/node_4.x {{ ansible_lsb.codename }} main'
+    state: present
+  register: aptrepos
+
+- name: Update apt if keys changed
+  become: true
+  apt: update_cache=yes
+  when: aptkey|changed or aptrepos|changed
+
+- name: Install node
+  become: true
+  apt:
+    name: 'nodejs'
+    state: '{{ bigbluebutton_apt_state }}'
+
+- name: Install hmtl5 client
+  become: true
+  apt:
+    name: 'bbb-html5'
+    state: '{{ bigbluebutton_apt_state }}'
+  notify: restart bigbluebutton
+
+- name: Set screenshare attributes on config.xml
+  xml:
+    path: /var/www/bigbluebutton/client/conf/config.xml
+    xpath: //module[@name="ScreenshareModule"]
+    attribute: '{{ item.attribute }}'
+    value: '{{ item.value }}'
+  become: yes
+  with_items:
+    - { attribute: 'chromeExtensionLink', value: '{{ bigbluebutton_screenshare_extension_url }}' }
+    - { attribute: 'chromeExtensionKey', value: '{{ bigbluebutton_screenshare_extension_key }}' }
+    - { attribute: 'tryKurentoWebRTC', value: 'true' }
+    - { attribute: 'tryWebRTCFirst', value: 'true' }
+
+- template:
+    src: files/kurento.yaml.j2
+    dest: '{{ item }}'
+    mode: 0644
+    owner: meteor
+    group: meteor
+  become: yes
+  with_items:
+    - /usr/share/meteor/bundle/programs/server/assets/app/config/development/public/kurento.yaml
+    - /usr/share/meteor/bundle/programs/server/assets/app/config/production/public/kurento.yaml
+  notify: restart bbb-html5

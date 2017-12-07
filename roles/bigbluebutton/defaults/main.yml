@@ -1,5 +1,37 @@
 ---
 
+bigbluebutton_apt_key: "http://ubuntu.bigbluebutton.org/repo/bigbluebutton.asc"
+# Install BigBlueButton 2.0
+bigbluebutton_apt_source: "deb http://ubuntu.bigbluebutton.org/xenial-200/ bigbluebutton-xenial main"
+# Install BigBlueButton 1.1
+# bigbluebutton_apt_source: "deb http://ubuntu.bigbluebutton.org/xenial-110/ bigbluebutton-xenial main"
+
+# Install HTML5 client
+bigbluebutton_html5: false
+# Install Mconf MCS-SIP
+bigbluebutton_sip: false
+
+# Setup Chrome extensions for WebRTC Desktop Sharing
+bigbluebutton_screenshare_extension_url:
+bigbluebutton_screenshare_extension_key:
+
+bigbluebutton_branding_welcome: '<br>Welcome to <b>%%CONFNAME%%</b>!<br>'
+bigbluebutton_branding_welcome_footer: 'For more information, visit <a href="https://mconf.com" target="_blank"><u>mconf.com</u></a>.'
+bigbluebutton_branding_layout:
+bigbluebutton_branding_logo_client:
+bigbluebutton_branding_logo_playback:
+bigbluebutton_branding_copyright: '&#169; 2017 Mconf Tecnologia &#183; <u><a href="https://mconf.com" target="_blank">https://mconf.com</a></u>;'
+bigbluebutton_branding_toolbar_color: '0x33132A'
+bigbluebutton_branding_toolbar_color_alphas: '0, 0'
+bigbluebutton_branding_deskshare_windows: https://s3-sa-east-1.amazonaws.com/assets.mconf.com/Mconf+Deskshare-1.0.2.4-installer-32bit-unsigned.exe
+bigbluebutton_branding_deskshare_mac: https://s3-sa-east-1.amazonaws.com/assets.mconf.com/Mconf+Deskshare-1.0.2.4-no-audio-installer-signed.dmg
+bigbluebutton_branding_playback_error: This recording could not be found
+bigbluebutton_branding_playback_title: Recording Playback
+bigbluebutton_branding_playback_copyright: '<p>Recorded with <a target="_blank" href="https://mconf.com/">Mconf</a>.</p><p>Use <a target="_blank" href="http://mozilla.org/firefox">Mozilla Firefox</a> or <a target="_blank" href="http://google.com/chrome/">Google Chrome</a> to play this recording.</p>'
+
+bigbluebutton_apt_state: latest
+# bigbluebutton_apt_state: present
+
 # Install/remove demos
 bigbluebutton_demos: false
 
@@ -17,3 +49,6 @@ bigbluebutton_external_rap: false
 bigbluebutton_external_rap_repo: https://github.com/daronco/bigbluebutton.git
 bigbluebutton_external_rap_ref: rap-on-docker
 
+# Deploy an SSL certificate from local repository
+local_ssl_certificate:
+local_ssl_certificate_key:

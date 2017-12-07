@@ -1,0 +1,112 @@
+- name: Landing page
+  unarchive:
+    src: 'envs/{{ env }}/files/index.tar.gz'
+    dest: /var/www/bigbluebutton-default
+  become: yes
+
+- name: Copy layout.xml
+  copy:
+    src: '{{ bigbluebutton_branding_layout }}'
+    dest: /var/www/bigbluebutton/client/conf/layout.xml
+  become: yes
+  when: not((bigbluebutton_branding_layout is undefined) or (bigbluebutton_branding_layout is none) or (bigbluebutton_branding_layout | trim == ''))
+
+- name: Copy client logo
+  copy:
+    src: '{{ bigbluebutton_branding_logo_client }}'
+    dest: /var/www/bigbluebutton/client/logo.png
+  become: yes
+  when: not((bigbluebutton_branding_logo_client is undefined) or (bigbluebutton_branding_logo_client is none) or (bigbluebutton_branding_logo_client | trim == ''))
+
+- name: Copy playback logo
+  copy:
+    src: '{{ bigbluebutton_branding_logo_playback }}'
+    dest: '{{ item }}'
+  with_items:
+    - /var/bigbluebutton/playback/presentation/0.81/logo.png
+    - /var/bigbluebutton/playback/presentation/0.9.0/logo.png
+    - /var/bigbluebutton/playback/presentation_export/logo.png
+  ignore_errors: yes
+  become: yes
+  when: not((bigbluebutton_branding_logo_playback is undefined) or (bigbluebutton_branding_logo_playback is none) or (bigbluebutton_branding_logo_playback | trim == ''))
+
+# xml module doesn't work with html
+# - name: Customize playback.html
+#   xml:
+#     path: /var/bigbluebutton/playback/presentation/0.9.0/playback.html
+#     xpath: '{{ item.xpath }}'
+#     value: '{{ item.value }}'
+#   with_items:
+#     - { xpath: '//div[@id="copyright"]', value: 'logo.png' }
+#     - { xpath: '//p[@id="load-error-msg"]', value: '{{ bigbluebutton_branding_copyright }}' }
+#     - { xpath: '//title', value: '{{ bigbluebutton_branding_toolbar_color }}' }
+#   become: yes
+
+- name: Download once again bbb-client
+  command: apt-get download bbb-client
+  become: yes
+
+- name: Reset config.xml
+  shell: 'dpkg-deb --fsys-tarfile /var/cache/apt/archives/bbb-client_*.deb | tar -x ./var/www/bigbluebutton/client/conf/config.xml --strip-components=6'
+  args:
+    chdir: /var/www/bigbluebutton/client/conf/
+  become: yes
+- replace:
+    path: /var/www/bigbluebutton/client/conf/config.xml
+    regexp: '{{ item.regexp }}'
+    replace: '{{ item.replace }}'
+  with_items:
+    - { regexp: 'http:\/\/HOST', replace: 'https://HOST' }
+    - { regexp: 'HOST', replace: '{{ inventory_hostname }}' }
+  become: yes
+  notify: restart bigbluebutton
+
+- name: Customize config.xml
+  xml:
+    path: /var/www/bigbluebutton/client/conf/config.xml
+    xpath: '{{ item.xpath }}'
+    attribute: '{{ item.attribute }}'
+    value: '{{ item.value }}'
+  with_items:
+    # - { xpath: '/config/branding', attribute: 'logo', value: 'https://s3-sa-east-1.amazonaws.com/assets.mconf.com/logo-mconftec.png' }
+    - { xpath: '/config/branding', attribute: 'logo', value: 'logo.png' }
+    - { xpath: '/config/branding', attribute: 'copyright', value: '{{ bigbluebutton_branding_copyright }}' }
+    - { xpath: '/config/branding', attribute: 'toolbarColor', value: '{{ bigbluebutton_branding_toolbar_color }}' }
+    - { xpath: '/config/branding', attribute: 'toolbarColorAlphas', value: '{{ bigbluebutton_branding_toolbar_color_alphas }}' }
+    - { xpath: '/config/mconfDeskshare', attribute: 'downloadLinkWindows', value: '{{ bigbluebutton_branding_deskshare_windows }}' }
+    - { xpath: '/config/mconfDeskshare', attribute: 'downloadLinkMacOS', value: '{{ bigbluebutton_branding_deskshare_mac }}' }
+  become: yes
+  notify: restart bigbluebutton
+  tags:
+    - teste
+
+- name: Create link to Mconf-Live.html
+  file:
+    src: /var/www/bigbluebutton/client/BigBlueButton.html
+    dest: /var/www/bigbluebutton/client/Mconf-Live.html
+    state: link
+  become: yes
+
+- name: Customize bigbluebutton.properties
+  replace:
+    path: /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties
+    regexp: '{{ item.regexp }}'
+    replace: '{{ item.replace }}'
+    # UTF-8 fails to set accent words properly
+    encoding: iso-8859-1
+  with_items:
+    - { regexp: '^(defaultWelcomeMessage)=.*', replace: '\1={{ bigbluebutton_branding_welcome }}' }
+    - { regexp: '^(defaultWelcomeMessageFooter)=.*', replace: '\1={{ bigbluebutton_branding_welcome_footer }}' }
+    - { regexp: '^(defaultClientUrl)=.*', replace: '\1=${bigbluebutton.web.serverURL}/client/Mconf-Live.html' }
+  become: yes
+  notify: restart bigbluebutton
+
+- name: Customize blinker
+  replace:
+    path: /var/www/bigbluebutton/client/lib/bbb_blinker.js
+    regexp: '"BigBlueButton - " \+ title'
+    replace: 'title'
+  become: yes
+
+# TODO sons do FreeSWITCH
+# TODO gravação em todas as salas

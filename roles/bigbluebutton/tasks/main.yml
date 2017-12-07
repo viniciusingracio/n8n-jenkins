@@ -6,7 +6,20 @@
   become: true
   apt:
     name: language-pack-en
-    state: present
+    state: '{{ bigbluebutton_apt_state }}'
+
+- name: Install entropy daemon
+  become: true
+  apt:
+    name: haveged
+    state: '{{ bigbluebutton_apt_state }}'
+
+- name: Enable haveged daemon
+  service:
+    name: haveged
+    state: started
+    enabled: yes
+  become: yes
 
 - name: Set default locale
   become: true
@@ -15,7 +28,7 @@
 - name: Add BigBlueButton apt key
   become: true
   apt_key:
-    url: "http://ubuntu.bigbluebutton.org/repo/bigbluebutton.asc"
+    url: '{{ bigbluebutton_apt_key }}'
     state: present
   register: aptkey
 
@@ -27,7 +40,7 @@
   register: aptrepos
   with_items:
     - 'deb http://archive.ubuntu.com/ubuntu/ xenial multiverse'
-    - 'deb http://ubuntu.bigbluebutton.org/xenial-110/ bigbluebutton-xenial main'
+    - '{{ bigbluebutton_apt_source }}'
 
 - name: Update apt if keys changed
   become: true
@@ -38,7 +51,69 @@
   become: true
   apt:
     name: bigbluebutton
-    state: present
+    state: '{{ bigbluebutton_apt_state }}'
+  notify: restart bigbluebutton
+
+- name: Upgrade packages to make sure BigBlueButton packages are updated
+  become: true
+  apt:
+    upgrade: safe
+  when: bigbluebutton_apt_state == 'latest'
+  notify: restart bigbluebutton
+
+- name: Create certs directory for nginx
+  file:
+    path: /etc/nginx/ssl
+    recurse: yes
+    state: directory
+  become: yes
+
+- name: Generate dhparam
+  command: openssl dhparam -out /etc/nginx/ssl/dhp-2048.pem 2048
+  args:
+    creates: /etc/nginx/ssl/dhp-2048.pem
+  become: yes
+  notify: reload nginx
+
+- name: Copy certificates
+  copy:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+  become: yes
+  with_items:
+    - { src: '{{ local_ssl_certificate }}', dest: '{{ ssl_certificate }}' }
+    - { src: '{{ local_ssl_certificate_key }}', dest: '{{ ssl_certificate_key }}' }
+  when: not((local_ssl_certificate is undefined) or (local_ssl_certificate is none) or (local_ssl_certificate | trim == ''))
+    and not((local_ssl_certificate_key is undefined) or (local_ssl_certificate_key is none) or (local_ssl_certificate_key | trim == ''))
+  notify: reload nginx
+
+- name: Add ssl configuration on nginx
+  blockinfile:
+    dest: /etc/nginx/sites-available/bigbluebutton
+    block: |2
+           listen 443 ssl;
+           listen [::]:443 ssl;
+           ssl_certificate {{ ssl_certificate }};
+           ssl_certificate_key {{ ssl_certificate_key}};
+           ssl_session_cache shared:SSL:10m;
+           ssl_session_timeout 10m;
+           # need TLSv1 for the Java calls for the API, otherwise it would be removed
+           ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+           ssl_ciphers "EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH";
+           ssl_prefer_server_ciphers on;
+           ssl_dhparam /etc/nginx/ssl/dhp-2048.pem;
+           ssl_ecdh_curve secp384r1; # Requires nginx >= 1.1.0
+           ssl_session_tickets off; # Requires nginx >= 1.5.9
+           ssl_stapling on; # Requires nginx >= 1.3.7
+           ssl_stapling_verify on; # Requires nginx => 1.3.7
+           # still unclear why we need to set the resolver
+           # resolver $DNS-IP-1 $DNS-IP-2 valid=300s;
+           # resolver_timeout 5s;
+           add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload";
+    insertafter: '.*server_name .*'
+    marker: '     # {mark} ANSIBLE MANAGED BLOCK'
+  become: yes
+  notify: reload nginx
 
 - name: Get IP set on BigBlueButton
   command: bbb-conf --secret
@@ -47,16 +122,25 @@
 - name: Set IP on BigBlueButton
   become: true
   command: bbb-conf --setip '{{ inventory_hostname }}'
-  # notify: restart bigbluebutton
   when: not bbbip.stdout | search("http[s]?://" + inventory_hostname)
 
 - name: Install demos
   become: true
   apt:
     name: bbb-demo
-    state: present
+    state: '{{ bigbluebutton_apt_state }}'
   when: bigbluebutton_demos
-  notify: restart bigbluebutton
+  register: reg_demo
+
+- name: Restart tomcat7
+  command: service tomcat7 restart
+  become: true
+  when: reg_demo.changed
+
+- name: Wait until demo is deployed before continuing
+  wait_for:
+    path: /var/lib/tomcat7/webapps/demo/bbb_api_conf.jsp
+  when: bigbluebutton_demos
 
 - name: Remove demos
   become: true
@@ -64,6 +148,182 @@
     name: bbb-demo
     state: absent
   when: not bigbluebutton_demos
+
+- name: Make sure demo is removed
+  file:
+    path: /var/lib/tomcat7/demo
+    recurse: yes
+    state: absent
+  become: yes
+  when: not bigbluebutton_demos
+
+- name: Set HTTPS on bigbluebutton.properties
+  replace:
+    path: '{{ item }}'
+    regexp: 'http:\/\/{{ inventory_hostname }}'
+    replace: 'https://{{ inventory_hostname }}'
+  with_items:
+    - /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties
+    - /var/lib/tomcat7/webapps/demo/bbb_api_conf.jsp
+    - /var/www/bigbluebutton/client/conf/config.xml
+    - /usr/share/red5/webapps/screenshare/WEB-INF/screenshare.properties
+  ignore_errors: yes
+  become: yes
+  notify: restart bigbluebutton
+
+# http://docs.ansible.com/ansible/latest/playbooks_lookups.html#the-dns-lookup-dig
+# couldn't make dig lookup use dnspython on the guest
+- name: Define external IP
+  set_fact:
+    # external_ip: "{{ lookup('dig', inventory_hostname, '@8.8.8.8') }}"
+    external_ip: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | head -n 1') }}"
+- name: Define wss_binding value
+  set_fact:
+    wss_binding_value: '{% if ansible_default_ipv4.address == external_ip %}:7443{% else %}{{ external_ip }}:7443{% endif %}'
+
+# http://docs.bigbluebutton.org/install/install.html#configure-a-dummy-nic-if-required
+- name: Check if dummy NIC required
+  command: 'curl --max-time 5 --trace-ascii - -k https://{{ external_ip }}:443/bigbluebutton/api'
+  ignore_errors: yes
+  register: reg_dummy
+
+- name: Add dummy NIC
+  command: 'ip addr add {{ external_ip }}/32 dev lo'
+  become: yes
+  when: reg_dummy|failed
+  
+- name: Add dummy NIC to network interfaces
+  blockinfile:
+    dest: /etc/network/interfaces
+    block: |2
+              post-up ip addr add {{ external_ip }}/32 dev lo
+              pre-down ip addr del {{ external_ip }}/32 dev lo
+    insertafter: 'iface lo inet loopback'
+    marker: '        # {mark} ANSIBLE MANAGED BLOCK'
+  become: yes
+  when: reg_dummy|failed
+
+- name: Set HTTPS on sip.nginx
+  replace:
+    path: '/etc/bigbluebutton/nginx/sip.nginx'
+    regexp: 'http[s]?:\/\/[0-9\.]*:\d+'
+    replace: 'https://{{ external_ip }}:7443'
+  become: yes
+  notify: reload nginx
+
+- name: Read wss-binding attribute
+  xml:
+    path: /opt/freeswitch/conf/sip_profiles/external.xml
+    xpath: '{{ item }}'
+    content: attribute
+    attribute: value
+  with_items:
+    - /profile/settings/param[@name="ws-binding"]
+    - /profile/settings/param[@name="wss-binding"]
+  register: hits
+  ignore_errors: yes
+  become: yes
+
+- name: Remove ws-binding
+  xml:
+    path: /opt/freeswitch/conf/sip_profiles/external.xml
+    xpath: /profile/settings/param[@name="ws-binding"]
+    state: absent
+  become: yes
+  when: not bigbluebutton_sip
+  notify: restart bigbluebutton
+
+- name: Modify ws-binding if it exists
+  xml:
+    path: /opt/freeswitch/conf/sip_profiles/external.xml
+    xpath: /profile/settings/param[@name="ws-binding"]
+    attribute: value
+    value: :5066
+  become: yes
+  when: hits.results[0]|succeeded and bigbluebutton_sip
+  notify: restart bigbluebutton
+
+- name: Add ws-binding if it doesn't exist
+  xml:
+    path: /opt/freeswitch/conf/sip_profiles/external.xml
+    xpath: /profile/settings
+    add_children:
+      - param:
+          name: ws-binding
+          value: :5066
+    pretty_print: yes
+  become: yes
+  when: hits.results[0]|failed and bigbluebutton_sip
+  notify: restart bigbluebutton
+
+- name: Modify wss-binding if it exists
+  xml:
+    path: /opt/freeswitch/conf/sip_profiles/external.xml
+    xpath: /profile/settings/param[@name="wss-binding"]
+    attribute: value
+    value: '{{ wss_binding_value }}'
+  become: yes
+  when: hits.results[1]|succeeded
+  notify: restart bigbluebutton
+
+- name: Add wss-binding if it doesn't exist
+  xml:
+    path: /opt/freeswitch/conf/sip_profiles/external.xml
+    xpath: /profile/settings
+    add_children:
+      - param:
+          name: wss-binding
+          value: '{{ wss_binding_value }}'
+    pretty_print: yes
+  become: yes
+  when: hits.results[1]|failed
+  notify: restart bigbluebutton
+
+- name: Define FreeSWITCH external SIP port
+  set_fact:
+    freeswitch_sip_port: '{% if bigbluebutton_sip %}5062{% else %}5060{% endif %}'
+
+- name: Modify FreeSWTICH vars.xml
+  xml:
+    path: /opt/freeswitch/conf/vars.xml
+    xpath: '{{ item.xpath }}'
+    attribute: '{{ item.attribute }}'
+    value: '{{ item.value }}'
+  with_items:
+    - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "external_sip_port=")]', attribute: 'data', value: 'external_sip_port={{ freeswitch_sip_port }}' }
+    - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "external_rtp_ip=")]', attribute: 'data', value: 'external_rtp_ip={{ external_ip }}' }
+    - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "external_sip_ip=")]', attribute: 'data', value: 'external_sip_ip={{ external_ip }}' }
+  become: yes
+  notify: restart bigbluebutton
+
+- name: Modify FreeSWTICH external.xml
+  xml:
+    path: /opt/freeswitch/conf/sip_profiles/external.xml
+    xpath: '{{ item.xpath }}'
+    attribute: '{{ item.attribute }}'
+    value: '{{ item.value }}'
+  with_items:
+    - { xpath: '/profile/settings/param[@name="ext-rtp-ip"]', attribute: 'value', value: '$${external_rtp_ip}' }
+    - { xpath: '/profile/settings/param[@name="ext-sip-ip"]', attribute: 'value', value: '$${external_sip_ip}' }
+  become: yes
+  notify: restart bigbluebutton
+
+- name: Modify external_sip_port on bbb-voice
+  lineinfile:
+    dest: /usr/share/red5/webapps/sip/WEB-INF/bigbluebutton-sip.properties
+    state: present
+    regexp: ^freeswitch\.port=
+    line: 'freeswitch.port={{ freeswitch_sip_port }}'
+  become: yes
+  notify: restart bigbluebutton
+
+- name: Enable WebRTC stats
+  xml:
+    path: /var/www/bigbluebutton/client/conf/config.xml
+    xpath: //module[@name="PhoneModule"]
+    attribute: showWebRTCStats
+    value: 'true'
+  become: yes
   notify: restart bigbluebutton
 
 - name: Open/close redis
@@ -86,7 +346,18 @@
   when: not bigbluebutton_redis_bind
   notify: restart redis
 
+- include: html5.yml
+  when: bigbluebutton_html5
+
+- include: sip.yml
+  when: bigbluebutton_sip
+
+- include: branding.yml
+  tags:
+    - branding
+
 - include: ufw.yml
+  when: not skip_ufw
   tags: [ufw,firewall]
 
 # - include: rap-resque.yml

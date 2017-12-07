@@ -5,3 +5,15 @@
 - name: restart redis
   become: true
   service: name=redis state=restarted
+
+- name: restart bbb-html5
+  become: true
+  service: name=bbb-html5 state=restarted
+
+- name: reload nginx
+  become: true
+  service: name=nginx state=reloaded
+
+- name: start mongo
+  become: true
+  service: name=mongod state=started
