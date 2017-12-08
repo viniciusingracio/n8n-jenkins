@@ -22,3 +22,5 @@ mconf_registry_password: INCMc0nfito123
 certbot_enabled: false
 
 skip_ufw: false
+
+public_keys: [ "public_keys/daronco.pub", "public_keys/fcecagno.pub" ]
