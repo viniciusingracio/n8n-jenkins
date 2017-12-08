@@ -92,5 +92,5 @@
   become: yes
 
 - name: Hold ffmpeg package (with aptitude)
-  command: aptitude hold ffmpeg
+  command: aptitude -y hold ffmpeg
   become: yes
