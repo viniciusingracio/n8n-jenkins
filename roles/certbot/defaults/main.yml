@@ -1,7 +1,7 @@
 ---
 
 # Domain get a certificate to
-certbot_domain: change-me.mconf.com
+certbot_domain: '{{ inventory_hostname }}'
 
 # Certbot commands
 certbot_base_cmd: 'certonly --non-interactive --register-unsafely-without-email --agree-tos --expand --domain {{ certbot_domain }}'
