@@ -20,3 +20,5 @@ mconf_registry_password: INCMc0nfito123
 
 # Disable certbot by default, enabled for specific roles/hosts
 certbot_enabled: false
+
+skip_ufw: false
