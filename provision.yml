@@ -123,3 +123,7 @@
 - hosts: vtraining-debriefing
   roles:
   - vtraining-debriefing
+
+- hosts: jenkins
+  roles:
+  - jenkins
