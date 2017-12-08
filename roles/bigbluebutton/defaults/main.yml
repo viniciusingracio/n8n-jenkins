@@ -5,6 +5,7 @@ bigbluebutton_apt_key: "http://ubuntu.bigbluebutton.org/repo/bigbluebutton.asc"
 bigbluebutton_apt_source: "deb http://ubuntu.bigbluebutton.org/xenial-200/ bigbluebutton-xenial main"
 # Install BigBlueButton 1.1
 # bigbluebutton_apt_source: "deb http://ubuntu.bigbluebutton.org/xenial-110/ bigbluebutton-xenial main"
+bigbluebutton_apt_package: bigbluebutton
 
 # Install HTML5 client
 bigbluebutton_html5: false

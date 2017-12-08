@@ -68,8 +68,7 @@
     attribute: '{{ item.attribute }}'
     value: '{{ item.value }}'
   with_items:
-    # - { xpath: '/config/branding', attribute: 'logo', value: 'https://s3-sa-east-1.amazonaws.com/assets.mconf.com/logo-mconftec.png' }
-    - { xpath: '/config/branding', attribute: 'logo', value: 'logo.png' }
+    - { xpath: '/config/branding', attribute: 'logo', value: '/logo_client.png' }
     - { xpath: '/config/branding', attribute: 'copyright', value: '{{ bigbluebutton_branding_copyright }}' }
     - { xpath: '/config/branding', attribute: 'toolbarColor', value: '{{ bigbluebutton_branding_toolbar_color }}' }
     - { xpath: '/config/branding', attribute: 'toolbarColorAlphas', value: '{{ bigbluebutton_branding_toolbar_color_alphas }}' }

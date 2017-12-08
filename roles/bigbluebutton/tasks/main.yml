@@ -50,7 +50,7 @@
 - name: Install BigBlueButton
   become: true
   apt:
-    name: bigbluebutton
+    name: '{{ bigbluebutton_apt_package }}'
     state: '{{ bigbluebutton_apt_state }}'
   notify: restart bigbluebutton
 

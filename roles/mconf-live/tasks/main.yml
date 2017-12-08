@@ -1,2 +1,7 @@
+- include_role:
+    name: bigbluebutton
+  vars:
+    - bigbluebutton_apt_package: mconf-live
+
 - include: ufw.yml
   tags: [ufw,firewall]
