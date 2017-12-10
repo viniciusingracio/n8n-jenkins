@@ -30,24 +30,39 @@
   become: yes
   when: not((bigbluebutton_branding_logo_playback is undefined) or (bigbluebutton_branding_logo_playback is none) or (bigbluebutton_branding_logo_playback | trim == ''))
 
-# xml module doesn't work with html
-# - name: Customize playback.html
-#   xml:
-#     path: /var/bigbluebutton/playback/presentation/0.9.0/playback.html
-#     xpath: '{{ item.xpath }}'
-#     value: '{{ item.value }}'
-#   with_items:
-#     - { xpath: '//div[@id="copyright"]', value: 'logo.png' }
-#     - { xpath: '//p[@id="load-error-msg"]', value: '{{ bigbluebutton_branding_copyright }}' }
-#     - { xpath: '//title', value: '{{ bigbluebutton_branding_toolbar_color }}' }
-#   become: yes
-
-- name: Download once again bbb-client
-  command: apt-get download bbb-client
+- name: Customize error message on playback
+  replace:
+    path: /var/bigbluebutton/playback/presentation/0.9.0/playback.html
+    regexp: '(<p id="load-error-msg">)[^<]*'
+    replace: '\1{{ bigbluebutton_branding_playback_error }}'
   become: yes
 
+- name: Customize page title on playback
+  replace:
+    path: /var/bigbluebutton/playback/presentation/0.9.0/lib/writing.js
+    regexp: '(    document.title =) "[^"]*";'
+    replace: '\1 "{{ bigbluebutton_branding_playback_title }}";'
+  become: yes
+
+- name: Customize copyright on playback
+  replace:
+    path: /var/bigbluebutton/playback/presentation/0.9.0/playback.js
+    regexp: '(  copyright = typeof copyright !== ''undefined'' \? copyright :) ''[^'']*'';'
+    replace: '\1 ''{{ bigbluebutton_branding_playback_copyright }}'';'
+  become: yes
+
+- name: Create temporary directory for bbb-client
+  tempfile:
+    state: directory
+  register: tmpdir_client
+
+- name: Download bbb-client from repo
+  command: apt-get download bbb-client
+  args:
+    chdir: '{{ tmpdir_client.path }}'
+
 - name: Reset config.xml
-  shell: 'dpkg-deb --fsys-tarfile /var/cache/apt/archives/bbb-client_*.deb | tar -x ./var/www/bigbluebutton/client/conf/config.xml --strip-components=6'
+  shell: 'dpkg-deb --fsys-tarfile {{ tmpdir_client.path }}/bbb-client_*.deb | tar -x ./var/www/bigbluebutton/client/conf/config.xml --strip-components=6'
   args:
     chdir: /var/www/bigbluebutton/client/conf/
   become: yes
@@ -61,6 +76,11 @@
   become: yes
   notify: restart bigbluebutton
 
+- name: Remove temporary directory for bbb-client
+  file:
+    path: '{{ tmpdir_client }}'
+    state: absent
+
 - name: Customize config.xml
   xml:
     path: /var/www/bigbluebutton/client/conf/config.xml
@@ -68,16 +88,15 @@
     attribute: '{{ item.attribute }}'
     value: '{{ item.value }}'
   with_items:
-    - { xpath: '/config/branding', attribute: 'logo', value: '/logo_client.png' }
+    - { xpath: '/config/branding', attribute: 'logo', value: 'logo.png' }
     - { xpath: '/config/branding', attribute: 'copyright', value: '{{ bigbluebutton_branding_copyright }}' }
     - { xpath: '/config/branding', attribute: 'toolbarColor', value: '{{ bigbluebutton_branding_toolbar_color }}' }
     - { xpath: '/config/branding', attribute: 'toolbarColorAlphas', value: '{{ bigbluebutton_branding_toolbar_color_alphas }}' }
     - { xpath: '/config/mconfDeskshare', attribute: 'downloadLinkWindows', value: '{{ bigbluebutton_branding_deskshare_windows }}' }
     - { xpath: '/config/mconfDeskshare', attribute: 'downloadLinkMacOS', value: '{{ bigbluebutton_branding_deskshare_mac }}' }
+    - { xpath: '//module[@name="PhoneModule"]', attribute: 'showWebRTCStats', value: 'true' }
   become: yes
   notify: restart bigbluebutton
-  tags:
-    - teste
 
 - name: Create link to Mconf-Live.html
   file:
