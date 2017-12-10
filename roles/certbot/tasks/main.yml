@@ -1,7 +1,7 @@
 # TODO: make a module with this?
 - name: check if port 80 is used
   become: true
-  shell: netstat -tuln | grep :80
+  shell: netstat -tuln | grep ':80 '
   register: port_80
   failed_when: False # never fail
 
