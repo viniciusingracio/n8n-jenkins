@@ -1,0 +1,2 @@
+- name: docker logout
+  command: 'docker logout {{ mconf_registry_host }}'
