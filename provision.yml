@@ -64,7 +64,7 @@
 
 - hosts: bigbluebutton-dev
   vars:
-    skip_ufw: yes
+    ufw_enabled: false
   roles:
   - bigbluebutton-dev
 
@@ -81,6 +81,8 @@
   roles:
 #  - certbot
   - bigbluebutton
+  vars:
+    ufw_enabled: false
 
 # Mconf-Live
 - hosts: mconf-live200

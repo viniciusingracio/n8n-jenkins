@@ -4,4 +4,5 @@
     - bigbluebutton_apt_package: mconf-live
 
 - include: ufw.yml
+  when: ufw_enabled
   tags: [ufw,firewall]

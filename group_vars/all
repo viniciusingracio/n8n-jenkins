@@ -21,6 +21,6 @@ mconf_registry_password: INCMc0nfito123
 # Disable certbot by default, enabled for specific roles/hosts
 certbot_enabled: false
 
-skip_ufw: false
+ufw_enabled: true
 
 public_keys: [ "public_keys/daronco.pub", "public_keys/fcecagno.pub" ]

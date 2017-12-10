@@ -357,7 +357,7 @@
     - branding
 
 - include: ufw.yml
-  when: not skip_ufw
+  when: ufw_enabled
   tags: [ufw,firewall]
 
 # - include: rap-resque.yml
