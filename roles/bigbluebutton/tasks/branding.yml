@@ -64,26 +64,19 @@
 - name: Reset config.xml
   shell: 'dpkg-deb --fsys-tarfile {{ tmpdir_client.path }}/bbb-client_*.deb | tar -x ./var/www/bigbluebutton/client/conf/config.xml --strip-components=6'
   args:
-    chdir: /var/www/bigbluebutton/client/conf/
-  become: yes
+    chdir: '{{ tmpdir_client.path }}'
+
 - replace:
-    path: /var/www/bigbluebutton/client/conf/config.xml
+    path: '{{ tmpdir_client.path }}/config.xml'
     regexp: '{{ item.regexp }}'
     replace: '{{ item.replace }}'
   with_items:
     - { regexp: 'http:\/\/HOST', replace: 'https://HOST' }
     - { regexp: 'HOST', replace: '{{ inventory_hostname }}' }
-  become: yes
-  notify: restart bigbluebutton
-
-- name: Remove temporary directory for bbb-client
-  file:
-    path: '{{ tmpdir_client }}'
-    state: absent
 
 - name: Customize config.xml
   xml:
-    path: /var/www/bigbluebutton/client/conf/config.xml
+    path: '{{ tmpdir_client.path }}/config.xml'
     xpath: '{{ item.xpath }}'
     attribute: '{{ item.attribute }}'
     value: '{{ item.value }}'
@@ -95,8 +88,19 @@
     - { xpath: '/config/mconfDeskshare', attribute: 'downloadLinkWindows', value: '{{ bigbluebutton_branding_deskshare_windows }}' }
     - { xpath: '/config/mconfDeskshare', attribute: 'downloadLinkMacOS', value: '{{ bigbluebutton_branding_deskshare_mac }}' }
     - { xpath: '//module[@name="PhoneModule"]', attribute: 'showWebRTCStats', value: 'true' }
+
+- name: Copy temporary config.xml to client dir
+  copy:
+    src: '{{ tmpdir_client.path }}/config.xml'
+    dest: /var/www/bigbluebutton/client/conf/config.xml
+    remote_src: yes
   become: yes
   notify: restart bigbluebutton
+
+- name: Remove temporary directory for bbb-client
+  file:
+    path: '{{ tmpdir_client }}'
+    state: absent
 
 - name: Create link to Mconf-Live.html
   file:
