@@ -1,3 +1,6 @@
 [submodule "envs/prod"]
 	path = envs/prod
 	url = git@github.com:mconftec/mconf-ansihub-private-envs.git
+[submodule "roles/dj-wasabi.zabbix-agent"]
+	path = roles/dj-wasabi.zabbix-agent
+	url = https://github.com/dj-wasabi/ansible-zabbix-agent.git
