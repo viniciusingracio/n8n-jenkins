@@ -19,9 +19,9 @@ bigbluebutton_screenshare_extension_key:
 bigbluebutton_branding_welcome: '<br>Welcome to <b>%%CONFNAME%%</b>!<br>'
 bigbluebutton_branding_welcome_footer: 'For more information, visit <a href="https://mconf.com" target="_blank"><u>mconf.com</u></a>.'
 bigbluebutton_branding_layout:
-bigbluebutton_branding_logo_client:
+bigbluebutton_branding_logo_client: /logo_client.png
 bigbluebutton_branding_logo_playback:
-bigbluebutton_branding_copyright: '&#169; 2017 Mconf Tecnologia &#183; <u><a href="https://mconf.com" target="_blank">https://mconf.com</a></u>;'
+bigbluebutton_branding_copyright: '&#169; 2017 Mconf Tecnologia &#183; <u><a href="https://mconf.com" target="_blank">https://mconf.com</a></u>'
 bigbluebutton_branding_toolbar_color: '0x33132A'
 bigbluebutton_branding_toolbar_color_alphas: '0, 0'
 bigbluebutton_branding_deskshare_windows: https://s3-sa-east-1.amazonaws.com/assets.mconf.com/Mconf+Deskshare-1.0.2.4-installer-32bit-unsigned.exe

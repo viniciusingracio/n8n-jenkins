@@ -5,7 +5,8 @@
     - { rule: 'allow', port: 80, proto: 'tcp' }
     - { rule: 'allow', port: 443, proto: 'tcp' }
     - { rule: 'allow', port: 1935, proto: 'tcp' }
-    - { rule: 'allow', port: 7443, proto: 'tcp' }
-    - { rule: 'allow', port: '16384:32768', proto: 'udp' }
+    - { rule: 'allow', port: '1:65535', proto: 'udp' }
+    - { rule: 'allow', port: 5060, proto: 'tcp', when: bigbluebutton_sip }
+    - { rule: 'allow', port: 10050, proto: 'tcp', when: zabbix_agent_enabled }
   notify:
     - restart ufw
