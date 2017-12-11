@@ -23,4 +23,6 @@ certbot_enabled: false
 
 ufw_enabled: true
 
+zabbix_agent_enabled: false
+
 public_keys: [ "public_keys/daronco.pub", "public_keys/fcecagno.pub" ]
