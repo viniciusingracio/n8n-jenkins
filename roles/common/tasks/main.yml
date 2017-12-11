@@ -6,5 +6,7 @@
   when: ufw_enabled
 - include: python.yml
   tags: [python]
+- include: swap.yml
+  tags: [swap]
 
 # TODO setup NTP
