@@ -16,3 +16,4 @@ bigbluebutton_external_rap: false
 # Fetch source code from
 bigbluebutton_external_rap_repo: https://github.com/daronco/bigbluebutton.git
 bigbluebutton_external_rap_ref: rap-on-docker
+

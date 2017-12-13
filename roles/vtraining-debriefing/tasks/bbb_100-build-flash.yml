@@ -1,0 +1,42 @@
+- name: Reset config.xml
+  shell: |
+    cp resources/config.xml.template src/conf/config.xml
+    sed -i 's|http://|https://|g' src/conf/config.xml
+    sed -i 's|HOST|{{ inventory_hostname }}|g' src/conf/config.xml
+    ant init-ant-contrib copy-resource-files
+  args:
+    chdir: '{{ ansible_env.HOME }}/dev/bigbluebutton/bigbluebutton-client'
+  environment:
+    JAVA_HOME: '/usr/lib/jvm/java-7-openjdk-amd64'
+    ANT_OPTS: '-Xmx512m -XX:MaxPermSize=768m'
+    FLEX_HOME: '{{ ansible_env.HOME }}/dev/tools/flex'
+    PATH: '{{ ansible_env.HOME }}/dev/tools/flex/bin:{{ ansible_env.PATH }}'
+
+- name: Build flash client
+  shell: |
+    ant locales
+    ant
+  args:
+    chdir: '{{ ansible_env.HOME }}/dev/bigbluebutton/bigbluebutton-client'
+  environment:
+    JAVA_HOME: '/usr/lib/jvm/java-7-openjdk-amd64'
+    ANT_OPTS: '-Xmx512m -XX:MaxPermSize=768m'
+    FLEX_HOME: '{{ ansible_env.HOME }}/dev/tools/flex'
+    PATH: '{{ ansible_env.HOME }}/dev/tools/flex/bin:{{ ansible_env.PATH }}'
+  tags:
+    - build-flash-slow
+
+- name: Copy custom nginx file for the client
+  template:
+    src: files/client.nginx.j2
+    dest: /etc/bigbluebutton/nginx/client_dev
+    mode: 0644
+  become: yes
+  tags: [nginx,nginx-bbb]
+
+- name: Create link for client.nginx
+  file:
+    src: /etc/bigbluebutton/nginx/client_dev
+    dest: /etc/bigbluebutton/nginx/client.nginx
+    state: link
+  become: yes

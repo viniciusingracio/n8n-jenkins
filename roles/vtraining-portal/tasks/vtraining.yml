@@ -1,0 +1,134 @@
+- git:
+    repo: git@bitbucket.org:i9access/mirtrainer.git
+    dest: '{{ ansible_env.HOME }}/dev/vtraining'
+    version: master
+    accept_hostkey: true
+    recursive: false
+    update: true
+    force: true
+
+- name: Modify seed to include BigBlueButton server
+  blockinfile:
+    dest: '{{ ansible_env.HOME }}/dev/vtraining/db/seeds.rb'
+    block: |
+        BigbluebuttonServer.create(name: 'default', url: Rails.application.secrets.bigbluebutton_url, secret: Rails.application.secrets.bigbluebutton_secret, param: 'default')
+    insertafter: EOF
+    marker: '# {mark} ANSIBLE MANAGED BLOCK'
+    create: yes 
+  become: yes
+
+- template:
+    src: files/secrets.yml.j2
+    dest: '{{ ansible_env.HOME }}/dev/vtraining/config/secrets.yml'
+    mode: '0644'
+  notify: restart vtraining
+
+- template:
+    src: files/database.yml.j2
+    dest: '{{ ansible_env.HOME }}/dev/vtraining/config/database.yml'
+    mode: '0644'
+  notify: restart vtraining
+
+- name: Install VTraining dependencies
+  become: yes
+  apt:
+    name: '{{ item }}'
+    state: present
+  with_items:
+    - postgresql-server-dev-9.3
+    - postgresql-contrib-9.3
+    - zlib1g-dev
+    - build-essential
+    - libreadline-dev
+    - libssl-dev
+    - redis-server
+    - libav-tools
+
+- name: Install bundler
+  command: gem install bundler
+  args:
+    chdir: '{{ ansible_env.HOME }}/dev/vtraining'
+  environment:
+    PATH: '{{ ansible_env.HOME }}/.rbenv/shims:{{ ansible_env.PATH }}'
+
+# TODO --without pg se o banco for sqlserver
+- name: Install VTraining ruby dependencies
+  command: bundle install --without sqlserver, test
+  args:
+    chdir: '{{ ansible_env.HOME }}/dev/vtraining'
+  environment:
+    PATH: '{{ ansible_env.HOME }}/.rbenv/shims:{{ ansible_env.PATH }}'
+  when: vtraining_database == 'postgresql'
+
+- name: Set locales
+  lineinfile:
+    dest: '/etc/default/locale'
+    state: present
+    regexp: '{{ item.regexp }}'
+    line: '{{ item.line }}'
+  become: yes
+  with_items:
+    - { regexp: '^LANGUAGE=', line: 'LANGUAGE="en_US.UTF-8"' }
+    - { regexp: '^LC_ALL=', line: 'LC_ALL="en_US.UTF-8"' }
+
+- service:
+    name: postgresql
+    state: started
+    enabled: yes
+  become: yes
+
+- name: Test user
+  command: bash -c 'psql -c "\du" | cut -d \| -f 1 | grep -qw {{ vtraining_database_username }}'
+  become: yes
+  become_user: postgres
+  register: postgres_user
+  ignore_errors: yes
+
+- name: Create user
+  command: psql -c "create user {{ vtraining_database_username }} with password '{{ vtraining_database_password }}';"
+  become: yes
+  become_user: postgres
+  when: postgres_user|failed
+
+- name: Create role and template
+  command: '{{ item }}'
+  become: yes
+  become_user: postgres
+  with_items:
+    - psql -c "alter role {{ vtraining_database_username }} createrole createdb;"
+
+- name: Test database
+  command: bash -c 'psql -lqt | cut -d \| -f 1 | grep -qw {{ vtraining_database_name }}'
+  become: yes
+  become_user: postgres
+  register: postgres_database
+  ignore_errors: yes
+
+# Para remover o banco:
+#
+# cd ~/dev/vtraining
+# bundle exec rake db:drop
+- name: Seed database
+  command: bundle exec rake {{ item }} RAILS_ENV=development
+  args:
+    chdir: '{{ ansible_env.HOME }}/dev/vtraining'
+  with_items:
+    - db:create
+    - db:migrate
+    - db:seed
+  when: postgres_database|failed
+  environment:
+    PATH: '{{ ansible_env.HOME }}/.rbenv/shims:{{ ansible_env.PATH }}'
+
+- template:
+    src: files/vtraining.upstart.j2
+    dest: /etc/init/vtraining.conf
+    mode: 0644
+  become: yes
+
+- service:
+    name: vtraining
+    pattern: vtraining
+    state: started
+    enabled: yes
+  become: yes

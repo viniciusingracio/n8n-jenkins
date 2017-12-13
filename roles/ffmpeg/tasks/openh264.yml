@@ -1,0 +1,39 @@
+- name: Check if libopenh264 exists
+  stat:
+    path: /usr/lib/x86_64-linux-gnu/libopenh264.so.0
+  become: yes
+  register: openh264_lib
+
+- name: Define if openh264 needs to be build
+  set_fact:
+    build_openh264: not openh264_lib.stat.exists
+
+- name: Download and extract openh264
+  unarchive:
+    src: https://github.com/cisco/openh264/archive/v{{ openh264_version }}.tar.gz
+    dest: /usr/local/src/
+    remote_src: True
+    creates: /usr/local/src/openh264-{{ openh264_version }}
+  become: yes
+  when: build_openh264
+
+- name: Build openh264
+  make:
+    chdir: /usr/local/src/openh264-{{ openh264_version }}
+  become: yes
+  when: build_openh264
+
+- name: Install openh264
+  make:
+    chdir: /usr/local/src/openh264-{{ openh264_version }}
+    target: install
+  become: yes
+  when: build_openh264
+
+- name: Create link to openh264 library
+  file:
+    src: /usr/local/lib/libopenh264.so.0
+    dest: /usr/lib/x86_64-linux-gnu/libopenh264.so.0
+    state: link
+  become: yes
+  when: build_openh264

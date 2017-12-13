@@ -1,0 +1,262 @@
+- name: Install language pack
+  become: yes
+  apt:
+    name: language-pack-en
+    state: present
+
+- name: Set default locale
+  become: yes
+  command: update-locale LANG=en_US.UTF-8
+
+- name: Add BigBlueButton apt key
+  become: yes
+  apt_key:
+    url: "http://ubuntu.bigbluebutton.org/bigbluebutton.asc"
+    state: present
+  register: aptkey
+
+- name: Add multiverse and BigBlueButton repos to apt
+  become: yes
+  apt_repository:
+    repo: '{{ item }}'
+    state: present
+  register: aptrepos
+  with_items:
+    - 'ppa:libreoffice/libreoffice-4-4'
+    - 'ppa:ondrej/apache2'
+    - 'ppa:ondrej/php'
+    - 'ppa:0k53d-karl-f830m/openssl'
+    - 'deb http://archive.ubuntu.com/ubuntu/ trusty multiverse'
+    - 'deb http://ubuntu.bigbluebutton.org/trusty-1-0/ bigbluebutton-trusty main'
+
+- include: ffmpeg.yml
+  tags: [ffmpeg]
+
+- name: Update apt if keys changed
+  become: yes
+  apt: update_cache=yes
+  when: aptkey|changed or aptrepos|changed
+
+- name: Install BigBlueButton
+  become: yes
+  apt:
+    name: bigbluebutton
+    state: present
+
+# dependency of FreeSWITCH 1.9-dev
+- name: Install libedit2
+  apt:
+    name: libedit2
+    state: present
+
+- name: Install FreeSWITCH 1.9-dev
+  apt:
+    deb: http://jenkins-live-10x.mconf.com/apt/releases/201705250228/pool/main/b/bbb-freeswitch/bbb-freeswitch_0.9.0-1ubuntu8_amd64.deb
+    force: yes
+  become: yes
+  notify: stop freeswitch
+  tags: [freeswitch-1.9]
+
+- name: Hold FreeSWITCH package
+  command: apt-mark hold bbb-freeswitch
+  become: yes
+
+- name: Install FreeSWITCH dependencies
+  command: apt-get -f -y install
+  become: yes
+
+- name: Install specific libssl-dev
+  become: yes
+  apt:
+    name: libssl-dev=1.0.2g-1ubuntu11
+    state: present
+    force: yes
+
+- name: Hold libssl-dev package
+  command: apt-mark hold libssl-dev
+  become: yes
+
+- stat:
+    path: /opt/freeswitch/conf
+  become: yes
+  register: freeswitch_conf
+
+- file:
+    path: /opt/freeswitch/conf/
+    state: absent
+  become: yes
+  when: freeswitch_conf.stat.islnk is defined and freeswitch_conf.stat.islnk == False
+
+- file:
+    src: /opt/freeswitch/etc/freeswitch/
+    dest: /opt/freeswitch/conf
+    state: link
+  become: yes
+  when: freeswitch_conf.stat.islnk is defined and freeswitch_conf.stat.islnk == False
+
+- stat:
+    path: /opt/freeswitch/log
+  become: yes
+  register: freeswitch_log
+
+- file:
+    path: /opt/freeswitch/log
+    state: absent
+  become: yes
+  when: freeswitch_log.stat.islnk is defined and freeswitch_log.stat.islnk == False
+
+- file:
+    src: /opt/freeswitch/var/log/freeswitch
+    dest: /opt/freeswitch/log
+    state: link
+  become: yes
+  when: freeswitch_log.stat.islnk is defined and freeswitch_log.stat.islnk == False
+
+- stat:
+    path: /opt/freeswitch/run
+  become: yes
+  register: freeswitch_run
+
+- file:
+    path: /opt/freeswitch/run
+    state: absent
+  become: yes
+  when: freeswitch_run.stat.islnk is defined and freeswitch_run.stat.islnk == False
+
+- file:
+    src: /opt/freeswitch/var/run/freeswitch
+    dest: /opt/freeswitch/run
+    state: link
+  become: yes
+  when: freeswitch_run.stat.islnk is defined and freeswitch_run.stat.islnk == False
+
+- copy:
+    src: 'files/bbb/external-audio.xml'
+    dest: '/opt/freeswitch/conf/sip_profiles/'
+    mode: 0644
+    owner: freeswitch
+    group: daemon
+  become: yes
+
+- name: Add kurentowarnings profile
+  blockinfile:
+    dest: /opt/freeswitch/conf/autoload_configs/conference.conf.xml
+    block: |
+          <profile name="kurentowarnings">
+            <param name="domain" value="$${domain}"/>
+            <param name="rate" value="8000"/>
+            <param name="interval" value="20"/>
+            <param name="caller-id-name" value="$${outbound_caller_name}"/>
+            <param name="caller-id-number" value="$${outbound_caller_id}"/>
+            <param name="min-required-recording-participants" value="1"/>
+          </profile>
+    insertbefore: '</profiles>'
+    marker: '<!-- {mark} ANSIBLE MANAGED BLOCK -->'
+    create: yes 
+  become: yes
+
+- name: Set IP on vars.xml
+  lineinfile:
+    dest: /opt/freeswitch/conf/vars.xml
+    state: present
+    regexp: 'data="local_ip_v4='
+    line: '  <X-PRE-PROCESS cmd="set" data="local_ip_v4={{ ansible_default_ipv4.address }}"/>'
+  become: yes
+  tags: [sip]
+
+- template:
+    src: files/bigbluebutton.j2
+    dest: /etc/nginx/sites-available/bigbluebutton
+    mode: 0644
+    backup: yes
+  become: yes
+  tags: [nginx,nginx-bbb]
+
+- name: Create certs directory for nginx
+  file:
+    path: /etc/nginx/certs
+    mode: 0755
+    recurse: yes
+    state: directory
+  become: yes
+
+- name: Copy certificates
+  copy:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+  become: yes
+  with_items:
+    - { src: '{{ ssl_certificate }}', dest: '/etc/nginx/certs/server.crt' }
+    - { src: '{{ ssl_certificate_key }}', dest: '/etc/nginx/certs/server.key' }
+  notify: restart nginx
+
+- name: Delete certificate from Java keystore if already exists
+  command: 'keytool -delete -keystore /usr/lib/jvm/java-7-openjdk-amd64/jre/lib/security/cacerts -storepass changeit -noprompt -alias {{ inventory_hostname }}'
+  become: yes
+  ignore_errors: yes
+
+- name: Import certificate on Java keystore
+  command: 'keytool -import -trustcacerts -keystore /usr/lib/jvm/java-7-openjdk-amd64/jre/lib/security/cacerts -storepass changeit -noprompt -alias {{ inventory_hostname }} -file /etc/nginx/certs/server.crt'
+  become: yes
+
+- name: Get IP set on BigBlueButton
+  command: bbb-conf --secret
+  register: bbbip
+
+- name: Set IP on BigBlueButton
+  become: yes
+  command: bbb-conf --setip '{{ inventory_hostname }}'
+  # notify: restart bigbluebutton
+  when: not bbbip.stdout | search("http[s]?://" + inventory_hostname)
+
+- name: Set BigBlueButton salt
+  become: yes
+  command: bbb-conf --setsalt '{{ bigbluebutton_salt }}'
+  notify: restart bigbluebutton
+  when: not bbbip.stdout | search(bigbluebutton_salt)
+
+- name: Install demos
+  become: yes
+  apt:
+    name: bbb-demo
+    state: present
+  when: bigbluebutton_demos
+  notify: restart bigbluebutton
+
+- name: Remove demos
+  become: yes
+  apt:
+    name: bbb-demo
+    state: absent
+  when: bigbluebutton_demos == False
+  notify: restart bigbluebutton
+
+- name: Open/close redis
+  become: yes
+  lineinfile:
+    dest: /etc/redis/redis.conf
+    state: present
+    regexp: '^bind\s'
+    line: 'bind {{ bigbluebutton_redis_bind | join(" ") }}'
+  when: bigbluebutton_redis_bind
+  notify:
+    - restart redis-server
+    - restart bigbluebutton
+
+- name: Close redis to localhost
+  become: yes
+  lineinfile:
+    dest: /etc/redis/redis.conf
+    state: present
+    regexp: '^bind\s'
+    line: 'bind 127.0.0.1'
+  when: not bigbluebutton_redis_bind
+  notify:
+    - restart redis-server
+    - restart bigbluebutton
+
+- copy:
+    src: files/policy.xml
+    dest: /etc/ImageMagick/policy.xml
+    mode: 0644
+  become: yes

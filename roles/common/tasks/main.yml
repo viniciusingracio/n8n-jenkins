@@ -3,3 +3,7 @@
   tags: [apt]
 - include: ufw.yml
   tags: [ufw,firewall]
+- include: python.yml
+  tags: [python]
+
+# TODO setup NTP

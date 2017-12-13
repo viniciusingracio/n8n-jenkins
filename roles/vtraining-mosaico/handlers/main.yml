@@ -1,0 +1,7 @@
+- name: restart kms
+  become: true
+  service: name=kurento-media-server-6.0 state=restarted
+
+- name: restart monit
+  become: true
+  service: name=monit state=restarted

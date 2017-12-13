@@ -1,0 +1,61 @@
+- name: Install FFmpeg dependencies
+  become: yes
+  apt:
+    name: '{{ item }}'
+    state: present
+  with_items:
+    - yasm
+    - nasm
+    - wget
+    - git-core
+    - build-essential
+    - checkinstall
+    - yasm
+    - texi2html
+    - libvorbis-dev
+    - libx11-dev
+    - libvpx-dev
+    - libxfixes-dev
+    - zlib1g-dev
+    - pkg-config
+    - libxext-dev
+    - libv4l-dev
+    - netcat
+    - librtmp-dev
+    - libx264-dev
+    - libmp3lame-dev
+    - libopus-dev
+    - libtheora-dev
+    - libwebp-dev
+    - libspeex-dev
+    - libfreetype6-dev
+
+- include: openh264.yml
+  tags: [openh264]
+
+- name: Download and extract FFmpeg
+  unarchive:
+    src: http://ffmpeg.org/releases/ffmpeg-{{ ffmpeg_version }}.tar.bz2
+    dest: /usr/local/src
+    remote_src: True
+  become: yes
+
+# TODO do not if previous build was succeed
+- name: Configure FFmpeg
+  command: ./configure --enable-x11grab --enable-gpl --enable-version3 --enable-postproc --enable-libvorbis --enable-libvpx --enable-librtmp --enable-libx264 --enable-libtheora --enable-libvpx --enable-libwebp --enable-lsp --enable-libmp3lame --enable-libopus --enable-libspeex --enable-avresample --enable-libopenh264 --enable-libfreetype
+  args:
+    chdir: /usr/local/src/ffmpeg-{{ ffmpeg_version }}
+  become: yes
+
+# TODO do not if previous build was succeed
+- name: Build FFmpeg
+  make:
+    chdir: /usr/local/src/ffmpeg-{{ ffmpeg_version }}
+  become: yes
+
+# TODO do not if previous build was succeed
+- name: Install FFmpeg
+  command: checkinstall --pkgname=ffmpeg --pkgversion="5:${FFMPEG_VERSION}" --backup=no --deldoc=yes --default
+  args:
+    chdir: /usr/local/src/ffmpeg-{{ ffmpeg_version }}
+  become: yes

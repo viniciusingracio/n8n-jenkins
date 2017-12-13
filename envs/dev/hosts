@@ -15,3 +15,7 @@ kurento-desktopsharing.mconf.com ansible_user=root deploy_user=root
 
 [mconf-web-reports]
 10.0.3.173
+
+[vtraining]
+196.168.0.197
+196.168.0.198

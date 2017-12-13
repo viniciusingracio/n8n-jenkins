@@ -1,0 +1,48 @@
+- name: Stop tomcat7
+  service:
+    name: tomcat7
+    state: stopped
+  become: yes
+
+- name: Change permission over bbb-web.log
+  file:
+    path: /var/log/bigbluebutton/bbb-web.log
+    mode: 0666
+  become: yes
+
+- name: Remove bigbluebutton webapp
+  file:
+    path: '{{ item }}'
+    state: absent
+  become: yes
+  with_items:
+    - /var/lib/tomcat7/webapps/bigbluebutton
+    - /var/lib/tomcat7/webapps/bigbluebutton.war
+    - '{{ ansible_env.HOME }}/dev/bigbluebutton/bigbluebutton-web/target'
+
+- name: Set serverURL
+  lineinfile:
+    dest: '{{ ansible_env.HOME }}/dev/bigbluebutton/bigbluebutton-web/grails-app/conf/bigbluebutton.properties'
+    state: present
+    regexp: '^bigbluebutton\.web\.serverURL'
+    line: 'bigbluebutton.web.serverURL=https://{{ inventory_hostname }}'
+
+- name: Compile bbb-web
+  shell: |
+    gradle clean resolveDeps
+    grails clean
+    grails war
+  args:
+    chdir: '{{ ansible_env.HOME }}/dev/bigbluebutton/bigbluebutton-web'
+  environment:
+    JAVA_HOME: '/usr/lib/jvm/java-7-openjdk-amd64'
+    GRAILS_HOME: '{{ ansible_env.HOME }}/dev/tools/grails'
+    GRADLE_HOME: '{{ ansible_env.HOME }}/dev/tools/gradle'
+    PATH: '{{ ansible_env.HOME }}/dev/tools/gradle/bin:{{ ansible_env.HOME }}/dev/tools/grails/bin:{{ ansible_env.PATH }}'
+
+# TODO use copy when possible (issue with python2)
+- name: Deploy bbb-web
+  command: cp target/bigbluebutton-0.9.0.war /var/lib/tomcat7/webapps/bigbluebutton.war
+  become: yes
+  args:
+    chdir: '{{ ansible_env.HOME }}/dev/bigbluebutton/bigbluebutton-web'
