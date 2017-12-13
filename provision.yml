@@ -74,8 +74,6 @@
   - { role: certbot, when: certbot_enabled }
   - { role: dj-wasabi.zabbix-agent, when: zabbix_agent_enabled }
   - mconf-live
-  vars:
-    ufw_enabled: false
 
 # Mconf-Live
 - hosts: mconf-live200

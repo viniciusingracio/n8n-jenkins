@@ -17,3 +17,12 @@
   notify:
     - restart ufw
   when: bigbluebutton_redis_bind
+
+- name: Enable TCP/IP SYN cookies
+  become: true
+  replace:
+    path: /etc/ufw/sysctl.conf
+    regexp: '^[#]?(net/ipv4/tcp_syncookies)=.*'
+    replace: '\1=1'
+  notify:
+    - restart ufw
