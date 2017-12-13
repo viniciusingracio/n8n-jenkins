@@ -362,5 +362,9 @@
   when: ufw_enabled
   tags: [ufw,firewall]
 
+- include: zabbix.yml
+  when: zabbix_agent_enabled
+  tags: [zabbix]
+
 # - include: rap-resque.yml
 #   tags: [rap]
