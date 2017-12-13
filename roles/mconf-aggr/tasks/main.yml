@@ -1,0 +1,7 @@
+- include_tasks: container-zabbix.yml
+  tags: [container,docker]
+  when: mconf_aggr_type is 'zabbix'
+
+# - include_tasks: container-conf.yml
+#   tags: [container,docker]
+#   when: mconf_aggr_type is 'conf'

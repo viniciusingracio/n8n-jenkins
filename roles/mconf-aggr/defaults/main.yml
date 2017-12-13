@@ -1,0 +1,11 @@
+---
+
+# 'zabbix' or 'conf'
+mconf_aggr_type: ''
+
+# Docker image name and version
+mconf_aggr_image: '{{ mconf_registry_host }}/mconf-aggr'
+mconf_aggr_image_version: 'latest'
+
+# Configuration file
+mconf_aggr_config_path: "envs/{{ env }}/files/mconf-aggr/config.json"

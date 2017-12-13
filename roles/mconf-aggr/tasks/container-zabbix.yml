@@ -1,0 +1,23 @@
+- name: Copy env file with the variables to run the container
+  become: true
+  copy:
+    src: '{{ mconf_aggr_config_path }}'
+    dest: '/root/mconf-aggr-config.json'
+    owner: 'root'
+    group: 'root'
+    mode: 0600
+
+# TODO: remove old images
+- name: Pull the docker image
+  docker_image:
+    name: '{{ mconf_aggr_image }}'
+    tag: '{{ mconf_aggr_image_version }}'
+# TODO: restart the container if the file above changed
+
+- name: Start the container
+  docker_container:
+    name: mconf-aggr
+    image: '{{ mconf_aggr_image }}:{{ mconf_aggr_image_version }}'
+    restart_policy: unless-stopped
+    volumes:
+      - '/root/mconf-aggr-config.json:/usr/src/mconf-aggr/config/config.json'
