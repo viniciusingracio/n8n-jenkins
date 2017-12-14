@@ -2,7 +2,8 @@
     repo: git@github.com:mconftec/kurento-apps.git
     dest: '{{ ansible_env.HOME }}/dev/kurento-apps'
     accept_hostkey: true
-    update: false
+    update: true
+    force: true
   notify: restart kurento-apps
 
 # TODO extract environment to specific file
