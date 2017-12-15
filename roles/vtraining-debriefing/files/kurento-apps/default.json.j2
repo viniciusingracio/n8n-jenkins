@@ -14,7 +14,7 @@
     "server_timeout" : 10000,
     "recording_server": "0",
     "recording_timeout": 30000,
-    "recordings_path": "file:///opt/kurento-recordings/",
+    "recordings_path": "file:///mnt/recordings/",
     "server_timeout": 10000,
     "bitrate": {{ vtraining_kms_bitrate }}
   },
@@ -40,7 +40,7 @@
     "timeoutCallbackUrl": "{{ vtraining_media_recordings_server }}/media_recordings/",
     "timeoutCallbackMethod": "PUT",
     "closeRecordingTimeout": 5000,
-    "postRecordingMaximumTime": 60000,
+    "postRecordingMaximumTime": 60,
     "bitrate": {{ vtraining_kms_recording_bitrate }}
   },
 
