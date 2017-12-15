@@ -63,8 +63,6 @@
   - rec-worker-authorized
 
 - hosts: bigbluebutton-dev
-  vars:
-    ufw_enabled: false
   roles:
   - bigbluebutton-dev
 
@@ -74,6 +72,8 @@
   - { role: certbot, when: certbot_enabled }
   - { role: dj-wasabi.zabbix-agent, when: zabbix_agent_enabled }
   - mconf-live
+  vars:
+    bigbluebutton_install_libreoffice: true
 
 # Mconf-Live
 - hosts: mconf-live200

@@ -33,6 +33,9 @@ bigbluebutton_branding_playback_copyright: '<p>Recorded with <a target="_blank" 
 bigbluebutton_apt_state: latest
 # bigbluebutton_apt_state: present
 
+# we need to install bbb-libreoffice on 1.1 because it's nobody's dependencies
+bigbluebutton_install_libreoffice: false
+
 # Install/remove demos
 bigbluebutton_demos: false
 

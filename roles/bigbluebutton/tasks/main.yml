@@ -54,6 +54,14 @@
     state: '{{ bigbluebutton_apt_state }}'
   notify: restart bigbluebutton
 
+- name: Install bbb-libreoffice
+  become: true
+  apt:
+    name: bbb-libreoffice
+    state: '{{ bigbluebutton_apt_state }}'
+  when: bigbluebutton_install_libreoffice
+  notify: restart bigbluebutton
+
 - name: Upgrade packages to make sure BigBlueButton packages are updated
   become: true
   apt:
