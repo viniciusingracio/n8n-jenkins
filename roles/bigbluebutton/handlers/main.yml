@@ -17,3 +17,7 @@
 - name: start mongo
   become: true
   service: name=mongod state=started
+
+- name: restart zabbix-agent
+  become: true
+  service: name=zabbix-agent state=restarted

@@ -1,19 +1,21 @@
 - name: Create zabbix scripts dir
   file:
-    path: /etc/zabbix/scripts
+    path: /etc/zabbix/scripts/
     recurse: yes
     state: directory
   become: yes
 
-- name: Copy check
+- name: Copy scripts
   copy:
-    src: files/check.rb
-    dest: /etc/zabbix/scripts/check.rb
+    src: 'files/zabbix/'
+    dest: /etc/zabbix/scripts/
   become: yes
 
-- name: Copy userparams
-  copy:
-    src: files/userparams_mconf.conf
-    dest: /etc/zabbix/zabbix_agentd.d/userparams_mconf.conf
+- name: Setup
+  command: find /etc/zabbix/scripts/ -name setup.sh -exec chmod +x {} \; -exec {} \;
   become: yes
-  notify: restart zabbix-agent
+
+- name: Userparams
+  shell: find /etc/zabbix/scripts/ -name userparams.conf -exec cat {} \; | tee /etc/zabbix/zabbix_agentd.d/userparams_mconf.conf
+  become: yes
+  notify: restart zabbix-agent 
