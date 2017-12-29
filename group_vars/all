@@ -21,8 +21,12 @@ mconf_registry_password: INCMc0nfito123
 # Disable certbot by default, enabled for specific roles/hosts
 certbot_enabled: false
 
+# Enable ufw by default
 ufw_enabled: true
 
+# Disable zabbix agent by default
 zabbix_agent_enabled: false
 
-public_keys: [ "public_keys/daronco.pub", "public_keys/fcecagno.pub" ]
+public_keys: 
+- public_keys/daronco.pub
+- public_keys/fcecagno.pub

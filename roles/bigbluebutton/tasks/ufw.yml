@@ -9,6 +9,24 @@
   notify:
     - restart ufw
 
+- name: Configure ufw rules for SIP
+  become: true
+  ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
+  with_items:
+    - { rule: 'allow', port: 5060, proto: 'tcp' }
+  notify:
+    - restart ufw
+  when: bigbluebutton_sip
+
+- name: Configure ufw rules for Zabbix
+  become: true
+  ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
+  with_items:
+    - { rule: 'allow', port: 10050, proto: 'tcp' }
+  notify:
+    - restart ufw
+  when: zabbix_agent_enabled
+
 - name: Configure ufw rules for redis on BigBlueButton
   become: true
   ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
@@ -24,5 +42,24 @@
     path: /etc/ufw/sysctl.conf
     regexp: '^[#]?(net/ipv4/tcp_syncookies)=.*'
     replace: '\1=1'
-  notify:
-    - restart ufw
+  register: reboot_required
+
+# https://github.com/ansible/ansible/issues/14413#issuecomment-257887580
+- name: Reboot server
+  shell: sleep 2 && shutdown -r now "Ansible reboot"
+  become: true
+  async: 1
+  poll: 0
+  when: reboot_required|changed
+
+- name: Wait for the server to finish rebooting
+  become: no
+  connection: local
+  local_action: wait_for
+  args:
+    host: '{{ inventory_hostname }}'
+    port: '{{ ansible_ssh_port | default(22) }}'
+    state: started
+    delay: 15
+    timeout: 180
+  when: reboot_required|changed

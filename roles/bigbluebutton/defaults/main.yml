@@ -22,6 +22,7 @@ bigbluebutton_branding_layout:
 bigbluebutton_branding_logo_client: /logo_client.png
 bigbluebutton_branding_logo_playback:
 bigbluebutton_branding_copyright: '&#169; 2017 Mconf Tecnologia &#183; <u><a href="https://mconf.com" target="_blank">https://mconf.com</a></u>'
+bigbluebutton_branding_copyright_html5: '© 2017 Mconf Tecnologia'
 bigbluebutton_branding_toolbar_color: '0x33132A'
 bigbluebutton_branding_toolbar_color_alphas: '0, 0'
 bigbluebutton_branding_deskshare_windows: https://s3-sa-east-1.amazonaws.com/assets.mconf.com/Mconf+Deskshare-1.0.2.4-installer-32bit-unsigned.exe
@@ -32,9 +33,6 @@ bigbluebutton_branding_playback_copyright: '<p>Recorded with <a target="_blank" 
 
 bigbluebutton_apt_state: latest
 # bigbluebutton_apt_state: present
-
-# we need to install bbb-libreoffice on 1.1 because it's nobody's dependencies
-bigbluebutton_install_libreoffice: false
 
 # Install/remove demos
 bigbluebutton_demos: false

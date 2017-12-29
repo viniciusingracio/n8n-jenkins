@@ -67,24 +67,20 @@
   - bigbluebutton-dev
 
 # Mconf-Live
-- hosts: mconf-live110
+- hosts:
+  - mconf-live110
   roles:
   - { role: certbot, when: certbot_enabled }
   - { role: dj-wasabi.zabbix-agent, when: zabbix_agent_enabled }
   - mconf-live
-  vars:
-    bigbluebutton_install_libreoffice: true
 
 # Mconf-Live
-- hosts: mconf-live200
+- hosts:
+  - mconf-live200
   roles:
-#  - certbot
+  - { role: certbot, when: certbot_enabled }
+  - { role: dj-wasabi.zabbix-agent, when: zabbix_agent_enabled }
   - bigbluebutton
-
-# Mconf-Live
-- hosts: mconf-live
-  roles:
-  - mconf-live
 
 # Kurento
 - hosts: kurento

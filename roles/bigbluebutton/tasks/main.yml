@@ -54,14 +54,6 @@
     state: '{{ bigbluebutton_apt_state }}'
   notify: restart bigbluebutton
 
-- name: Install bbb-libreoffice
-  become: true
-  apt:
-    name: bbb-libreoffice
-    state: '{{ bigbluebutton_apt_state }}'
-  when: bigbluebutton_install_libreoffice
-  notify: restart bigbluebutton
-
 - name: Upgrade packages to make sure BigBlueButton packages are updated
   become: true
   apt:
@@ -134,11 +126,11 @@
 - name: Get IP set on BigBlueButton
   command: bbb-conf --secret
   register: bbbip
+  notify: setip
 
-- name: Set IP on BigBlueButton
-  become: true
-  command: bbb-conf --setip '{{ inventory_hostname }}'
-  when: not bbbip.stdout | search("http[s]?://" + inventory_hostname)
+- name: Determine if setip is needed based on bbb-conf
+  set_fact:
+    setip_needed: '{{ not bbbip.stdout | search("http[s]?://" + inventory_hostname) }}'
 
 - name: Install demos
   become: true
@@ -156,6 +148,13 @@
 - name: Wait until demo is deployed before continuing
   wait_for:
     path: /var/lib/tomcat7/webapps/demo/bbb_api_conf.jsp
+  when: bigbluebutton_demos
+
+- name: Copy demo0
+  become: true
+  copy:
+    src: files/demo0.jsp
+    dest: /var/lib/tomcat7/webapps/demo/demo0.jsp
   when: bigbluebutton_demos
 
 - name: Remove demos
@@ -189,6 +188,23 @@
   ignore_errors: yes
   become: yes
   notify: restart bigbluebutton
+
+- name: Adjust bigbluebutton.yml
+  replace:
+    path: /usr/local/bigbluebutton/core/scripts/bigbluebutton.yml
+    regexp: '{{ item.regexp }}'
+    replace: '{{ item.replace }}'
+  with_items:
+    - { regexp: '^(playback_host): .*', replace: '\1: {{ inventory_hostname }}' }
+    - { regexp: '^(playback_protocol): .*', replace: '\1: https' }
+  become: yes
+  notify: setip
+  register: reg_bigbluebutton_yml_replace
+
+- name: Determine if setip is needed based on bigbluebutton.yml
+  set_fact:
+    setip_needed: '{{ reg_bigbluebutton_yml_replace|changed }}'
+  when: not setip_needed
 
 # http://docs.ansible.com/ansible/latest/playbooks_lookups.html#the-dns-lookup-dig
 # couldn't make dig lookup use dnspython on the guest

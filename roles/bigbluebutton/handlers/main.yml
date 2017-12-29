@@ -21,3 +21,8 @@
 - name: restart zabbix-agent
   become: true
   service: name=zabbix-agent state=restarted
+
+- name: setip
+  become: true
+  command: bbb-conf --setip '{{ inventory_hostname }}'
+  when: setip_needed
