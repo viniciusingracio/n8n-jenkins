@@ -116,3 +116,15 @@
 - hosts: jenkins
   roles:
   - jenkins
+
+- hosts: mconf-aggr-zabbix
+  roles:
+  - mconf-aggr
+  vars:
+  - mconf_aggr_type: 'zabbix'
+
+- hosts: mconf-aggr-conf
+  roles:
+  - mconf-aggr
+  vars:
+  - mconf_aggr_type: 'conf'
