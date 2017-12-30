@@ -1,8 +1,9 @@
 - name: Landing page
-  unarchive:
-    src: 'envs/{{ env }}/files/index.tar.gz'
+  copy:
+    src: 'envs/{{ env }}/files/landing_page/'
     dest: /var/www/bigbluebutton-default
   become: yes
+  ignore_errors: yes
 
 - name: Figure out which demo to use
   set_fact:
