@@ -180,7 +180,6 @@
   with_nested:
     - [ '/var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties',
       '/var/lib/tomcat7/webapps/demo/bbb_api_conf.jsp',
-      '/var/www/bigbluebutton/client/conf/config.xml',
       '/usr/share/red5/webapps/screenshare/WEB-INF/screenshare.properties' ]
     - [ { regexp: 'http[s]?:\/\/{{ inventory_hostname }}', replace: 'https://{{ inventory_hostname }}' },
       { regexp: 'http[s]?:\/\/{{ ansible_default_ipv4.address }}', replace: 'https://{{ inventory_hostname }}' },
@@ -371,6 +370,8 @@
     line: 'bind 127.0.0.1'
   when: not bigbluebutton_redis_bind
   notify: restart redis
+
+- include: config-xml.yml
 
 - include: html5.yml
   when: bigbluebutton_html5

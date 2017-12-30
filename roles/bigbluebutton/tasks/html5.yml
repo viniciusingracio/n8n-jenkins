@@ -60,19 +60,6 @@
     state: '{{ bigbluebutton_apt_state }}'
   notify: restart bigbluebutton
 
-- name: Set screenshare attributes on config.xml
-  xml:
-    path: /var/www/bigbluebutton/client/conf/config.xml
-    xpath: //module[@name="ScreenshareModule"]
-    attribute: '{{ item.attribute }}'
-    value: '{{ item.value }}'
-  become: yes
-  with_items:
-    - { attribute: 'chromeExtensionLink', value: '{{ bigbluebutton_screenshare_extension_url }}' }
-    - { attribute: 'chromeExtensionKey', value: '{{ bigbluebutton_screenshare_extension_key }}' }
-    - { attribute: 'tryKurentoWebRTC', value: 'true' }
-    - { attribute: 'tryWebRTCFirst', value: 'true' }
-
 - template:
     src: files/kurento.yaml.j2
     dest: '{{ item }}'
