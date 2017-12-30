@@ -1,0 +1,112 @@
+---
+# vars file for GTI.basic.security
+
+epel:
+  - epel-release
+
+redhat_pkg:
+  - libpwquality
+  - libselinux-python
+  - yum-plugin-security
+  - vim-enhanced
+
+debian_pkg: 
+  - libpwquality-common
+  - libpam-pwquality
+  - libpam-modules
+  - build-essential
+
+
+compilers:
+  - /usr/bin/cc
+  - /usr/bin/g++
+  - /usr/bin/gcc
+
+grub:
+  - /boot/grub2/grub.cfg
+  - /boot/grub/grub.cfg
+rh:
+  - { file: '/etc/pam.d/passwd' , line: 'password   required     pam_pwquality.so retry=3' }
+
+
+suctlubuntu:
+  - { file: '/etc/pam.d/su' , line: 'auth       required        pam_wheel.so use_uid' , after: '^auth' }
+
+suctlubuntu16:
+  - { file: '/etc/pam.d/su' , line: 'auth       required        pam_wheel.so group=wheel' , after: '^auth' }
+
+suctlrh:
+  - { file: '/etc/pam.d/su' , line: 'auth       required        pam_wheel.so use_uid' , before: '^auth' }
+
+sysctl:
+  - { name: 'net.ipv4.tcp_timestamps' , value: '0' }
+  - { name: 'net.ipv4.icmp_echo_ignore_broadcasts' , value: '1' }
+  - { name: 'net.ipv4.conf.all.log_martians' , value: '1' }
+  - { name: 'net.ipv4.conf.all.accept_redirects' , value: '0' }
+  - { name: 'net.ipv4.conf.default.accept_redirects' , value: '0' }
+  - { name: 'net.ipv4.conf.all.secure_redirects' , value: '0' }
+  - { name: 'net.ipv4.conf.default.secure_redirects' , value: '0' }
+  - { name: 'net.ipv4.conf.all.accept_source_route' , value: '0' }
+  - { name: 'net.ipv4.conf.default.accept_source_route' , value: '0' }
+  - { name: 'net.ipv6.conf.all.accept_source_route' , value: '0' }
+  - { name: 'net.ipv6.conf.default.accept_source_route' , value: '0' }
+  - { name: 'net.ipv6.conf.all.accept_redirects' , value: '0' }
+  - { name: 'net.ipv6.conf.default.accept_redirects' , value: '0' }
+
+
+statfiles:
+  - /etc/pam.d/password-auth
+  - /etc/pam.d/system-auth
+
+mpassauthfiles:
+  - { src: '/etc/pam.d/system-auth' , dest: '/etc/pam.d/system-auth-ac' }
+  - { src: '/etc/pam.d/password-auth' , dest: '/etc/pam.d/password-auth-ac' }
+
+cpassauthfiles:
+  - { src: 'system-auth-local.j2' , dest: '/etc/pam.d/system-auth-local' }
+  - { src: 'password-auth-local.j2' , dest: '/etc/pam.d/password-auth-local' }
+
+spassauthfiles:
+  - { file: '/etc/pam.d/system-auth-local' , link: '/etc/pam.d/system-auth' }
+  - { file: '/etc/pam.d/password-auth-local' , link: '/etc/pam.d/password-auth' }
+
+cleanssh:
+  - { file: '/etc/ssh/sshd_config' , regex: '^KexAlgorithms.*' }
+  - { file: '/etc/ssh/sshd_config' , regex: '^Ciphers.*' }
+  - { file: '/etc/ssh/sshd_config' , regex: '^MACs.*' }
+  - { file: '/etc/ssh/sshd_config' , regex: '^ClientAliveInterval.*' }
+  - { file: '/etc/ssh/sshd_config' , regex: '^ClientAliveCountMax.*' }
+  - { file: '/etc/ssh/sshd_config' , regex: '^MaxStartups.*' }
+  - { file: '/etc/ssh/sshd_config' , regex: '^X11Forwarding.*' }
+  - { file: '/etc/ssh/sshd_config' , regex: '^MaxSessions.*' }
+  - { file: '/etc/ssh/sshd_config' , regex: '^AllowTcpForwarding.*' }
+  - { file: '/etc/ssh/sshd_config' , regex: '^Banner.*' }
+  - { file: '/etc/ssh/sshd_config' , regex: '^PermitRootLogin.*' }
+
+crtl:
+  - { file: '/etc/init/control-alt-delete.conf' , regex: '^exec.*' , replace: 'exec /usr/bin/logger -p authpriv.notice -t init "Ctrl-Alt-Del was pressed and ignored"'}
+
+commonauth:
+  - { file: '/etc/pam.d/common-auth' , line: 'auth            required                        pam_tally2.so  file=/var/log/tallylog deny=5 unlock_time=600' }
+  - { file: '/etc/pam.d/common-account' , line: 'account         required                        pam_tally2.so' }
+
+pwquality:
+  - /etc/security/pwquality.conf
+
+systemauth:
+  - /etc/pam.d/system-auth
+
+logindefs:
+  - { file: '/etc/login.defs' , regex: '^PASS_MAX_DAYS.*' , replace: 'PASS_MAX_DAYS   40' } 
+  - { file: '/etc/login.defs' , regex: '^PASS_MIN_DAYS.*' , replace: 'PASS_MIN_DAYS   2' } 
+
+sshd:
+  - /etc/ssh/sshd_config
+
+cron:
+ - { src: 'cron.allow.j2' , dest: '/etc/cron.allow' }
+ - { src: 'at.allow.j2' , dest: '/etc/at.allow' }
+
+services:
+  - rsyslog 
+  - sshd
