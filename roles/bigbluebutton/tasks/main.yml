@@ -207,11 +207,11 @@
 
 # http://docs.ansible.com/ansible/latest/playbooks_lookups.html#the-dns-lookup-dig
 # couldn't make dig lookup use dnspython on the guest
-- name: Define external IP
+- name: Determine external IP
   set_fact:
     # external_ip: "{{ lookup('dig', inventory_hostname, '@8.8.8.8') }}"
     external_ip: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | head -n 1') }}"
-- name: Define wss_binding value
+- name: Determine wss_binding value
   set_fact:
     wss_binding_value: '{% if ansible_default_ipv4.address == external_ip %}:7443{% else %}{{ external_ip }}:7443{% endif %}'
 
@@ -350,6 +350,34 @@
     line: 'freeswitch.port={{ freeswitch_sip_port }}'
   become: yes
   notify: restart bigbluebutton
+
+
+
+- name: Check if Kurento WebRtcEndpoint config file exists
+  stat:
+    path: /etc/kurento/modules/kurento/WebRtcEndpoint.conf.ini
+  become: yes
+  register: kurento_config
+
+- name: Determine STUN information for Kurento
+  set_fact:
+    stun_server_ip: "{{ lookup('pipe', 'dig {{ stun_server[0].split(\":\")[0] }} @8.8.8.8 A +short | head -n 1') }}"
+    stun_server_port: "{{ stun_server[0].split(':')[1] }}"
+
+- name: Update STUN on Kurento
+  lineinfile:
+    dest: /etc/kurento/modules/kurento/WebRtcEndpoint.conf.ini
+    state: present
+    regexp: '{{ item.regexp }}'
+    line: '{{ item.line }}'
+  become: yes
+  with_items:
+    - { regexp: 'stunServerAddress=', line: 'stunServerAddress={{ stun_server_ip }}' }
+    - { regexp: 'stunServerPort=', line: 'stunServerPort={{ stun_server_port }}' }
+  notify: restart kurento
+  when: kurento_config.stat.exists
+
+
 
 - name: Open/close redis
   become: true

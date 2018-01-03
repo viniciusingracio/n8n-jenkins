@@ -84,3 +84,6 @@ config_xml:
   - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'tryKurentoWebRTC', value: 'true', run: '{{ bigbluebutton_html5 }}' }
   - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'tryWebRTCFirst', value: 'true', run: '{{ bigbluebutton_html5 }}' }
   - { xpath: '//module[@name="PhoneModule"]', attribute: 'enableOutboundCalls', value: 'true', run: '{{ bigbluebutton_sip }}' }
+
+stun_server:
+  - stun.l.google.com:19302
