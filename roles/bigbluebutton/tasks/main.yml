@@ -361,8 +361,8 @@
 
 - name: Determine STUN information for Kurento
   set_fact:
-    stun_server_ip: "{{ lookup('pipe', 'dig {{ stun_server[0].split(\":\")[0] }} @8.8.8.8 A +short | head -n 1') }}"
-    stun_server_port: "{{ stun_server[0].split(':')[1] }}"
+    stun_server_ip: "{{ lookup('pipe', 'dig {{ stun_server[0].split(\":\")[1] }} @8.8.8.8 A +short | head -n 1') }}"
+    stun_server_port: "{{ stun_server[0].split(':')[2] }}"
 
 - name: Update STUN on Kurento
   lineinfile:

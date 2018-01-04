@@ -86,4 +86,5 @@ config_xml:
   - { xpath: '//module[@name="PhoneModule"]', attribute: 'enableOutboundCalls', value: 'true', run: '{{ bigbluebutton_sip }}' }
 
 stun_server:
-  - stun.l.google.com:19302
+  - stun:stun.l.google.com:19302
+  - stun:stun1.mconf.com:3478
