@@ -1,4 +1,5 @@
 ---
 
 dependencies:
+  - jpnewman.json
   - role: handlers

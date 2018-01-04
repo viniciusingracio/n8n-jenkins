@@ -9,3 +9,26 @@
     name: ffmpeg
   tags:
     - ffmpeg
+
+- name: Install jpnewman.json dependencies
+  become: true
+  pip:
+    name: '{{ item.name }}'
+    version: '{{ item.version }}'
+    state: present
+  with_items:
+    - { name: 'jsonpath-rw', version: '1.4.0' }
+    - { name: 'dpath', version: '1.4.0' }
+
+- name: Update json values
+  become: true
+  json:
+    path: /usr/local/bigbluebutton/mconf-mcs-sip/config/default.json
+    replace:
+      json_path: '{{ item }}'
+      with_value: '{{ external_ip }}'
+    indent: 4
+  with_items:
+    - /kurento/server/ip_address
+    - /sip/local_ip_address
+  notify: restart bigbluebutton

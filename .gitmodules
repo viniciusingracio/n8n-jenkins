@@ -4,3 +4,6 @@
 [submodule "roles/dj-wasabi.zabbix-agent"]
 	path = roles/dj-wasabi.zabbix-agent
 	url = https://github.com/dj-wasabi/ansible-zabbix-agent.git
+[submodule "roles/ansible-role-json"]
+	path = roles/jpnewman.json
+	url = https://github.com/jpnewman/ansible-role-json.git
