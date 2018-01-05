@@ -9,11 +9,18 @@
   copy:
     src: 'files/zabbix/'
     dest: /etc/zabbix/scripts/
+    owner: '{{ ansible_user }}'
   become: yes
 
+- find:
+    paths: /etc/zabbix/scripts/
+    patterns: setup.sh
+    recurse: yes
+  register: find_result
+
 - name: Setup
-  command: find /etc/zabbix/scripts/ -name setup.sh -exec chmod +x {} \; -exec {} \;
-  become: yes
+  command: '{{ item.path }}'
+  with_items: '{{ find_result.files }}'
 
 - name: Userparams
   shell: find /etc/zabbix/scripts/ -name userparams.conf -exec cat {} \; | tee /etc/zabbix/zabbix_agentd.d/userparams_mconf.conf
