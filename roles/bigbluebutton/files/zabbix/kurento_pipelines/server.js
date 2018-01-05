@@ -80,7 +80,9 @@ getKurentoClient(function (error, kurentoClient) {
                         for (var key in mediaEndpoint.stats) {
                             if (mediaEndpoint.stats[key].hasOwnProperty("packetsLost")) {
                                 inboundSumPacketsLost += mediaEndpoint.stats[key].packetsLost
-                                inboundPacketsLostRateList.push(mediaEndpoint.stats[key].packetsLost / (mediaEndpoint.stats[key].packetsLost + mediaEndpoint.stats[key].packetsReceived));
+                                if (mediaEndpoint.stats[key].hasOwnProperty("packetsReceived")) {
+                                    inboundPacketsLostRateList.push(mediaEndpoint.stats[key].packetsLost / (mediaEndpoint.stats[key].packetsLost + mediaEndpoint.stats[key].packetsReceived));
+                                }
                             }
                             if (mediaEndpoint.stats[key].hasOwnProperty("jitter")) {
                                 inboundJitterList.push(mediaEndpoint.stats[key].jitter);
@@ -91,7 +93,9 @@ getKurentoClient(function (error, kurentoClient) {
                         for (var key in mediaEndpoint.stats) {
                             if (mediaEndpoint.stats[key].hasOwnProperty("packetsLost")) {
                                 outboundSumPacketsLost += mediaEndpoint.stats[key].packetsLost
-                                outboundPacketsLostRateList.push(mediaEndpoint.stats[key].packetsLost / (mediaEndpoint.stats[key].packetsLost + mediaEndpoint.stats[key].packetsSent));
+                                if (mediaEndpoint.stats[key].hasOwnProperty("packetsSent")) {
+                                    outboundPacketsLostRateList.push(mediaEndpoint.stats[key].packetsLost / (mediaEndpoint.stats[key].packetsLost + mediaEndpoint.stats[key].packetsSent));
+                                }
                             }
                             if (mediaEndpoint.stats[key].hasOwnProperty("jitter")) {
                                 outboundJitterList.push(mediaEndpoint.stats[key].jitter);
