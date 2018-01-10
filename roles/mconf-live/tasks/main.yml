@@ -2,3 +2,10 @@
     name: bigbluebutton
   vars:
     - bigbluebutton_apt_package: mconf-live
+
+- name: Install extra recording formats
+  become: true
+  apt:
+    name: '{{ item }}'
+    state: '{{ bigbluebutton_apt_state }}'
+  with_items: '{{ bigbluebutton_extra_formats }}'
