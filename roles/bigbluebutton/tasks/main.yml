@@ -211,9 +211,13 @@
   set_fact:
     # external_ip: "{{ lookup('dig', inventory_hostname, '@8.8.8.8') }}"
     external_ip: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | head -n 1') }}"
+  tags:
+    - always
 - name: Determine wss_binding value
   set_fact:
     wss_binding_value: '{% if ansible_default_ipv4.address == external_ip %}:7443{% else %}{{ external_ip }}:7443{% endif %}'
+  tags:
+    - always
 
 # http://docs.bigbluebutton.org/install/install.html#configure-a-dummy-nic-if-required
 - name: Check if dummy NIC required
@@ -316,6 +320,8 @@
 - name: Define FreeSWITCH external SIP port
   set_fact:
     freeswitch_sip_port: '{% if bigbluebutton_sip %}5062{% else %}5060{% endif %}'
+  tags:
+    - always
 
 - name: Modify FreeSWITCH vars.xml
   xml:
@@ -390,6 +396,8 @@
   set_fact:
     stun_server_ip: "{{ lookup('pipe', 'dig {{ stun_server[0].split(\":\")[1] }} @8.8.8.8 A +short | head -n 1') }}"
     stun_server_port: "{{ stun_server[0].split(':')[2] }}"
+  tags:
+    - always
 
 - name: Update STUN on Kurento
   lineinfile:

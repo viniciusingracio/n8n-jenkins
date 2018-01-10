@@ -2,4 +2,5 @@
 
 dependencies:
   - jpnewman.json
+  - ffmpeg
   - role: handlers
