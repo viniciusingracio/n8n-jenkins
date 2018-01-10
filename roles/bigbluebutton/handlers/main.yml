@@ -1,6 +1,7 @@
 - name: restart bigbluebutton
   become: true
   command: bbb-conf --restart
+  ignore_errors: yes
 
 - name: restart redis
   become: true

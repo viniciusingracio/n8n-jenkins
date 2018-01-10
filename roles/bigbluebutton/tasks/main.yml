@@ -317,7 +317,7 @@
   set_fact:
     freeswitch_sip_port: '{% if bigbluebutton_sip %}5062{% else %}5060{% endif %}'
 
-- name: Modify FreeSWTICH vars.xml
+- name: Modify FreeSWITCH vars.xml
   xml:
     path: /opt/freeswitch/conf/vars.xml
     xpath: '{{ item.xpath }}'
@@ -327,10 +327,11 @@
     - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "external_sip_port=")]', attribute: 'data', value: 'external_sip_port={{ freeswitch_sip_port }}' }
     - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "external_rtp_ip=")]', attribute: 'data', value: 'external_rtp_ip={{ external_ip }}' }
     - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "external_sip_ip=")]', attribute: 'data', value: 'external_sip_ip={{ external_ip }}' }
+    - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "sound_prefix=")]', attribute: 'data', value: 'sound_prefix={{ bigbluebutton_sounds_prefix }}' }
   become: yes
   notify: restart bigbluebutton
 
-- name: Modify FreeSWTICH external.xml
+- name: Modify FreeSWITCH external.xml
   xml:
     path: /opt/freeswitch/conf/sip_profiles/external.xml
     xpath: '{{ item.xpath }}'
@@ -348,6 +349,32 @@
     state: present
     regexp: ^freeswitch\.port=
     line: 'freeswitch.port={{ freeswitch_sip_port }}'
+  become: yes
+  notify: restart bigbluebutton
+
+- name: Download audio files for FreeSWITCH
+  unarchive:
+    src: https://files.freeswitch.org/releases/sounds/{{ item[1].name }}-{{ item[0] }}-{{ item[1].version }}.tar.gz
+    dest: /opt/freeswitch/share/freeswitch/sounds
+    remote_src: True
+    owner: freeswitch
+    group: daemon
+  become: yes
+  with_nested:
+    - '{{ bigbluebutton_sounds_frequency }}'
+    - '{{ bigbluebutton_sounds_name_version }}'
+  notify: restart bigbluebutton
+  when:
+    - not(bigbluebutton_sounds_frequency is none)
+    - not(bigbluebutton_sounds_name_version is none)
+
+- name: Modify FreeSWITCH sounds
+  xml:
+    path: /opt/freeswitch/etc/freeswitch/autoload_configs/conference.conf.xml
+    xpath: /configuration/profiles/profile/param[@name='{{ item.name }}']
+    attribute: 'value'
+    value: '{{ item.value }}'
+  with_items: '{{ bigbluebutton_sounds_profile }}'
   become: yes
   notify: restart bigbluebutton
 
