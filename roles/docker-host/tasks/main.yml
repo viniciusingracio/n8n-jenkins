@@ -31,7 +31,7 @@
 - name: Add user to docker group
   become: true
   user:
-    name: '{{ deploy_user }}'
+    name: '{{ ansible_ssh_user }}'
     groups: docker
     append: yes
   register: reg_docker
