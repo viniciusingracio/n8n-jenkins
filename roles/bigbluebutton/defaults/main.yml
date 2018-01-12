@@ -37,6 +37,9 @@ bigbluebutton_apt_state: latest
 # Install/remove demos
 bigbluebutton_demos: false
 
+# Install/remove webhooks
+bigbluebutton_webhooks: true
+
 # Open redis to external access. Set to false remove external access.
 bigbluebutton_redis_bind: false
 # To open use:

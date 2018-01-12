@@ -164,6 +164,12 @@
     state: absent
   when: not bigbluebutton_demos
 
+- name: Install/remove webhooks
+  become: true
+  apt:
+    name: bbb-webhooks
+    state: '{% if bigbluebutton_webhooks %}{{ bigbluebutton_apt_state }}{% else %}absent{% endif %}'
+
 - name: Make sure demo is removed
   file:
     path: /var/lib/tomcat7/demo
