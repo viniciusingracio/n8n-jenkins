@@ -21,3 +21,9 @@ rec_proxy_s3_bucket: some-bucket
 # Host paths that have the HTTPS certificates to be used
 rec_proxy_certs_path_root: /etc/nginx/ssl
 rec_proxy_certs_path: /etc/nginx/ssl/live
+
+rec_proxy_app_environment: development
+rec_proxy_local_playback: false
+rec_proxy_http_port: 80
+rec_proxy_api_secret:
+rec_proxy_jwt_secret:

@@ -1,0 +1,54 @@
+- name: Get BigBlueButton secret
+  shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
+  register: bbb_secret
+
+- include_role:
+    name: rec-proxy
+    private: false
+  vars:
+    rec_proxy_api_secret: '{{ bbb_secret.stdout }}'
+    rec_proxy_jwt_secret: '{{ bbb_secret.stdout | to_uuid }}'
+    # rec_proxy_jwt_secret: '{{ bbb_secret.stdout | hash('md5') }}'
+    rec_proxy_build_from_source: yes
+    rec_proxy_repo_ref: 'mconf-rec-auth'
+    rec_proxy_app_environment: production
+    rec_proxy_image: mconf/mconf-rec-server
+    rec_proxy_local_playback: true
+    rec_proxy_http_port: '{{ mconf_live_rec_proxy_http_port }}'
+
+- stat:
+    path: '{{ item }}'
+  with_items:
+    - /etc/bigbluebutton/nginx/presentation.nginx
+    - /etc/bigbluebutton/nginx/presentation_video.nginx
+    - /etc/bigbluebutton/nginx/presentation_export.nginx
+  register: nginx_files
+
+- command: mv {{ item.item }} {{ item.item }}.orig
+  with_items: '{{ nginx_files.results }}'
+  become: yes
+  when: item.stat.exists and not item.stat.islnk
+  notify: reload nginx
+
+- template:
+    src: files/{{ item.item | basename }}.j2
+    dest: '{{ item.item }}.openresty'
+  with_items: '{{ nginx_files.results }}'
+  become: yes
+  when: item.stat.exists
+  notify: reload nginx
+
+- file:
+    src: '{{ item.item }}.openresty'
+    dest: '{{ item.item }}'
+    state: link
+  with_items: '{{ nginx_files.results }}'
+  become: yes
+  when: item.stat.exists
+  notify: reload nginx
+
+- template:
+    src: files/rec_auth_token.nginx.j2
+    dest: '/etc/bigbluebutton/nginx/rec_auth_token.nginx'
+  become: yes
+  notify: reload nginx

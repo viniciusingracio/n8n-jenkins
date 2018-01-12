@@ -6,8 +6,33 @@
     # depth: 1 # can't use it otherwise won't update the code
     accept_hostkey: true
     force: yes
+
+- name: Fetch template file from server
+  fetch:
+    src: '{{ ansible_env.HOME }}/src/rec-proxy/templates/nginx-site.conf.j2'
+    dest: /tmp/nginx-site.conf.j2
+    flat: yes
+    fail_on_missing: yes
   when: rec_proxy_build_from_source
-  register: rec_proxy_code
+
+- file:
+    path: '{{ ansible_env.HOME }}/src/rec-proxy/build'
+    state: directory
+    mode: 0755
+  when: rec_proxy_build_from_source
+
+- name:
+  template:
+    src: '/tmp/nginx-site.conf.j2'
+    dest: '{{ ansible_env.HOME }}/src/rec-proxy/build/nginx-site.conf.template'
+    mode: '0644'
+    trim_blocks: false
+  vars:
+    ssl: false
+    proxy: false
+    auth: true
+    s3: false
+  when: rec_proxy_build_from_source
 
 # TODO: remove old images
 - name: Build the rec-proxy docker image
@@ -16,22 +41,36 @@
     name: '{{ rec_proxy_image }}'
     tag: '{{ rec_proxy_image_version }}'
     force: true
-  when: rec_proxy_build_from_source and rec_proxy_code.changed
+  when: rec_proxy_build_from_source
+
+- name: Determine default volumes for the container
+  set_fact:
+    container_volumes:
+      - /var/www:/usr/local/openresty/nginx/html # for certbot --webroot and static pages
+      - '{{ rec_proxy_certs_path_root }}:{{ rec_proxy_certs_path_root }}'
+
+- name: Include playback volume
+  set_fact:
+    container_volumes: '{{ container_volumes + [ "/var/bigbluebutton:/var/bigbluebutton" ] }}'
+  when: rec_proxy_local_playback
+
+- name: Determine ports
+  set_fact:
+    rec_proxy_ports: '{% if rec_proxy_local_playback %}[ "{{ rec_proxy_http_port }}:80" ]{% else %}[ "80:80", "443:443" ]{% endif %}'
 
 - name: Start the rec-proxy container
   docker_container:
     name: mconf-rec-proxy
     image: '{{ rec_proxy_image }}:{{ rec_proxy_image_version }}'
     restart_policy: unless-stopped
-    volumes:
-      - /var/www:/usr/local/openresty/nginx/html # for certbot --webroot and static pages
-      - '{{ rec_proxy_certs_path_root }}:{{ rec_proxy_certs_path_root }}'
-    published_ports:
-      - 80:80
-      - 443:443
+    volumes: '{{ container_volumes }}'
+    published_ports: '{{ rec_proxy_ports }}'
     env:
       APP_HOST: '{{ rec_proxy_app_host }}'
       CERTS_PATH: '{{ rec_proxy_certs_path }}'
       MEDIA_HOST: '{{ rec_proxy_media_host }}'
       MEDIA_PROTOCOL: '{{ rec_proxy_media_protocol }}'
       S3_BUCKET: '{{ rec_proxy_s3_bucket }}'
+      APP_ENV: '{{ rec_proxy_app_environment }}'
+      API_SECRET: '{{ rec_proxy_api_secret }}'
+      JWT_SECRET: '{{ rec_proxy_jwt_secret }}'
