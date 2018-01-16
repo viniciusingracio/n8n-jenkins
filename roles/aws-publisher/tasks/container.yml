@@ -8,21 +8,13 @@
   when: aws_publisher_build_from_source
   register: aws_publisher_code
 
-- name: Set docker command
-  lineinfile:
-    dest: '~/src/aws-publisher/labs/bbb-aws-publisher/Dockerfile'
-    state: present
-    regexp: '^CMD .* "--watch"'
-    line: 'CMD ["bundle", "exec", "ruby", "s3.rb", "--resync"]'
-  register: aws_publisher_command
-
 # TODO: remove old images
 - name: Build the aws-publisher docker image
   docker_image:
     build_path: ~/src/aws-publisher/labs/bbb-aws-publisher/
     name: mconf/mconf-aws-publisher
     force: true
-  when: aws_publisher_build_from_source and ( aws_publisher_code.changed or aws_publisher_command.changed )
+  when: aws_publisher_build_from_source and aws_publisher_code.changed
 
 - name: Register Docker host IP
   shell: "ifconfig docker0 | grep 'inet addr:' | cut -d: -f2 | awk '{print $1}'"
@@ -30,6 +22,7 @@
 
 - name: Start the aws-publisher container
   docker_container:
+    command: bundle exec ruby s3.rb --resync
     name: mconf-aws-publisher
     image: mconf/mconf-aws-publisher
     restart_policy: on-failure
