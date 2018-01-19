@@ -15,6 +15,7 @@
     rec_proxy_image: mconf/mconf-rec-server
     rec_proxy_local_playback: true
     rec_proxy_http_port: '{{ mconf_live_rec_proxy_http_port }}'
+  when: mconf_live_rec_proxy_enabled
 
 - stat:
     path: '{{ item }}'
@@ -35,11 +36,23 @@
     dest: '{{ item.item }}.openresty'
   with_items: '{{ nginx_files.results }}'
   become: yes
-  when: item.stat.exists
+  when: item.stat.exists and mconf_live_rec_proxy_enabled
   notify: reload nginx
 
 - file:
-    src: '{{ item.item }}.openresty'
+    path: '{{ item.item }}.openresty'
+    state: absent
+  with_items: '{{ nginx_files.results }}'
+  become: yes
+  when: not mconf_live_rec_proxy_enabled
+  notify: reload nginx
+
+- name: Define nginx files extension
+  set_fact: 
+    nginx_extension: '{% if mconf_live_rec_proxy_enabled %}openresty{% else %}orig{% endif %}'
+
+- file:
+    src: '{{ item.item }}.{{ nginx_extension }}'
     dest: '{{ item.item }}'
     state: link
   with_items: '{{ nginx_files.results }}'
@@ -51,4 +64,12 @@
     src: files/rec_auth_token.nginx.j2
     dest: '/etc/bigbluebutton/nginx/rec_auth_token.nginx'
   become: yes
+  notify: reload nginx
+  when: mconf_live_rec_proxy_enabled
+
+- file:
+    path: '/etc/bigbluebutton/nginx/rec_auth_token.nginx'
+    state: absent
+  become: yes
+  when: not mconf_live_rec_proxy_enabled
   notify: reload nginx
