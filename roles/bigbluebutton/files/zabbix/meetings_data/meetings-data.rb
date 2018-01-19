@@ -84,7 +84,7 @@ end
 recordings = {}
 
 date_format = "%Y-%m-%d %H:%M:%S,%L%:z"
-`ls -tr1 /var/log/bigbluebutton/bbb-web.log* | xargs -I{} grep 'Meeting started\\|Removing expired meeting\\|Meeting ended\\|Removing un-joined meeting\\|Meeting destroyed\\|Starting Meeting Service' {} --no-filename`.split("\n").each do |line|
+`ls -tr1 /var/log/bigbluebutton/bbb-web.log* | xargs -I{} zgrep 'Meeting started\\|Removing expired meeting\\|Meeting ended\\|Removing un-joined meeting\\|Meeting destroyed\\|Starting Meeting Service' {}`.split("\n").each do |line|
   next if assign_next(line, recordings, "start_meeting", /(?<date>\d+-\d+-\d+ \d+:\d+:\d+,\d+[^ ]*).*Meeting started: data=(?<data>.*)/i, date_format)
   next if assign_next(line, recordings, "end_meeting", /(?<date>\d+-\d+-\d+ \d+:\d+:\d+,\d+[^ ]*).*(Meeting ended|Removing expired meeting|Removing un-joined meeting|Meeting destroyed): data=(?<data>.*)/i, date_format)
   next if assign_next(line, recordings, "restart_server", /(?<date>\d+-\d+-\d+ \d+:\d+:\d+,\d+[^ ]*).*Starting Meeting Service.$/i, date_format)
@@ -92,7 +92,7 @@ end
 
 date_format = "%Y-%m-%dT%H:%M:%S.%L"
 if File.exists?("/var/log/bigbluebutton/bbb-rap-worker.log")
-  `ls -tr1 /var/log/bigbluebutton/bbb-rap-worker.log* | xargs -I{} grep 'Successfully sanity checked\\|Successfully archived' {} --no-filename`.split("\n").each do |line|
+  `ls -tr1 /var/log/bigbluebutton/bbb-rap-worker.log* | xargs -I{} zgrep 'Successfully sanity checked\\|Successfully archived' {}`.split("\n").each do |line|
     next if assign_next(line, recordings, "end_sanity", /\[(?<date>\d+-\d+-\d+.\d+:\d+:\d+\.\d+).*Successfully sanity checked (?<record_id>\w+-\d+)/i, date_format)
     next if assign_next(line, recordings, "end_archive", /\[(?<date>\d+-\d+-\d+.\d+:\d+:\d+\.\d+).*Successfully archived (?<record_id>\w+-\d+)/i, date_format)
   end
@@ -103,6 +103,8 @@ recordings.each do |record_id, info|
     info["status"] = "running"
   elsif ! info["record"] || info["end_meeting_reason"] == "Meeting has not been joined."
     info["status"] = "not recorded"
+  elsif info["end_meeting_event"] == "server_restart"
+    info["status"] = "server restarted"
   elsif File.exists?("/var/bigbluebutton/recording/status/published/#{record_id}-presentation.done")
     info["end_publish"] = DateTime.parse(File.mtime("/var/bigbluebutton/recording/status/published/#{record_id}-presentation.done").to_s)
     info["status"] = "processed"
@@ -140,7 +142,7 @@ now = DateTime.now
 time_limit = 60
 recordings.reject! do |e|
   ( e["status"] == "processed" && ((now - e["end_publish"]) * 24 * 60).to_i > time_limit ) || \
-  ( ["not recorded", "no recorded segment"].include?(e["status"]) && ((now - e["end_meeting"]) * 24 * 60).to_i > time_limit ) || \
+  ( ["not recorded", "no recorded segment", "server restarted"].include?(e["status"]) && ((now - e["end_meeting"]) * 24 * 60).to_i > time_limit ) || \
   ( e["status"] == "no recorded segment removed" && ((now - e["end_archive"]) * 24 * 60).to_i > time_limit )
 end
 recordings.sort! { |a,b| a["start_meeting"] <=> b["start_meeting"] }
