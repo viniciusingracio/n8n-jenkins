@@ -10,15 +10,7 @@
   tags:
     - ffmpeg
 
-- name: Install jpnewman.json dependencies
-  become: true
-  pip:
-    name: '{{ item.name }}'
-    version: '{{ item.version }}'
-    state: present
-  with_items:
-    - { name: 'jsonpath-rw', version: '1.4.0' }
-    - { name: 'dpath', version: '1.4.0' }
+- include: json-deps.yml
 
 - name: Update json values
   become: true
