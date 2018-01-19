@@ -21,6 +21,10 @@
     enabled: yes
   become: yes
 
+- name: Accept mscorefonts EULA
+  become: true
+  shell: echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections
+
 - name: Set default locale
   become: true
   command: update-locale LANG=en_US.UTF-8
@@ -184,12 +188,14 @@
     regexp: '{{ item[1].regexp }}'
     replace: '{{ item[1].replace }}'
   with_nested:
-    - [ '/var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties',
-      '/var/lib/tomcat7/webapps/demo/bbb_api_conf.jsp',
-      '/usr/share/red5/webapps/screenshare/WEB-INF/screenshare.properties' ]
-    - [ { regexp: 'http[s]?:\/\/{{ inventory_hostname }}', replace: 'https://{{ inventory_hostname }}' },
-      { regexp: 'http[s]?:\/\/{{ ansible_default_ipv4.address }}', replace: 'https://{{ inventory_hostname }}' },
-      { regexp: 'rtmp:\/\/{{ ansible_default_ipv4.address }}', replace: 'rtmp://{{ inventory_hostname }}' }]
+    -
+      - /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties
+      - /var/lib/tomcat7/webapps/demo/bbb_api_conf.jsp
+      - /usr/share/red5/webapps/screenshare/WEB-INF/screenshare.properties
+    -
+      - { regexp: 'http[s]?:\/\/{{ inventory_hostname }}', replace: 'https://{{ inventory_hostname }}' }
+      - { regexp: 'http[s]?:\/\/{{ ansible_default_ipv4.address }}', replace: 'https://{{ inventory_hostname }}' }
+      - { regexp: 'rtmp:\/\/{{ ansible_default_ipv4.address }}', replace: 'rtmp://{{ inventory_hostname }}' }
   ignore_errors: yes
   become: yes
   notify: restart bigbluebutton
