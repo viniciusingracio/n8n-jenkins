@@ -38,7 +38,7 @@
 - name: Add node repo to apt
   become: true
   apt_repository:
-    repo: 'deb http://deb.nodesource.com/node_4.x {{ ansible_lsb.codename }} main'
+    repo: 'deb http://deb.nodesource.com/node_8.x {{ ansible_lsb.codename }} main'
     state: present
   register: aptrepos
 
@@ -60,14 +60,15 @@
     state: '{{ bigbluebutton_apt_state }}'
   notify: restart bigbluebutton
 
-- template:
-    src: files/kurento.yaml.j2
-    dest: '{{ item }}'
-    mode: 0644
-    owner: meteor
-    group: meteor
-  become: yes
-  with_items:
-    - /usr/share/meteor/bundle/programs/server/assets/app/config/development/public/kurento.yaml
-    - /usr/share/meteor/bundle/programs/server/assets/app/config/production/public/kurento.yaml
+- include: json-deps.yml
+
+- name: Update json values
+  become: true
+  json:
+    path: /usr/share/meteor/bundle/programs/server/assets/app/config/settings-production.json
+    replace:
+      json_path: '{{ item.path }}'
+      with_value: '{{ item.value }}'
+    indent: 4
+  with_items: '{{ bigbluebutton_html5_config }}'
   notify: restart bbb-html5

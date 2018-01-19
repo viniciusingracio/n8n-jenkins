@@ -51,18 +51,6 @@
   become: yes
   when: bigbluebutton_html5
 
-- name: Customize HTML5 app properties
-  replace:
-    path: /usr/share/meteor/bundle/programs/server/assets/app/config/public/app.yaml
-    regexp: '{{ item.regexp }}'
-    replace: '{{ item.replace }}'
-  with_items:
-    - { regexp: '(^[ \t]*appName): .*', replace: '\1: Mconf-Live HTML5' }
-    - { regexp: '(^[ \t]*copyright): .*', replace: '\1: {{ bigbluebutton_branding_copyright_html5 }}' }
-  become: yes
-  when: bigbluebutton_html5
-  notify: restart bbb-html5
-
 - name: Customize error message on playback
   replace:
     path: /var/bigbluebutton/playback/presentation/0.9.0/playback.html
