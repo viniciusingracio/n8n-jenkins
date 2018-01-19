@@ -1,8 +1,8 @@
 - name: Fetch BigBlueButton source code
   git:
-    repo: '{{ bigbluebutton_repo }}'
+    repo: '{{ bigbluebutton_dev_repo }}'
     dest: '{{ ansible_env.HOME }}/dev/bigbluebutton'
-    version: '{{ bigbluebutton_repo_ref }}'
+    version: '{{ bigbluebutton_dev_repo_ref }}'
     accept_hostkey: true
     update: false
 

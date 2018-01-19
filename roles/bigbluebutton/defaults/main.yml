@@ -21,8 +21,8 @@ bigbluebutton_branding_welcome_footer: 'For more information, visit <a href="htt
 bigbluebutton_branding_layout:
 bigbluebutton_branding_logo_client: /logo_client.png
 bigbluebutton_branding_logo_playback:
-bigbluebutton_branding_copyright: '&#169; 2017 Mconf Tecnologia &#183; <u><a href="https://mconf.com" target="_blank">https://mconf.com</a></u>'
-bigbluebutton_branding_copyright_html5: '© 2017 Mconf Tecnologia'
+bigbluebutton_branding_copyright: '&#169; 2018 Mconf Tecnologia &#183; <u><a href="https://mconf.com" target="_blank">https://mconf.com</a></u>'
+bigbluebutton_branding_copyright_html5: '© 2018 Mconf Tecnologia'
 bigbluebutton_branding_toolbar_color: '0x33132A'
 bigbluebutton_branding_toolbar_color_alphas: '0, 0'
 bigbluebutton_branding_deskshare_windows: https://s3-sa-east-1.amazonaws.com/assets.mconf.com/Mconf+Deskshare-1.0.2.4-installer-32bit-unsigned.exe
@@ -55,10 +55,10 @@ bigbluebutton_external_rap_repo: https://github.com/daronco/bigbluebutton.git
 bigbluebutton_external_rap_ref: rap-on-docker
 
 # Deploy an SSL certificate from local repository
-local_ssl_certificate:
-local_ssl_certificate_key:
+bigbluebutton_local_ssl_certificate:
+bigbluebutton_local_ssl_certificate_key:
 
-sysctl:
+bigbluebutton_sysctl:
   - { name: 'net.ipv4.tcp_syncookies' , value: '1' }
   - { name: 'net.ipv4.tcp_timestamps' , value: '0' }
   - { name: 'net.ipv4.icmp_echo_ignore_broadcasts' , value: '1' }
@@ -74,7 +74,7 @@ sysctl:
   - { name: 'net.ipv6.conf.all.accept_redirects' , value: '0' }
   - { name: 'net.ipv6.conf.default.accept_redirects' , value: '0' }
 
-config_xml:
+bigbluebutton_config_xml:
   - { xpath: '/config/branding', attribute: 'logo', value: 'logo.png' }
   - { xpath: '/config/branding', attribute: 'copyright', value: '{{ bigbluebutton_branding_copyright }}' }
   - { xpath: '/config/branding', attribute: 'toolbarColor', value: '{{ bigbluebutton_branding_toolbar_color }}' }
@@ -88,7 +88,9 @@ config_xml:
   - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'tryWebRTCFirst', value: 'true', run: '{{ bigbluebutton_html5 }}' }
   - { xpath: '//module[@name="PhoneModule"]', attribute: 'enableOutboundCalls', value: 'true', run: '{{ bigbluebutton_sip }}' }
 
-stun_server:
+bigbluebutton_config_xml_custom:
+
+bigbluebutton_stun_server:
   - stun:stun.l.google.com:19302
   - stun:stun1.mconf.com:3478
 

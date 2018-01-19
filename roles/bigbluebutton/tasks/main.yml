@@ -81,10 +81,10 @@
     dest: '{{ item.dest }}'
   become: yes
   with_items:
-    - { src: '{{ local_ssl_certificate }}', dest: '{{ ssl_certificate }}' }
-    - { src: '{{ local_ssl_certificate_key }}', dest: '{{ ssl_certificate_key }}' }
-  when: not((local_ssl_certificate is undefined) or (local_ssl_certificate is none) or (local_ssl_certificate | trim == ''))
-    and not((local_ssl_certificate_key is undefined) or (local_ssl_certificate_key is none) or (local_ssl_certificate_key | trim == ''))
+    - { src: '{{ bigbluebutton_local_ssl_certificate }}', dest: '{{ ssl_certificate }}' }
+    - { src: '{{ bigbluebutton_local_ssl_certificate_key }}', dest: '{{ ssl_certificate_key }}' }
+  when: not((bigbluebutton_local_ssl_certificate is undefined) or (bigbluebutton_local_ssl_certificate is none) or (bigbluebutton_local_ssl_certificate | trim == ''))
+    and not((bigbluebutton_local_ssl_certificate_key is undefined) or (bigbluebutton_local_ssl_certificate_key is none) or (bigbluebutton_local_ssl_certificate_key | trim == ''))
   notify: reload nginx
 
 - name: Add ssl configuration on nginx
@@ -400,8 +400,8 @@
 
 - name: Determine STUN information for Kurento
   set_fact:
-    stun_server_ip: "{{ lookup('pipe', 'dig {{ stun_server[0].split(\":\")[1] }} @8.8.8.8 A +short | head -n 1') }}"
-    stun_server_port: "{{ stun_server[0].split(':')[2] }}"
+    stun_server_ip: "{{ lookup('pipe', 'dig {{ bigbluebutton_stun_server[0].split(\":\")[1] }} @8.8.8.8 A +short | head -n 1') }}"
+    stun_server_port: "{{ bigbluebutton_stun_server[0].split(':')[2] }}"
   tags:
     - always
 

@@ -27,7 +27,7 @@
     xpath: '{{ item.xpath }}'
     attribute: '{{ item.attribute }}'
     value: '{{ item.value }}'
-  with_items: '{{ config_xml }}'
+  with_items: '{{ bigbluebutton_config_xml + bigbluebutton_config_xml_custom }}'
   when: item.run is undefined or item.run == true
 
 - name: Copy temporary config.xml to client dir

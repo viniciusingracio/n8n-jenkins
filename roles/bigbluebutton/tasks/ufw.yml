@@ -42,7 +42,7 @@
     path: /etc/ufw/sysctl.conf
     regexp: '^[#]?({{ item.name }})=.*'
     replace: \1={{ item.value }}
-  with_items: "{{ sysctl }}"
+  with_items: "{{ bigbluebutton_sysctl }}"
   register: reboot_required
 
 # https://github.com/ansible/ansible/issues/14413#issuecomment-257887580
