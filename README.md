@@ -4,6 +4,7 @@
 * Install sshpass (apt-get install sshpass)
 * For docker: `pip install 'docker-py>=1.7.0'`
 * Remote server needs python
+* Run: `ansible-galaxy install -r requirements.yml`
 
 ### Run
 
