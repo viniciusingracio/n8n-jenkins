@@ -3,7 +3,7 @@
   tags: [apt]
 - include: ufw.yml
   tags: [ufw,firewall]
-  when: ufw_enabled
+  when: common_ufw_enabled
 - include: python.yml
   tags: [python]
 - include: swap.yml

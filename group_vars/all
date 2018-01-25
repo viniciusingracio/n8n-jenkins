@@ -22,7 +22,7 @@ mconf_registry_password: INCMc0nfito123
 certbot_enabled: false
 
 # Enable ufw by default
-ufw_enabled: true
+common_ufw_enabled: true
 
 # Disable zabbix agent by default
 zabbix_agent_enabled: false

@@ -459,7 +459,7 @@
     - branding
 
 - include: ufw.yml
-  when: ufw_enabled
+  when: common_ufw_enabled
   tags: [ufw,firewall]
 
 - include: zabbix.yml
