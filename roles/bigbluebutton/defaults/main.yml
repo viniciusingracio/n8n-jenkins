@@ -54,6 +54,10 @@ bigbluebutton_external_rap: false
 bigbluebutton_external_rap_repo: https://github.com/daronco/bigbluebutton.git
 bigbluebutton_external_rap_ref: rap-on-docker
 
+# Path to the certificate in the server
+bigbluebutton_ssl_certificate: /etc/nginx/ssl/{{ inventory_hostname }}.crt
+bigbluebutton_ssl_certificate_key: /etc/nginx/ssl/{{ inventory_hostname }}.key
+
 # Deploy an SSL certificate from local repository
 bigbluebutton_local_ssl_certificate:
 bigbluebutton_local_ssl_certificate_key:
@@ -88,7 +92,7 @@ bigbluebutton_config_xml:
   - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'tryWebRTCFirst', value: 'true', run: '{{ bigbluebutton_html5 }}' }
   - { xpath: '//module[@name="PhoneModule"]', attribute: 'enableOutboundCalls', value: 'true', run: '{{ bigbluebutton_sip }}' }
 
-bigbluebutton_config_xml_custom:
+bigbluebutton_config_xml_custom: []
 
 bigbluebutton_html5_config:
   - { path: '/public/kurento/wsUrl', value: 'wss://{{ inventory_hostname }}/bbb-webrtc-sfu' }
@@ -108,7 +112,7 @@ bigbluebutton_sounds_frequency:
   - 32000
   - 16000
   - 8000
-bigbluebutton_sounds_name_version:
+bigbluebutton_sounds_name_version: []
 bigbluebutton_sounds_prefix: $${sounds_dir}/en/us/callie
 bigbluebutton_sounds_profile:
   - { name: 'muted-sound', value: '' }
@@ -116,3 +120,4 @@ bigbluebutton_sounds_profile:
   - { name: 'alone-sound', value: '' }
   - { name: 'moh-sound', value: '' }
   - { name: 'comfort-noise', value: 'false' }
+mconf_live_sounds_hold_music: local_stream://moh

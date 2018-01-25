@@ -30,6 +30,13 @@
   with_items: '{{ bigbluebutton_config_xml + bigbluebutton_config_xml_custom }}'
   when: item.run is undefined or item.run == true
 
+- name: Remove comments
+  xml:
+    path: '{{ tmpdir_client.path }}/config.xml'
+    xpath: //comment()
+    state: absent
+    pretty_print: true
+
 - name: Copy temporary config.xml to client dir
   copy:
     src: '{{ tmpdir_client.path }}/config.xml'

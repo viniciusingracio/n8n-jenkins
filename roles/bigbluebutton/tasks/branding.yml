@@ -85,8 +85,7 @@
     path: /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties
     regexp: '{{ item.regexp }}'
     replace: '{{ item.replace }}'
-    # UTF-8 fails to set accent words properly
-    encoding: iso-8859-1
+    encoding: '{{ properties_charset }}'
   with_items:
     - { regexp: '^(defaultWelcomeMessage)=.*', replace: '\1={{ bigbluebutton_branding_welcome }}' }
     - { regexp: '^(defaultWelcomeMessageFooter)=.*', replace: '\1={{ bigbluebutton_branding_welcome_footer }}' }

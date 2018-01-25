@@ -1,0 +1,62 @@
+- name: Install openssl
+  apt:
+    name: openssl
+    state: latest
+  become: yes
+
+- set_fact:
+    ssl_certificate_filename: '{{ bigbluebutton_ssl_certificate | basename }}'
+    ssl_certificate_dir: '{{ bigbluebutton_ssl_certificate | dirname }}'
+    ssl_certificate_key_filename: '{{ bigbluebutton_ssl_certificate_key | basename }}'
+    ssl_certificate_key_dir: '{{ bigbluebutton_ssl_certificate_key | dirname }}'
+
+- name: Create certificate dir
+  file:
+    path: '{{ item }}'
+    mode: 0755
+    recurse: yes
+    state: directory
+  with_items:
+    - '{{ ssl_certificate_dir }}'
+    - '{{ ssl_certificate_key_dir }}'
+  become: yes
+
+- name: Generate key
+  command: 'openssl genrsa -out {{ ssl_certificate_key_filename }} 2048'
+  become: yes
+  args:
+    chdir: '{{ ssl_certificate_key_dir }}'
+    creates: '{{ bigbluebutton_ssl_certificate_key }}'
+  notify: reload nginx
+
+- name: Generate certificate
+  command: openssl req -x509 -new -nodes -key {{ bigbluebutton_ssl_certificate_key }} -sha256 -days 3650 -out {{ bigbluebutton_ssl_certificate }} -subj "/C=BR/ST=Porto Alegre/O=Mconf Tecnologia/OU=Dev/CN={{ inventory_hostname }}"
+  become: yes
+  args:
+    creates: '{{ bigbluebutton_ssl_certificate }}'
+  notify: reload nginx
+
+- name: Compare certificate before import
+  command: 'diff -q {{ bigbluebutton_ssl_certificate }} /usr/local/share/ca-certificates/{{ ssl_certificate_filename }}'
+  become: yes
+  ignore_errors: yes
+  register: diff_cert
+
+- name: Copy certificate to be imported
+  command: 'cp {{ bigbluebutton_ssl_certificate }} /usr/local/share/ca-certificates/'
+  become: yes
+  when: diff_cert|failed
+
+- name: Import certificate
+  command: update-ca-certificates --fresh
+  become: yes
+  when: diff_cert|failed
+
+- name: Delete certificate from Java keystore if already exists
+  command: 'keytool -delete -keystore /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security/cacerts -storepass changeit -noprompt -alias {{ inventory_hostname }}'
+  become: yes
+  ignore_errors: yes
+
+- name: Import certificate on Java keystore
+  command: 'keytool -import -trustcacerts -keystore /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security/cacerts -storepass changeit -noprompt -alias {{ inventory_hostname }} -file {{ bigbluebutton_ssl_certificate }}'
+  become: yes

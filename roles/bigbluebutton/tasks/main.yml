@@ -32,9 +32,12 @@
 - name: Add BigBlueButton apt key
   become: true
   apt_key:
-    url: '{{ bigbluebutton_apt_key }}'
+    url: '{{ item }}'
     state: present
   register: aptkey
+  with_items:
+    - '{{ bigbluebutton_apt_key }}'
+    - https://deb.nodesource.com/gpgkey/nodesource.gpg.key
 
 - name: Add multiverse and BigBlueButton repos to apt
   become: true
@@ -45,6 +48,7 @@
   with_items:
     - 'deb http://archive.ubuntu.com/ubuntu/ xenial multiverse'
     - '{{ bigbluebutton_apt_source }}'
+    - 'deb http://deb.nodesource.com/node_8.x {{ ansible_lsb.codename }} main'
 
 - name: Update apt if keys changed
   become: true
@@ -61,9 +65,13 @@
 - name: Upgrade packages to make sure BigBlueButton packages are updated
   become: true
   apt:
-    upgrade: safe
+    upgrade: dist
   when: bigbluebutton_apt_state == 'latest'
   notify: restart bigbluebutton
+
+- name: Determine if reset encoding needed on bigbluebutton.properties
+  set_fact:
+    properties_charset: 'iso-8859-1'
 
 - name: Create certs directory for nginx
   file:
@@ -85,11 +93,21 @@
     dest: '{{ item.dest }}'
   become: yes
   with_items:
-    - { src: '{{ bigbluebutton_local_ssl_certificate }}', dest: '{{ ssl_certificate }}' }
-    - { src: '{{ bigbluebutton_local_ssl_certificate_key }}', dest: '{{ ssl_certificate_key }}' }
+    - { src: '{{ bigbluebutton_local_ssl_certificate }}', dest: '{{ bigbluebutton_ssl_certificate }}' }
+    - { src: '{{ bigbluebutton_local_ssl_certificate_key }}', dest: '{{ bigbluebutton_ssl_certificate_key }}' }
   when: not((bigbluebutton_local_ssl_certificate is undefined) or (bigbluebutton_local_ssl_certificate is none) or (bigbluebutton_local_ssl_certificate | trim == ''))
     and not((bigbluebutton_local_ssl_certificate_key is undefined) or (bigbluebutton_local_ssl_certificate_key is none) or (bigbluebutton_local_ssl_certificate_key | trim == ''))
+  ignore_errors: yes
   notify: reload nginx
+
+- name: Check if certificate exists
+  stat:
+    path: '{{ bigbluebutton_ssl_certificate }}'
+  register: reg_ssl_certificate
+  become: yes
+
+- include: self-signed-certs.yml
+  when: not reg_ssl_certificate.stat.exists
 
 - name: Add ssl configuration on nginx
   blockinfile:
@@ -97,8 +115,8 @@
     block: |2
            listen 443 ssl;
            listen [::]:443 ssl;
-           ssl_certificate {{ ssl_certificate }};
-           ssl_certificate_key {{ ssl_certificate_key}};
+           ssl_certificate {{ bigbluebutton_ssl_certificate }};
+           ssl_certificate_key {{ bigbluebutton_ssl_certificate_key}};
            ssl_session_cache shared:SSL:10m;
            ssl_session_timeout 10m;
            # need TLSv1 for the Java calls for the API, otherwise it would be removed
@@ -126,15 +144,6 @@
     replace: '\1 {{ inventory_hostname }};'
   become: yes
   notify: reload nginx
-
-- name: Get IP set on BigBlueButton
-  command: bbb-conf --secret
-  register: bbbip
-  notify: setip
-
-- name: Determine if setip is needed based on bbb-conf
-  set_fact:
-    setip_needed: '{{ not bbbip.stdout | search("http[s]?://" + inventory_hostname) }}'
 
 - name: Install demos
   become: true
@@ -182,11 +191,47 @@
   become: yes
   when: not bigbluebutton_demos
 
+- name: Adjust bigbluebutton.yml
+  replace:
+    path: /usr/local/bigbluebutton/core/scripts/bigbluebutton.yml
+    regexp: '{{ item.regexp }}'
+    replace: '{{ item.replace }}'
+  with_items:
+    - { regexp: '^(playback_host): .*', replace: '\1: {{ inventory_hostname }}' }
+    - { regexp: '^(playback_protocol): .*', replace: '\1: https' }
+  become: yes
+  register: reg_bigbluebutton_yml_replace
+
+- name: Get BigBlueButton secret
+  shell: bbb-conf --secret | tr -s ' ' | grep '^ Secret:' | cut -d' ' -f3
+  register: reg_bbb_secret
+
+- name: Get BigBlueButton URL
+  shell: bbb-conf --secret | tr -s ' ' | grep '^ URL:' | cut -d' ' -f3
+  register: reg_bbb_url
+
+- name: Check akka configuration
+  shell: cat /usr/share/bbb-apps-akka/conf/application.conf | grep 'sharedSecret.*changeme'
+  register: reg_akka_changeme
+  ignore_errors: yes
+
+- name: Determine if setip is needed
+  set_fact:
+    setip_needed: '{{ not reg_bbb_url.stdout | search("http[s]?://" + inventory_hostname) or reg_akka_changeme|succeeded or reg_bigbluebutton_yml_replace|changed }}'
+    bbb_url: '{{ reg_bbb_url.stdout }}'
+    bbb_secret: '{{ reg_bbb_secret.stdout }}'
+
+- name: bbb-conf --setip
+  become: true
+  command: bbb-conf --setip '{{ inventory_hostname }}'
+  when: setip_needed
+
 - name: Set HTTPS on bigbluebutton.properties
   replace:
     path: '{{ item[0] }}'
     regexp: '{{ item[1].regexp }}'
     replace: '{{ item[1].replace }}'
+    encoding: '{{ properties_charset }}'
   with_nested:
     -
       - /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties
@@ -200,23 +245,6 @@
   become: yes
   notify: restart bigbluebutton
 
-- name: Adjust bigbluebutton.yml
-  replace:
-    path: /usr/local/bigbluebutton/core/scripts/bigbluebutton.yml
-    regexp: '{{ item.regexp }}'
-    replace: '{{ item.replace }}'
-  with_items:
-    - { regexp: '^(playback_host): .*', replace: '\1: {{ inventory_hostname }}' }
-    - { regexp: '^(playback_protocol): .*', replace: '\1: https' }
-  become: yes
-  notify: setip
-  register: reg_bigbluebutton_yml_replace
-
-- name: Determine if setip is needed based on bigbluebutton.yml
-  set_fact:
-    setip_needed: '{{ reg_bigbluebutton_yml_replace|changed }}'
-  when: not setip_needed
-
 # http://docs.ansible.com/ansible/latest/playbooks_lookups.html#the-dns-lookup-dig
 # couldn't make dig lookup use dnspython on the guest
 - name: Determine external IP
@@ -225,6 +253,10 @@
     external_ip: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | head -n 1') }}"
   tags:
     - always
+- name: Set external IP as internal IP if nothing returns from dig
+  set_fact:
+    external_ip: '{{ ansible_default_ipv4.address }}'
+  when: external_ip | trim == ""
 - name: Determine wss_binding value
   set_fact:
     wss_binding_value: '{% if ansible_default_ipv4.address == external_ip %}:7443{% else %}{{ external_ip }}:7443{% endif %}'
