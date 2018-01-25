@@ -55,4 +55,4 @@
     remote_src: true
   become: yes
   with_fileglob:
-    - '{{ ansible_env.HOME }}/dev/bigbluebutton-config/bin/*'
+    - '{{ ansible_env.HOME }}/dev/bigbluebutton/bigbluebutton-config/bin/*'

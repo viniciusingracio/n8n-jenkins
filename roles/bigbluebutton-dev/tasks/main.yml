@@ -94,6 +94,11 @@
     - { src: 'apache-flex-sdk-4.13.0-bin', dest: 'flex' }
     - { src: 'apache-maven-3.3.3', dest: 'maven' }
 
+- name: Create global sbt config file
+  file:
+    path: '{{ ansible_env.HOME }}/.sbt/0.13'
+    state: directory
+
 - name: Add publishTo on build.sbt
   blockinfile:
     dest: '{{ ansible_env.HOME }}/.sbt/0.13/global.sbt'

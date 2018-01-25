@@ -37,3 +37,19 @@
     - bbb-voice
     - bigbluebutton-apps
     - video-broadcast
+
+- name: Set owner of red5 video dir
+  file:
+    path: /usr/share/red5/webapps/video/streams
+    recurse: yes
+    state: directory
+    owner: red5
+    group: red5
+  become: yes
+
+- name: Build bbb-screenshare
+  command: ./deploy.sh
+  args:
+    chdir: '{{ ansible_env.HOME }}/dev/bigbluebutton/bbb-screenshare/app'
+  environment:
+    PATH: '{{ ansible_env.HOME }}/dev/tools/gradle/bin:{{ ansible_env.PATH }}'

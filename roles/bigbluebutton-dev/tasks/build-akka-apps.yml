@@ -8,6 +8,7 @@
   with_items:
     - bbb-common-message
     - bbb-fsesl-client
+    - bbb-common-web
 
 - name: Compile akka libraries
   shell: |
@@ -24,9 +25,29 @@
     - bbb-fsesl-client
     - bbb-common-web
 
+- name: Get BigBlueButton secret
+  shell: bbb-conf --secret | tr -s ' ' | grep '^ Secret:' | cut -d' ' -f3
+  register: bbb_secret
+
+- name: Get BigBlueButton URL
+  shell: bbb-conf --secret | tr -s ' ' | grep '^ URL:' | cut -d' ' -f3
+  register: bbb_url
+
+- name: Configure akka apps
+  lineinfile:
+    dest: '{{ ansible_env.HOME }}/dev/bigbluebutton/akka-bbb-apps/src/main/resources/application.conf'
+    state: present
+    regexp: '{{ item.regexp }}'
+    line: '{{ item.line }}'
+  with_items:
+    - { regexp: 'bbbWebAPI[ ]*=', line: '  bbbWebAPI = "{{ bbb_url.stdout }}api"' }
+    - { regexp: 'sharedSecret[ ]*=', line: '  sharedSecret = "{{ bbb_secret.stdout }}"' }
+    - { regexp: 'deskshareip[ ]*=', line: '  deskshareip = "{{ inventory_hostname }}"' }
+
 - name: Compile akka apps
   shell: |
     sbt clean
+    sbt compile
     sbt debian:packageBin
   args:
     chdir: '{{ ansible_env.HOME }}/dev/bigbluebutton/{{ item }}'
@@ -36,7 +57,6 @@
     - akka-bbb-apps
     - akka-bbb-fsesl
     - akka-bbb-transcode
-    - bbb-screenshare/app
 
 - name: Install akka apps
   shell: |
@@ -50,4 +70,3 @@
     - akka-bbb-apps
     - akka-bbb-fsesl
     - akka-bbb-transcode
-    - bbb-screenshare/app
