@@ -1,0 +1,7 @@
+---
+
+bigbluebutton_html5: true
+bigbluebutton_sip: false
+
+bigbluebutton_screenshare_extension_url: https://chrome.google.com/webstore/detail/kurento-screenshare-test/mbfngdphjegmlbfobcblikeefpidfncb
+bigbluebutton_screenshare_extension_key: mbfngdphjegmlbfobcblikeefpidfncb

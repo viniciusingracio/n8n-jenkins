@@ -1,0 +1,87 @@
+;(function($) {
+
+  // make sure all elements in the modal are enabled and the first input
+  // is focused when the modal is opened
+  $(document).on('opening', '.remodal', function () {
+    enableFormComponents($(this));
+  });
+  $(document).on('opened', '.remodal', function () {
+    $('form:first *:input[type!=hidden]:first', $(this)).focus();
+  });
+
+  // when the modal to request an integrator key is opened, changed the
+  // input "type" to "Integrator"
+  $(document).on('opened', '.modal-register-integrator.remodal', function () {
+    $('input[name="type"]', $(this)).val("Integrator");
+  });
+
+  // disable all components when submitting the form, re-enable if an
+  // error happens (so the user can try again)
+  $(document).on('wpcf7:mailfailed', '.modal-register .wpcf7', function(event) {
+    enableFormComponents($(this));
+  });
+  $(document).on('wpcf7:mailsent', '.modal-register .wpcf7', function(event) {
+  });
+  $(document).on('wpcf7:invalid', '.modal-register .wpcf7', function(event) {
+    enableFormComponents($(this));
+  });
+  // wpcf7:submit is called after the request is submitted *and* processed
+  $(document).on('submit', '.modal-register .wpcf7 form', function(event) {
+    disableFormComponents($(this));
+  });
+
+  // in the demo form we disable only the submit button so it doesn't mess
+  // with the data being submitted
+  $(document).on('submit', '.modal-demo form', function(e) {
+    //e.preventDefault(); // don't submit multiple times
+    //this.submit(); // use the native submit method of the form element
+    disableFormComponents($(this), true);
+  });
+
+  var enableFormComponents = function($el) {
+    $('input', $el).attr("disabled", null);
+    $('select', $el).attr("disabled", null);
+    $('[type=submit]', $el).attr("disabled", null); //enable();
+  };
+
+  var disableFormComponents = function($el, btnOnly) {
+    var btnOnly = (typeof btnOnly !== 'undefined') ?  btnOnly : false;
+    if (!btnOnly) {
+      $('input', $el).attr("disabled", "disabled");
+      $('select', $el).attr("disabled", "disabled");
+    }
+    $('[type=submit]', $el).attr("disabled", "disabled"); //disable();
+  };
+
+  setTimeout(function() {
+    if (!$("body").hasClass("page-template-page-template-room") && !$("body").hasClass("page-template-page-template-room-dark")) {
+
+      if ($("html").attr("lang") == "pt-BR") {
+
+        var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+        (function(){
+          var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+          s1.async=true;
+          s1.src='https://embed.tawk.to/5889f868bab87e66427b6df2/1b7dh5pqb';
+          s1.charset='UTF-8';
+          s1.setAttribute('crossorigin','*');
+          s0.parentNode.insertBefore(s1,s0);
+        })();
+
+      } else {
+
+        var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+        (function(){
+          var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+          s1.async=true;
+          s1.src='https://embed.tawk.to/5889f868bab87e66427b6df2/default';
+          s1.charset='UTF-8';
+          s1.setAttribute('crossorigin','*');
+          s0.parentNode.insertBefore(s1,s0);
+        })();
+
+      }
+    }
+  }, 1000);
+
+}(jQuery));

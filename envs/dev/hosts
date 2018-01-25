@@ -20,5 +20,12 @@ kurento-desktopsharing.mconf.com ansible_user=root deploy_user=root
 196.168.0.197
 196.168.0.198
 
+[mconf-live110]
+dev.mconf.local
+# setup with on lxc with:
+# ansible-playbook -v -i envs/dev -l dev.mconf.local setup.yml --extra-vars "ansible_user=ubuntu"
+# provision with:
+# ansible-playbook -v -i envs/dev -l dev.mconf.local provision.yml
+
 [bigbluebutton-dev]
-test-live110.mconf.com bigbluebutton_repo=git@github.com:mconftec/bigbluebutton.git bigbluebutton_repo_ref=mconf-commercial-1.1
+dev.mconf.local
