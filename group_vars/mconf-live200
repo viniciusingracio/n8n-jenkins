@@ -1,0 +1,10 @@
+---
+
+mconf_live_extra_recording_packages:
+  - mconf-presentation-video
+
+bigbluebutton_apt_package: bigbluebutton
+bigbluebutton_apt_source: 'deb https://jenkins-live.mconf.com/apt/development/html5-dev/xenial-2.0.0 mconf-xenial main'
+bigbluebutton_apt_key: 'https://jenkins-live.mconf.com/apt/public.asc'
+bigbluebutton_config_xml_custom:
+  - { xpath: '/config/logging', attribute: 'logPattern', value: 'ignored_for_now' }

@@ -1,12 +1,5 @@
 - include_role:
     name: bigbluebutton
-  vars:
-    - bigbluebutton_apt_package: mconf-live
-    - bigbluebutton_apt_key: 'https://jenkins-live.mconf.com/apt/public.asc'
-    - bigbluebutton_config_xml_custom:
-      - { xpath: '/config/logging', attribute: 'logPattern', value: 'ignored_for_now' }
-      - { xpath: '//module[@name="VideoconfModule"]', attribute: 'useMconfDeskshare', value: 'true' }
-      - { xpath: '//module[@name="VideoconfModule"]', attribute: 'showExpandVideosButton', value: 'true' }
 
 - name: Install extra recording formats
   become: true

@@ -1,7 +1,6 @@
 ---
 
-mconf_live_extra_recording_packages:
-  - mconf-presentation-video
+mconf_live_extra_recording_packages: []
 
 mconf_live_rec_proxy_http_port: 8091
 

@@ -73,8 +73,6 @@
   - { role: certbot, when: certbot_enabled }
   - { role: dj-wasabi.zabbix-agent, when: zabbix_agent_enabled }
   - mconf-live
-  vars:
-  - bigbluebutton_apt_source: 'deb https://jenkins-live.mconf.com/apt/development/mconf-comm-110/xenial-1.1.0 mconf-xenial main'
 
 # Mconf-Live
 - hosts:
@@ -82,7 +80,7 @@
   roles:
   - { role: certbot, when: certbot_enabled }
   - { role: dj-wasabi.zabbix-agent, when: zabbix_agent_enabled }
-  - bigbluebutton
+  - mconf-live
 
 # Kurento
 - hosts: kurento
