@@ -26,3 +26,7 @@
 - name: restart kurento
   become: true
   service: name=kurento-media-server-6.0 state=restarted
+
+- name: reboot
+  become: true
+  command: shutdown -r 1

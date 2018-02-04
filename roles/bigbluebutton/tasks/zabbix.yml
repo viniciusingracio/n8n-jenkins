@@ -30,4 +30,15 @@
 - name: Userparams
   shell: find /etc/zabbix/scripts/ -name userparams.conf -exec cat {} \; | tee /etc/zabbix/zabbix_agentd.d/userparams_mconf.conf
   become: yes
+  notify: restart zabbix-agent
+
+- name: Copy sudoers
+  copy:
+    src: files/zabbix/zabbix.sudoers
+    dest: /etc/sudoers.d/zabbix
+    owner: root
+    group: root
+    mode: 0440
+    validate: /usr/sbin/visudo -cf %s
+  become: yes
   notify: restart zabbix-agent 

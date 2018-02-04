@@ -203,11 +203,13 @@
   register: reg_bigbluebutton_yml_replace
 
 - name: Get BigBlueButton secret
-  shell: bbb-conf --secret | tr -s ' ' | grep '^ Secret:' | cut -d' ' -f3
+  # shell: bbb-conf --secret | tr -s ' ' | grep '^ Secret:' | cut -d' ' -f3
+  shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
   register: reg_bbb_secret
 
 - name: Get BigBlueButton URL
-  shell: bbb-conf --secret | tr -s ' ' | grep '^ URL:' | cut -d' ' -f3
+  # shell: bbb-conf --secret | tr -s ' ' | grep '^ URL:' | cut -d' ' -f3
+  shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^bigbluebutton.web.serverURL=' | cut -d'=' -f2 | awk '{print $1"/bigbluebutton/"}'
   register: reg_bbb_url
 
 - name: Check akka configuration
@@ -257,6 +259,7 @@
   set_fact:
     external_ip: '{{ ansible_default_ipv4.address }}'
   when: external_ip | trim == ""
+
 - name: Determine wss_binding value
   set_fact:
     wss_binding_value: '{% if ansible_default_ipv4.address == external_ip %}:7443{% else %}{{ external_ip }}:7443{% endif %}'
@@ -265,7 +268,7 @@
 
 # http://docs.bigbluebutton.org/install/install.html#configure-a-dummy-nic-if-required
 - name: Check if dummy NIC required
-  command: 'curl --max-time 5 --trace-ascii - -k https://{{ external_ip }}:443/bigbluebutton/api'
+  command: 'curl --max-time 5 --trace-ascii - -k https://{{ external_ip }}:443/favicon.ico'
   ignore_errors: yes
   register: reg_dummy
 
@@ -418,14 +421,40 @@
     - not(bigbluebutton_sounds_frequency is none)
     - not(bigbluebutton_sounds_name_version is none)
 
-- name: Modify FreeSWITCH sounds
+- name: Read FreeSWITCH sounds
   xml:
     path: /opt/freeswitch/etc/freeswitch/autoload_configs/conference.conf.xml
-    xpath: /configuration/profiles/profile/param[@name='{{ item.name }}']
+    xpath: /configuration/profiles/profile[@name='cdquality']/param[@name='{{ item.name }}']
     attribute: 'value'
-    value: '{{ item.value }}'
+    content: attribute
   with_items: '{{ bigbluebutton_sounds_profile }}'
+  register: hits
+  ignore_errors: yes
   become: yes
+
+- name: Modify FreeSWITCH sounds if they exist
+  xml:
+    path: /opt/freeswitch/etc/freeswitch/autoload_configs/conference.conf.xml
+    xpath: /configuration/profiles/profile[@name='cdquality']/param[@name='{{ item.item.name }}']
+    attribute: value
+    value: '{{ item.item.value }}'
+  become: yes
+  with_items: '{{ hits.results }}'
+  when: '{{ item | succeeded }}'
+  notify: restart bigbluebutton
+
+- name: Add FreeSWITCH sounds if they don't exist
+  xml:
+    path: /opt/freeswitch/etc/freeswitch/autoload_configs/conference.conf.xml
+    xpath: /configuration/profiles/profile[@name='cdquality']
+    add_children:
+      - param:
+          name: '{{ item.item.name }}'
+          value: '{{ item.item.value }}'
+    pretty_print: yes
+  become: yes
+  with_items: '{{ hits.results }}'
+  when: '{{ item | failed }}'
   notify: restart bigbluebutton
 
 
@@ -500,3 +529,13 @@
 
 # - include: rap-resque.yml
 #   tags: [rap]
+
+- name: Check if reboot is required
+  stat:
+    path: /var/run/reboot-required
+  register: reg_reboot
+
+- name: Notify when reboot is required
+  command: 'true'
+  notify: reboot
+  when: reg_reboot.stat.exists

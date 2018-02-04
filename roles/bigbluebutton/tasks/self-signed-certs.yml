@@ -54,10 +54,10 @@
   when: diff_cert|failed
 
 - name: Delete certificate from Java keystore if already exists
-  command: 'keytool -delete -keystore /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security/cacerts -storepass changeit -noprompt -alias {{ inventory_hostname }}'
+  command: 'keytool -delete -keystore /etc/ssl/certs/java/cacerts -storepass changeit -noprompt -alias {{ inventory_hostname }}'
   become: yes
   ignore_errors: yes
 
 - name: Import certificate on Java keystore
-  command: 'keytool -import -trustcacerts -keystore /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security/cacerts -storepass changeit -noprompt -alias {{ inventory_hostname }} -file {{ bigbluebutton_ssl_certificate }}'
+  command: 'keytool -import -trustcacerts -keystore /etc/ssl/certs/java/cacerts -storepass changeit -noprompt -alias {{ inventory_hostname }} -file {{ bigbluebutton_ssl_certificate }}'
   become: yes

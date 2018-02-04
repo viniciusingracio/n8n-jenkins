@@ -37,6 +37,7 @@
     - bbb-voice
     - bigbluebutton-apps
     - video-broadcast
+    - bbb-screenshare/app
 
 - name: Set owner of red5 video dir
   file:

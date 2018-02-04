@@ -1,0 +1,2 @@
+exclude node_modules
+exclude spectre-meltdown-checker.sh
