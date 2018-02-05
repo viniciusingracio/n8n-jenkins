@@ -3,9 +3,6 @@
     src: files/zabbix/
     dest: /etc/zabbix/scripts/
     delete: yes
-    # TODO do not remove node_modules
-    # rsync_opts:
-    #   - --filter='P */node_modules/*'
   become: yes
 
 - name: Set owner of zabbix scripts dir
@@ -13,8 +10,8 @@
     path: /etc/zabbix/scripts/
     recurse: yes
     state: directory
-    owner: '{{ deploy_user }}'
-    group: '{{ deploy_user }}'
+    owner: '{{ ansible_user }}'
+    group: '{{ ansible_user }}'
   become: yes
 
 - find:

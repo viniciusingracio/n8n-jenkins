@@ -23,14 +23,14 @@
     src: '{{ bigbluebutton_branding_layout }}'
     dest: /var/www/bigbluebutton/client/conf/layout.xml
   become: yes
-  when: not((bigbluebutton_branding_layout is undefined) or (bigbluebutton_branding_layout is none) or (bigbluebutton_branding_layout | trim == ''))
+  when: bigbluebutton_branding_layout | trim != ''
 
 - name: Copy client logo
   copy:
     src: '{{ bigbluebutton_branding_logo_client }}'
     dest: /var/www/bigbluebutton/client/logo.png
   become: yes
-  when: not((bigbluebutton_branding_logo_client is undefined) or (bigbluebutton_branding_logo_client is none) or (bigbluebutton_branding_logo_client | trim == ''))
+  when: bigbluebutton_branding_logo_client | trim != ''
 
 - name: Copy playback logo
   copy:
@@ -42,7 +42,7 @@
     - /var/bigbluebutton/playback/presentation_export/logo.png
   ignore_errors: yes
   become: yes
-  when: not((bigbluebutton_branding_logo_playback is undefined) or (bigbluebutton_branding_logo_playback is none) or (bigbluebutton_branding_logo_playback | trim == ''))
+  when: bigbluebutton_branding_logo_playback | trim != ''
 
 - name: Customize HTML5 Client title
   replace:
@@ -90,6 +90,7 @@
     - { regexp: '^(defaultWelcomeMessage)=.*', replace: '\1={{ bigbluebutton_branding_welcome }}' }
     - { regexp: '^(defaultWelcomeMessageFooter)=.*', replace: '\1={{ bigbluebutton_branding_welcome_footer }}' }
     - { regexp: '^(defaultClientUrl)=.*', replace: '\1=${bigbluebutton.web.serverURL}/client/Mconf-Live.html' }
+  when: item.replace | trim != ''
   become: yes
   notify: restart bigbluebutton
 
@@ -99,6 +100,3 @@
     regexp: '"BigBlueButton - " \+ title'
     replace: 'title'
   become: yes
-
-# TODO sons do FreeSWITCH
-# TODO gravação em todas as salas

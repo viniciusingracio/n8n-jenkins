@@ -100,14 +100,12 @@
   ignore_errors: yes
   notify: reload nginx
 
-- name: Check if certificate exists
-  stat:
-    path: '{{ bigbluebutton_ssl_certificate }}'
-  register: reg_ssl_certificate
-  become: yes
+- name: Determine if use self signed certificate
+  set_fact:
+    use_self_signed_certificate: '{{ bigbluebutton_local_ssl_certificate | trim == "" and not certbot_enabled }}'
 
 - include: self-signed-certs.yml
-  when: not reg_ssl_certificate.stat.exists
+  when: use_self_signed_certificate
 
 - name: Add ssl configuration on nginx
   blockinfile:
@@ -296,123 +294,6 @@
   become: yes
   notify: reload nginx
 
-- name: Read wss-binding attribute
-  xml:
-    path: /opt/freeswitch/conf/sip_profiles/external.xml
-    xpath: '{{ item }}'
-    content: attribute
-    attribute: value
-  with_items:
-    - /profile/settings/param[@name="ws-binding"]
-    - /profile/settings/param[@name="wss-binding"]
-  register: hits
-  ignore_errors: yes
-  become: yes
-
-- name: Remove ws-binding
-  xml:
-    path: /opt/freeswitch/conf/sip_profiles/external.xml
-    xpath: /profile/settings/param[@name="ws-binding"]
-    state: absent
-  become: yes
-  when: not bigbluebutton_sip
-  notify: restart bigbluebutton
-
-- name: Modify ws-binding if it exists
-  xml:
-    path: /opt/freeswitch/conf/sip_profiles/external.xml
-    xpath: /profile/settings/param[@name="ws-binding"]
-    attribute: value
-    value: :5066
-  become: yes
-  when: hits.results[0]|succeeded and bigbluebutton_sip
-  notify: restart bigbluebutton
-
-- name: Add ws-binding if it doesn't exist
-  xml:
-    path: /opt/freeswitch/conf/sip_profiles/external.xml
-    xpath: /profile/settings
-    add_children:
-      - param:
-          name: ws-binding
-          value: :5066
-    pretty_print: yes
-  become: yes
-  when: hits.results[0]|failed and bigbluebutton_sip
-  notify: restart bigbluebutton
-
-- name: Modify wss-binding if it exists
-  xml:
-    path: /opt/freeswitch/conf/sip_profiles/external.xml
-    xpath: /profile/settings/param[@name="wss-binding"]
-    attribute: value
-    value: '{{ wss_binding_value }}'
-  become: yes
-  when: hits.results[1]|succeeded
-  notify: restart bigbluebutton
-
-- name: Add wss-binding if it doesn't exist
-  xml:
-    path: /opt/freeswitch/conf/sip_profiles/external.xml
-    xpath: /profile/settings
-    add_children:
-      - param:
-          name: wss-binding
-          value: '{{ wss_binding_value }}'
-    pretty_print: yes
-  become: yes
-  when: hits.results[1]|failed
-  notify: restart bigbluebutton
-
-- name: Define FreeSWITCH external SIP port
-  set_fact:
-    freeswitch_sip_port: '{% if bigbluebutton_sip %}5062{% else %}5060{% endif %}'
-  tags:
-    - always
-
-- name: Modify FreeSWITCH vars.xml
-  xml:
-    path: /opt/freeswitch/conf/vars.xml
-    xpath: '{{ item.xpath }}'
-    attribute: '{{ item.attribute }}'
-    value: '{{ item.value }}'
-  with_items:
-    - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "external_sip_port=")]', attribute: 'data', value: 'external_sip_port={{ freeswitch_sip_port }}' }
-    - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "external_rtp_ip=")]', attribute: 'data', value: 'external_rtp_ip={{ external_ip }}' }
-    - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "external_sip_ip=")]', attribute: 'data', value: 'external_sip_ip={{ external_ip }}' }
-    - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "sound_prefix=")]', attribute: 'data', value: 'sound_prefix={{ bigbluebutton_sounds_prefix }}' }
-  become: yes
-  notify: restart bigbluebutton
-
-- name: Modify FreeSWITCH external.xml
-  xml:
-    path: /opt/freeswitch/conf/sip_profiles/external.xml
-    xpath: '{{ item.xpath }}'
-    attribute: '{{ item.attribute }}'
-    value: '{{ item.value }}'
-  with_items:
-    - { xpath: '/profile/settings/param[@name="ext-rtp-ip"]', attribute: 'value', value: '$${external_rtp_ip}' }
-    - { xpath: '/profile/settings/param[@name="ext-sip-ip"]', attribute: 'value', value: '$${external_sip_ip}' }
-  become: yes
-  notify: restart bigbluebutton
-
-- name: Modify external_sip_port on bbb-voice
-  lineinfile:
-    dest: /usr/share/red5/webapps/sip/WEB-INF/bigbluebutton-sip.properties
-    state: present
-    regexp: ^freeswitch\.port=
-    line: 'freeswitch.port={{ freeswitch_sip_port }}'
-  become: yes
-  notify: restart bigbluebutton
-
-
-
-- name: Check if Kurento WebRtcEndpoint config file exists
-  stat:
-    path: /etc/kurento/modules/kurento/WebRtcEndpoint.conf.ini
-  become: yes
-  register: kurento_config
-
 - name: Determine STUN information for Kurento
   set_fact:
     stun_server_ip: "{{ lookup('pipe', 'dig {{ bigbluebutton_stun_server[0].split(\":\")[1] }} @8.8.8.8 A +short | head -n 1') }}"
@@ -420,20 +301,34 @@
   tags:
     - always
 
-- name: Update STUN on Kurento
+- name: Update KMS config
   lineinfile:
-    dest: /etc/kurento/modules/kurento/WebRtcEndpoint.conf.ini
+    dest: '{{ item.dest }}'
     state: present
     regexp: '{{ item.regexp }}'
     line: '{{ item.line }}'
   become: yes
   with_items:
-    - { regexp: 'stunServerAddress=', line: 'stunServerAddress={{ stun_server_ip }}' }
-    - { regexp: 'stunServerPort=', line: 'stunServerPort={{ stun_server_port }}' }
-  notify: restart kurento
-  when: kurento_config.stat.exists
+    - { dest: /etc/kurento/modules/kurento/WebRtcEndpoint.conf.ini, regexp: '^stunServerAddress=', line: 'stunServerAddress={{ stun_server_ip }}' }
+    - { dest: /etc/kurento/modules/kurento/WebRtcEndpoint.conf.ini, regexp: '^stunServerPort=', line: 'stunServerPort={{ stun_server_port }}' }
+    - { dest: /etc/kurento/modules/kurento/BaseRtpEndpoint.conf.ini, regexp: '^minPort=', line: 'minPort={{ bigbluebutton_kms_udp_range_begin }}' }
+    - { dest: /etc/kurento/modules/kurento/BaseRtpEndpoint.conf.ini, regexp: '^maxPort=', line: 'maxPort={{ bigbluebutton_kms_udp_range_end }}' }
+  notify: restart kms
 
-
+- name: Update bbb-webrtc-sfu config
+  lineinfile:
+    dest: /usr/local/bigbluebutton/bbb-webrtc-sfu/config/default.yml
+    state: present
+    regexp: '{{ item.regexp }}'
+    line: '{{ item.line }}'
+  become: yes
+  with_items:
+    - { regexp: '^minVideoPort:', line: 'minVideoPort: {{ bigbluebutton_html5_udp_range_begin }}' }
+    - { regexp: '^maxVideoPort:', line: 'maxVideoPort: {{ bigbluebutton_html5_udp_range_end }}' }
+    - { regexp: '^kurentoIp:', line: 'kurentoIp: {{ external_ip }}' }
+    - { regexp: '^localIpAddress:', line: 'localIpAddress: {{ external_ip }}' }
+    - { regexp: '^acceptSelfSignedCertificate:', line: 'acceptSelfSignedCertificate: {{ use_self_signed_certificate }}' }
+  notify: restart bbb-webrtc-sfu
 
 - name: Open/close redis
   become: true
@@ -455,7 +350,7 @@
   when: not bigbluebutton_redis_bind
   notify: restart redis
 
-- include: sounds.yml
+- include: freeswitch.yml
 
 - include: config-xml.yml
 

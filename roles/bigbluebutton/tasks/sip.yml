@@ -7,15 +7,17 @@
 
 - include: json-deps.yml
 
-- name: Update json values
+- name: Update config
   become: true
   json:
     path: /usr/local/bigbluebutton/mconf-mcs-sip/config/default.json
     replace:
-      json_path: '{{ item }}'
-      with_value: '{{ external_ip }}'
+      json_path: '{{ item.path }}'
+      with_value: '{{ item.value }}'
     indent: 4
   with_items:
-    - /kurento/server/ip_address
-    - /sip/local_ip_address
-  notify: restart bigbluebutton
+    - { path: '/kurento/server/ip_address', value: '{{ external_ip }}' }
+    - { path: '/sip/local_ip_address', value: '{{ external_ip }}' }
+    - { path: '/sip/min_video_port', value: '{{ bigbluebutton_sip_udp_range_begin }}' }
+    - { path: '/sip/max_video_port', value: '{{ bigbluebutton_sip_udp_range_end }}' }
+  notify: restart mconf-mcs-sip
