@@ -1,0 +1,53 @@
+# TODO update if version is different
+- name: Download audio files for FreeSWITCH
+  unarchive:
+    src: https://files.freeswitch.org/releases/sounds/{{ item[1].name }}-{{ item[0] }}-{{ item[1].version }}.tar.gz
+    dest: /opt/freeswitch/share/freeswitch/sounds
+    remote_src: True
+    owner: freeswitch
+    group: daemon
+    creates: '{{ bigbluebutton_sounds_prefix | regex_replace("\$\${sounds_dir}", "/opt/freeswitch/share/freeswitch/sounds") }}/conference/{{ item[0] }}/conf-muted.wav'
+  become: yes
+  with_nested:
+    - '{{ bigbluebutton_sounds_frequency }}'
+    - '{{ bigbluebutton_sounds_name_version }}'
+  notify: restart bigbluebutton
+  when:
+    - not(bigbluebutton_sounds_frequency is none)
+    - not(bigbluebutton_sounds_name_version is none)
+
+- name: Read FreeSWITCH sounds
+  xml:
+    path: /opt/freeswitch/etc/freeswitch/autoload_configs/conference.conf.xml
+    xpath: /configuration/profiles/profile[@name='cdquality']/param[@name='{{ item.name }}']
+    attribute: 'value'
+    content: attribute
+  with_items: '{{ bigbluebutton_sounds_profile }}'
+  register: hits
+  ignore_errors: yes
+  become: yes
+
+- name: Modify FreeSWITCH sounds if they exist
+  xml:
+    path: /opt/freeswitch/etc/freeswitch/autoload_configs/conference.conf.xml
+    xpath: /configuration/profiles/profile[@name='cdquality']/param[@name='{{ item.item.name }}']
+    attribute: value
+    value: '{{ item.item.value }}'
+  become: yes
+  with_items: '{{ hits.results }}'
+  when: '{{ item | succeeded }}'
+  notify: restart bigbluebutton
+
+- name: Add FreeSWITCH sounds if they don't exist
+  xml:
+    path: /opt/freeswitch/etc/freeswitch/autoload_configs/conference.conf.xml
+    xpath: /configuration/profiles/profile[@name='cdquality']
+    add_children:
+      - param:
+          name: '{{ item.item.name }}'
+          value: '{{ item.item.value }}'
+    pretty_print: yes
+  become: yes
+  with_items: '{{ hits.results }}'
+  when: '{{ item | failed }}'
+  notify: restart bigbluebutton
