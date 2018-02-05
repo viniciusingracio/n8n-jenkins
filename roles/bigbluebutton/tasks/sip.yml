@@ -5,6 +5,11 @@
     state: '{{ bigbluebutton_apt_state }}'
   notify: restart bigbluebutton
 
+- include_role:
+    name: ffmpeg
+  tags:
+    - ffmpeg
+
 - include: json-deps.yml
 
 - name: Update config
