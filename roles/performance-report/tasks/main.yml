@@ -1,0 +1,33 @@
+- name: Install pip on Python 2
+  become: true
+  apt:
+    name: python-pip
+    state: present
+
+- name: Install psutil
+  become: true
+  pip:
+    name: psutil
+    version: 0.5.1
+    state: present
+    executable: pip2
+
+- template:
+    src: files/performance_report.service.j2
+    dest: /usr/lib/systemd/system/performance_report.service
+  become: yes
+  notify: restart performance_report
+
+- name: Create directory
+  file:
+    path: '{{ performance_report_dir }}'
+    mode: 0755
+    recurse: yes
+    state: directory
+  become: yes
+
+- copy:
+    src: files/performance_report.py
+    dest: '{{ performance_report_dir }}/performance_report.py'
+  become: true
+  notify: restart performance_report

@@ -83,6 +83,12 @@
   - { role: dj-wasabi.zabbix-agent, when: zabbix_agent_enabled }
   - mconf-live
 
+- hosts:
+  - monitored-by-nagios
+  roles:
+  - performance-report
+  - nsca
+  
 # Kurento
 - hosts: kurento
   roles:

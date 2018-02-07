@@ -1,0 +1,11 @@
+performance_report_dir: /usr/local/performance_report
+performance_report_interval: 20
+
+performance_report_network_warning: 80000
+performance_report_network_critical: 90000
+performance_report_memory_warning: 80
+performance_report_memory_critical: 90
+performance_report_cpu_warning: 80
+performance_report_cpu_critical: 90
+performance_report_disk_warning: 80
+performance_report_disk_critical: 90

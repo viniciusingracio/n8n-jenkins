@@ -1,0 +1,14 @@
+[Unit]
+Description=Performance report
+After=syslog.target network.target
+
+[Service]
+WorkingDirectory={{ performance_report_dir }}
+ExecStart=/bin/bash -c '/usr/bin/python performance_report.py --hostname {{ inventory_hostname }} --send_rate {{ performance_report_interval }} --network-warning {{ performance_report_network_warning }} --network-critical {{ performance_report_network_critical }} --cpu-warning {{ performance_report_cpu_warning }} --cpu-critical {{ performance_report_cpu_critical }} --memory-warning {{ performance_report_memory_warning }} --memory-critical {{ performance_report_memory_critical }} --disk-warning {{ performance_report_disk_warning }} --disk-critical {{ performance_report_disk_critical }} | {{ nsca_binary_dir }}/reporter.sh'
+Restart=always
+SyslogIdentifier=performance_report
+User=bigbluebutton
+Group=bigbluebutton
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+while read data; do
+{% if nsca_reporter_debug %}
+    echo "[`date -u +%Y-%m-%dT%T.%3NZ`] Sending data: $data"
+{% endif %}
+{% for server in nsca_server %}
+    echo "$data" | {{ nsca_binary_dir }}/send_nsca -H {{ server }} -c {{ nsca_config_dir }}/send_nsca.cfg -to {{ nsca_timeout }}
+{% endfor %}
+done
+# this is important to keep chef executing even if it can't send the information to all the servers
+exit 0

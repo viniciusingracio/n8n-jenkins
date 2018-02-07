@@ -1,0 +1,6 @@
+- name: restart performance_report
+  become: true
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: performance_report
