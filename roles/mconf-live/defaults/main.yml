@@ -5,3 +5,5 @@ mconf_live_extra_recording_packages: []
 mconf_live_rec_proxy_http_port: 8091
 
 mconf_live_rec_proxy_enabled: false
+
+mconf_live_sounds_hold_music:

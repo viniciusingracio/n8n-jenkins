@@ -2,7 +2,8 @@
 
 bigbluebutton_apt_key: "http://ubuntu.bigbluebutton.org/repo/bigbluebutton.asc"
 # Install BigBlueButton 2.0
-bigbluebutton_apt_source: "deb http://ubuntu.bigbluebutton.org/xenial-200/ bigbluebutton-xenial main"
+# bigbluebutton_apt_source: "deb http://ubuntu.bigbluebutton.org/xenial-200/ bigbluebutton-xenial main"
+bigbluebutton_apt_source: "deb http://ubuntu.bigbluebutton.org/xenial-200-dev/ bigbluebutton-xenial main"
 # Install BigBlueButton 1.1
 # bigbluebutton_apt_source: "deb http://ubuntu.bigbluebutton.org/xenial-110/ bigbluebutton-xenial main"
 bigbluebutton_apt_package: bigbluebutton
@@ -13,23 +14,25 @@ bigbluebutton_html5: false
 bigbluebutton_sip: false
 
 # Setup Chrome extensions for WebRTC Desktop Sharing
-bigbluebutton_screenshare_extension_url:
-bigbluebutton_screenshare_extension_key:
+bigbluebutton_screenshare_extension_url: https://chrome.google.com/webstore/detail/bigbluebutton-screenshare/fdebcjabckbgfelopckfkhjldbbkoofj
+bigbluebutton_screenshare_extension_key: fdebcjabckbgfelopckfkhjldbbkoofj
 
-bigbluebutton_branding_welcome: '<br>Welcome to <b>%%CONFNAME%%</b>!<br>'
-bigbluebutton_branding_welcome_footer: 'For more information, visit <a href="https://mconf.com" target="_blank"><u>mconf.com</u></a>.'
+bigbluebutton_branding_welcome:
+bigbluebutton_branding_welcome_footer:
 bigbluebutton_branding_layout:
-bigbluebutton_branding_logo_client: /logo_client.png
+bigbluebutton_branding_logo_client:
 bigbluebutton_branding_logo_playback:
-bigbluebutton_branding_copyright: '&#169; 2018 Mconf Tecnologia &#183; <u><a href="https://mconf.com" target="_blank">https://mconf.com</a></u>'
-bigbluebutton_branding_copyright_html5: '© 2018 Mconf Tecnologia'
-bigbluebutton_branding_toolbar_color: '0x33132A'
-bigbluebutton_branding_toolbar_color_alphas: '0, 0'
-bigbluebutton_branding_deskshare_windows: https://s3-sa-east-1.amazonaws.com/assets.mconf.com/Mconf+Deskshare-1.0.2.4-installer-32bit-unsigned.exe
-bigbluebutton_branding_deskshare_mac: https://s3-sa-east-1.amazonaws.com/assets.mconf.com/Mconf+Deskshare-1.0.2.4-no-audio-installer-signed.dmg
-bigbluebutton_branding_playback_error: This recording could not be found
-bigbluebutton_branding_playback_title: Recording Playback
-bigbluebutton_branding_playback_copyright: '<p>Recorded with <a target="_blank" href="https://mconf.com/">Mconf</a>.</p><p>Use <a target="_blank" href="http://mozilla.org/firefox">Mozilla Firefox</a> or <a target="_blank" href="http://google.com/chrome/">Google Chrome</a> to play this recording.</p>'
+bigbluebutton_branding_copyright:
+bigbluebutton_branding_copyright_html5:
+bigbluebutton_branding_toolbar_color:
+bigbluebutton_branding_toolbar_color_alphas:
+bigbluebutton_branding_deskshare_windows:
+bigbluebutton_branding_deskshare_mac:
+bigbluebutton_branding_playback_error:
+bigbluebutton_branding_playback_title:
+bigbluebutton_branding_playback_copyright:
+
+bigbluebutton_default_presentation:
 
 bigbluebutton_apt_state: latest
 # bigbluebutton_apt_state: present
@@ -79,13 +82,6 @@ bigbluebutton_sysctl:
   - { name: 'net.ipv6.conf.default.accept_redirects' , value: '0' }
 
 bigbluebutton_config_xml:
-  - { xpath: '/config/branding', attribute: 'logo', value: 'logo.png' }
-  - { xpath: '/config/branding', attribute: 'copyright', value: '{{ bigbluebutton_branding_copyright }}' }
-  - { xpath: '/config/branding', attribute: 'toolbarColor', value: '{{ bigbluebutton_branding_toolbar_color }}' }
-  - { xpath: '/config/branding', attribute: 'toolbarColorAlphas', value: '{{ bigbluebutton_branding_toolbar_color_alphas }}' }
-  - { xpath: '/config/mconfDeskshare', attribute: 'downloadLinkWindows', value: '{{ bigbluebutton_branding_deskshare_windows }}' }
-  - { xpath: '/config/mconfDeskshare', attribute: 'downloadLinkMacOS', value: '{{ bigbluebutton_branding_deskshare_mac }}' }
-  - { xpath: '//module[@name="PhoneModule"]', attribute: 'showWebRTCStats', value: 'true' }
   - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeExtensionLink', value: '{{ bigbluebutton_screenshare_extension_url }}', run: '{{ bigbluebutton_html5 }}' }
   - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeExtensionKey', value: '{{ bigbluebutton_screenshare_extension_key }}', run: '{{ bigbluebutton_html5 }}' }
   - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'tryKurentoWebRTC', value: 'true', run: '{{ bigbluebutton_html5 }}' }
@@ -100,12 +96,9 @@ bigbluebutton_html5_config:
   - { path: '/public/kurento/chromeExtensionLink', value: '{{ bigbluebutton_screenshare_extension_url }}' }
   - { path: '/public/kurento/enableScreensharing', value: true }
   - { path: '/public/kurento/enableVideo', value: true }
-  - { path: '/public/app/appName', value: 'Mconf-Live HTML5' }
-  - { path: '/public/app/copyright', value: '{{ bigbluebutton_branding_copyright_html5 }}' }
 
 bigbluebutton_stun_server:
   - stun:stun.l.google.com:19302
-  - stun:stun1.mconf.com:3478
 
 bigbluebutton_sounds_frequency:
   - 48000

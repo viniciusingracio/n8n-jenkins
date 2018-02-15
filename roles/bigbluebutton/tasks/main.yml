@@ -95,14 +95,13 @@
   with_items:
     - { src: '{{ bigbluebutton_local_ssl_certificate }}', dest: '{{ bigbluebutton_ssl_certificate }}' }
     - { src: '{{ bigbluebutton_local_ssl_certificate_key }}', dest: '{{ bigbluebutton_ssl_certificate_key }}' }
-  when: not((bigbluebutton_local_ssl_certificate is undefined) or (bigbluebutton_local_ssl_certificate is none) or (bigbluebutton_local_ssl_certificate | trim == ''))
-    and not((bigbluebutton_local_ssl_certificate_key is undefined) or (bigbluebutton_local_ssl_certificate_key is none) or (bigbluebutton_local_ssl_certificate_key | trim == ''))
+  when: not bigbluebutton_local_ssl_certificate is none and not bigbluebutton_local_ssl_certificate_key is none
   ignore_errors: yes
   notify: reload nginx
 
 - name: Determine if use self signed certificate
   set_fact:
-    use_self_signed_certificate: '{{ bigbluebutton_local_ssl_certificate | trim == "" and not certbot_enabled }}'
+    use_self_signed_certificate: '{{ bigbluebutton_local_ssl_certificate is none and not certbot_enabled }}'
 
 - include: self-signed-certs.yml
   when: use_self_signed_certificate
@@ -265,15 +264,20 @@
     - always
 
 # http://docs.bigbluebutton.org/install/install.html#configure-a-dummy-nic-if-required
-- name: Check if dummy NIC required
+- name: Check if external IP is accessible
   command: 'curl --max-time 5 --trace-ascii - -k https://{{ external_ip }}:443/favicon.ico'
   ignore_errors: yes
-  register: reg_dummy
+  register: reg_external_ip_access
+
+- name: Check if external IP is assigned to any interface
+  shell: ip addr | grep 'inet {{ external_ip }}'
+  ignore_errors: yes
+  register: reg_external_ip_assigned
 
 - name: Add dummy NIC
   command: 'ip addr add {{ external_ip }}/32 dev lo'
   become: yes
-  when: reg_dummy|failed
+  when: reg_external_ip_assigned|failed or reg_external_ip_access|failed
   
 - name: Add dummy NIC to network interfaces
   blockinfile:
@@ -284,7 +288,10 @@
     insertafter: 'iface lo inet loopback'
     marker: '        # {mark} ANSIBLE MANAGED BLOCK'
   become: yes
-  when: reg_dummy|failed
+  when: reg_external_ip_assigned|failed or reg_external_ip_access|failed
+
+- name: Confirm if external IP is accessible
+  command: 'curl --max-time 5 --trace-ascii - -k https://{{ external_ip }}:443/favicon.ico'
 
 - name: Set HTTPS on sip.nginx
   replace:
@@ -349,6 +356,13 @@
     line: 'bind 127.0.0.1'
   when: not bigbluebutton_redis_bind
   notify: restart redis
+
+- name: Copy presentation
+  copy:
+    src: '{{ bigbluebutton_default_presentation }}'
+    dest: /var/www/bigbluebutton-default/default.pdf
+  when: not bigbluebutton_default_presentation is none
+  become: yes
 
 - include: freeswitch.yml
 

@@ -16,12 +16,12 @@
     dest: /opt/freeswitch/share/freeswitch/sounds/{{ mconf_live_sounds_hold_music }}
     owner: freeswitch
     group: daemon
-  when: not(mconf_live_sounds_hold_music is undefined)
+  when: not mconf_live_sounds_hold_music is none
   become: true
 
 - name: Create wav file
   command: ffmpeg -y -i /opt/freeswitch/share/freeswitch/sounds/{{ mconf_live_sounds_hold_music }} /opt/freeswitch/share/freeswitch/sounds/{{ (mconf_live_sounds_hold_music | splitext)[0] }}.wav
   args:
     creates: /opt/freeswitch/share/freeswitch/sounds/{{ (mconf_live_sounds_hold_music | splitext)[0] }}.wav
-  when: not(mconf_live_sounds_hold_music is undefined)
+  when: not mconf_live_sounds_hold_music is none
   become: true

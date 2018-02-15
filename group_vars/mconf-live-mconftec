@@ -1,0 +1,35 @@
+---
+
+bigbluebutton_branding_copyright: '&#169; 2018 Mconf Tecnologia &#183; <u><a href="https://mconf.com" target="_blank">https://mconf.com</a></u>'
+bigbluebutton_branding_copyright_html5: '© 2018 Mconf Tecnologia'
+bigbluebutton_branding_toolbar_color: '#33132A'
+bigbluebutton_branding_toolbar_color_alphas: '0, 0'
+bigbluebutton_branding_deskshare_windows: https://s3-sa-east-1.amazonaws.com/assets.mconf.com/Mconf+Deskshare-1.0.2.4-installer-32bit-unsigned.exe
+bigbluebutton_branding_deskshare_mac: https://s3-sa-east-1.amazonaws.com/assets.mconf.com/Mconf+Deskshare-1.0.2.4-no-audio-installer-signed.dmg
+
+bigbluebutton_config_xml:
+  - { xpath: '/config/branding', attribute: 'logo', value: 'logo.png' }
+  - { xpath: '/config/branding', attribute: 'copyright', value: '{{ bigbluebutton_branding_copyright }}' }
+  - { xpath: '/config/branding', attribute: 'toolbarColor', value: '{{ bigbluebutton_branding_toolbar_color }}' }
+  - { xpath: '/config/branding', attribute: 'toolbarColorAlphas', value: '{{ bigbluebutton_branding_toolbar_color_alphas }}' }
+  - { xpath: '/config/mconfDeskshare', attribute: 'downloadLinkWindows', value: '{{ bigbluebutton_branding_deskshare_windows }}' }
+  - { xpath: '/config/mconfDeskshare', attribute: 'downloadLinkMacOS', value: '{{ bigbluebutton_branding_deskshare_mac }}' }
+  - { xpath: '//module[@name="PhoneModule"]', attribute: 'showWebRTCStats', value: 'true' }
+  - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeExtensionLink', value: '{{ bigbluebutton_screenshare_extension_url }}', run: '{{ bigbluebutton_html5 }}' }
+  - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeExtensionKey', value: '{{ bigbluebutton_screenshare_extension_key }}', run: '{{ bigbluebutton_html5 }}' }
+  - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'tryKurentoWebRTC', value: 'true', run: '{{ bigbluebutton_html5 }}' }
+  - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'tryWebRTCFirst', value: 'true', run: '{{ bigbluebutton_html5 }}' }
+  - { xpath: '//module[@name="PhoneModule"]', attribute: 'enableOutboundCalls', value: 'true', run: '{{ bigbluebutton_sip }}' }
+
+bigbluebutton_html5_config:
+  - { path: '/public/kurento/wsUrl', value: 'wss://{{ inventory_hostname }}/bbb-webrtc-sfu' }
+  - { path: '/public/kurento/chromeExtensionKey', value: '{{ bigbluebutton_screenshare_extension_key }}' }
+  - { path: '/public/kurento/chromeExtensionLink', value: '{{ bigbluebutton_screenshare_extension_url }}' }
+  - { path: '/public/kurento/enableScreensharing', value: true }
+  - { path: '/public/kurento/enableVideo', value: true }
+  - { path: '/public/app/appName', value: 'Mconf-Live HTML5' }
+  - { path: '/public/app/copyright', value: '{{ bigbluebutton_branding_copyright_html5 }}' }
+
+bigbluebutton_stun_server:
+  - stun:stun.l.google.com:19302
+  - stun:stun1.mconf.com:3478
