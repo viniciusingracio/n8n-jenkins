@@ -122,7 +122,7 @@ getKurentoClient(function (error, kurentoClient) {
             if (inboundPacketsLostRateList.length > 0) {
                 let inboundSumPacketsLostRate = inboundPacketsLostRateList.reduce((previous, current) => current += previous);
                 let inboundAvgPacketsLostRate = inboundSumPacketsLostRate / inboundPacketsLostRateList.length;
-                let inboundMaxPacketsLostRate = Math.max(null, inboundPacketsLostRateList);
+                let inboundMaxPacketsLostRate = Math.max.apply(null, inboundPacketsLostRateList);
                 output += ", inbound_avg_packet_loss_rate: " + formatFloat(inboundAvgPacketsLostRate)
                     + ", inbound_max_packet_loss_rate: " + formatFloat(inboundMaxPacketsLostRate)
                     + ", inbound_sum_packet_loss: " + inboundSumPacketsLost;
@@ -130,7 +130,7 @@ getKurentoClient(function (error, kurentoClient) {
             if (inboundJitterList.length > 0) {
                 let inboundSumJitter = inboundJitterList.reduce((previous, current) => current += previous);
                 let inboundAvgJitter = inboundSumJitter / inboundJitterList.length;
-                let inboundMaxJitter = Math.max(null, inboundJitterList);
+                let inboundMaxJitter = Math.max.apply(null, inboundJitterList);
                 output += ", inbound_avg_jitter: " + formatFloat(inboundAvgJitter)
                     + ", inbound_max_jitter: " + formatFloat(inboundMaxJitter);
             }
@@ -139,7 +139,7 @@ getKurentoClient(function (error, kurentoClient) {
             if (outboundPacketsLostRateList.length > 0) {
                 let outboundSumPacketsLostRate = outboundPacketsLostRateList.reduce((previous, current) => current += previous);
                 let outboundAvgPacketsLostRate = outboundSumPacketsLostRate / outboundPacketsLostRateList.length;
-                let outboundMaxPacketsLostRate = Math.max(null, outboundPacketsLostRateList);
+                let outboundMaxPacketsLostRate = Math.max.apply(null, outboundPacketsLostRateList);
                 output += ", outbound_avg_packet_loss_rate: " + formatFloat(outboundAvgPacketsLostRate)
                     + ", outbound_max_packet_loss_rate: " + formatFloat(outboundMaxPacketsLostRate)
                     + ", outbound_sum_packet_loss: " + outboundSumPacketsLost;
@@ -147,7 +147,7 @@ getKurentoClient(function (error, kurentoClient) {
             if (outboundJitterList.length > 0) {
                 let outboundSumJitter = outboundJitterList.reduce((previous, current) => current += previous);
                 let outboundAvgJitter = outboundSumJitter / outboundJitterList.length;
-                let outboundMaxJitter = Math.max(null, outboundJitterList);
+                let outboundMaxJitter = Math.max.apply(null, outboundJitterList);
                 output += ", outbound_avg_jitter: " + formatFloat(outboundAvgJitter)
                     + ", outbound_max_jitter: " + formatFloat(outboundMaxJitter);
             }
@@ -259,24 +259,24 @@ function getPipelinesInfo(server, callback) {
                                     } else {
                                         mediaPipelines[p.id]["endpoints"][me.id]["stale"] = result == "DISCONNECTED";
                                     }
-                                    me.getSinkConnections('VIDEO', 'NONE', function (error, result) {
-                                        if (error) {
-                                            console.log(error);
-                                        } else {
-                                            // console.log("getSinkConnections: " + result);
-                                        }
-                                        me.getSourceConnections('VIDEO', 'NONE', function (error, result) {
-                                            if (error) {
-                                                console.log(error);
-                                            } else {
-                                                // console.log("getSourceConnections: " + result);
-                                            }
+                                    // me.getSinkConnections('VIDEO', 'NONE', function (error, result) {
+                                    //     if (error) {
+                                    //         console.log(error);
+                                    //     } else {
+                                    //         // console.log("getSinkConnections: " + result);
+                                    //     }
+                                    //     me.getSourceConnections('VIDEO', 'NONE', function (error, result) {
+                                    //         if (error) {
+                                    //             console.log(error);
+                                    //         } else {
+                                    //             // console.log("getSourceConnections: " + result);
+                                    //         }
                                             counter++;
                                             if (counter == endpointsCount) {
                                                 return callback(error);
                                             }
-                                        })
-                                    })
+                                    //     })
+                                    // })
                                 })
                             })
                         })

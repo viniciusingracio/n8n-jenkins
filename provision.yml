@@ -81,6 +81,7 @@
   roles:
   - { role: certbot, when: certbot_enabled }
   - { role: dj-wasabi.zabbix-agent, when: zabbix_agent_enabled }
+  - { role: GTI.basic.security, when: inventory_hostname | search(".*\.rnp\.br"), become: yes }
   - mconf-live
 
 - hosts:

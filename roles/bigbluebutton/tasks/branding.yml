@@ -2,7 +2,6 @@
   synchronize:
     src: envs/{{ env }}/files/landing_page/
     dest: /var/www/bigbluebutton-default
-    delete: yes
   become: yes
   ignore_errors: yes
 

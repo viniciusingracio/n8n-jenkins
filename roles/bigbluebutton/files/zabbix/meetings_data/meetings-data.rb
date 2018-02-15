@@ -108,6 +108,8 @@ recordings.each do |record_id, info|
   elsif File.exists?("/var/bigbluebutton/recording/status/published/#{record_id}-presentation.done")
     info["end_publish"] = DateTime.parse(File.mtime("/var/bigbluebutton/recording/status/published/#{record_id}-presentation.done").to_s)
     info["status"] = "processed"
+  elsif `find /var/bigbluebutton/recording/status -name "*#{record_id}*" | wc -l`.strip.to_i == 0
+    info["status"] = "deleted"
   elsif ! info["end_sanity"].nil?
     info["status"] = "processing"
   elsif File.exists?("/var/bigbluebutton/recording/status/archived/#{record_id}.norecord")
@@ -142,7 +144,7 @@ now = DateTime.now
 time_limit = 60
 recordings.reject! do |e|
   ( e["status"] == "processed" && ((now - e["end_publish"]) * 24 * 60).to_i > time_limit ) || \
-  ( ["not recorded", "no recorded segment", "server restarted"].include?(e["status"]) && ((now - e["end_meeting"]) * 24 * 60).to_i > time_limit ) || \
+  ( ["not recorded", "no recorded segment", "server restarted", "deleted"].include?(e["status"]) && ((now - e["end_meeting"]) * 24 * 60).to_i > time_limit ) || \
   ( e["status"] == "no recorded segment removed" && ((now - e["end_archive"]) * 24 * 60).to_i > time_limit )
 end
 recordings.sort! { |a,b| a["start_meeting"] <=> b["start_meeting"] }

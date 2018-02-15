@@ -34,7 +34,6 @@
     s3: false
   when: rec_proxy_build_from_source
 
-# TODO: remove old images
 - name: Build the rec-proxy docker image
   docker_image:
     build_path: ~/src/rec-proxy/
@@ -42,6 +41,7 @@
     tag: '{{ rec_proxy_image_version }}'
     force: true
   when: rec_proxy_build_from_source
+  notify: clean docker
 
 - name: Determine default volumes for the container
   set_fact:
