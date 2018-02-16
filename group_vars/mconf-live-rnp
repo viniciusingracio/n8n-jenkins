@@ -33,3 +33,6 @@ bigbluebutton_html5_config:
 bigbluebutton_stun_server:
   - stun:stun.l.google.com:19302
   - stun:stun1.mconf.com:3478
+
+mconf_live_extra_recording_packages:
+  - mconf-presentation-video

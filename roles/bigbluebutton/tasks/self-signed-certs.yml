@@ -30,7 +30,7 @@
   notify: reload nginx
 
 - name: Generate certificate
-  shell: openssl req -x509 -new -nodes -key {{ bigbluebutton_ssl_certificate_key }} -sha256 -days 3650 -subj "/C=BR/ST=Porto Alegre/O=Mconf Tecnologia/OU=Dev/CN={{ inventory_hostname }}" -reqexts SAN -extensions SAN -config <(cat /etc/ssl/openssl.cnf <(printf "[SAN]\nsubjectAltName=IP:{{ inventory_hostname }}")) -out {{ bigbluebutton_ssl_certificate }}
+  shell: openssl req -x509 -new -nodes -key {{ bigbluebutton_ssl_certificate_key }} -sha256 -days 3650 -subj "/C=BR/ST=Porto Alegre/O=Mconf Tecnologia/OU=Dev/CN={{ inventory_hostname }}" {% if inventory_hostname | match("\d+\.\d+\.\d+\.\d+") %}-reqexts SAN -extensions SAN -config <(cat /etc/ssl/openssl.cnf <(printf "[SAN]\nsubjectAltName=IP:{{ inventory_hostname }}")){% endif %} -out {{ bigbluebutton_ssl_certificate }}
   become: yes
   args:
     creates: '{{ bigbluebutton_ssl_certificate }}'

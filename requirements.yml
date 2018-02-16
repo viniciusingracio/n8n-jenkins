@@ -3,3 +3,6 @@
 
 - src: jpnewman.json
   version: 1.0.0
+
+- src: https://github.com/kwoodson/yedit
+  version: 7c1cc7cd64248cef72ea3c831733a1cf013a5b19

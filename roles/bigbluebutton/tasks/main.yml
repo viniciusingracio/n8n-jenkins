@@ -335,6 +335,7 @@
     - { regexp: '^kurentoIp:', line: 'kurentoIp: {{ external_ip }}' }
     - { regexp: '^localIpAddress:', line: 'localIpAddress: {{ external_ip }}' }
     - { regexp: '^acceptSelfSignedCertificate:', line: 'acceptSelfSignedCertificate: {{ use_self_signed_certificate }}' }
+    - { regexp: '^mediaFlowTimeoutDuration:', line: 'mediaFlowTimeoutDuration: 15000' }
   notify: restart bbb-webrtc-sfu
 
 - name: Open/close redis
