@@ -323,19 +323,19 @@
   notify: restart kms
 
 - name: Update bbb-webrtc-sfu config
-  lineinfile:
-    dest: /usr/local/bigbluebutton/bbb-webrtc-sfu/config/default.yml
+  yedit:
+    src: /usr/local/bigbluebutton/bbb-webrtc-sfu/config/default.yml
+    edits:
+    - { key: 'minVideoPort', value: '{{ bigbluebutton_html5_udp_range_begin }}' }
+    - { key: 'maxVideoPort', value: '{{ bigbluebutton_html5_udp_range_end }}' }
+    - { key: 'kurentoIp', value: '{{ external_ip }}' }
+    - { key: 'localIpAddress', value: '{{ external_ip }}' }
+    - { key: 'acceptSelfSignedCertificate', value: '{{ use_self_signed_certificate }}' }
+    - { key: 'mediaFlowTimeoutDuration', value: '15000' }
+    - { key: 'common-message-version', value: '{% if bigbluebutton_html5 %}2.x{% else %}1.x{% endif %}' }
+    - { key: 'freeswitch.ip', value: '{{ external_ip }}' }
     state: present
-    regexp: '{{ item.regexp }}'
-    line: '{{ item.line }}'
   become: yes
-  with_items:
-    - { regexp: '^minVideoPort:', line: 'minVideoPort: {{ bigbluebutton_html5_udp_range_begin }}' }
-    - { regexp: '^maxVideoPort:', line: 'maxVideoPort: {{ bigbluebutton_html5_udp_range_end }}' }
-    - { regexp: '^kurentoIp:', line: 'kurentoIp: {{ external_ip }}' }
-    - { regexp: '^localIpAddress:', line: 'localIpAddress: {{ external_ip }}' }
-    - { regexp: '^acceptSelfSignedCertificate:', line: 'acceptSelfSignedCertificate: {{ use_self_signed_certificate }}' }
-    - { regexp: '^mediaFlowTimeoutDuration:', line: 'mediaFlowTimeoutDuration: 15000' }
   notify: restart bbb-webrtc-sfu
 
 - name: Open/close redis
