@@ -42,6 +42,7 @@
       BBB_AWS_AVAILABLE_FORMATS: '{{ aws_publisher_available_formats }}'
       BBB_AWS_KEEP_LOCAL: '{{ aws_publisher_keep_local }}'
       BBB_AWS_REDIS_HOST: '{{ docker_ip.stdout }}'
+      BBB_AWS_FAST_RESYNC: '{{ aws_publisher_fast_resync }}'
 
 
 

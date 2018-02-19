@@ -4,8 +4,8 @@
 aws_publisher_build_from_source: true
 
 # Fetch source code from
-aws_publisher_repo_url: git@github.com:mconftec/bigbluebutton.git
-aws_publisher_repo_ref: aws-publisher-on-100
+aws_publisher_repo_url: git@github.com:fcecagno/bigbluebutton-1.git
+aws_publisher_repo_ref: aws-publisher-fast-resync
 
 aws_publisher_region:
 aws_publisher_key:
