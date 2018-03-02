@@ -8,11 +8,9 @@
   vars:
     rec_proxy_api_secret: '{{ bbb_secret.stdout }}'
     rec_proxy_jwt_secret: '{{ bbb_secret.stdout | to_uuid }}'
-    # rec_proxy_jwt_secret: '{{ bbb_secret.stdout | hash('md5') }}'
-    rec_proxy_build_from_source: yes
-    rec_proxy_repo_ref: 'mconf-rec-auth'
-    rec_proxy_app_environment: production
-    rec_proxy_image: mconf/mconf-rec-server
+    rec_proxy_build_from_source: false
+    rec_proxy_image: 'mconftec/mconf-rec'
+    rec_proxy_image_version: 'local-nossl-0.0.1'
     rec_proxy_local_playback: true
     rec_proxy_http_port: '{{ mconf_live_rec_proxy_http_port }}'
   when: mconf_live_rec_proxy_enabled
@@ -48,7 +46,7 @@
   notify: reload nginx
 
 - name: Define nginx files extension
-  set_fact: 
+  set_fact:
     nginx_extension: '{% if mconf_live_rec_proxy_enabled %}openresty{% else %}orig{% endif %}'
 
 - file:

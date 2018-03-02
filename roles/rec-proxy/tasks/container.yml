@@ -6,33 +6,8 @@
     # depth: 1 # can't use it otherwise won't update the code
     accept_hostkey: true
     force: yes
-
-- name: Fetch template file from server
-  fetch:
-    src: '{{ ansible_env.HOME }}/src/rec-proxy/templates/nginx-site.conf.j2'
-    dest: /tmp/nginx-site.conf.j2
-    flat: yes
-    fail_on_missing: yes
   when: rec_proxy_build_from_source
-
-- file:
-    path: '{{ ansible_env.HOME }}/src/rec-proxy/build'
-    state: directory
-    mode: 0755
-  when: rec_proxy_build_from_source
-
-- name:
-  template:
-    src: '/tmp/nginx-site.conf.j2'
-    dest: '{{ ansible_env.HOME }}/src/rec-proxy/build/nginx-site.conf.template'
-    mode: '0644'
-    trim_blocks: false
-  vars:
-    ssl: false
-    proxy: false
-    auth: true
-    s3: false
-  when: rec_proxy_build_from_source
+  register: rec_proxy_code
 
 - name: Build the rec-proxy docker image
   docker_image:
@@ -40,8 +15,7 @@
     name: '{{ rec_proxy_image }}'
     tag: '{{ rec_proxy_image_version }}'
     force: true
-  when: rec_proxy_build_from_source
-  notify: clean docker
+  when: rec_proxy_build_from_source and rec_proxy_code.changed
 
 - name: Determine default volumes for the container
   set_fact:
@@ -62,6 +36,8 @@
   docker_container:
     name: mconf-rec-proxy
     image: '{{ rec_proxy_image }}:{{ rec_proxy_image_version }}'
+    # TODO do it only when not rec_proxy_build_from_source
+    pull: yes
     restart_policy: unless-stopped
     volumes: '{{ container_volumes }}'
     published_ports: '{{ rec_proxy_ports }}'
@@ -71,6 +47,10 @@
       MEDIA_HOST: '{{ rec_proxy_media_host }}'
       MEDIA_PROTOCOL: '{{ rec_proxy_media_protocol }}'
       S3_BUCKET: '{{ rec_proxy_s3_bucket }}'
-      APP_ENV: '{{ rec_proxy_app_environment }}'
+      S3_ACCESS_KEY_ID: '{{ rec_proxy_s3_access_key_id }}'
+      S3_SECRET: '{{ rec_proxy_s3_secret }}'
+      S3_REGION: '{{ rec_proxy_s3_region }}'
+      S3_EXPIRATION_TIME: '{{ rec_proxy_s3_expiration_time }}'
       API_SECRET: '{{ rec_proxy_api_secret }}'
       JWT_SECRET: '{{ rec_proxy_jwt_secret }}'
+  notify: clean docker
