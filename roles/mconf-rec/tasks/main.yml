@@ -1,0 +1,19 @@
+- include_role:
+    name: mconf-live
+
+- name: Disable services not needed
+  service:
+    name: '{{ item }}'
+    state: stopped
+    enabled: no
+  with_items:
+    - red5
+    - libreoffice
+    - freeswitch
+    - kurento-media-server-6.0
+    - bbb-apps-akka
+    - bbb-transcode-akka
+    - bbb-fsesl-akka
+    - bbb-webrtc-sfu
+    - mconf-mcs-sip
+  become: yes

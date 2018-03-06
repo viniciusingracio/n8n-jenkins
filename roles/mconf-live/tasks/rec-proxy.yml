@@ -62,8 +62,8 @@
     src: files/rec_auth_token.nginx.j2
     dest: '/etc/bigbluebutton/nginx/rec_auth_token.nginx'
   become: yes
-  notify: reload nginx
   when: mconf_live_rec_proxy_enabled
+  notify: reload nginx
 
 - file:
     path: '/etc/bigbluebutton/nginx/rec_auth_token.nginx'

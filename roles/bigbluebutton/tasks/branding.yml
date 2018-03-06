@@ -61,9 +61,22 @@
 - name: Customize page title on playback
   replace:
     path: /var/bigbluebutton/playback/presentation/0.9.0/lib/writing.js
-    regexp: '(    document.title =) "[^"]*";'
+    regexp: '(  document.title =) "[^"]*";'
     replace: '\1 "{{ bigbluebutton_branding_playback_title }}";'
   become: yes
+
+- name: Check if video recorder is present
+  stat:
+    path: /usr/local/bigbluebutton/core/scripts/record/video_recorder.rb
+  register: reg_recorder
+
+- name: Customize page title 
+  replace:
+    path: /usr/local/bigbluebutton/core/scripts/record/video_recorder.rb
+    regexp: '([\t ]+playback_window_title =).*'
+    replace: '\1 "{{ bigbluebutton_branding_playback_title }}"'
+  become: yes
+  when: reg_recorder.stat.exists
 
 - name: Customize copyright on playback
   replace:

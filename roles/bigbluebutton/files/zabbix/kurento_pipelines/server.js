@@ -51,60 +51,115 @@ getKurentoClient(function (error, kurentoClient) {
             return;
         }
         serverManager = server;
-        getInfo(serverManager, function (info) {
-            var counter = 0;
-            var inboundEndpoints = 0;
-            var outboundEndpoints = 0;
+        getInfo(serverManager, function (error) {
+            if (error) {
+                return;
+            }
+
+            // console.log(JSON.stringify(mediaPipelines, null, 4));
+            // process.exit(0);
+
             var staleEndpoints = 0;
             var stalePipelines = 0;
+            var staleRtp = 0;
+            var staleWebrtc = 0;
 
-            var inboundPacketsLostRateList = [];
-            var inboundSumPacketsLost = 0;
-            var inboundJitterList = [];
-
-            var outboundPacketsLostRateList = [];
-            var outboundSumPacketsLost = 0;
-            var outboundAvgPacketsLostRate = 0;
-            var outboundMaxPacketsLostRate = 0;
-            var outboundJitterList = [];
-            var outboundAvgJitter = 0;
-            var outboundMaxJitter = 0;
+            var info = { "audio": {}, "video": {} };
+            ["audio", "video"].forEach(function(media) {
+                info[media]["duplex"] = 0;
+                info[media]["rtp"] = 0;
+                info[media]["webrtc"] = 0;
+                ["inbound", "outbound"].forEach(function(direction) {
+                    info[media][direction] = 0;
+                    info[media][direction + "PacketsLostRateList"] = [];
+                    info[media][direction + "SumPacketsLost"] = 0;
+                    info[media][direction + "AvgPacketsLostRate"] = 0;
+                    info[media][direction + "MaxPacketsLostRate"] = 0;
+                    info[media][direction + "JitterList"] = [];
+                    info[media][direction + "AvgJitter"] = 0;
+                    info[media][direction + "MaxJitter"] = 0;
+                });
+            });
 
             for (var pipelineId in mediaPipelines) {
                 var pipeline = mediaPipelines[pipelineId];
                 var itemStaleEndpoint = 0;
                 for (var mediaEndpointId in pipeline.endpoints) {
                     var mediaEndpoint = pipeline.endpoints[mediaEndpointId];
-                    if (mediaEndpoint.mediaFlowingIn == true) {
-                        inboundEndpoints++;
-                        for (var key in mediaEndpoint.stats) {
-                            if (mediaEndpoint.stats[key].hasOwnProperty("packetsLost")) {
-                                inboundSumPacketsLost += mediaEndpoint.stats[key].packetsLost
-                                if (mediaEndpoint.stats[key].hasOwnProperty("packetsReceived")) {
-                                    inboundPacketsLostRateList.push(mediaEndpoint.stats[key].packetsLost / (mediaEndpoint.stats[key].packetsLost + mediaEndpoint.stats[key].packetsReceived));
-                                }
-                            }
-                            if (mediaEndpoint.stats[key].hasOwnProperty("jitter")) {
-                                inboundJitterList.push(mediaEndpoint.stats[key].jitter);
-                            }
-                        }
-                    } else if (mediaEndpoint.mediaFlowingOut == true) {
-                        outboundEndpoints++;
-                        for (var key in mediaEndpoint.stats) {
-                            if (mediaEndpoint.stats[key].hasOwnProperty("packetsLost")) {
-                                outboundSumPacketsLost += mediaEndpoint.stats[key].packetsLost
-                                if (mediaEndpoint.stats[key].hasOwnProperty("packetsSent")) {
-                                    outboundPacketsLostRateList.push(mediaEndpoint.stats[key].packetsLost / (mediaEndpoint.stats[key].packetsLost + mediaEndpoint.stats[key].packetsSent));
-                                }
-                            }
-                            if (mediaEndpoint.stats[key].hasOwnProperty("jitter")) {
-                                outboundJitterList.push(mediaEndpoint.stats[key].jitter);
-                            }
-                        }
+
+                    var rtp = false;
+                    var webrtc = false;
+                    if (mediaEndpointId.indexOf("kurento.RtpEndpoint") != -1) {
+                        rtp = true;
+                    } else if (mediaEndpointId.indexOf("kurento.WebRtcEndpoint") != -1) {
+                        webrtc = true;
                     }
-                    if (mediaEndpoint.stale == true) {
+
+                    var inbound = false;
+                    var outbound = false;
+                    ["audio", "video"].every(function(media, index) {
+                        for (var key in mediaEndpoint[media].stats) {
+                            if (mediaEndpoint[media].stats[key].type == "outboundrtp" && mediaEndpoint[media].stats[key].bytesSent > 0) {
+                                outbound = true;
+
+                                if (mediaEndpoint[media].stats[key].hasOwnProperty("packetsLost")) {
+                                    info[media].outboundSumPacketsLost += mediaEndpoint[media].stats[key].packetsLost;
+                                    if (mediaEndpoint[media].stats[key].hasOwnProperty("packetsSent")) {
+                                        info[media].outboundPacketsLostRateList.push(mediaEndpoint[media].stats[key].packetsLost / (mediaEndpoint[media].stats[key].packetsLost + mediaEndpoint[media].stats[key].packetsSent));
+                                    }
+                                }
+                                if (mediaEndpoint[media].stats[key].hasOwnProperty("jitter")) {
+                                    info[media].outboundJitterList.push(mediaEndpoint[media].stats[key].jitter);
+                                }
+                            }
+                            if (mediaEndpoint[media].stats[key].type == "inboundrtp" && mediaEndpoint[media].stats[key].bytesReceived > 0) {
+                                inbound = true;
+
+                                if (mediaEndpoint[media].stats[key].hasOwnProperty("packetsLost")) {
+                                    info[media].inboundSumPacketsLost += mediaEndpoint[media].stats[key].packetsLost;
+                                    if (mediaEndpoint[media].stats[key].hasOwnProperty("packetsReceived")) {
+                                        info[media].inboundPacketsLostRateList.push(mediaEndpoint[media].stats[key].packetsLost / (mediaEndpoint[media].stats[key].packetsLost + mediaEndpoint[media].stats[key].packetsReceived));
+                                    }
+                                }
+                                if (mediaEndpoint[media].stats[key].hasOwnProperty("jitter")) {
+                                    info[media].inboundJitterList.push(mediaEndpoint[media].stats[key].jitter);
+                                }
+                            }
+                        }
+                        if (inbound) {
+                            if (outbound) {
+                                info[media].duplex++;
+                            } else {
+                                info[media].inbound++;
+                            }
+                        } else {
+                            if (outbound) {
+                                info[media].outbound++;
+                            } else {
+                                
+                            }
+                        }
+                        if (inbound || outbound) {
+                            if (rtp) {
+                                info[media].rtp++;
+                            } else if (webrtc) {
+                                info[media].webrtc++;
+                            }
+                            return false;
+                        }
+                        return true;
+                    })
+                    if (! inbound && ! outbound) {
+                        if (rtp) {
+                            staleRtp++;
+                        } else if (webrtc) {
+                            staleWebrtc++;
+                        }
                         itemStaleEndpoint++;
                     }
+                    // if (mediaEndpoint.stale == true) {
+                    //     itemStaleEndpoint++;
+                    // }
                 }
                 staleEndpoints += itemStaleEndpoint;
                 if (Object.keys(pipeline.endpoints).length == itemStaleEndpoint) {
@@ -112,49 +167,57 @@ getKurentoClient(function (error, kurentoClient) {
                 }
             }
 
-            // console.log(JSON.stringify(mediaPipelines, null, 4));
+            // console.log(JSON.stringify(info, null, 4));
 
             var output = "pipelines: " + Object.keys(mediaPipelines).length
-                + ", stale_pipelines: " + stalePipelines
                 + ", endpoints: " + endpointsCount
-                + ", inbound_endpoints: " + inboundEndpoints;
+                + ", stale_pipelines: " + stalePipelines
+                + ", stale_endpoints: " + staleEndpoints
+                + ", stale_endpoints_rtp: " + staleRtp
+                + ", stale_endpoints_webrtc: " + staleWebrtc;
+            
+            ["audio", "video"].forEach(function(media) {
+                output += "\n" + media + "_endpoints: " + (info[media].inbound + info[media].outbound + info[media].duplex);
+                output += ", " + media + "_duplex_endpoints: " + info[media].duplex;
+                output += ", " + media + "_inbound_endpoints: " + info[media].inbound;
 
-            if (inboundPacketsLostRateList.length > 0) {
-                let inboundSumPacketsLostRate = inboundPacketsLostRateList.reduce((previous, current) => current += previous);
-                let inboundAvgPacketsLostRate = inboundSumPacketsLostRate / inboundPacketsLostRateList.length;
-                let inboundMaxPacketsLostRate = Math.max.apply(null, inboundPacketsLostRateList);
-                output += ", inbound_avg_packet_loss_rate: " + formatFloat(inboundAvgPacketsLostRate)
-                    + ", inbound_max_packet_loss_rate: " + formatFloat(inboundMaxPacketsLostRate)
-                    + ", inbound_sum_packet_loss: " + inboundSumPacketsLost;
-            }
-            if (inboundJitterList.length > 0) {
-                let inboundSumJitter = inboundJitterList.reduce((previous, current) => current += previous);
-                let inboundAvgJitter = inboundSumJitter / inboundJitterList.length;
-                let inboundMaxJitter = Math.max.apply(null, inboundJitterList);
-                output += ", inbound_avg_jitter: " + formatFloat(inboundAvgJitter)
-                    + ", inbound_max_jitter: " + formatFloat(inboundMaxJitter);
-            }
+                if (info[media].inboundPacketsLostRateList.length > 0) {
+                    let inboundSumPacketsLostRate = info[media].inboundPacketsLostRateList.reduce((previous, current) => current += previous);
+                    let inboundAvgPacketsLostRate = info[media].inboundSumPacketsLostRate / info[media].inboundPacketsLostRateList.length;
+                    let inboundMaxPacketsLostRate = Math.max.apply(null, info[media].inboundPacketsLostRateList);
+                    output += ", " + media + "_inbound_avg_packet_loss_rate: " + formatFloat(info[media].inboundAvgPacketsLostRate)
+                        + ", " + media + "_inbound_max_packet_loss_rate: " + formatFloat(info[media].inboundMaxPacketsLostRate)
+                        + ", " + media + "_inbound_sum_packet_loss: " + info[media].inboundSumPacketsLost;
+                }
+                if (info[media].inboundJitterList.length > 0) {
+                    let inboundSumJitter = info[media].inboundJitterList.reduce((previous, current) => current += previous);
+                    let inboundAvgJitter = info[media].inboundSumJitter / info[media].inboundJitterList.length;
+                    let inboundMaxJitter = Math.max.apply(null, info[media].inboundJitterList);
+                    output += ", " + media + "_inbound_avg_jitter: " + formatFloat(info[media].inboundAvgJitter)
+                        + ", " + media + "_inbound_max_jitter: " + formatFloat(info[media].inboundMaxJitter);
+                }
 
-            output += ", outbound_endpoints: " + outboundEndpoints;
-            if (outboundPacketsLostRateList.length > 0) {
-                let outboundSumPacketsLostRate = outboundPacketsLostRateList.reduce((previous, current) => current += previous);
-                let outboundAvgPacketsLostRate = outboundSumPacketsLostRate / outboundPacketsLostRateList.length;
-                let outboundMaxPacketsLostRate = Math.max.apply(null, outboundPacketsLostRateList);
-                output += ", outbound_avg_packet_loss_rate: " + formatFloat(outboundAvgPacketsLostRate)
-                    + ", outbound_max_packet_loss_rate: " + formatFloat(outboundMaxPacketsLostRate)
-                    + ", outbound_sum_packet_loss: " + outboundSumPacketsLost;
-            }
-            if (outboundJitterList.length > 0) {
-                let outboundSumJitter = outboundJitterList.reduce((previous, current) => current += previous);
-                let outboundAvgJitter = outboundSumJitter / outboundJitterList.length;
-                let outboundMaxJitter = Math.max.apply(null, outboundJitterList);
-                output += ", outbound_avg_jitter: " + formatFloat(outboundAvgJitter)
-                    + ", outbound_max_jitter: " + formatFloat(outboundMaxJitter);
-            }
+                output += ", " + media + "_outbound_endpoints: " + info[media].outbound;
+                if (info[media].outboundPacketsLostRateList.length > 0) {
+                    let outboundSumPacketsLostRate = info[media].outboundPacketsLostRateList.reduce((previous, current) => current += previous);
+                    let outboundAvgPacketsLostRate = info[media].outboundSumPacketsLostRate / info[media].outboundPacketsLostRateList.length;
+                    let outboundMaxPacketsLostRate = Math.max.apply(null, info[media].outboundPacketsLostRateList);
+                    output += ", " + media + "_outbound_avg_packet_loss_rate: " + formatFloat(info[media].outboundAvgPacketsLostRate)
+                        + ", " + media + "_outbound_max_packet_loss_rate: " + formatFloat(info[media].outboundMaxPacketsLostRate)
+                        + ", " + media + "_outbound_sum_packet_loss: " + info[media].outboundSumPacketsLost;
+                }
+                if (info[media].outboundJitterList.length > 0) {
+                    let outboundSumJitter = info[media].outboundJitterList.reduce((previous, current) => current += previous);
+                    let outboundAvgJitter = info[media].outboundSumJitter / info[media].outboundJitterList.length;
+                    let outboundMaxJitter = Math.max.apply(null, info[media].outboundJitterList);
+                    output += ", " + media + "_outbound_avg_jitter: " + formatFloat(info[media].outboundAvgJitter)
+                        + ", " + media + "_outbound_max_jitter: " + formatFloat(info[media].outboundMaxJitter);
+                }
+                output += ", " + media + "_rtp_endpoints: " + info[media].rtp;
+                output += ", " + media + "_webrtc_endpoints: " + info[media].webrtc;
+            });
 
-            output += ", stale_endpoints: " + staleEndpoints;
-
-            console.log(output)
+            console.log(output);
             process.exit(0);
         });
     });
@@ -222,67 +285,127 @@ function getPipelinesInfo(server, callback) {
         }
 
         var counter = 0;
+        var promises = [];
+        var firstPromises = [];
         pipelines.forEach(function (p, index, array) {
             mediaPipelines[p.id] = { "endpoints": {} };
-            p.setLatencyStats(true, function (error) {
-                if (error) return onError(error);
-            })
+            firstPromises.push(setLatencyStats(p, mediaPipelines[p.id]));
+            firstPromises.push(getCreationTime(p, mediaPipelines[p.id]));
+
             // console.log("===> " + JSON.stringify(getAllFuncs(p), null, 4));
+            // console.log("===> " + p.getCreationTime());
             p.getChildren(function (error, elements) {
                 endpointsCount += elements.length;
-                mediaPipelines[p.id]["hasPlayer"] = elements.length > 1;
-                mediaPipelines[p.id]["endpoints"] = {}
+                mediaPipelines[p.id].hasPlayer = elements.length > 1;
                 elements.forEach(function (me, index, array) {
-                    // console.log("===> " + JSON.stringify(getAllFuncs(me), null, 4));
-                    mediaPipelines[p.id]["endpoints"][me.id] = { "endpoint": me };
-                    me.isMediaFlowingIn('VIDEO', function (error, result) {
-                        if (error) {
-                            console.log(error);
-                        } else {
-                            mediaPipelines[p.id]["endpoints"][me.id]["mediaFlowingOut"] = result;
-                        }
-                        me.isMediaFlowingOut('VIDEO', function (error, result) {
-                            if (error) {
-                                console.log(error);
-                            } else {
-                                mediaPipelines[p.id]["endpoints"][me.id]["mediaFlowingIn"] = result;
-                            }
-                            me.getStats('VIDEO', function (error, result) {
-                                if (error) {
-                                    console.log(error);
-                                } else {
-                                    mediaPipelines[p.id]["endpoints"][me.id]["stats"] = result;
-                                }
-                                me.getMediaState(function (error, result) {
-                                    if (error) {
-                                        console.log(error);
-                                    } else {
-                                        mediaPipelines[p.id]["endpoints"][me.id]["stale"] = result == "DISCONNECTED";
-                                    }
-                                    // me.getSinkConnections('VIDEO', 'NONE', function (error, result) {
-                                    //     if (error) {
-                                    //         console.log(error);
-                                    //     } else {
-                                    //         // console.log("getSinkConnections: " + result);
-                                    //     }
-                                    //     me.getSourceConnections('VIDEO', 'NONE', function (error, result) {
-                                    //         if (error) {
-                                    //             console.log(error);
-                                    //         } else {
-                                    //             // console.log("getSourceConnections: " + result);
-                                    //         }
-                                            counter++;
-                                            if (counter == endpointsCount) {
-                                                return callback(error);
-                                            }
-                                    //     })
-                                    // })
-                                })
-                            })
-                        })
-                    })
+                    mediaPipelines[p.id].endpoints[me.id] = { "video": {}, "audio": {} };
+                    promises.push(getCreationTime(me, mediaPipelines[p.id].endpoints[me.id]));
+                    promises.push(isFlowingIn(me, "VIDEO", mediaPipelines[p.id].endpoints[me.id].video));
+                    promises.push(isFlowingIn(me, "AUDIO", mediaPipelines[p.id].endpoints[me.id].audio));
+                    promises.push(isFlowingOut(me, "VIDEO", mediaPipelines[p.id].endpoints[me.id].video));
+                    promises.push(isFlowingOut(me, "AUDIO", mediaPipelines[p.id].endpoints[me.id].audio));
+                    promises.push(getStats(me, "VIDEO", mediaPipelines[p.id].endpoints[me.id].video));
+                    promises.push(getStats(me, "AUDIO", mediaPipelines[p.id].endpoints[me.id].audio));
+                    promises.push(getMediaState(me, mediaPipelines[p.id].endpoints[me.id]));
                 })
+                counter++;
+                if (counter == pipelines.length) {
+                    var rejectPromise = function(error) {
+                        return callback(error);
+                    }
+                    Promise.all(firstPromises).then(function(value) {
+                        Promise.all(promises).then(function(value) {
+                            return callback();
+                        }, rejectPromise);
+                    }, rejectPromise);
+                }
             })
         })
     })
+}
+
+var setLatencyStats = function(pipeline, obj) {
+    var promise = new Promise(function(resolve, reject) {
+        pipeline.setLatencyStats(true, function (error) {
+            if (error) {
+                reject(error);
+            } else {
+                resolve();
+            }
+        });
+    });
+    return promise;
+}
+
+var getCreationTime = function(element, obj) {
+    var promise = new Promise(function(resolve, reject) {
+        element.getCreationTime(function (error, result) {
+            if (error) {
+                reject(error);
+            } else {
+                // var t = new Date(result * 1000);
+                // var formatted = t.toISOString();
+                // console.log(formatted);
+                obj.creationTime = result;
+                resolve();
+            }
+        });
+    });
+    return promise;
+}
+
+var isFlowingIn = function(mediaElement, media, obj) {
+    var promise = new Promise(function(resolve, reject) {
+        mediaElement.isMediaFlowingIn(media, function (error, result) {
+            if (error) {
+                reject(error);
+            } else {
+                obj.mediaFlowingIn = result;
+                resolve();
+            }
+        });
+    });
+    return promise;
+}
+
+var isFlowingOut = function(mediaElement, media, obj) {
+    var promise = new Promise(function(resolve, reject) {
+        mediaElement.isMediaFlowingOut(media, function (error, result) {
+            if (error) {
+                reject(error);
+            } else {
+                obj.mediaFlowingOut = result;
+                resolve();
+            }
+        });
+    });
+    return promise;
+}
+
+var getStats = function(mediaElement, media, obj) {
+    var promise = new Promise(function(resolve, reject) {
+        mediaElement.getStats(media, function (error, result) {
+            if (error) {
+                reject(error);
+            } else {
+                obj.stats = result;
+                resolve();
+            }
+        });
+    });
+    return promise;
+}
+
+var getMediaState = function(mediaElement, obj) {
+    var promise = new Promise(function(resolve, reject) {
+        mediaElement.getMediaState(function (error, result) {
+            if (error) {
+                reject(error);
+            } else {
+                obj.stale = result == "DISCONNECTED";
+                resolve();
+            }
+        });
+    });
+    return promise;
 }

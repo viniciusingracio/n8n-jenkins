@@ -27,6 +27,7 @@ rec_proxy_s3_secret:
 rec_proxy_s3_region:
 rec_proxy_s3_expiration_time: 60
 
+rec_proxy_local_playback: false
 rec_proxy_http_port: 80
 rec_proxy_api_secret:
 rec_proxy_jwt_secret:
