@@ -1,3 +1,10 @@
+- name: Determine wss_binding value
+  set_fact:
+    wss_binding_value: '{% if ansible_default_ipv4.address == external_ip %}:7443{% else %}{{ external_ip }}:7443{% endif %}'
+    ws_binding_value: ':5066'
+  tags:
+    - always
+
 - name: Read wss-binding attribute
   xml:
     path: /opt/freeswitch/conf/sip_profiles/external.xml
@@ -25,7 +32,7 @@
     path: /opt/freeswitch/conf/sip_profiles/external.xml
     xpath: /profile/settings/param[@name="ws-binding"]
     attribute: value
-    value: :5066
+    value: '{{ ws_binding_value }}'
   become: yes
   when: hits.results[0]|succeeded and bigbluebutton_sip
   notify: restart bigbluebutton
@@ -37,7 +44,7 @@
     add_children:
       - param:
           name: ws-binding
-          value: :5066
+          value: '{{ ws_binding_value }}'
     pretty_print: yes
   become: yes
   when: hits.results[0]|failed and bigbluebutton_sip

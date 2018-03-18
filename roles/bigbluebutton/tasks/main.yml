@@ -55,6 +55,24 @@
   apt: update_cache=yes
   when: aptkey|changed or aptrepos|changed
 
+- name: Remove kurento-media-server-6.0
+  become: true
+  apt:
+    name: kurento-media-server-6.0
+    state: absent
+    autoremove: yes
+
+- service:
+    name: kurento-media-server-6.0
+    state: stopped
+  become: true
+  ignore_errors: yes
+
+- file:
+    name: /etc/init.d/kurento-media-server-6.0
+    state: absent
+  become: true
+
 - name: Install BigBlueButton
   become: true
   apt:
@@ -257,12 +275,6 @@
     external_ip: '{{ ansible_default_ipv4.address }}'
   when: external_ip | trim == ""
 
-- name: Determine wss_binding value
-  set_fact:
-    wss_binding_value: '{% if ansible_default_ipv4.address == external_ip %}:7443{% else %}{{ external_ip }}:7443{% endif %}'
-  tags:
-    - always
-
 # http://docs.bigbluebutton.org/install/install.html#configure-a-dummy-nic-if-required
 - name: Check if external IP is accessible
   command: 'curl --max-time 5 --trace-ascii - -k https://{{ external_ip }}:443/favicon.ico'
@@ -333,7 +345,7 @@
     - { key: 'acceptSelfSignedCertificate', value: '{{ use_self_signed_certificate }}' }
     - { key: 'mediaFlowTimeoutDuration', value: '15000' }
     - { key: 'common-message-version', value: '{% if bigbluebutton_html5 %}2.x{% else %}1.x{% endif %}' }
-    - { key: 'freeswitch.ip', value: '{{ external_ip }}' }
+    - { key: 'freeswitch.ip', value: '{{ ansible_default_ipv4.address }}' }
     state: present
   become: yes
   notify: restart bbb-webrtc-sfu
