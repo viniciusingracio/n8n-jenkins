@@ -8,11 +8,11 @@
   when: aws_publisher_build_from_source
   register: aws_publisher_code
 
-# TODO: remove old images
 - name: Build the aws-publisher docker image
   docker_image:
     build_path: ~/src/aws-publisher/labs/bbb-aws-publisher/
-    name: mconf/mconf-aws-publisher
+    name: '{{ aws_publisher_image }}'
+    tag: '{{ aws_publisher_image_version }}'
     force: true
   when: aws_publisher_build_from_source and aws_publisher_code.changed
 
@@ -24,9 +24,9 @@
   docker_container:
     command: bundle exec ruby s3.rb --resync
     name: mconf-aws-publisher
-    image: mconf/mconf-aws-publisher
+    image: '{{ aws_publisher_image }}:{{ aws_publisher_image_version }}'
+    pull: yes
     restart_policy: on-failure
-    keep_volumes: false
     volumes:
       - /var/bigbluebutton:/var/bigbluebutton
       - /var/log/bigbluebutton:/var/log/bigbluebutton
@@ -43,7 +43,6 @@
       BBB_AWS_KEEP_LOCAL: '{{ aws_publisher_keep_local }}'
       BBB_AWS_REDIS_HOST: '{{ docker_ip.stdout }}'
       BBB_AWS_FAST_RESYNC: '{{ aws_publisher_fast_resync }}'
-
 
 
 # sudo tc qdisc add dev `ifconfig | grep veth | tail -1 | awk '{print $1; exit}'` root tbf rate 100kbit latency 50ms burst 800000
