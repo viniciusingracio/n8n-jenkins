@@ -53,4 +53,5 @@
       S3_EXPIRATION_TIME: '{{ rec_proxy_s3_expiration_time }}'
       API_SECRET: '{{ rec_proxy_api_secret }}'
       JWT_SECRET: '{{ rec_proxy_jwt_secret }}'
+      REDIRECT_UNAUTHORIZED: '{{ rec_proxy_redirect_unauthorized }}'
   notify: clean docker

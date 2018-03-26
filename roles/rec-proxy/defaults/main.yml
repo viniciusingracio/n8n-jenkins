@@ -31,3 +31,4 @@ rec_proxy_local_playback: false
 rec_proxy_http_port: 80
 rec_proxy_api_secret:
 rec_proxy_jwt_secret:
+rec_proxy_redirect_unauthorized:

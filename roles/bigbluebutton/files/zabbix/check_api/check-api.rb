@@ -1,4 +1,4 @@
-#!/usr/bin/ruby -w
+#!/usr/bin/ruby
 
 require 'net/http'
 require 'nokogiri'
@@ -6,9 +6,20 @@ require 'trollop'
 require 'digest/sha1'
 require 'benchmark'
 
+# Manage BBB properties such as server address and salt.
+# These informations can be loaded from file (bigbluebutton.properties) or
+# externally set (for instance, from command line).
 class BBBProperties
-  @@properties = Hash[File.read("/var/lib/tomcat7/webapps/bigbluebutton/"\
-    "WEB-INF/classes/bigbluebutton.properties", :encoding => "ISO-8859-1:UTF-8").scan(/(.+?)=(.+)/)]
+  def self.load_properties_from_file()
+      @@properties = Hash[File.read("/var/lib/tomcat7/webapps/bigbluebutton/"\
+        "WEB-INF/classes/bigbluebutton.properties", :encoding => "ISO-8859-1:UTF-8").scan(/(.+?)=(.+)/)]
+  end
+
+  def self.load_properties_from_cli(server_url, salt)
+    @@properties = Hash.new(0)
+    @@properties['bigbluebutton.web.serverURL'] = server_url
+    @@properties['securitySalt'] = salt
+  end
 
   def self.server_url
     @@server_url ||= get_properties 'bigbluebutton.web.serverURL'
@@ -30,8 +41,11 @@ class BBBProperties
   private_class_method :get_properties
 end
 
+# Build URIs to different resources available in the BBB server.
 class URIBuilder
-  @@server_url = BBBProperties.server_url
+  def self.server_url=(server_url)
+    @@server_url = server_url
+  end
 
   def self.api_uri
     @@api_uri ||= build_uri "/bigbluebutton/api"
@@ -69,6 +83,7 @@ class URIBuilder
   private_class_method :build_uri, :get_security
 end
 
+# HTTP connection manager to retrieve informations from the BBB server.
 class HTTPRequester
   attr_accessor :ssl_enabled
 
@@ -104,20 +119,38 @@ class HTTPRequester
   end
 end
 
-module HashFormatter
+# Format like:
+# meetings: 1, participants: 4, sent_videos: 0, received_videos: 0, sent_audio: 0, received_audio: 1, meetings_list: ["NAME", "random-36448439", "Random Room"]
+class DefaultFormatter
   def hash_to_s(hash)
     hash.map {|k, v| "#{k}: #{v}"}.join(", ")
   end
 end
 
-class MonitoredService
-  extend HashFormatter
-
-  def self.requester=(requester)
-    @@requester = requester
+# Format like:
+# Meetings: 0, Users: 0, User with audio: 0, User with video: 0|meetings=0;;;0; users=0;;;0; audios=0;;;0; videos=0;;;0;
+# Further information about Nagios output style:
+# https://nagios-plugins.org/doc/guidelines.html#AEN200
+class NagiosFormatter
+  def hash_to_s(hash)
+    "Meetings: #{hash[:meetings]}, Users: #{hash[:participants]}, User with audio: #{hash[:sent_audio]}, User with video: #{hash[:sent_videos]}|meetings=#{hash[:meetings]};;;0; users=#{hash[:participants]};;;0; audios=#{hash[:sent_audio]};;;0; videos=#{hash[:sent_videos]};;;0; "
   end
 end
 
+# All monitored services need
+# a HTTP requester to retrive data from BBB server, and
+# a formatter to put the output in the desired format.
+class MonitoredService
+  def self.requester=(requester)
+    @@requester = requester
+  end
+
+  def self.formatter=(formatter)
+    @@formatter = formatter
+  end
+end
+
+# Retrieve and process meetings information
 class Meetings < MonitoredService
   def self.process_meetings
     # Meetings data can change between queries so it should be computed every time
@@ -160,12 +193,13 @@ class Meetings < MonitoredService
   end
 
   def self.text
-    hash_to_s process_meetings
+    @@formatter.hash_to_s process_meetings
   end
 
   private_class_method :process_meetings, :update_meetings
 end
 
+# Retrieve and process recordings information
 class Recordings < MonitoredService
   def self.process_recordings
     update_recordings
@@ -186,7 +220,7 @@ class Recordings < MonitoredService
   end
 
   def self.text
-    hash_to_s process_recordings
+    @@formatter.hash_to_s process_recordings
   end
 
   private_class_method :process_recordings, :update_recordings
@@ -205,10 +239,31 @@ opts = Trollop::options do
   opt :client, "Get Mconf-Live version in config.xml" # --client, default false
   opt :meetings, "Get meetings statistics" # --meetings, default false
   opt :recordings, "Get recordings statistics" # --recordings, default false
+  opt :nagios, "Enable Nagios-style output" # --nagios, default false
+  opt :server, "Server address in format '<scheme://<addr>:<port>/bigbluebutton'", :type => :string # --host, default nil
+  opt :salt, "Salt of BBB server", :type => :string # --salt, default nil
   opt :ssl, "Enable secure HTTP with SSL" # --ssl, default false
 end
 
 requester = HTTPRequester.new(opts[:ssl])
+
+# If --nagios is used, output response in Nagios response,
+# according to https://nagios-plugins.org/doc/guidelines.html#AEN200.
+formatter = if opts[:nagios] then NagiosFormatter.new() else DefaultFormatter.new() end
+
+# If server or salt are not passed as arguments,
+# load properties from bigbluebutton.properties.
+unless opts[:server] and opts[:salt]
+  BBBProperties.load_properties_from_file
+else
+  BBBProperties.load_properties_from_cli(opts[:server], opts[:salt])
+end
+
+if BBBProperties.server_url =~ /^http[s]?:\/\//
+  URIBuilder.server_url = BBBProperties.server_url
+else
+  URIBuilder.server_url = (opts[:ssl] ? "https://" : "http://") + BBBProperties.server_url
+end
 
 if opts[:bbb]
   puts requester.get_response_code(URIBuilder.api_uri)
@@ -218,12 +273,14 @@ elsif opts[:client]
   # Parse before verifying if 'client' is responding?
   version = parse_xml(requester.get_response(URIBuilder.client_uri),
                       '/config/version')
-  puts requester.is_responding?('client') ? version :
+  puts if requester.is_responding?('client') ? version :
     "error: #{get_response_code(URIBuilder.client_uri)}"
 elsif opts[:meetings]
   Meetings.requester = requester
+  Meetings.formatter = formatter
   puts Meetings.text
 elsif opts[:recordings]
   Recordings.requester = requester
+  Recordings.formatter = formatter
   puts Recordings.text
 end
