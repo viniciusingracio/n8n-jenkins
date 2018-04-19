@@ -10,6 +10,7 @@ bigbluebutton_config_xml:
   - { xpath: '/config/branding', attribute: 'copyright', value: '{{ bigbluebutton_branding_copyright }}' }
   - { xpath: '/config/branding', attribute: 'toolbarColor', value: '{{ bigbluebutton_branding_toolbar_color }}' }
   - { xpath: '/config/branding', attribute: 'toolbarColorAlphas', value: '{{ bigbluebutton_branding_toolbar_color_alphas }}' }
+  - { xpath: '/config/help', attribute: 'url', value: 'https://wiki.rnp.br/x/oW5jBQ' }
   - { xpath: '//module[@name="PhoneModule"]', attribute: 'showWebRTCStats', value: 'true' }
   - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeExtensionLink', value: '{{ bigbluebutton_screenshare_extension_url }}' }
   - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeExtensionKey', value: '{{ bigbluebutton_screenshare_extension_key }}' }
@@ -21,7 +22,7 @@ bigbluebutton_html5_config:
   - { path: '/public/kurento/chromeExtensionLink', value: '{{ bigbluebutton_screenshare_extension_url }}' }
   - { path: '/public/kurento/enableScreensharing', value: true }
   - { path: '/public/kurento/enableVideo', value: true }
-  - { path: '/public/app/appName', value: 'Mconf-Live HTML5' }
+  - { path: '/public/app/appName', value: 'Mconf' }
   - { path: '/public/app/copyright', value: '{{ bigbluebutton_branding_copyright_html5 }}' }
 
 bigbluebutton_stun_server:
