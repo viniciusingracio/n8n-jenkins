@@ -52,7 +52,7 @@
   become: true
   async: 1
   poll: 0
-  when: reboot_required|changed
+  when: reboot_required is changed
 
 - name: Wait for the server to finish rebooting
   become: no
@@ -64,4 +64,4 @@
     state: started
     delay: 15
     timeout: 180
-  when: reboot_required|changed
+  when: reboot_required is changed

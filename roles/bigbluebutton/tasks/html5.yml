@@ -16,7 +16,7 @@
 - name: Update apt if keys changed
   become: true
   apt: update_cache=yes
-  when: aptkey|changed or aptrepos|changed
+  when: aptkey is changed or aptrepos is changed
 
 - name: Install mongo
   become: true

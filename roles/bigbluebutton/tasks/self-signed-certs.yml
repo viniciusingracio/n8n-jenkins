@@ -30,7 +30,7 @@
   notify: reload nginx
 
 - name: Generate certificate
-  shell: openssl req -x509 -new -nodes -key {{ bigbluebutton_ssl_certificate_key }} -sha256 -days 3650 -subj "/C=BR/ST=Porto Alegre/O=Mconf Tecnologia/OU=Dev/CN={{ inventory_hostname }}" {% if inventory_hostname | match("\d+\.\d+\.\d+\.\d+") %}-reqexts SAN -extensions SAN -config <(cat /etc/ssl/openssl.cnf <(printf "[SAN]\nsubjectAltName=IP:{{ inventory_hostname }}")){% endif %} -out {{ bigbluebutton_ssl_certificate }}
+  shell: openssl req -x509 -new -nodes -key {{ bigbluebutton_ssl_certificate_key }} -sha256 -days 3650 -subj "/C=BR/ST=Porto Alegre/O=Mconf Tecnologia/OU=Dev/CN={{ inventory_hostname }}" {% if inventory_hostname is match("\d+\.\d+\.\d+\.\d+") %}-reqexts SAN -extensions SAN -config <(cat /etc/ssl/openssl.cnf <(printf "[SAN]\nsubjectAltName=IP:{{ inventory_hostname }}")){% endif %} -out {{ bigbluebutton_ssl_certificate }}
   become: yes
   args:
     creates: '{{ bigbluebutton_ssl_certificate }}'
@@ -46,12 +46,12 @@
 - name: Copy certificate to be imported
   command: 'cp {{ bigbluebutton_ssl_certificate }} /usr/local/share/ca-certificates/'
   become: yes
-  when: diff_cert|failed
+  when: diff_cert is failed
 
 - name: Import certificate
   command: update-ca-certificates --fresh
   become: yes
-  when: diff_cert|failed
+  when: diff_cert is failed
 
 - name: Delete certificate from Java keystore if already exists
   command: 'keytool -delete -keystore /etc/ssl/certs/java/cacerts -storepass changeit -noprompt -alias {{ inventory_hostname }}'

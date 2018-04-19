@@ -35,7 +35,7 @@
 - name: Update apt if keys changed
   become: yes
   apt: update_cache=yes
-  when: aptkey|changed or aptrepos|changed
+  when: aptkey is changed or aptrepos is changed
 
 - name: Install BigBlueButton
   become: yes
@@ -207,13 +207,13 @@
   become: yes
   command: bbb-conf --setip '{{ inventory_hostname }}'
   # notify: restart bigbluebutton
-  when: not bbbip.stdout | search("http[s]?://" + inventory_hostname)
+  when: not bbbip.stdout is search("http[s]?://" + inventory_hostname)
 
 - name: Set BigBlueButton salt
   become: yes
   command: bbb-conf --setsalt '{{ bigbluebutton_salt }}'
   notify: restart bigbluebutton
-  when: not bbbip.stdout | search(bigbluebutton_salt)
+  when: not bbbip.stdout is search(bigbluebutton_salt)
 
 - name: Install demos
   become: yes

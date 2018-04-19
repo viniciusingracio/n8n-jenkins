@@ -49,7 +49,7 @@
 
 - name: Decide if FFmpeg needs to be (re)built
   set_fact:
-    build_ffmpeg: reg_ffmpeg_version|failed or reg_ffmpeg_version.stdout != '{{ ffmpeg_version }}' or reg_ffmpeg_configure_flags|failed or reg_ffmpeg_configure_flags.stdout != '{{ ffmpeg_configure_flags }}'
+    build_ffmpeg: reg_ffmpeg_version is failed or reg_ffmpeg_version.stdout != '{{ ffmpeg_version }}' or reg_ffmpeg_configure_flags is failed or reg_ffmpeg_configure_flags.stdout != '{{ ffmpeg_configure_flags }}'
   tags:
     - test_ffmpeg_version
 

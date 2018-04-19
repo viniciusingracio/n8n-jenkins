@@ -14,7 +14,7 @@
 
 - name: Determine if nsca needs to be (re)built
   set_fact:
-    build_nsca: reg_nsca_version|failed or reg_nsca_version.stdout != '{{ nsca_version }}'
+    build_nsca: reg_nsca_version is failed or reg_nsca_version.stdout != '{{ nsca_version }}'
     src_dir: /usr/local/src/nsca-{{ nsca_version }}
 
 - get_url:

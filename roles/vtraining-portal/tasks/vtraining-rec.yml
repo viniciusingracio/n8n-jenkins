@@ -31,7 +31,7 @@
 - name: Mount bindfs
   command: mount -a
   become: yes
-  when: recordings_mount|failed
+  when: recordings_mount is failed
 
 - file:
     src: /mnt/kurento-recordings/video

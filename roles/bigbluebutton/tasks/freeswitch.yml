@@ -57,7 +57,7 @@
     attribute: value
     value: '{{ wss_binding_value }}'
   become: yes
-  when: hits.results[1]|succeeded
+  when: hits.results[1] is succeeded
   notify: restart bigbluebutton
 
 - name: Add wss-binding if it doesn't exist
@@ -70,7 +70,7 @@
           value: '{{ wss_binding_value }}'
     pretty_print: yes
   become: yes
-  when: hits.results[1]|failed
+  when: hits.results[1] is failed
   notify: restart bigbluebutton
 
 - name: Define FreeSWITCH external SIP port
@@ -135,7 +135,7 @@
     value: '{{ item.item.value }}'
   with_items: '{{ hits.results }}'
   become: yes
-  when: item|succeeded
+  when: item is succeeded
   notify: restart bigbluebutton
 
 - name: Add rtp range if it doesn't exist
@@ -149,7 +149,7 @@
     pretty_print: yes
   with_items: '{{ hits.results }}'
   become: yes
-  when: item|failed
+  when: item is failed
   notify: restart bigbluebutton
 
 - include: sounds.yml

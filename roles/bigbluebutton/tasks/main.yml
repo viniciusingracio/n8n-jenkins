@@ -53,7 +53,7 @@
 - name: Update apt if keys changed
   become: true
   apt: update_cache=yes
-  when: aptkey|changed or aptrepos|changed
+  when: aptkey is changed or aptrepos is changed
 
 - name: Remove kurento-media-server-6.0
   become: true
@@ -234,7 +234,7 @@
 
 - name: Determine if setip is needed
   set_fact:
-    setip_needed: '{{ not reg_bbb_url.stdout | search("http[s]?://" + inventory_hostname) or reg_akka_changeme|succeeded or reg_bigbluebutton_yml_replace|changed }}'
+    setip_needed: '{{ not reg_bbb_url.stdout is search("http[s]?://" + inventory_hostname) or reg_akka_changeme is succeeded or reg_bigbluebutton_yml_replace is changed }}'
     bbb_url: '{{ reg_bbb_url.stdout }}'
     bbb_secret: '{{ reg_bbb_secret.stdout }}'
 
@@ -289,7 +289,7 @@
 - name: Add dummy NIC
   command: 'ip addr add {{ external_ip }}/32 dev lo'
   become: yes
-  when: reg_external_ip_assigned|failed or reg_external_ip_access|failed
+  when: reg_external_ip_assigned is failed or reg_external_ip_access is failed
   
 - name: Add dummy NIC to network interfaces
   blockinfile:
@@ -300,7 +300,7 @@
     insertafter: 'iface lo inet loopback'
     marker: '        # {mark} ANSIBLE MANAGED BLOCK'
   become: yes
-  when: reg_external_ip_assigned|failed or reg_external_ip_access|failed
+  when: reg_external_ip_assigned is failed or reg_external_ip_access is failed
 
 - name: Confirm if external IP is accessible
   command: 'curl --max-time 5 --trace-ascii - -k https://{{ external_ip }}:443/favicon.ico'

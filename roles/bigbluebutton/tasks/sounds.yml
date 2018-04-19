@@ -35,7 +35,7 @@
     value: '{{ item.item.value }}'
   become: yes
   with_items: '{{ hits.results }}'
-  when: '{{ item | succeeded }}'
+  when: item is succeeded
   notify: restart bigbluebutton
 
 - name: Add FreeSWITCH sounds if they don't exist
@@ -49,5 +49,5 @@
     pretty_print: yes
   become: yes
   with_items: '{{ hits.results }}'
-  when: '{{ item | failed }}'
+  when: item is failed
   notify: restart bigbluebutton
