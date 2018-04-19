@@ -143,3 +143,7 @@
   - { role: dj-wasabi.zabbix-agent, when: zabbix_agent_enabled }
   - { role: GTI.basic.security, when: inventory_hostname is search(".*\.rnp\.br"), become: yes }
   - mconf-rec
+
+- hosts: aws-publisher
+  roles:
+  - aws-publisher

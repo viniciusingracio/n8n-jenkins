@@ -112,16 +112,3 @@ lxc.aa_profile = unconfined
 lxc.cgroup.devices.allow = a
 lxc.cap.drop =
     ```
-
-* VTraining
-
-```bash
-ansible-playbook -i envs/dev/ -l 196.168.0.198 setup.yml --ask-pass --ask-sudo-pass --extra-vars "ansible_user=ubuntu deploy_user=ubuntu common_ufw_ipv6=false"
-ansible-playbook -i envs/dev/ -l 196.168.0.198 provision.yml --extra-vars "ansible_user=ubuntu deploy_user=ubuntu common_ufw_ipv6=false ansible_python_interpreter=/usr/bin/python2"
-```
-
-After a first successful run, you can use: 
-
-```bash
-ansible-playbook -i envs/dev/ -l 196.168.0.198 provision.yml --extra-vars "ansible_user=ubuntu deploy_user=ubuntu common_ufw_ipv6=false ansible_python_interpreter=/usr/bin/python2" --skip-tags "ffmpeg,build-flash-slow,freeswitch-1.9,build-akka-apps,build-red5-apps"
-```

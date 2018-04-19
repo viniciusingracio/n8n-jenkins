@@ -1,0 +1,22 @@
+---
+
+# Build docker image from src, otherwise will try to pull from hub
+aws_publisher_build_from_source: false
+
+# Fetch source code from
+aws_publisher_repo_url: git@github.com:mconftec/bigbluebutton.git
+aws_publisher_repo_ref: mconf-commercial-1.1
+
+aws_publisher_image: mconftec/aws-publisher
+aws_publisher_image_version: 0.0.2
+
+aws_publisher_region:
+aws_publisher_key:
+aws_publisher_secret:
+aws_publisher_bucket:
+aws_publisher_media_url:
+aws_publisher_debug: 0
+aws_publisher_remote_playback: 0
+aws_publisher_remote_playback_url:
+aws_publisher_available_formats: presentation,presentation_video
+aws_publisher_keep_local: 1
