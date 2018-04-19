@@ -4,21 +4,15 @@ bigbluebutton_branding_welcome_footer: Para mais informações, acesse a <a href
 bigbluebutton_branding_copyright: Servi&#231;o de Confer&#234;ncia Web da RNP &#183; <a href="https://conferenciaweb.rnp.br" target="_blank"><u>conferenciaweb.rnp.br</u></a> &#183; Mconf &#174; 2018
 bigbluebutton_branding_toolbar_color: '#243d8f'
 bigbluebutton_branding_toolbar_color_alphas: 0, 0
-bigbluebutton_branding_deskshare_windows: http://url.rnp.br?mconf-deskshare
-bigbluebutton_branding_deskshare_mac: http://url.rnp.br?mconf-deskshare-mac
 
 bigbluebutton_config_xml:
   - { xpath: '/config/branding', attribute: 'logo', value: 'logo.png' }
   - { xpath: '/config/branding', attribute: 'copyright', value: '{{ bigbluebutton_branding_copyright }}' }
   - { xpath: '/config/branding', attribute: 'toolbarColor', value: '{{ bigbluebutton_branding_toolbar_color }}' }
   - { xpath: '/config/branding', attribute: 'toolbarColorAlphas', value: '{{ bigbluebutton_branding_toolbar_color_alphas }}' }
-  - { xpath: '/config/mconfDeskshare', attribute: 'downloadLinkWindows', value: '{{ bigbluebutton_branding_deskshare_windows }}' }
-  - { xpath: '/config/mconfDeskshare', attribute: 'downloadLinkMacOS', value: '{{ bigbluebutton_branding_deskshare_mac }}' }
   - { xpath: '//module[@name="PhoneModule"]', attribute: 'showWebRTCStats', value: 'true' }
-  - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeExtensionLink', value: '{{ bigbluebutton_screenshare_extension_url }}', run: '{{ bigbluebutton_html5 }}' }
-  - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeExtensionKey', value: '{{ bigbluebutton_screenshare_extension_key }}', run: '{{ bigbluebutton_html5 }}' }
-  - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'tryKurentoWebRTC', value: 'true', run: '{{ bigbluebutton_html5 }}' }
-  - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'tryWebRTCFirst', value: 'true', run: '{{ bigbluebutton_html5 }}' }
+  - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeExtensionLink', value: '{{ bigbluebutton_screenshare_extension_url }}' }
+  - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeExtensionKey', value: '{{ bigbluebutton_screenshare_extension_key }}' }
   - { xpath: '//module[@name="PhoneModule"]', attribute: 'enableOutboundCalls', value: 'true', run: '{{ bigbluebutton_sip }}' }
 
 bigbluebutton_html5_config:

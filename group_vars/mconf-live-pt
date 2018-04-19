@@ -1,8 +1,5 @@
 ---
 
-mconf_live_sounds_hold_music: onenotesamba.ogg
-
-bigbluebutton_branding_welcome_footer: Para mais informações, acesse <a href="https://mconf.com" target="_blank"><u>mconf.com</u></a>.
 bigbluebutton_branding_playback_error: Essa gravação não foi encontrada
 bigbluebutton_branding_playback_title: Reprodução de gravação
 bigbluebutton_branding_playback_copyright: <p>Gravado no <a target="_blank" href="https://mconf.com/">Mconf</a>.</p><p>Use <a target="_blank" href="http://mozilla.org/firefox">Mozilla Firefox</a> ou <a target="_blank" href="http://google.com/chrome/">Google Chrome</a> para reproduzir essa gravação.</p>
@@ -14,5 +11,5 @@ bigbluebutton_sounds_profile:
   - { name: 'muted-sound', value: 'silence' }
   - { name: 'unmuted-sound', value: 'silence' }
   - { name: 'alone-sound', value: 'conference/conf-alone.wav' }
-  - { name: 'moh-sound', value: '/opt/freeswitch/share/freeswitch/sounds/{{ (mconf_live_sounds_hold_music | splitext)[0] }}.wav' }
+  - { name: 'moh-sound', value: 'local_stream://moh' }
   - { name: 'comfort-noise', value: 'false' }
