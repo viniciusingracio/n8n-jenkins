@@ -202,7 +202,6 @@
 - name: Make sure demo is removed
   file:
     path: /var/lib/tomcat7/demo
-    recurse: yes
     state: absent
   become: yes
   when: not bigbluebutton_demos
