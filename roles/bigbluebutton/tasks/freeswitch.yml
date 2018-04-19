@@ -18,15 +18,6 @@
   ignore_errors: yes
   become: yes
 
-- name: Remove ws-binding
-  xml:
-    path: /opt/freeswitch/conf/sip_profiles/external.xml
-    xpath: /profile/settings/param[@name="ws-binding"]
-    state: absent
-  become: yes
-  when: not bigbluebutton_sip
-  notify: restart bigbluebutton
-
 - name: Modify ws-binding if it exists
   xml:
     path: /opt/freeswitch/conf/sip_profiles/external.xml
@@ -34,7 +25,7 @@
     attribute: value
     value: '{{ ws_binding_value }}'
   become: yes
-  when: hits.results[0]|succeeded and bigbluebutton_sip
+  when: hits.results[0] is succeeded
   notify: restart bigbluebutton
 
 - name: Add ws-binding if it doesn't exist
@@ -47,7 +38,7 @@
           value: '{{ ws_binding_value }}'
     pretty_print: yes
   become: yes
-  when: hits.results[0]|failed and bigbluebutton_sip
+  when: hits.results[0] is failed
   notify: restart bigbluebutton
 
 - name: Modify wss-binding if it exists

@@ -47,7 +47,7 @@
   replace:
     path: /usr/share/meteor/bundle/programs/web.browser/head.html
     regexp: '(<title>)[^<]*'
-    replace: '\1Mconf-Live HTML5'
+    replace: '\1Mconf'
   become: yes
   when: bigbluebutton_html5
 

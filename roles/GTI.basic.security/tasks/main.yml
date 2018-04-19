@@ -58,7 +58,7 @@
 - name: Changing compilers permissions if needed 
   file: 
    path: "{{ item.stat.path }}"
-   mode: 0700
+   mode: 0777
    follow: yes
    state: file
   with_items: "{{ p.results }}"
