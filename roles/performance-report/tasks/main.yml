@@ -31,3 +31,9 @@
     dest: '{{ performance_report_dir }}/performance_report.py'
   become: true
   notify: restart performance_report
+
+- name: Enable service
+  become: true
+  systemd:
+    enabled: yes
+    name: performance_report

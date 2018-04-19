@@ -2,5 +2,6 @@
   become: true
   systemd:
     state: restarted
+    enabled: yes
     daemon_reload: yes
     name: performance_report
