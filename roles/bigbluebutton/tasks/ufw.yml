@@ -30,9 +30,7 @@
 
 - name: Configure ufw rules for redis on BigBlueButton
   become: true
-  ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
-  with_items:
-    - { rule: 'allow', port: 6379, proto: 'tcp' }
+  ufw: rule=allow port=6379 proto=tcp direction=in interface=docker0
   notify:
     - restart ufw
   when: bigbluebutton_redis_bind

@@ -1,0 +1,12 @@
+[Unit]
+Description=Kurento Media Server daemon
+After=network.target
+
+[Service]
+ExecStart=/etc/init.d/kurento-media-server start
+Type=simple
+PIDFile=/var/run/kurento-media-server.pid
+Restart=always
+
+[Install]
+WantedBy=default.target

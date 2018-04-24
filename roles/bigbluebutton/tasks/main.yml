@@ -395,6 +395,20 @@
 - include: sip.yml
   when: bigbluebutton_sip
 
+- name: Copy kurento systemd file
+  become: true
+  copy:
+    src: files/kurento-media-server.service
+    dest: /usr/lib/systemd/system/kurento-media-server.service
+  notify: reload systemd
+
+- name: Enable kurento service
+  become: true
+  service:
+    name: kurento-media-server
+    state: started
+    enabled: yes
+
 - include: branding.yml
   tags:
     - branding

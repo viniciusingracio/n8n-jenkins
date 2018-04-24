@@ -6,18 +6,12 @@
   with_items:
     - yasm
     - nasm
-    - wget
-    - git-core
-    - build-essential
     - checkinstall
     - yasm
     - texi2html
-    - libvorbis-dev
     - libx11-dev
     - libvpx-dev
     - libxfixes-dev
-    - zlib1g-dev
-    - pkg-config
     - libxext-dev
     - libv4l-dev
     - netcat
@@ -25,10 +19,30 @@
     - libx264-dev
     - libmp3lame-dev
     - libopus-dev
-    - libtheora-dev
     - libwebp-dev
     - libspeex-dev
+    # from https://trac.ffmpeg.org/wiki/CompilationGuide/Ubuntu
+    - autoconf
+    - automake
+    - build-essential
+    - cmake
+    - git
+    - libass-dev
     - libfreetype6-dev
+    - libsdl2-dev
+    - libtheora-dev
+    - libtool
+    - libva-dev
+    - libvdpau-dev
+    - libvorbis-dev
+    - libxcb1-dev
+    - libxcb-shm0-dev
+    - libxcb-xfixes0-dev
+    - mercurial
+    - pkg-config
+    - texinfo
+    - wget
+    - zlib1g-dev
 
 - include: openh264.yml
   tags: [openh264]

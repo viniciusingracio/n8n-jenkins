@@ -137,6 +137,10 @@
   vars:
   - mconf_aggr_type: 'conf'
 
+- hosts: docker-host
+  roles:
+  - docker-host
+
 - hosts: mconf-rec
   roles:
   - { role: certbot, when: certbot_enabled }
