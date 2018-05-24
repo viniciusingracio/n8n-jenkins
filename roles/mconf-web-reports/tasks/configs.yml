@@ -1,0 +1,17 @@
+- name: Copy env file with the variables to run the container
+  become: true
+  copy:
+    src: '{{ mconf_web_reports_env_file }}'
+    dest: '/root/mconf-web-reports.env.local'
+    owner: 'root'
+    group: 'root'
+    mode: 0600
+
+- name: Copy config file
+  become: true
+  copy:
+    src: '{{ mconf_web_reports_config_file }}'
+    dest: '/root/mconf-web-reports-config.yml'
+    owner: 'root'
+    group: 'root'
+    mode: 0600

@@ -1,2 +1,4 @@
+- include: configs.yml
+  tags: [configs]
 - include: container.yml
   tags: [container,docker]
