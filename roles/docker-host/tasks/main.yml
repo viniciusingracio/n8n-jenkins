@@ -45,11 +45,20 @@
   poll: 2
   when: reg_docker|changed
 
-- name: Log into private registry and force re-authorization
-  shell: "docker login -p {{ mconf_registry_password }} -u {{ mconf_registry_user }} {{ mconf_registry_host }}"
+- name: Load local docker authentication variables
+  include_vars:
+    file: .docker-auth
+    name: docker_auth
+  ignore_errors: yes
+
+- name: Log into docker registry
+  shell: "docker login --username '{{ docker_auth.user }}' --password '{{ docker_auth.password }}'"
+  notify: docker logout
+  when: docker_auth is defined
   # TODO: can't use docker_login yet because it breaks with python3
   # docker_login:
-  #   registry: '{{ mconf_registry_host }}'
-  #   username: '{{ mconf_registry_user }}'
-  #   password: '{{ mconf_registry_password }}'
+  #   # registry: '{{ docker_auth.registry }}'
+  #   username: '{{ docker_auth.user }}'
+  #   password: '{{ docker_auth.password }}'
+  #   email: '{{ docker_auth.email }}'
   #   reauthorize: yes
