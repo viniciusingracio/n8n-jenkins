@@ -22,6 +22,7 @@ bigbluebutton_html5_config:
   - { path: '/public/kurento/chromeExtensionLink', value: '{{ bigbluebutton_screenshare_extension_url }}' }
   - { path: '/public/kurento/enableScreensharing', value: true }
   - { path: '/public/kurento/enableVideo', value: true }
+  - { path: '/public/kurento/enableVideoStats', value: true }
   - { path: '/public/app/appName', value: 'Mconf' }
   - { path: '/public/app/copyright', value: '{{ bigbluebutton_branding_copyright_html5 }}' }
 

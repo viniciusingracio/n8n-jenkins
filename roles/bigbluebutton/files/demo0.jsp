@@ -68,7 +68,7 @@ Error: createMeeting() failed
 
 	processJoinUrl = function(url) {
 		if (mobileAndTabletcheck()) {
-			return url.replace("https://", "mconf://");
+			return url.replace("https://", "bigbluebutton://");
 		} else {
 			return url;
 		}
@@ -80,4 +80,3 @@ Error: createMeeting() failed
 <%
 	}
 %>
-

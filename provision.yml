@@ -11,6 +11,7 @@
 - hosts: rec-proxy
   roles:
   - { role: certbot, when: certbot_enabled }
+  - { role: dj-wasabi.zabbix-agent, when: zabbix_agent_enabled }
   - rec-proxy
 - hosts: rec-proxy-self-signed
   roles:
@@ -59,8 +60,8 @@
 # BigBlueButton
 - hosts: bigbluebutton
   roles:
+  - { role: certbot, when: certbot_enabled }
   - bigbluebutton
-  - rec-worker-authorized
 
 - hosts: bigbluebutton-dev
   roles:
@@ -136,6 +137,12 @@
   - mconf-aggr
   vars:
   - mconf_aggr_type: 'conf'
+
+- hosts: mconf-lti
+  roles:
+  - { role: certbot, when: certbot_enabled }
+  - { role: dj-wasabi.zabbix-agent, when: zabbix_agent_enabled }
+  - mconf-lti
 
 - hosts: docker-host
   roles:

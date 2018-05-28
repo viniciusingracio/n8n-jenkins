@@ -14,7 +14,6 @@ aws_publisher_region:
 aws_publisher_key:
 aws_publisher_secret:
 aws_publisher_bucket:
-aws_publisher_media_url:
 aws_publisher_debug: 0
 aws_publisher_remote_playback: 0
 aws_publisher_remote_playback_url:

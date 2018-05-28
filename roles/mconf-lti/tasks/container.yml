@@ -1,0 +1,20 @@
+- name: Start the mconf-lti container
+  docker_container:
+    name: mconf-lti_{{ item.id }}
+    image: '{{ mconf_lti_image }}:{{ mconf_lti_image_version }}'
+    pull: yes
+    restart_policy: unless-stopped
+    published_ports:
+      - '{{ 3001 + loop_index }}:8080'
+    volumes:
+      - '{{ ansible_env.HOME }}/server.xml:/usr/local/tomcat/conf/server.xml:ro'
+    env:
+      BIGBLUEBUTTON_URL: '{{ item.bigbluebutton_url }}'
+      BIGBLUEBUTTON_SHARED_SECRET: '{{ item.bigbluebutton_shared_secret }}'
+      LTI_ENDPOINT: '{{ inventory_hostname }}/{{ item.id }}'
+      LTI_CONSUMERS: '{{ item.lti_customers }}'
+      JAVA_OPTS: -Xmx128m
+  with_items: '{{ mconf_lti_config }}'
+  loop_control:
+    index_var: loop_index
+  notify: clean docker

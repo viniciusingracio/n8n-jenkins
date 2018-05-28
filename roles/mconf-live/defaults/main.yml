@@ -2,6 +2,13 @@
 
 mconf_live_extra_recording_packages: []
 
+# TODO enable/disable recording formats
+mconf_live_enabled_recording_formats:
+    - presentation
+    - presentation_video
+
+mconf_live_num_presentation_recorders: 1
+
 mconf_live_rec_proxy_http_port: 8091
 
 mconf_live_rec_proxy_enabled: false

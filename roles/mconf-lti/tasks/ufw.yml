@@ -1,4 +1,4 @@
-- name: Configure ufw rules for rec-proxy
+- name: Configure ufw rules
   become: true
   ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
   with_items:

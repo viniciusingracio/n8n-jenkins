@@ -56,9 +56,6 @@ getKurentoClient(function (error, kurentoClient) {
                 return;
             }
 
-            // console.log(JSON.stringify(mediaPipelines, null, 4));
-            // process.exit(0);
-
             var staleEndpoints = 0;
             var stalePipelines = 0;
             var staleRtp = 0;
@@ -157,17 +154,12 @@ getKurentoClient(function (error, kurentoClient) {
                         }
                         itemStaleEndpoint++;
                     }
-                    // if (mediaEndpoint.stale == true) {
-                    //     itemStaleEndpoint++;
-                    // }
                 }
                 staleEndpoints += itemStaleEndpoint;
                 if (Object.keys(pipeline.endpoints).length == itemStaleEndpoint) {
                     stalePipelines++;
                 }
             }
-
-            // console.log(JSON.stringify(info, null, 4));
 
             var output = "pipelines: " + Object.keys(mediaPipelines).length
                 + ", endpoints: " + endpointsCount
@@ -292,8 +284,6 @@ function getPipelinesInfo(server, callback) {
             firstPromises.push(setLatencyStats(p, mediaPipelines[p.id]));
             firstPromises.push(getCreationTime(p, mediaPipelines[p.id]));
 
-            // console.log("===> " + JSON.stringify(getAllFuncs(p), null, 4));
-            // console.log("===> " + p.getCreationTime());
             p.getChildren(function (error, elements) {
                 endpointsCount += elements.length;
                 mediaPipelines[p.id].hasPlayer = elements.length > 1;
@@ -314,6 +304,12 @@ function getPipelinesInfo(server, callback) {
                         return callback(error);
                     }
                     Promise.all(firstPromises).then(function(value) {
+                        // Do not retrieve detailed stats if there are more than 50 endpoints,
+                        // so it won't flood the KMS API
+                        if (endpointsCount >= 50) {
+                            return callback();
+                        }
+
                         Promise.all(promises).then(function(value) {
                             return callback();
                         }, rejectPromise);
@@ -343,9 +339,6 @@ var getCreationTime = function(element, obj) {
             if (error) {
                 reject(error);
             } else {
-                // var t = new Date(result * 1000);
-                // var formatted = t.toISOString();
-                // console.log(formatted);
                 obj.creationTime = result;
                 resolve();
             }

@@ -38,7 +38,3 @@
 - name: reboot
   become: true
   command: shutdown -r 1
-
-- name: reload systemd
-  become: true
-  command: systemctl daemon-reload

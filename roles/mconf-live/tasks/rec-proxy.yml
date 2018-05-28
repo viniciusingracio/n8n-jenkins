@@ -2,6 +2,10 @@
   shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
   register: bbb_secret
 
+- name: Get BigBlueButton URL
+  shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^bigbluebutton.web.serverURL=' | cut -d'=' -f2 | awk '{print $1"/bigbluebutton/api"}'
+  register: bbb_api_entry_point
+
 - include_role:
     name: rec-proxy
     private: false
@@ -15,59 +19,4 @@
     rec_proxy_http_port: '{{ mconf_live_rec_proxy_http_port }}'
   when: mconf_live_rec_proxy_enabled
 
-- stat:
-    path: '{{ item }}'
-  with_items:
-    - /etc/bigbluebutton/nginx/presentation.nginx
-    - /etc/bigbluebutton/nginx/presentation_video.nginx
-    - /etc/bigbluebutton/nginx/presentation_export.nginx
-  register: nginx_files
-
-- command: mv {{ item.item }} {{ item.item }}.orig
-  with_items: '{{ nginx_files.results }}'
-  become: yes
-  when: item.stat.exists and not item.stat.islnk
-  notify: reload nginx
-
-- template:
-    src: files/{{ item.item | basename }}.j2
-    dest: '{{ item.item }}.openresty'
-  with_items: '{{ nginx_files.results }}'
-  become: yes
-  when: item.stat.exists and mconf_live_rec_proxy_enabled
-  notify: reload nginx
-
-- file:
-    path: '{{ item.item }}.openresty'
-    state: absent
-  with_items: '{{ nginx_files.results }}'
-  become: yes
-  when: not mconf_live_rec_proxy_enabled
-  notify: reload nginx
-
-- name: Define nginx files extension
-  set_fact:
-    nginx_extension: '{% if mconf_live_rec_proxy_enabled %}openresty{% else %}orig{% endif %}'
-
-- file:
-    src: '{{ item.item }}.{{ nginx_extension }}'
-    dest: '{{ item.item }}'
-    state: link
-  with_items: '{{ nginx_files.results }}'
-  become: yes
-  when: item.stat.exists
-  notify: reload nginx
-
-- template:
-    src: files/rec_auth_token.nginx.j2
-    dest: '/etc/bigbluebutton/nginx/rec_auth_token.nginx'
-  become: yes
-  when: mconf_live_rec_proxy_enabled
-  notify: reload nginx
-
-- file:
-    path: '/etc/bigbluebutton/nginx/rec_auth_token.nginx'
-    state: absent
-  become: yes
-  when: not mconf_live_rec_proxy_enabled
-  notify: reload nginx
+- include: nginx.yml

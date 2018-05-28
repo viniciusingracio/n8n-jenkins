@@ -1,5 +1,5 @@
 - name: docker logout
-  command: 'docker logout {{ mconf_registry_host }}'
+  command: docker logout
 
 - name: clean docker
   command: docker system prune --force

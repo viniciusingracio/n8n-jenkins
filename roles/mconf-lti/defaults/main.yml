@@ -1,0 +1,14 @@
+---
+
+mconf_lti_image: mconftec/bbb-lti
+mconf_lti_image_version: latest
+
+mconf_lti_config:
+
+# Path to the certificate in the server
+mconf_lti_ssl_certificate: /etc/nginx/ssl/{{ inventory_hostname }}.crt
+mconf_lti_ssl_certificate_key: /etc/nginx/ssl/{{ inventory_hostname }}.key
+
+# Deploy an SSL certificate from local repository
+mconf_lti_local_ssl_certificate:
+mconf_lti_local_ssl_certificate_key:

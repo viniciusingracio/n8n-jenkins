@@ -20,7 +20,7 @@
 - name: Determine default volumes for the container
   set_fact:
     container_volumes:
-      - /var/www:/usr/local/openresty/nginx/html # for certbot --webroot and static pages
+      - /var/www:/usr/share/nginx/html # for certbot --webroot and static pages
       - '{{ rec_proxy_certs_path_root }}:{{ rec_proxy_certs_path_root }}'
 
 - name: Include playback volume

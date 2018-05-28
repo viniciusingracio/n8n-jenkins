@@ -1,0 +1,74 @@
+- name: Update apt (if older than 5m)
+  become: true
+  apt: update_cache=yes cache_valid_time=300
+
+- name: Install nginx
+  become: true
+  apt:
+    name: nginx
+    state: present
+
+- name: Create certs directory for nginx
+  file:
+    path: /etc/nginx/ssl
+    recurse: yes
+    state: directory
+  become: yes
+
+- name: Install entropy daemon
+  become: true
+  apt:
+    name: haveged
+    state: present
+
+- name: Enable haveged daemon
+  service:
+    name: haveged
+    state: started
+    enabled: yes
+  become: yes
+
+- name: Generate dhparam
+  command: openssl dhparam -out /etc/nginx/ssl/dhp-2048.pem 2048
+  args:
+    creates: /etc/nginx/ssl/dhp-2048.pem
+  become: yes
+  notify: reload nginx
+
+- name: Copy certificates
+  copy:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+  become: yes
+  with_items:
+    - { src: '{{ mconf_lti_local_ssl_certificate }}', dest: '{{ mconf_lti_ssl_certificate }}' }
+    - { src: '{{ mconf_lti_local_ssl_certificate_key }}', dest: '{{ mconf_lti_ssl_certificate_key }}' }
+  when: not mconf_lti_local_ssl_certificate is none and not mconf_lti_local_ssl_certificate_key is none
+  ignore_errors: yes
+  notify: reload nginx
+
+- name: Copy custom nginx config file
+  template:
+    src: files/nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    mode: 0644
+  become: yes
+  notify: reload nginx
+
+- name: Copy icon
+  become: true
+  copy:
+    src: files/icon.ico
+    dest: /usr/share/nginx/html/icon.ico
+
+- name: Copy server.xml
+  copy:
+    src: files/server.xml
+    dest: '{{ ansible_env.HOME }}/server.xml'
+
+- include: container.yml
+  tags: [container,docker]
+
+- include: ufw.yml
+  when: common_ufw_enabled
+  tags: [ufw,firewall]

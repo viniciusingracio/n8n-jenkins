@@ -26,3 +26,21 @@
     creates: /opt/freeswitch/share/freeswitch/sounds/{{ (mconf_live_sounds_hold_music | splitext)[0] }}.wav
   when: not mconf_live_sounds_hold_music is none
   become: true
+
+- name: Check if presentation_recorder is installed
+  stat:
+    path: /usr/local/bigbluebutton/core/scripts/mconf-presentation-recorder.yml
+  register: reg_recorder
+
+- name: Adjust mconf-presentation-recorder.yml
+  replace:
+    path: /usr/local/bigbluebutton/core/scripts/mconf-presentation-recorder.yml
+    regexp: '{{ item.regexp }}'
+    replace: '{{ item.replace }}'
+  with_items:
+    - { regexp: '^(api_entry_point): .*', replace: '\1: {{ bbb_api_entry_point.stdout }}' }
+    - { regexp: '^(api_shared_secret): .*', replace: '\1: {{ bbb_secret.stdout }}' }
+    - { regexp: '^(local_address): .*', replace: '\1: {{ ansible_default_ipv4 }}' }
+    - { regexp: '^(simultaneous_meetings): .*', replace: '\1: {{ mconf_live_num_presentation_recorders }}' }
+  become: yes
+  when: reg_recorder.stat.exists
