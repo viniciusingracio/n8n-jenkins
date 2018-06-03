@@ -51,7 +51,7 @@
     - { src: 'https://github.com/grails/grails-core/releases/download/v2.5.2/grails-2.5.2.zip', creates: 'grails-2.5.2/bin/grails' }
     - { src: 'https://dl.bintray.com/sbt/native-packages/sbt/0.13.9/sbt-0.13.9.tgz', creates: 'sbt/bin/sbt' }
     - { src: 'https://archive.apache.org/dist/flex/4.13.0/binaries/apache-flex-sdk-4.13.0-bin.tar.gz', creates: 'apache-flex-sdk-4.13.0-bin/bin/mxmlc' }
-    - { src: 'https://archive.apache.org/dist/maven/maven-3/3.3.3/binaries/apache-maven-3.3.3-bin.tar.gz', creates: 'apache-maven-3.3.3/bin/maven' }
+    - { src: 'https://archive.apache.org/dist/maven/maven-3/3.3.3/binaries/apache-maven-3.3.3-bin.tar.gz', creates: 'apache-maven-3.3.3/bin/mvn' }
 
 - file:
     path: '{{ item }}'
