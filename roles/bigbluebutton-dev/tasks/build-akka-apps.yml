@@ -70,3 +70,19 @@
     - akka-bbb-apps
     - akka-bbb-fsesl
     - akka-bbb-transcode
+
+- name: Compile and deploy screenshare
+  shell: |
+    sbt clean
+    sbt compile
+    sbt package
+    rm -rf /usr/share/red5/webapps/screenshare
+    cp -r target/webapp /usr/share/red5/webapps/screenshare
+    cp -r jws/lib /usr/share/red5/webapps/screenshare/
+    cp jws/screenshare.jnlp /usr/share/red5/webapps/screenshare/
+  args:
+    chdir: '{{ ansible_env.HOME }}/dev/bigbluebutton/{{ item }}'
+  environment:
+    PATH: '{{ ansible_env.HOME }}/dev/tools/sbt/bin:{{ ansible_env.PATH }}'
+  with_items:
+    - bbb-screenshare/app
