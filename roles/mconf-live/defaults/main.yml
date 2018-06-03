@@ -2,7 +2,6 @@
 
 mconf_live_extra_recording_packages: []
 
-# TODO enable/disable recording formats
 mconf_live_enabled_recording_formats:
     - presentation
     - presentation_video

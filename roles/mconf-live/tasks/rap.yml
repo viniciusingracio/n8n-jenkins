@@ -1,0 +1,41 @@
+- name: Check if presentation_recorder is installed
+  stat:
+    path: /usr/local/bigbluebutton/core/scripts/mconf-presentation-recorder.yml
+  register: reg_recorder
+
+- name: Adjust mconf-presentation-recorder.yml
+  replace:
+    path: /usr/local/bigbluebutton/core/scripts/mconf-presentation-recorder.yml
+    regexp: '{{ item.regexp }}'
+    replace: '{{ item.replace }}'
+  with_items:
+    - { regexp: '^(api_entry_point): .*', replace: '\1: {{ bbb_api_entry_point.stdout }}' }
+    - { regexp: '^(api_shared_secret): .*', replace: '\1: {{ bbb_secret.stdout }}' }
+    - { regexp: '^(local_address): .*', replace: '\1: {{ ansible_default_ipv4 }}' }
+    - { regexp: '^(simultaneous_meetings): .*', replace: '\1: {{ mconf_live_num_presentation_recorders }}' }
+  become: yes
+  when: reg_recorder.stat.exists
+
+- name: List rap scripts enabled
+  find:
+    paths: /usr/local/bigbluebutton/core/scripts/publish
+    patterns: '*.rb'
+  register: enabled_formats
+
+- name: Disable extra formats
+  command: bbb-record --disable {{ item.path | basename | splitext | first }}
+  with_items: '{{ enabled_formats.files }}'
+  when: item.path | basename | splitext | first not in mconf_live_enabled_recording_formats
+  become: yes
+
+- name: List rap scripts disabled
+  find:
+    paths: /usr/local/bigbluebutton/core/scripts/publish
+    patterns: '*.bk'
+  register: disabled_formats
+
+- name: Enable extra formats
+  command: bbb-record --enable {{ item.path | basename | splitext | first | splitext | first }}
+  with_items: '{{ disabled_formats.files }}'
+  when: item.path | basename | splitext | first | splitext | first in mconf_live_enabled_recording_formats
+  become: yes

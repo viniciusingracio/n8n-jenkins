@@ -6,8 +6,16 @@
   with_items:
     - yasm
     - nasm
+    - libsdl2-dev
+    - libva-dev
+
+- name: Install FFmpeg build dependencies
+  become: yes
+  apt:
+    name: '{{ item }}'
+    state: present
+  with_items:
     - checkinstall
-    - yasm
     - texi2html
     - libx11-dev
     - libvpx-dev
@@ -29,10 +37,8 @@
     - git
     - libass-dev
     - libfreetype6-dev
-    - libsdl2-dev
     - libtheora-dev
     - libtool
-    - libva-dev
     - libvdpau-dev
     - libvorbis-dev
     - libxcb1-dev
@@ -41,8 +47,8 @@
     - mercurial
     - pkg-config
     - texinfo
-    - wget
     - zlib1g-dev
+  when: ffmpeg_build_from_source
 
 - include: openh264.yml
   tags: [openh264]
@@ -63,15 +69,15 @@
 
 - name: Decide if FFmpeg needs to be (re)built
   set_fact:
-    build_ffmpeg: reg_ffmpeg_version is failed or reg_ffmpeg_version.stdout != '{{ ffmpeg_version }}' or reg_ffmpeg_configure_flags is failed or reg_ffmpeg_configure_flags.stdout != '{{ ffmpeg_configure_flags }}'
+    version_differ: reg_ffmpeg_version is failed or reg_ffmpeg_version.stdout != '{{ ffmpeg_version }}' or reg_ffmpeg_configure_flags is failed or reg_ffmpeg_configure_flags.stdout != '{{ ffmpeg_configure_flags }}'
   tags:
     - test_ffmpeg_version
 
-- debug:
-    msg: "FFmpeg needs to be (re)built"
-  when: build_ffmpeg
-  tags:
-    - test_ffmpeg_version
+- name: Install from packages
+  apt:
+    deb: '{{ ffmpeg_url }}'
+  become: yes
+  when: version_differ and not ffmpeg_build_from_source
 
 - name: Download and extract FFmpeg
   unarchive:
@@ -79,27 +85,27 @@
     dest: /usr/local/src
     remote_src: True
   become: yes
-  when: build_ffmpeg
+  when: version_differ and ffmpeg_build_from_source
 
 - name: Configure FFmpeg
   command: './configure {{ ffmpeg_configure_flags }}'
   args:
     chdir: /usr/local/src/ffmpeg-{{ ffmpeg_version }}
   become: yes
-  when: build_ffmpeg
+  when: version_differ and ffmpeg_build_from_source
 
 - name: Build FFmpeg
   make:
     chdir: /usr/local/src/ffmpeg-{{ ffmpeg_version }}
   become: yes
-  when: build_ffmpeg
+  when: version_differ and ffmpeg_build_from_source
 
 - name: Install FFmpeg
-  command: checkinstall --pkgname=ffmpeg --pkgversion="5:${FFMPEG_VERSION}" --backup=no --deldoc=yes --default
+  command: checkinstall --pkgname=ffmpeg --pkgversion="5:{{ ffmpeg_version }}" --backup=no --deldoc=yes --default
   args:
     chdir: /usr/local/src/ffmpeg-{{ ffmpeg_version }}
   become: yes
-  when: build_ffmpeg
+  when: version_differ and ffmpeg_build_from_source
 
 - name: Hold ffmpeg package
   command: apt-mark hold ffmpeg
