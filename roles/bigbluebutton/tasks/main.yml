@@ -417,6 +417,23 @@
 # - include: rap-resque.yml
 #   tags: [rap]
 
+- name: Copy scripts for recordings
+  synchronize:
+    src: files/utils/
+    dest: /usr/local/bigbluebutton/core/scripts/utils/
+    delete: yes
+  become: yes
+
+- cron:
+    name: "remove norecord"
+    special_time: hourly
+    job: "ruby /usr/local/bigbluebutton/core/scripts/utils/remove-norecord.rb"
+
+- cron:
+    name: "remove archived"
+    special_time: hourly
+    job: "ruby /usr/local/bigbluebutton/core/scripts/utils/clean-recordings-data.rb"
+
 - name: Check if reboot is required
   stat:
     path: /var/run/reboot-required
