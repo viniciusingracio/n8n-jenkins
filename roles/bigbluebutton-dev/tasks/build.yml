@@ -32,7 +32,7 @@
     dest: '{{ ansible_env.HOME }}/dev/bigbluebutton'
     version: '{{ bigbluebutton_dev_repo_ref }}'
     accept_hostkey: yes
-    force: yes
+    update: '{{ bigbluebutton_dev_stash_changes }}'
 
 - name: Adjust versions of common-message and fsesl libraries
   shell: |
