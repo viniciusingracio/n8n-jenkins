@@ -1,0 +1,85 @@
+- name: Copy git config
+  template:
+    src: files/.gitconfig.j2
+    dest: '{{ ansible_env.HOME }}/.gitconfig'
+    mode: 0644
+    force: no
+
+- name: Make sure ansible_user own ~/.config
+  file:
+    path: '{{ ansible_env.HOME }}/.config'
+    owner: '{{ ansible_user }}'
+    group: '{{ ansible_user }}'
+    state: directory
+  become: yes
+
+- name: Check if local repository has any change
+  command: git diff-index --quiet HEAD --
+  register: dirty_repo
+  ignore_errors: yes
+  args:
+    chdir: '{{ ansible_env.HOME }}/dev/bigbluebutton'
+
+- name: Stash local changes
+  command: git stash save "Dirty repo during ansible run"
+  when: dirty_repo is failed and bigbluebutton_dev_stash_changes
+  args:
+    chdir: '{{ ansible_env.HOME }}/dev/bigbluebutton'
+
+- name: Fetch BigBlueButton source code
+  git:
+    repo: '{{ bigbluebutton_dev_repo }}'
+    dest: '{{ ansible_env.HOME }}/dev/bigbluebutton'
+    version: '{{ bigbluebutton_dev_repo_ref }}'
+    accept_hostkey: yes
+    update: '{{ bigbluebutton_dev_stash_changes }}'
+
+- name: Adjust versions of common-message and fsesl libraries
+  shell: |
+    EPHEMERAL_VERSION=0.0.$(date +%s)-SNAPSHOT
+
+    sed -i "s|\(version := \)\".*|\1\"$EPHEMERAL_VERSION\"|g" bbb-common-message/build.sbt
+    find -name build.gradle -exec sed -i "s|\(.*org.bigbluebutton.*bbb-common-message[^:]*\):.*|\1:$EPHEMERAL_VERSION'|g" {} \;
+    find -name build.sbt -exec sed -i "s|\(.*org.bigbluebutton.*bbb-common-message[^\"]*\"[ ]*%[ ]*\)\"[^\"]*\"\(.*\)|\1\"$EPHEMERAL_VERSION\"\2|g" {} \;
+
+    sed -i "s|\(version := \)\".*|\1\"$EPHEMERAL_VERSION\"|g" bbb-fsesl-client/build.sbt
+    find -name build.sbt -exec sed -i "s|\(.*org.bigbluebutton.*bbb-fsesl-client[^\"]*\"[ ]*%[ ]*\)\"[^\"]*\"\(.*\)|\1\"$EPHEMERAL_VERSION\"\2|g" {} \;
+
+    sed -i "s|\(version := \)\".*|\1\"$EPHEMERAL_VERSION\"|g" akka-bbb-transcode/build.sbt
+    find -name build.gradle -exec sed -i "s|\(.*org.bigbluebutton.*akka-bbb-transcode[^:]*\):.*|\1:$EPHEMERAL_VERSION'|g" {} \;
+    find -name build.sbt -exec sed -i "s|\(.*org.bigbluebutton.*akka-bbb-transcode[^\"]*\"[ ]*%[ ]*\)\"[^\"]*\"\(.*\)|\1\"$EPHEMERAL_VERSION\"\2|g" {} \;
+
+    sed -i "s|\(version := \)\".*|\1\"$EPHEMERAL_VERSION\"|g" bbb-common-web/build.sbt
+    find -name build.gradle -exec sed -i "s|\(.*org.bigbluebutton.*bbb-common-web[^:]*\):.*|\1:$EPHEMERAL_VERSION'|g" {} \;
+    find -name build.sbt -exec sed -i "s|\(.*org.bigbluebutton.*bbb-common-web[^\"]*\"[ ]*%[ ]*\)\"[^\"]*\"\(.*\)|\1\"$EPHEMERAL_VERSION\"\2|g" {} \;
+
+    sed -i 's|javax/media|javax.media|g' bbb-voice/build.gradle
+  args:
+    chdir: '{{ ansible_env.HOME }}/dev/bigbluebutton'
+
+- name: Stop BigBlueButton
+  command: bbb-conf --stop
+  become: yes
+  notify: restart bigbluebutton
+
+- include: build-akka-apps.yml
+  tags: [build-bbb,build-akka-apps]
+
+- include: build-red5-apps.yml
+  tags: [build-bbb,build-red5-apps]
+
+- include: build-flash.yml
+  tags: [build-bbb,build-flash]
+
+- include: build-web.yml
+  tags: [build-bbb,build-web]
+
+- name: Deploy bbb-conf and bbb-record
+  copy:
+    src: '{{ item }}'
+    dest: '/usr/bin/'
+    mode: 0755
+    remote_src: true
+  become: yes
+  with_fileglob:
+    - '{{ ansible_env.HOME }}/dev/bigbluebutton/bigbluebutton-config/bin/*'

@@ -19,3 +19,13 @@ kurento-desktopsharing.mconf.com ansible_user=root deploy_user=root
 [vtraining]
 196.168.0.197
 196.168.0.198
+
+[mconf-live110]
+dev.mconf.local
+# setup with on lxc with:
+# ansible-playbook -v -i envs/dev -l dev.mconf.local setup.yml --extra-vars "ansible_user=ubuntu"
+# provision with:
+# ansible-playbook -v -i envs/dev -l dev.mconf.local provision.yml
+
+[bigbluebutton-dev]
+dev.mconf.local

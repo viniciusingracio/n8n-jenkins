@@ -13,9 +13,11 @@
 
 - include_role:
     name: ruby
+  tags: [ruby]
 
 - include_role:
     name: node
+  tags: [node]
 
 - include: kurento-apps.yml
   tags: [kurento-apps]

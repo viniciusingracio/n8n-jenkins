@@ -27,7 +27,7 @@
 - name: Update apt if keys changed
   become: yes
   apt: update_cache=yes
-  when: aptkey|changed or aptrepos|changed
+  when: aptkey is changed or aptrepos is changed
 
 - name: Install Kurento
   become: yes

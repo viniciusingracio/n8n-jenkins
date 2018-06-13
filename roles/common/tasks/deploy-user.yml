@@ -18,9 +18,7 @@
     user: '{{ deploy_user }}'
     state: present
     key: '{{ item }}'
-  with_file: # TODO: this should be configurable
-    - public_keys/daronco.pub
-    - public_keys/fcecagno.pub
+  with_file: '{{ public_keys }}'
 
 - name: Add to sudoers
   become: true

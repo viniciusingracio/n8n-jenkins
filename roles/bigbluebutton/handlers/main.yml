@@ -1,7 +1,40 @@
 - name: restart bigbluebutton
   become: true
   command: bbb-conf --restart
+  ignore_errors: yes
 
 - name: restart redis
   become: true
   service: name=redis state=restarted
+
+- name: restart bbb-html5
+  become: true
+  service: name=bbb-html5 state=restarted
+
+- name: reload nginx
+  become: true
+  service: name=nginx state=reloaded
+
+- name: start mongo
+  become: true
+  service: name=mongod state=started
+
+- name: restart zabbix-agent
+  become: true
+  service: name=zabbix-agent state=restarted
+
+- name: restart kms
+  become: true
+  service: name=kurento-media-server state=restarted
+
+- name: restart bbb-webrtc-sfu
+  become: true
+  service: name=bbb-webrtc-sfu state=restarted
+
+- name: restart mconf-mcs-sip
+  become: true
+  service: name=mconf-mcs-sip state=restarted
+
+- name: reboot
+  become: true
+  command: shutdown -r 1

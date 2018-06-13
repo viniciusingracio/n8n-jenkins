@@ -1,0 +1,17 @@
+- name: Configure ufw rules
+  become: true
+  ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
+  with_items:
+    - { rule: 'allow', port: 80, proto: 'tcp' }
+    - { rule: 'allow', port: 443, proto: 'tcp' }
+  notify:
+    - restart ufw
+
+- name: Configure ufw rules for Zabbix
+  become: true
+  ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
+  with_items:
+    - { rule: 'allow', port: 10050, proto: 'tcp' }
+  notify:
+    - restart ufw
+  when: zabbix_agent_enabled

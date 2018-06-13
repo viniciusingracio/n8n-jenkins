@@ -1,0 +1,77 @@
+- name: Install dependencies
+  become: true
+  apt:
+    name: '{{ item }}'
+    state: 'latest'
+  with_items:
+    - zlib1g-dev
+    - libmcrypt-dev
+
+- name: Get nsca version
+  shell: "/usr/local/nagios/bin/send_nsca --version | grep '^NSCA Client' | cut -d' ' -f 3"
+  register: reg_nsca_version
+  ignore_errors: yes
+
+- name: Determine if nsca needs to be (re)built
+  set_fact:
+    build_nsca: reg_nsca_version is failed or reg_nsca_version.stdout != '{{ nsca_version }}'
+    src_dir: /usr/local/src/nsca-{{ nsca_version }}
+
+- get_url:
+    url: '{{ nsca_url }}'
+    dest: /usr/local/src
+    remote_src: True
+    checksum: 'sha256:{{ nsca_checksum }}'
+  become: yes
+  when: build_nsca
+
+- unarchive:
+    src: /usr/local/src/nsca-{{ nsca_version }}.tar.gz
+    dest: /usr/local/src
+    remote_src: True
+  become: yes
+  when: build_nsca
+
+- name: Configure nsca
+  command: ./configure
+  args:
+    chdir: '{{ src_dir }}'
+  become: yes
+  when: build_nsca
+
+- name: Build nsca
+  make:
+    target: all
+    chdir: '{{ src_dir }}'
+  become: yes
+  when: build_nsca
+
+- name: Create directories and change permissions
+  file:
+    path: '{{ item }}'
+    mode: 0755
+    recurse: yes
+    state: directory
+  become: yes
+  with_items:
+    - '{{ nsca_binary_dir }}'
+    - '{{ nsca_config_dir }}'
+  when: build_nsca
+
+- name: Deploy files
+  copy:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+    remote_src: yes
+    mode: '{{ item.mode }}'
+  become: yes
+  with_items:
+    - { src: '{{ src_dir }}/sample-config/send_nsca.cfg', dest: '{{ nsca_config_dir }}', mode: '0644' }
+    - { src: '{{ src_dir }}/src/send_nsca', dest: '{{ nsca_binary_dir }}', mode: '0755' }
+  when: build_nsca
+
+- template:
+    src: files/reporter.sh.j2
+    dest: '{{ nsca_binary_dir }}/reporter.sh'
+    mode: 0755
+  become: yes

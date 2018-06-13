@@ -20,3 +20,13 @@ mconf_registry_org: mconftec
 
 # Disable certbot by default, enabled for specific roles/hosts
 certbot_enabled: false
+
+# Enable ufw by default
+common_ufw_enabled: true
+
+# Disable zabbix agent by default
+zabbix_agent_enabled: false
+
+public_keys: 
+- public_keys/daronco.pub
+- public_keys/fcecagno.pub

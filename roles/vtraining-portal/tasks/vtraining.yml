@@ -88,7 +88,7 @@
   command: psql -c "create user {{ vtraining_database_username }} with password '{{ vtraining_database_password }}';"
   become: yes
   become_user: postgres
-  when: postgres_user|failed
+  when: postgres_user is failed
 
 - name: Create role and template
   command: '{{ item }}'
@@ -116,7 +116,7 @@
     - db:create
     - db:migrate
     - db:seed
-  when: postgres_database|failed
+  when: postgres_database is failed
   environment:
     PATH: '{{ ansible_env.HOME }}/.rbenv/shims:{{ ansible_env.PATH }}'
 

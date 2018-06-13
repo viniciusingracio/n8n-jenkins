@@ -1,0 +1,47 @@
+- name: Download aws-publisher source code
+  git:
+    repo: '{{ aws_publisher_repo_url }}'
+    dest: ~/src/aws-publisher
+    version: '{{ aws_publisher_repo_ref }}'
+    accept_hostkey: true
+    force: yes
+  when: aws_publisher_build_from_source
+  register: aws_publisher_code
+
+- name: Build the aws-publisher docker image
+  docker_image:
+    build_path: ~/src/aws-publisher/labs/bbb-aws-publisher/
+    name: '{{ aws_publisher_image }}'
+    tag: '{{ aws_publisher_image_version }}'
+    force: true
+  when: aws_publisher_build_from_source and aws_publisher_code.changed
+
+- name: Register Docker host IP
+  shell: "ifconfig docker0 | grep 'inet addr:' | cut -d: -f2 | awk '{print $1}'"
+  register: docker_ip
+
+- name: Start the aws-publisher container
+  docker_container:
+    command: bundle exec ruby s3.rb --resync --watch
+    name: mconf-aws-publisher
+    image: '{{ aws_publisher_image }}:{{ aws_publisher_image_version }}'
+    pull: yes
+    restart_policy: on-failure
+    volumes:
+      - /var/bigbluebutton:/var/bigbluebutton
+      - /var/log/bigbluebutton:/var/log/bigbluebutton
+    env:
+      BBB_AWS_REGION: '{{ aws_publisher_region }}'
+      BBB_AWS_KEY: '{{ aws_publisher_key }}'
+      BBB_AWS_SECRET: '{{ aws_publisher_secret }}'
+      BBB_AWS_BUCKET: '{{ aws_publisher_bucket }}'
+      BBB_AWS_DEBUG: '{{ aws_publisher_debug }}'
+      BBB_AWS_REMOTE_PLAYBACK: '{{ aws_publisher_remote_playback }}'
+      BBB_AWS_REMOTE_PLAYBACK_URL: '{{ aws_publisher_remote_playback_url }}'
+      BBB_AWS_AVAILABLE_FORMATS: '{{ aws_publisher_available_formats }}'
+      BBB_AWS_KEEP_LOCAL: '{{ aws_publisher_keep_local }}'
+      BBB_AWS_REDIS_HOST: '{{ docker_ip.stdout }}'
+      BBB_AWS_FAST_RESYNC: '{{ aws_publisher_fast_resync }}'
+
+
+# sudo tc qdisc add dev `ifconfig | grep veth | tail -1 | awk '{print $1; exit}'` root tbf rate 100kbit latency 50ms burst 800000

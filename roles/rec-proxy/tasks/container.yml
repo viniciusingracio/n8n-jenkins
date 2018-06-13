@@ -9,7 +9,6 @@
   when: rec_proxy_build_from_source
   register: rec_proxy_code
 
-# TODO: remove old images
 - name: Build the rec-proxy docker image
   docker_image:
     build_path: ~/src/rec-proxy/
@@ -18,20 +17,41 @@
     force: true
   when: rec_proxy_build_from_source and rec_proxy_code.changed
 
+- name: Determine default volumes for the container
+  set_fact:
+    container_volumes:
+      - /var/www:/usr/share/nginx/html # for certbot --webroot and static pages
+      - '{{ rec_proxy_certs_path_root }}:{{ rec_proxy_certs_path_root }}'
+
+- name: Include playback volume
+  set_fact:
+    container_volumes: '{{ container_volumes + [ "/var/bigbluebutton:/var/bigbluebutton" ] }}'
+  when: rec_proxy_local_playback
+
+- name: Determine ports
+  set_fact:
+    rec_proxy_ports: '{% if rec_proxy_local_playback %}[ "{{ rec_proxy_http_port }}:80" ]{% else %}[ "80:80", "443:443" ]{% endif %}'
+
 - name: Start the rec-proxy container
   docker_container:
     name: mconf-rec-proxy
     image: '{{ rec_proxy_image }}:{{ rec_proxy_image_version }}'
+    # TODO do it only when not rec_proxy_build_from_source
+    pull: yes
     restart_policy: unless-stopped
-    volumes:
-      - /var/www:/usr/local/openresty/nginx/html # for certbot --webroot and static pages
-      - '{{ rec_proxy_certs_path_root }}:{{ rec_proxy_certs_path_root }}'
-    published_ports:
-      - 80:80
-      - 443:443
+    volumes: '{{ container_volumes }}'
+    published_ports: '{{ rec_proxy_ports }}'
     env:
       APP_HOST: '{{ rec_proxy_app_host }}'
       CERTS_PATH: '{{ rec_proxy_certs_path }}'
       MEDIA_HOST: '{{ rec_proxy_media_host }}'
       MEDIA_PROTOCOL: '{{ rec_proxy_media_protocol }}'
       S3_BUCKET: '{{ rec_proxy_s3_bucket }}'
+      S3_ACCESS_KEY_ID: '{{ rec_proxy_s3_access_key_id }}'
+      S3_SECRET: '{{ rec_proxy_s3_secret }}'
+      S3_REGION: '{{ rec_proxy_s3_region }}'
+      S3_EXPIRATION_TIME: '{{ rec_proxy_s3_expiration_time }}'
+      API_SECRET: '{{ rec_proxy_api_secret }}'
+      JWT_SECRET: '{{ rec_proxy_jwt_secret }}'
+      REDIRECT_UNAUTHORIZED: '{{ rec_proxy_redirect_unauthorized }}'
+  notify: clean docker

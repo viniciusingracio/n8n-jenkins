@@ -1,0 +1,59 @@
+- name: Check if swap exists
+  shell: free -h | grep 'Swap:' | head -1 | tr -s ' ' | cut -d' ' -f2
+  register: free_swap
+
+- name: Check memory size
+  shell: free -h | grep 'Mem:' | head -1 | tr -s ' ' | cut -d' ' -f2
+  register: free_mem
+
+- name: Determine if needs to create swap
+  set_fact:
+    create_swap: '{{ free_swap.stdout == "0B" }}'
+    swap_size: '{{ free_mem.stdout }}'
+
+- name: Create swap file
+  command: fallocate -l {{ swap_size }} /swapfile
+  become: yes
+  when: create_swap
+
+- name: Set swap ownership and permissions
+  file:
+    path: /swapfile
+    mode: 0600
+    owner: root
+    group: root
+  become: yes
+  when: create_swap
+
+- name: Create swap
+  command: mkswap /swapfile
+  become: yes
+  when: create_swap
+
+- name: Enable swap
+  command: swapon /swapfile
+  become: yes
+  when: create_swap
+
+- name: Make swap permanent
+  blockinfile:
+    dest: /etc/fstab
+    block: |
+      /swapfile none swap sw 0 0
+    marker: '# {mark} ANSIBLE MANAGED BLOCK swapfile'
+  become: yes
+  when: create_swap
+
+- name: Set swappiness
+  command: sysctl vm.swappiness=10
+  become: yes
+  when: create_swap
+
+- name: Make swappiness permanent
+  blockinfile:
+    dest: /etc/sysctl.conf
+    block: |
+      vm.swappiness=10
+    marker: '# {mark} ANSIBLE MANAGED BLOCK swappiness'
+  become: yes
+  when: create_swap

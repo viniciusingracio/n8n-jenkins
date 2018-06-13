@@ -1,2 +1,30 @@
-- include: ufw.yml
-  tags: [ufw,firewall]
+- include_role:
+    name: bigbluebutton
+  tags: [bigbluebutton]
+
+- name: Install extra recording formats
+  become: true
+  apt:
+    name: '{{ item }}'
+    state: 'latest'
+  with_items: '{{ mconf_live_extra_recording_packages }}'
+
+- include: rec-proxy.yml
+
+- name: Copy sound
+  copy:
+    src: files/{{ mconf_live_sounds_hold_music }}
+    dest: /opt/freeswitch/share/freeswitch/sounds/{{ mconf_live_sounds_hold_music }}
+    owner: freeswitch
+    group: daemon
+  when: not mconf_live_sounds_hold_music is none
+  become: true
+
+- name: Create wav file
+  command: ffmpeg -y -i /opt/freeswitch/share/freeswitch/sounds/{{ mconf_live_sounds_hold_music }} /opt/freeswitch/share/freeswitch/sounds/{{ (mconf_live_sounds_hold_music | splitext)[0] }}.wav
+  args:
+    creates: /opt/freeswitch/share/freeswitch/sounds/{{ (mconf_live_sounds_hold_music | splitext)[0] }}.wav
+  when: not mconf_live_sounds_hold_music is none
+  become: true
+
+- include: rap.yml

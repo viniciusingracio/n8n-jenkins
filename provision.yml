@@ -11,6 +11,7 @@
 - hosts: rec-proxy
   roles:
   - { role: certbot, when: certbot_enabled }
+  - { role: dj-wasabi.zabbix-agent, when: zabbix_agent_enabled }
   - rec-proxy
 - hosts: rec-proxy-self-signed
   roles:
@@ -59,14 +60,37 @@
 # BigBlueButton
 - hosts: bigbluebutton
   roles:
+  - { role: certbot, when: certbot_enabled }
   - bigbluebutton
-  - rec-worker-authorized
 
 # Mconf-Live
-- hosts: mconf-live
+- hosts:
+  - mconf-live110
   roles:
+  - { role: certbot, when: certbot_enabled }
+  - { role: dj-wasabi.zabbix-agent, when: zabbix_agent_enabled }
+  - { role: GTI.basic.security, when: inventory_hostname is search(".*\.rnp\.br"), become: yes }
   - mconf-live
 
+# Mconf-Live
+- hosts:
+  - mconf-live200
+  roles:
+  - { role: certbot, when: certbot_enabled }
+  - { role: dj-wasabi.zabbix-agent, when: zabbix_agent_enabled }
+  - { role: GTI.basic.security, when: inventory_hostname is search(".*\.rnp\.br"), become: yes }
+  - mconf-live
+
+- hosts: bigbluebutton-dev
+  roles:
+  - bigbluebutton-dev
+
+- hosts:
+  - monitored-by-nagios
+  roles:
+  - performance-report
+  - nsca
+  
 # Kurento
 - hosts: kurento
   roles:
@@ -98,6 +122,10 @@
   roles:
   - vtraining-debriefing
 
+- hosts: jenkins
+  roles:
+  - jenkins
+
 - hosts: mconf-aggr-zabbix
   roles:
   - mconf-aggr
@@ -109,3 +137,24 @@
   - mconf-aggr
   vars:
   - mconf_aggr_type: 'conf'
+
+- hosts: mconf-lti
+  roles:
+  - { role: certbot, when: certbot_enabled }
+  - { role: dj-wasabi.zabbix-agent, when: zabbix_agent_enabled }
+  - mconf-lti
+
+- hosts: docker-host
+  roles:
+  - docker-host
+
+- hosts: mconf-rec
+  roles:
+  - { role: certbot, when: certbot_enabled }
+  - { role: dj-wasabi.zabbix-agent, when: zabbix_agent_enabled }
+  - { role: GTI.basic.security, when: inventory_hostname is search(".*\.rnp\.br"), become: yes }
+  - mconf-rec
+
+- hosts: aws-publisher
+  roles:
+  - aws-publisher

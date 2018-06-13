@@ -1,4 +1,6 @@
 ---
 
 dependencies:
+  - jpnewman.json
+  - kwoodson.yedit
   - role: handlers

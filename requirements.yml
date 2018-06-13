@@ -1,0 +1,9 @@
+- src: dj-wasabi.zabbix-agent
+  version: 1.1.0
+
+- src: https://github.com/mconftec/ansible-role-json
+  version: include-if-missing
+  name: jpnewman.json
+
+- src: https://github.com/kwoodson/yedit
+  name: kwoodson.yedit

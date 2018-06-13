@@ -1,0 +1,301 @@
+---
+# tasks file for GTI.basic.security
+#
+- name: Install epel release (yum)
+  yum: name={{ item }} state=present update_cache=yes
+  with_items: "{{ epel }}"
+  when: ansible_os_family == "RedHat"
+
+- name: Install needed packages (yum)
+  yum: name={{ item }} state=present update_cache=yes
+  with_items: "{{ redhat_pkg }}"
+  when: ansible_os_family == "RedHat"
+
+- name: Install needed packages (apt)
+  apt: name={{ item }} state=present update_cache=yes
+  with_items: "{{ debian_pkg }}" 
+  when: ansible_os_family == "Debian"
+
+- name: Check for lastest security updates (Redhat/CentOS)
+  command: yum -y --security update 
+  when: ansible_os_family == "RedHat"
+
+- name: Check for lastest security updates (Ubuntu)
+  command: unattended-upgrades
+  when: ansible_os_family == "Debian"
+
+- name: Changing grub.cfg permissions (Ubuntu)
+  file: 
+   path: /boot/grub/grub.cfg
+   owner: root
+   group: root
+   mode: 0600
+  when: ansible_os_family == "Debian"
+
+- name: Changing grub.cfg permissions (Redhat7/CentOS7)
+  file: 
+   path: /boot/grub2/grub.cfg
+   owner: root
+   group: root
+   mode: 0600
+  when: ansible_os_family == "RedHat" and ansible_distribution_release == "Core"
+
+- name: Changing grub.cfg permissions (Redhat6/CentOS6)
+  file: 
+   path: /boot/grub/grub.conf
+   owner: root
+   group: root
+   mode: 0600
+  when: ansible_os_family == "RedHat" and ansible_distribution_release == "Final"
+
+- name: stat compilers files
+  stat: 
+   path: "{{ item }}"
+   follow: yes
+  with_items: "{{ compilers }}"
+  register: p
+
+- name: Changing compilers permissions if needed 
+  file: 
+   path: "{{ item.stat.path }}"
+   mode: 0777
+   follow: yes
+   state: file
+  with_items: "{{ p.results }}"
+  when: item.stat.exists and item.stat.islnk == False
+
+- name: Changing default dir permissions creation (Ubuntu)
+  lineinfile:
+   dest: /etc/adduser.conf
+   regexp: '^DIR_MODE'
+   line: 'DIR_MODE=0750'
+   backup: yes
+  when: ansible_os_family == "Debian"
+
+- name: Create wheel group (Ubuntu)
+  group:
+   name: wheel
+   state: present
+  when: ansible_os_family == "Debian"
+
+- name: Add gtiadm to wheel group
+  user: 
+   name: gtiadm
+   groups: wheel
+   append: yes
+  when: ansible_os_family == "RedHat" or ansible_os_family == "Debian"
+
+- name: Modify create mode permission in logrotate.conf 
+  lineinfile:
+   dest: /etc/logrotate.conf
+   regexp: '^create'
+   line: 'create 0600'
+   state: present
+   backup: yes
+  when: ansible_os_family == "RedHat" or ansible_os_family == "Debian" 
+
+- name: Add sudo command to be logged into syslog
+  lineinfile:
+   dest: /etc/sudoers
+   line: 'Defaults        syslog=authpriv, syslog_badpri=info, syslog_goodpri=info'
+   backup: yes
+   state: present
+   insertafter: '^Defaults'
+   validate: visudo -cf %s
+  when: ansible_os_family == "RedHat" or ansible_os_family == "Debian"
+
+- name: Modifying pam.d passwd (Redhat/CentOS)
+  lineinfile:
+   dest: "{{ item.file }}"
+   line: "{{ item.line }}"
+   backup: yes
+  with_items: "{{ rh }}"
+  when: ansible_os_family == "RedHat"
+
+- name: Modifying @common-auth (Ubuntu)
+  lineinfile:
+   dest: "{{ item.file }}"
+   line: "{{ item.line }}"
+   insertbefore: BOF
+   backup: yes
+  with_items: "{{ commonauth }}"
+  when: ansible_os_family == "Debian"
+
+- name: Modifying @common-password (Ubuntu)
+  replace: 
+   dest: /etc/pam.d/common-password
+   regexp: '(\s+[success=1 default=ignore].*)(sha512$)'
+   replace: '\1\2 minlen=9 remember=3'
+  when: ansible_os_family == "Debian"
+
+- name: stat system-auth/password-auth files (Redhat/CentOS)
+  stat: path={{ item }}
+  register: stat_files
+  with_items: "{{ statfiles }}"
+  when: ansible_os_family == "RedHat"
+
+- name: adjust system-auth/password-auth files if needed (Redhat/CentOS)
+  command: mv "{{ item.src }}"  "{{ item.dest }}"  
+  with_items: "{{ mpassauthfiles  }}"
+  when: ansible_os_family == "RedHat" and stat_files.stat.islnk is defined and stat_files.stat.islnk == False
+
+- name: Copy pam.d system/password-auth-local (Redhat/CentOS)
+  template: src={{ item.src }}  dest={{ item.dest }}
+  with_items: "{{ cpassauthfiles }}"
+  when: ansible_os_family == "RedHat"
+
+- name: Create symlinks system/password-auth-local to system-auth/password-auth (Redhat/CentOS)
+  file: src={{ item.file }} dest={{ item.link }} state=link
+  with_items: "{{ spassauthfiles }}"
+  when: ansible_os_family == "RedHat"
+
+- name: Modifying sysctl 
+  sysctl:
+   name: "{{ item.name }}"
+   value: "{{ item.value }}"
+   reload: yes
+   sysctl_set: yes
+  with_items: "{{ sysctl }}"
+  when: ansible_os_family == "RedHat" or ansible_os_family == "Debian"
+
+- name: Restrict su command access (Ubuntu14)
+  lineinfile:
+   dest: "{{ item.file }}"
+   line: "{{ item.line }}"
+   insertafter: "{{ item.after }}"
+   backup: yes
+  with_items: "{{ suctlubuntu }}"
+  when: ansible_os_family == "Debian" and ansible_distribution_release == "trusty"
+
+- name: Restrict su command access (Ubuntu16)
+  lineinfile:
+   dest: "{{ item.file }}"
+   line: "{{ item.line }}"
+   insertafter: "{{ item.after }}"
+   backup: yes
+  with_items: "{{ suctlubuntu16 }}"
+  when: ansible_os_family == "Debian" and ansible_distribution_release == "xenial" or ansible_distribution_release == "yakkety"
+
+- name: Restrict su command access (Redhat/CentOS)
+  lineinfile:
+   dest: "{{ item.file }}"
+   line: "{{ item.line }}"
+   insertbefore: "{{ item.before }}"
+   backup: yes
+  with_items: "{{ suctlrh }}"
+  when: ansible_os_family == "RedHat"
+
+- name: Modifying pwquality
+  blockinfile:
+   dest: "{{ item }}"
+   block: |
+    minlen = 9
+    minclass = 3
+   backup: yes
+  with_items: "{{ pwquality }}"
+  when: ansible_os_family == "RedHat" or ansible_os_family == "Debian"
+
+- name: Modifying login defs
+  replace:
+   dest: "{{ item.file }}"
+   regexp: "{{ item.regex }}" 
+   replace: "{{ item.replace }}" 
+   backup: yes
+  with_items: "{{ logindefs }}"
+  when: ansible_os_family == "RedHat" or ansible_os_family == "Debian"
+
+- name: clean sshd variables 
+  lineinfile:
+   dest: "{{ item.file }}"
+   state: absent
+   regexp: "{{ item.regex }}"
+  with_items: "{{ cleanssh }}"
+  when: ansible_os_family == "RedHat" or ansible_os_family == "Debian"
+
+- name: Modifying sshd_config (Redhat6/CentOS6)
+  blockinfile:
+   dest: "{{ item }}"
+   block: |
+    PermitRootLogin no
+    ClientAliveInterval 300
+    ClientAliveCountMax 0
+    MaxStartups 4:10:8
+    X11Forwarding no
+    MaxSessions 3
+    AllowTcpForwarding no
+    Banner /etc/issue.net
+   backup: yes
+  with_items: "{{ sshd }}"
+  when: ansible_os_family == "RedHat" and ansible_distribution_release == "Final" 
+
+- name: Modifying sshd_config (Ubuntu/Redhat7/CentOS7)
+  blockinfile:
+   dest: "{{ item }}"
+   block: |
+    PermitRootLogin no
+    KexAlgorithms curve25519-sha256@libssh.org,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256
+    Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+    MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com
+    ClientAliveInterval 300
+    ClientAliveCountMax 0
+    MaxStartups 4:10:8
+    X11Forwarding no
+    MaxSessions 3
+    AllowTcpForwarding no
+    Banner /etc/issue.net
+   backup: yes
+  with_items: "{{ sshd }}"
+  when: ansible_os_family == "RedHat" and ansible_distribution_release == "Core" or ansible_os_family == "Debian"
+
+- name: Disable ctrl-alt-del (Redhat6/CentOS6/Ubuntu14)
+  replace:
+   dest: "{{ item.file }}"
+   regexp: "{{ item.regex }}" 
+   replace: "{{ item.replace }}" 
+   backup: yes
+  with_items: "{{ crtl }}"
+  when: ansible_os_family == "RedHat" and ansible_distribution_release == "Final" or ansible_os_family == "Debian" and ansible_distribution_release == "trusty"
+
+- name: Disable ctrl-alt-del (Redhat7/CentOS7/Ubuntu16)
+  command: systemctl mask ctrl-alt-del.target
+  when: ansible_os_family == "RedHat" and ansible_distribution_release == "Core" or ansible_os_family == "Debian" and ansible_distribution_release == "xenial" or ansible_distribution_release == "yakkety"
+
+- name: Reload systemctl daemon (Redhat7/CentOS7/Ubuntu16)
+  command: systemctl daemon-reload
+  when: ansible_os_family == "RedHat" and ansible_distribution_release == "Core" or ansible_os_family == "Debian" and ansible_distribution_release == "xenial" or ansible_distribution_release == "yakkety"
+
+- name: Copy timeout script template
+  template: src=tmout.sh.j2 dest=/etc/profile.d/tmout.sh
+  when: ansible_os_family == "RedHat" or ansible_os_family == "Debian"
+
+- name: Copy motd file template 
+  template: src=motd.j2 dest=/etc/motd
+  when: ansible_os_family == "RedHat" or ansible_os_family == "Debian"
+
+- name: Copy issue file template
+  template: src=issue.j2 dest=/etc/issue
+  when: ansible_os_family == "RedHat" or ansible_os_family == "Debian"
+
+- name: Copy issue.net file template
+  template: src=issue.net.j2 dest=/etc/issue.net
+  when: ansible_os_family == "RedHat" or ansible_os_family == "Debian"
+
+- name: Restrict crontab to spectific users
+  template: src={{ item.src }} dest={{ item.dest }}
+  with_items: "{{ cron }}"
+  when: ansible_os_family == "RedHat" or ansible_os_family == "Debian"
+
+- name: restart ssh service (Redhat6/CentOS6)
+  service: name={{ item }} state=restarted enabled=yes
+  with_items: "{{ services }}"
+  when: ansible_os_family == "RedHat" and ansible_distribution_release == "Final"
+
+- name: restart ssh service (Redhat7/CentOS7)
+  systemd: name={{ item }} state=restarted daemon_reload=yes enabled=yes
+  with_items: "{{ services }}"
+  when: ansible_os_family == "RedHat" and ansible_distribution_release == "Core"
+
+- name: restart ssh service (Ubuntu)
+  service: name={{ item }} state=restarted enabled=yes
+  with_items: "{{ services }}"
+  when: ansible_os_family == "Debian" 

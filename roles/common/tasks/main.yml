@@ -3,7 +3,10 @@
   tags: [apt]
 - include: ufw.yml
   tags: [ufw,firewall]
+  when: common_ufw_enabled
 - include: python.yml
   tags: [python]
+- include: swap.yml
+  tags: [swap]
 
 # TODO setup NTP

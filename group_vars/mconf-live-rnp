@@ -1,0 +1,33 @@
+---
+
+bigbluebutton_branding_welcome_footer: Para mais informações, acesse a <a href="https://wiki.rnp.br/x/oW5jBQ" target="_blank"><u>wiki do serviço</u></a>.
+bigbluebutton_branding_copyright: Servi&#231;o de Confer&#234;ncia Web da RNP &#183; <a href="https://conferenciaweb.rnp.br" target="_blank"><u>conferenciaweb.rnp.br</u></a> &#183; Mconf &#174; 2018
+bigbluebutton_branding_copyright_html5: Serviço de Conferência Web da RNP
+bigbluebutton_branding_toolbar_color: '#243d8f'
+bigbluebutton_branding_toolbar_color_alphas: 0, 0
+
+bigbluebutton_config_xml:
+  - { xpath: '/config/branding', attribute: 'logo', value: 'logo.png' }
+  - { xpath: '/config/branding', attribute: 'copyright', value: '{{ bigbluebutton_branding_copyright }}' }
+  - { xpath: '/config/branding', attribute: 'toolbarColor', value: '{{ bigbluebutton_branding_toolbar_color }}' }
+  - { xpath: '/config/branding', attribute: 'toolbarColorAlphas', value: '{{ bigbluebutton_branding_toolbar_color_alphas }}' }
+  - { xpath: '/config/help', attribute: 'url', value: 'https://wiki.rnp.br/x/oW5jBQ' }
+  - { xpath: '//module[@name="PhoneModule"]', attribute: 'showWebRTCStats', value: 'true' }
+  - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeExtensionLink', value: '{{ bigbluebutton_screenshare_extension_url }}' }
+  - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeExtensionKey', value: '{{ bigbluebutton_screenshare_extension_key }}' }
+  - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeWinHelpLink', value: 'https://medium.com/mconf/compartilhando-a-tela-no-google-chrome-43b6478854c3' }
+  - { xpath: '//module[@name="PhoneModule"]', attribute: 'enableOutboundCalls', value: 'true', run: '{{ bigbluebutton_sip }}' }
+
+bigbluebutton_html5_config:
+  - { path: '/public/kurento/wsUrl', value: 'wss://{{ inventory_hostname }}/bbb-webrtc-sfu' }
+  - { path: '/public/kurento/chromeExtensionKey', value: '{{ bigbluebutton_screenshare_extension_key }}' }
+  - { path: '/public/kurento/chromeExtensionLink', value: '{{ bigbluebutton_screenshare_extension_url }}' }
+  - { path: '/public/kurento/enableScreensharing', value: true }
+  - { path: '/public/kurento/enableVideo', value: true }
+  - { path: '/public/kurento/enableVideoStats', value: true }
+  - { path: '/public/app/appName', value: 'Mconf' }
+  - { path: '/public/app/copyright', value: '{{ bigbluebutton_branding_copyright_html5 }}' }
+
+bigbluebutton_stun_server:
+  - stun:stun.l.google.com:19302
+  - stun:stun1.mconf.com:3478

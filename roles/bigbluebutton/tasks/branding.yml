@@ -1,0 +1,132 @@
+- name: Landing page
+  synchronize:
+    src: envs/{{ env }}/files/landing_page/
+    dest: /var/www/bigbluebutton-default
+  become: yes
+  ignore_errors: yes
+
+- name: Figure out which demo to use
+  set_fact:
+    demo_jsp: '{% if bigbluebutton_html5 %}demoHTML5{% else %}demo0{% endif %}'
+
+- name: Set demo to use the HTML5 client
+  replace:
+    path: '/var/www/bigbluebutton-default/index.html'
+    regexp: '(?P<before><form [^>]*)\/demo\/.*.jsp(?P<after>[^>]*>)'
+    replace: '\g<before>/demo/{{ demo_jsp }}.jsp\g<after>'
+  become: yes
+  when: bigbluebutton_demos
+
+- name: Copy layout.xml
+  copy:
+    src: '{{ bigbluebutton_branding_layout }}'
+    dest: /var/www/bigbluebutton/client/conf/layout.xml
+  become: yes
+  when: not bigbluebutton_branding_layout is none
+
+- name: Copy client logo
+  copy:
+    src: '{{ bigbluebutton_branding_logo_client }}'
+    dest: /var/www/bigbluebutton/client/logo.png
+  become: yes
+  when: not bigbluebutton_branding_logo_client is none
+
+- name: Copy playback logo
+  copy:
+    src: '{{ bigbluebutton_branding_logo_playback }}'
+    dest: '{{ item }}'
+  with_items:
+    - /var/bigbluebutton/playback/presentation/0.81/logo.png
+    - /var/bigbluebutton/playback/presentation/0.9.0/logo.png
+    - /var/bigbluebutton/playback/presentation_export/logo.png
+  ignore_errors: yes
+  become: yes
+  when: not bigbluebutton_branding_logo_playback is none
+
+- name: Customize HTML5 Client title
+  replace:
+    path: /usr/share/meteor/bundle/programs/web.browser/head.html
+    regexp: '(<title>)[^<]*'
+    replace: '\1Mconf'
+  become: yes
+  when: bigbluebutton_html5
+
+- name: Customize error message on playback
+  replace:
+    path: /var/bigbluebutton/playback/presentation/0.9.0/lib/writing.js
+    regexp: '(  document.getElementById\("load-msg"\)\.innerHTML =).*;'
+    replace: '\1 "{{ bigbluebutton_branding_playback_error }}";'
+  become: yes
+  when: not bigbluebutton_branding_playback_error is none
+
+- name: Customize loading message on playback
+  replace:
+    path: /var/bigbluebutton/playback/presentation/0.9.0/playback.html
+    regexp: '(<p id="load-msg">)[^<]*'
+    replace: '\1{{ bigbluebutton_branding_playback_loading }}'
+  become: yes
+  when: not bigbluebutton_branding_playback_loading is none
+
+- name: Customize page title on playback
+  replace:
+    path: /var/bigbluebutton/playback/presentation/0.9.0/lib/writing.js
+    regexp: '(  document.title =) "[^"]*";'
+    replace: '\1 "{{ bigbluebutton_branding_playback_title }}";'
+  become: yes
+  when: not bigbluebutton_branding_playback_title is none
+
+- name: Customize copyright on playback
+  replace:
+    path: /var/bigbluebutton/playback/presentation/0.9.0/playback.js
+    regexp: '(const defaultCopyright =).*;'
+    replace: '\1 ''{{ bigbluebutton_branding_playback_copyright }}'';'
+  become: yes
+  when: not bigbluebutton_branding_playback_copyright is none
+
+- name: Check if video recorder is present
+  stat:
+    path: /usr/local/bigbluebutton/core/scripts/record/video_recorder.rb
+  register: reg_recorder
+
+- name: Customize page title
+  replace:
+    path: /usr/local/bigbluebutton/core/scripts/record/video_recorder.rb
+    regexp: '([\t ]+playback_window_title =).*'
+    replace: '\1 "{{ bigbluebutton_branding_playback_title }}"'
+  become: yes
+  when: reg_recorder.stat.exists and not bigbluebutton_branding_playback_title is none
+
+- name: Customize copyright on playback
+  replace:
+    path: /var/bigbluebutton/playback/presentation/0.9.0/playback.js
+    regexp: '(  copyright = typeof copyright !== ''undefined'' \? copyright :) ''[^'']*'';'
+    replace: '\1 ''{{ bigbluebutton_branding_playback_copyright }}'';'
+  become: yes
+
+- name: Create link to Mconf-Live.html
+  file:
+    src: /var/www/bigbluebutton/client/BigBlueButton.html
+    dest: /var/www/bigbluebutton/client/Mconf-Live.html
+    state: link
+  become: yes
+
+- name: Customize bigbluebutton.properties
+  replace:
+    path: /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties
+    regexp: '{{ item.regexp }}'
+    replace: '{{ item.replace }}'
+    encoding: '{{ properties_charset }}'
+  with_items:
+    - { regexp: '^(defaultWelcomeMessage)=.*', replace: '\1={{ bigbluebutton_branding_welcome }}' }
+    - { regexp: '^(defaultWelcomeMessageFooter)=.*', replace: '\1={{ bigbluebutton_branding_welcome_footer }}' }
+    - { regexp: '^(defaultClientUrl)=.*', replace: '\1=${bigbluebutton.web.serverURL}/client/Mconf-Live.html' }
+  when: not item.replace is none
+  become: yes
+  notify: restart bigbluebutton
+
+- name: Customize blinker
+  replace:
+    path: /var/www/bigbluebutton/client/lib/bbb_blinker.js
+    regexp: '"BigBlueButton - " \+ title'
+    replace: 'title'
+  become: yes

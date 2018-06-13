@@ -1,0 +1,13 @@
+nsca_dir: /usr/local/nagios
+nsca_binary_dir: '{{ nsca_dir }}/bin'
+nsca_config_dir: '{{ nsca_dir }}/etc'
+
+# nsca_server is a list
+nsca_server:
+
+nsca_version: 2.7.2
+nsca_url: http://sourceforge.net/projects/nagios/files/nsca-2.x/nsca-{{ nsca_version }}/nsca-{{ nsca_version }}.tar.gz/download
+nsca_checksum: fb41e3b536735235056643fb12187355c6561b9148996c093e8faddd4fced571
+
+nsca_timeout: 5
+nsca_reporter_debug: false

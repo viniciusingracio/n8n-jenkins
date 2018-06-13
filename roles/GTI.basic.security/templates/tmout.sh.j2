@@ -1,0 +1,10 @@
+#/!/bin/bash
+# This script will logout all the users in 180 Seconds except gtiadm users.
+
+if [ "`whoami`" = "gtiadm" ] || [ "`whoami`" = "{{ ansible_user }}" ]; then
+echo "NO TIMEOUT For `whoami`, Enjoy!!!"
+else
+TMOUT=300
+readonly TMOUT
+export TMOUT
+fi

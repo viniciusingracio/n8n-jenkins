@@ -1,0 +1,142 @@
+- name: Determine wss_binding value
+  set_fact:
+    wss_binding_value: '{% if ansible_default_ipv4.address == external_ip %}:7443{% else %}{{ external_ip }}:7443{% endif %}'
+    ws_binding_value: ':5066'
+
+- name: Read wss-binding attribute
+  xml:
+    path: /opt/freeswitch/conf/sip_profiles/external.xml
+    xpath: '{{ item }}'
+    content: attribute
+    attribute: value
+  with_items:
+    - /profile/settings/param[@name="ws-binding"]
+    - /profile/settings/param[@name="wss-binding"]
+  register: hits
+  ignore_errors: yes
+  become: yes
+
+- name: Modify ws-binding if it exists
+  xml:
+    path: /opt/freeswitch/conf/sip_profiles/external.xml
+    xpath: /profile/settings/param[@name="ws-binding"]
+    attribute: value
+    value: '{{ ws_binding_value }}'
+  become: yes
+  when: hits.results[0] is succeeded
+  notify: restart bigbluebutton
+
+- name: Add ws-binding if it doesn't exist
+  xml:
+    path: /opt/freeswitch/conf/sip_profiles/external.xml
+    xpath: /profile/settings
+    add_children:
+      - param:
+          name: ws-binding
+          value: '{{ ws_binding_value }}'
+    pretty_print: yes
+  become: yes
+  when: hits.results[0] is failed
+  notify: restart bigbluebutton
+
+- name: Modify wss-binding if it exists
+  xml:
+    path: /opt/freeswitch/conf/sip_profiles/external.xml
+    xpath: /profile/settings/param[@name="wss-binding"]
+    attribute: value
+    value: '{{ wss_binding_value }}'
+  become: yes
+  when: hits.results[1] is succeeded
+  notify: restart bigbluebutton
+
+- name: Add wss-binding if it doesn't exist
+  xml:
+    path: /opt/freeswitch/conf/sip_profiles/external.xml
+    xpath: /profile/settings
+    add_children:
+      - param:
+          name: wss-binding
+          value: '{{ wss_binding_value }}'
+    pretty_print: yes
+  become: yes
+  when: hits.results[1] is failed
+  notify: restart bigbluebutton
+
+- name: Define FreeSWITCH external SIP port
+  set_fact:
+    freeswitch_sip_port: '{% if bigbluebutton_sip %}5062{% else %}5060{% endif %}'
+
+- name: Modify FreeSWITCH vars.xml
+  xml:
+    path: /opt/freeswitch/conf/vars.xml
+    xpath: '{{ item.xpath }}'
+    attribute: '{{ item.attribute }}'
+    value: '{{ item.value }}'
+  with_items:
+    - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "external_sip_port=")]', attribute: 'data', value: 'external_sip_port={{ freeswitch_sip_port }}' }
+    - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "external_rtp_ip=")]', attribute: 'data', value: 'external_rtp_ip={{ external_ip }}' }
+    - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "external_sip_ip=")]', attribute: 'data', value: 'external_sip_ip={{ external_ip }}' }
+    - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "sound_prefix=")]', attribute: 'data', value: 'sound_prefix={{ bigbluebutton_sounds_prefix }}' }
+  become: yes
+  notify: restart bigbluebutton
+
+- name: Modify FreeSWITCH external.xml
+  xml:
+    path: /opt/freeswitch/conf/sip_profiles/external.xml
+    xpath: '{{ item.xpath }}'
+    attribute: '{{ item.attribute }}'
+    value: '{{ item.value }}'
+  with_items:
+    - { xpath: '/profile/settings/param[@name="ext-rtp-ip"]', attribute: 'value', value: '$${external_rtp_ip}' }
+    - { xpath: '/profile/settings/param[@name="ext-sip-ip"]', attribute: 'value', value: '$${external_sip_ip}' }
+  become: yes
+  notify: restart bigbluebutton
+
+- name: Modify external_sip_port on bbb-voice
+  lineinfile:
+    dest: /usr/share/red5/webapps/sip/WEB-INF/bigbluebutton-sip.properties
+    state: present
+    regexp: ^freeswitch\.port=
+    line: 'freeswitch.port={{ freeswitch_sip_port }}'
+  become: yes
+  notify: restart bigbluebutton
+
+- name: Read rtp range attributes attribute
+  xml:
+    path: /opt/freeswitch/conf/autoload_configs/switch.conf.xml
+    xpath: '{{ item.xpath }}'
+    content: attribute
+    attribute: value
+  with_items:
+    - { xpath: '/configuration/settings/param[@name="rtp-start-port"]', name: 'rtp-start-port', value: '{{ bigbluebutton_freeswitch_udp_range_begin }}' }
+    - { xpath: '/configuration/settings/param[@name="rtp-end-port"]', name: 'rtp-end-port', value: '{{ bigbluebutton_freeswitch_udp_range_end }}' }
+  register: hits
+  ignore_errors: yes
+  become: yes
+
+- name: Modify rtp range if it exists
+  xml:
+    path: /opt/freeswitch/conf/autoload_configs/switch.conf.xml
+    xpath: '{{ item.item.xpath }}'
+    attribute: value
+    value: '{{ item.item.value }}'
+  with_items: '{{ hits.results }}'
+  become: yes
+  when: item is succeeded
+  notify: restart bigbluebutton
+
+- name: Add rtp range if it doesn't exist
+  xml:
+    path: /opt/freeswitch/conf/autoload_configs/switch.conf.xml
+    xpath: '/configuration/settings'
+    add_children:
+      - param:
+          name: '{{ item.item.name }}'
+          value: '{{ item.item.value }}'
+    pretty_print: yes
+  with_items: '{{ hits.results }}'
+  become: yes
+  when: item is failed
+  notify: restart bigbluebutton
+
+- include: sounds.yml

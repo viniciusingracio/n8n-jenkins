@@ -37,9 +37,9 @@
 - name: Copy certificate to be imported
   command: 'cp /etc/certs/{{ inventory_hostname }}.crt /usr/local/share/ca-certificates/'
   become: yes
-  when: diff_cert|failed
+  when: diff_cert is failed
 
 - name: Import certificate
   command: update-ca-certificates --fresh
   become: yes
-  when: diff_cert|failed
+  when: diff_cert is failed

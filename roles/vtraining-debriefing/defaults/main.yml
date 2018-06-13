@@ -29,3 +29,5 @@ vtraining_media_sources_url: https://{{ inventory_hostname }}/media_sources.json
 vtraining_media_recordings_server: 'https://{{ inventory_hostname }}'
 vtraining_kms_uri: ws://{{ inventory_hostname }}:8888/kurento
 vtraining_kms_ip: '{{ ansible_default_ipv4.address }}'
+vtraining_kms_bitrate: 0
+vtraining_kms_recording_bitrate: 0

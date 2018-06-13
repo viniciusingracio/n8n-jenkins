@@ -1,7 +1,48 @@
 ---
 
+bigbluebutton_apt_key: "http://ubuntu.bigbluebutton.org/repo/bigbluebutton.asc"
+# Install BigBlueButton 2.0
+# bigbluebutton_apt_source: "deb http://ubuntu.bigbluebutton.org/xenial-200/ bigbluebutton-xenial main"
+bigbluebutton_apt_source: "deb http://ubuntu.bigbluebutton.org/xenial-200-dev/ bigbluebutton-xenial main"
+# Install BigBlueButton 1.1
+# bigbluebutton_apt_source: "deb http://ubuntu.bigbluebutton.org/xenial-110/ bigbluebutton-xenial main"
+bigbluebutton_apt_package: bigbluebutton
+
+# Install HTML5 client
+bigbluebutton_html5: false
+# Install Mconf MCS-SIP
+bigbluebutton_sip: false
+
+# Setup Chrome extensions for WebRTC Desktop Sharing
+bigbluebutton_screenshare_extension_url: https://chrome.google.com/webstore/detail/bigbluebutton-screenshare/fdebcjabckbgfelopckfkhjldbbkoofj
+bigbluebutton_screenshare_extension_key: fdebcjabckbgfelopckfkhjldbbkoofj
+
+bigbluebutton_branding_welcome:
+bigbluebutton_branding_welcome_footer:
+bigbluebutton_branding_layout:
+bigbluebutton_branding_logo_client:
+bigbluebutton_branding_logo_playback:
+bigbluebutton_branding_copyright:
+bigbluebutton_branding_copyright_html5:
+bigbluebutton_branding_toolbar_color:
+bigbluebutton_branding_toolbar_color_alphas:
+bigbluebutton_branding_deskshare_windows:
+bigbluebutton_branding_deskshare_mac:
+bigbluebutton_branding_playback_error:
+bigbluebutton_branding_playback_title:
+bigbluebutton_branding_playback_copyright:
+bigbluebutton_branding_playback_loading:
+
+bigbluebutton_default_presentation:
+
+bigbluebutton_apt_state: latest
+# bigbluebutton_apt_state: present
+
 # Install/remove demos
 bigbluebutton_demos: false
+
+# Install/remove webhooks
+bigbluebutton_webhooks: true
 
 # Open redis to external access. Set to false remove external access.
 bigbluebutton_redis_bind: false
@@ -17,3 +58,69 @@ bigbluebutton_external_rap: false
 bigbluebutton_external_rap_repo: https://github.com/daronco/bigbluebutton.git
 bigbluebutton_external_rap_ref: rap-on-docker
 
+# Path to the certificate in the server
+bigbluebutton_ssl_certificate: /etc/nginx/ssl/{{ inventory_hostname }}.crt
+bigbluebutton_ssl_certificate_key: /etc/nginx/ssl/{{ inventory_hostname }}.key
+
+# Deploy an SSL certificate from local repository
+bigbluebutton_local_ssl_certificate:
+bigbluebutton_local_ssl_certificate_key:
+
+bigbluebutton_sysctl:
+  - { name: 'net.ipv4.tcp_syncookies' , value: '1' }
+  - { name: 'net.ipv4.tcp_timestamps' , value: '0' }
+  - { name: 'net.ipv4.icmp_echo_ignore_broadcasts' , value: '1' }
+  - { name: 'net.ipv4.conf.all.log_martians' , value: '1' }
+  - { name: 'net.ipv4.conf.all.accept_redirects' , value: '0' }
+  - { name: 'net.ipv4.conf.default.accept_redirects' , value: '0' }
+  - { name: 'net.ipv4.conf.all.secure_redirects' , value: '0' }
+  - { name: 'net.ipv4.conf.default.secure_redirects' , value: '0' }
+  - { name: 'net.ipv4.conf.all.accept_source_route' , value: '0' }
+  - { name: 'net.ipv4.conf.default.accept_source_route' , value: '0' }
+  - { name: 'net.ipv6.conf.all.accept_source_route' , value: '0' }
+  - { name: 'net.ipv6.conf.default.accept_source_route' , value: '0' }
+  - { name: 'net.ipv6.conf.all.accept_redirects' , value: '0' }
+  - { name: 'net.ipv6.conf.default.accept_redirects' , value: '0' }
+
+bigbluebutton_config_xml:
+  - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeExtensionLink', value: '{{ bigbluebutton_screenshare_extension_url }}', run: '{{ bigbluebutton_html5 }}' }
+  - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeExtensionKey', value: '{{ bigbluebutton_screenshare_extension_key }}', run: '{{ bigbluebutton_html5 }}' }
+  - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'tryKurentoWebRTC', value: 'true', run: '{{ bigbluebutton_html5 }}' }
+  - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'tryWebRTCFirst', value: 'true', run: '{{ bigbluebutton_html5 }}' }
+  - { xpath: '//module[@name="PhoneModule"]', attribute: 'enableOutboundCalls', value: 'true', run: '{{ bigbluebutton_sip }}' }
+
+bigbluebutton_config_xml_custom: []
+
+bigbluebutton_html5_config:
+  - { path: '/public/kurento/wsUrl', value: 'wss://{{ inventory_hostname }}/bbb-webrtc-sfu' }
+  - { path: '/public/kurento/chromeExtensionKey', value: '{{ bigbluebutton_screenshare_extension_key }}' }
+  - { path: '/public/kurento/chromeExtensionLink', value: '{{ bigbluebutton_screenshare_extension_url }}' }
+  - { path: '/public/kurento/enableScreensharing', value: true }
+  - { path: '/public/kurento/enableVideo', value: true }
+
+bigbluebutton_stun_server:
+  - stun:stun.l.google.com:19302
+
+bigbluebutton_sounds_frequency:
+  - 48000
+  - 32000
+  - 16000
+  - 8000
+bigbluebutton_sounds_name_version: []
+bigbluebutton_sounds_prefix: $${sounds_dir}/en/us/callie
+bigbluebutton_sounds_profile:
+  - { name: 'muted-sound', value: 'silence' }
+  - { name: 'unmuted-sound', value: 'silence' }
+  - { name: 'alone-sound', value: 'silence' }
+  - { name: 'moh-sound', value: 'silence' }
+  - { name: 'comfort-noise', value: 'true' }
+mconf_live_sounds_hold_music: local_stream://moh
+
+bigbluebutton_freeswitch_udp_range_begin: 16384
+bigbluebutton_freeswitch_udp_range_end: 32767
+bigbluebutton_kms_udp_range_begin: 32768
+bigbluebutton_kms_udp_range_end: 65535
+bigbluebutton_html5_udp_range_begin: 32768
+bigbluebutton_html5_udp_range_end: 49151
+bigbluebutton_sip_udp_range_begin: 49152
+bigbluebutton_sip_udp_range_end: 65535

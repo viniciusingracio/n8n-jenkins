@@ -6,7 +6,24 @@
   become: true
   apt:
     name: language-pack-en
-    state: present
+    state: '{{ bigbluebutton_apt_state }}'
+
+- name: Install entropy daemon
+  become: true
+  apt:
+    name: haveged
+    state: '{{ bigbluebutton_apt_state }}'
+
+- name: Enable haveged daemon
+  service:
+    name: haveged
+    state: started
+    enabled: yes
+  become: yes
+
+- name: Accept mscorefonts EULA
+  become: true
+  shell: echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections
 
 - name: Set default locale
   become: true
@@ -15,9 +32,12 @@
 - name: Add BigBlueButton apt key
   become: true
   apt_key:
-    url: "http://ubuntu.bigbluebutton.org/repo/bigbluebutton.asc"
+    url: '{{ item }}'
     state: present
   register: aptkey
+  with_items:
+    - '{{ bigbluebutton_apt_key }}'
+    - https://deb.nodesource.com/gpgkey/nodesource.gpg.key
 
 - name: Add multiverse and BigBlueButton repos to apt
   become: true
@@ -26,37 +46,145 @@
     state: present
   register: aptrepos
   with_items:
-    - 'deb http://archive.ubuntu.com/ubuntu/ xenial multiverse'
-    - 'deb http://ubuntu.bigbluebutton.org/xenial-110/ bigbluebutton-xenial main'
+    - 'deb http://archive.ubuntu.com/ubuntu/ {{ ansible_lsb.codename }} multiverse'
+    - 'deb http://archive.ubuntu.com/ubuntu/ {{ ansible_lsb.codename }}-security universe multiverse'
+    - '{{ bigbluebutton_apt_source }}'
+    - 'deb http://deb.nodesource.com/node_8.x {{ ansible_lsb.codename }} main'
 
 - name: Update apt if keys changed
   become: true
   apt: update_cache=yes
-  when: aptkey|changed or aptrepos|changed
+  when: aptkey is changed or aptrepos is changed
+
+- name: Remove kurento-media-server-6.0
+  become: true
+  apt:
+    name: kurento-media-server-6.0
+    state: absent
+    autoremove: yes
+
+- service:
+    name: kurento-media-server-6.0
+    state: stopped
+  become: true
+  ignore_errors: yes
+
+- file:
+    name: /etc/init.d/kurento-media-server-6.0
+    state: absent
+  become: true
 
 - name: Install BigBlueButton
   become: true
   apt:
-    name: bigbluebutton
-    state: present
+    name: '{{ bigbluebutton_apt_package }}'
+    state: '{{ bigbluebutton_apt_state }}'
+  notify: restart bigbluebutton
 
-- name: Get IP set on BigBlueButton
-  command: bbb-conf --secret
-  register: bbbip
-
-- name: Set IP on BigBlueButton
+- name: Upgrade packages to make sure BigBlueButton packages are updated
   become: true
-  command: bbb-conf --setip '{{ inventory_hostname }}'
-  # notify: restart bigbluebutton
-  when: not bbbip.stdout | search("http[s]?://" + inventory_hostname)
+  apt:
+    upgrade: dist
+  when: bigbluebutton_apt_state == 'latest'
+  notify: restart bigbluebutton
+
+- name: Determine if reset encoding needed on bigbluebutton.properties
+  set_fact:
+    properties_charset: 'iso-8859-1'
+
+- name: Create certs directory for nginx
+  file:
+    path: /etc/nginx/ssl
+    recurse: yes
+    state: directory
+  become: yes
+
+- name: Generate dhparam
+  command: openssl dhparam -out /etc/nginx/ssl/dhp-2048.pem 2048
+  args:
+    creates: /etc/nginx/ssl/dhp-2048.pem
+  become: yes
+  notify: reload nginx
+
+- name: Copy certificates
+  copy:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+  become: yes
+  with_items:
+    - { src: '{{ bigbluebutton_local_ssl_certificate }}', dest: '{{ bigbluebutton_ssl_certificate }}' }
+    - { src: '{{ bigbluebutton_local_ssl_certificate_key }}', dest: '{{ bigbluebutton_ssl_certificate_key }}' }
+  when: not bigbluebutton_local_ssl_certificate is none and not bigbluebutton_local_ssl_certificate_key is none
+  ignore_errors: yes
+  notify: reload nginx
+
+- name: Determine if use self signed certificate
+  set_fact:
+    use_self_signed_certificate: '{{ bigbluebutton_local_ssl_certificate is none and not certbot_enabled }}'
+
+- include: self-signed-certs.yml
+  when: use_self_signed_certificate
+
+- name: Add ssl configuration on nginx
+  blockinfile:
+    dest: /etc/nginx/sites-available/bigbluebutton
+    block: |2
+           listen 443 ssl;
+           listen [::]:443 ssl;
+           ssl_certificate {{ bigbluebutton_ssl_certificate }};
+           ssl_certificate_key {{ bigbluebutton_ssl_certificate_key}};
+           ssl_session_cache shared:SSL:10m;
+           ssl_session_timeout 10m;
+           # need TLSv1 for the Java calls for the API, otherwise it would be removed
+           ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+           ssl_ciphers "EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH";
+           ssl_prefer_server_ciphers on;
+           ssl_dhparam /etc/nginx/ssl/dhp-2048.pem;
+           ssl_ecdh_curve secp384r1; # Requires nginx >= 1.1.0
+           ssl_session_tickets off; # Requires nginx >= 1.5.9
+           ssl_stapling on; # Requires nginx >= 1.3.7
+           ssl_stapling_verify on; # Requires nginx => 1.3.7
+           # still unclear why we need to set the resolver
+           # resolver $DNS-IP-1 $DNS-IP-2 valid=300s;
+           # resolver_timeout 5s;
+           add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload";
+    insertafter: '.*server_name .*'
+    marker: '     # {mark} ANSIBLE MANAGED BLOCK'
+  become: yes
+  notify: reload nginx
+
+- name: Set server_name on nginx
+  replace:
+    path: /etc/nginx/sites-available/bigbluebutton
+    regexp: '^([ \t]*server_name)[ \t]?.*'
+    replace: '\1 {{ inventory_hostname }};'
+  become: yes
+  notify: reload nginx
 
 - name: Install demos
   become: true
   apt:
     name: bbb-demo
-    state: present
+    state: '{{ bigbluebutton_apt_state }}'
   when: bigbluebutton_demos
-  notify: restart bigbluebutton
+  register: reg_demo
+
+- name: Restart tomcat7
+  command: service tomcat7 restart
+  become: true
+  when: reg_demo.changed
+
+- name: Wait until demo is deployed before continuing
+  wait_for:
+    path: /var/lib/tomcat7/webapps/demo/bbb_api_conf.jsp
+  when: bigbluebutton_demos
+
+- name: Copy demo0
+  become: true
+  copy:
+    src: files/demo0.jsp
+    dest: /var/lib/tomcat7/webapps/demo/demo0.jsp
+  when: bigbluebutton_demos
 
 - name: Remove demos
   become: true
@@ -64,7 +192,169 @@
     name: bbb-demo
     state: absent
   when: not bigbluebutton_demos
+
+- name: Install/remove webhooks
+  become: true
+  apt:
+    name: bbb-webhooks
+    state: '{% if bigbluebutton_webhooks %}{{ bigbluebutton_apt_state }}{% else %}absent{% endif %}'
+
+- name: Make sure demo is removed
+  file:
+    path: /var/lib/tomcat7/demo
+    state: absent
+  become: yes
+  when: not bigbluebutton_demos
+
+- name: Adjust bigbluebutton.yml
+  replace:
+    path: /usr/local/bigbluebutton/core/scripts/bigbluebutton.yml
+    regexp: '{{ item.regexp }}'
+    replace: '{{ item.replace }}'
+  with_items:
+    - { regexp: '^(playback_host): .*', replace: '\1: {{ inventory_hostname }}' }
+    - { regexp: '^(playback_protocol): .*', replace: '\1: https' }
+  become: yes
+  register: reg_bigbluebutton_yml_replace
+
+- name: Get BigBlueButton secret
+  # shell: bbb-conf --secret | tr -s ' ' | grep '^ Secret:' | cut -d' ' -f3
+  shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
+  register: reg_bbb_secret
+
+- name: Get BigBlueButton URL
+  # shell: bbb-conf --secret | tr -s ' ' | grep '^ URL:' | cut -d' ' -f3
+  shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^bigbluebutton.web.serverURL=' | cut -d'=' -f2 | awk '{print $1"/bigbluebutton/"}'
+  register: reg_bbb_url
+
+- name: Check akka configuration
+  shell: cat /usr/share/bbb-apps-akka/conf/application.conf | grep 'sharedSecret.*changeme'
+  register: reg_akka_changeme
+  ignore_errors: yes
+
+- name: Determine if setip is needed
+  set_fact:
+    setip_needed: '{{ not reg_bbb_url.stdout is search("http[s]?://" + inventory_hostname) or reg_akka_changeme is succeeded or reg_bigbluebutton_yml_replace is changed }}'
+    bbb_url: '{{ reg_bbb_url.stdout }}'
+    bbb_secret: '{{ reg_bbb_secret.stdout }}'
+
+- name: bbb-conf --setip
+  become: true
+  command: bbb-conf --setip '{{ inventory_hostname }}'
+  when: setip_needed
+
+- name: Set HTTPS on bigbluebutton.properties
+  replace:
+    path: '{{ item[0] }}'
+    regexp: '{{ item[1].regexp }}'
+    replace: '{{ item[1].replace }}'
+    encoding: '{{ properties_charset }}'
+  with_nested:
+    -
+      - /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties
+      - /var/lib/tomcat7/webapps/demo/bbb_api_conf.jsp
+      - /usr/share/red5/webapps/screenshare/WEB-INF/screenshare.properties
+    -
+      - { regexp: 'http[s]?:\/\/{{ inventory_hostname }}', replace: 'https://{{ inventory_hostname }}' }
+      - { regexp: 'http[s]?:\/\/{{ ansible_default_ipv4.address }}', replace: 'https://{{ inventory_hostname }}' }
+      - { regexp: 'rtmp:\/\/{{ ansible_default_ipv4.address }}', replace: 'rtmp://{{ inventory_hostname }}' }
+  ignore_errors: yes
+  become: yes
   notify: restart bigbluebutton
+
+# http://docs.ansible.com/ansible/latest/playbooks_lookups.html#the-dns-lookup-dig
+# couldn't make dig lookup use dnspython on the guest
+- name: Determine external IP
+  set_fact:
+    # external_ip: "{{ lookup('dig', inventory_hostname, '@8.8.8.8') }}"
+    external_ip: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | head -n 1') }}"
+- name: Set external IP as internal IP if nothing returns from dig
+  set_fact:
+    external_ip: '{{ ansible_default_ipv4.address }}'
+  when: external_ip | trim == ""
+
+# http://docs.bigbluebutton.org/install/install.html#configure-a-dummy-nic-if-required
+- name: Check if external IP is accessible
+  command: 'curl --max-time 5 --trace-ascii - -k https://{{ external_ip }}:443/favicon.ico'
+  ignore_errors: yes
+  register: reg_external_ip_access
+
+- name: Check if external IP is assigned to any interface
+  shell: ip addr | grep 'inet {{ external_ip }}'
+  ignore_errors: yes
+  register: reg_external_ip_assigned
+
+- name: Add dummy NIC
+  command: 'ip addr add {{ external_ip }}/32 dev lo'
+  become: yes
+  when: reg_external_ip_assigned is failed or reg_external_ip_access is failed
+  
+- name: Add dummy NIC to network interfaces
+  blockinfile:
+    dest: /etc/network/interfaces
+    block: |2
+              post-up ip addr add {{ external_ip }}/32 dev lo
+              pre-down ip addr del {{ external_ip }}/32 dev lo
+    insertafter: 'iface lo inet loopback'
+    marker: '        # {mark} ANSIBLE MANAGED BLOCK'
+  become: yes
+  when: reg_external_ip_assigned is failed or reg_external_ip_access is failed
+
+- name: Confirm if external IP is accessible
+  command: 'curl --max-time 5 --trace-ascii - -k https://{{ external_ip }}:443/favicon.ico'
+
+- name: Set HTTPS on sip.nginx
+  replace:
+    path: '/etc/bigbluebutton/nginx/sip.nginx'
+    regexp: 'http[s]?:\/\/[0-9\.]*:\d+'
+    replace: 'https://{{ external_ip }}:7443'
+  become: yes
+  notify: reload nginx
+
+- name: Determine STUN information for Kurento
+  set_fact:
+    stun_server_ip: "{{ lookup('pipe', 'dig {{ bigbluebutton_stun_server[0].split(\":\")[1] }} @8.8.8.8 A +short | head -n 1') }}"
+    stun_server_port: "{{ bigbluebutton_stun_server[0].split(':')[2] }}"
+
+- name: Update KMS config
+  lineinfile:
+    dest: '{{ item.dest }}'
+    state: present
+    regexp: '{{ item.regexp }}'
+    line: '{{ item.line }}'
+  become: yes
+  with_items:
+    - { dest: /etc/kurento/modules/kurento/WebRtcEndpoint.conf.ini, regexp: '^stunServerAddress=', line: 'stunServerAddress={{ stun_server_ip }}' }
+    - { dest: /etc/kurento/modules/kurento/WebRtcEndpoint.conf.ini, regexp: '^stunServerPort=', line: 'stunServerPort={{ stun_server_port }}' }
+    - { dest: /etc/kurento/modules/kurento/BaseRtpEndpoint.conf.ini, regexp: '^minPort=', line: 'minPort={{ bigbluebutton_kms_udp_range_begin }}' }
+    - { dest: /etc/kurento/modules/kurento/BaseRtpEndpoint.conf.ini, regexp: '^maxPort=', line: 'maxPort={{ bigbluebutton_kms_udp_range_end }}' }
+  notify: restart kms
+
+- name: Install dependency for yedit library
+  become: true
+  pip:
+    name: ruamel.yaml
+    version: 0.15.37
+    state: present
+
+- name: Update bbb-webrtc-sfu config
+  yedit:
+    src: /usr/local/bigbluebutton/bbb-webrtc-sfu/config/default.yml
+    edits:
+    - { key: 'minVideoPort', value: '{{ bigbluebutton_html5_udp_range_begin }}' }
+    - { key: 'maxVideoPort', value: '{{ bigbluebutton_html5_udp_range_end }}' }
+    - { key: 'kurentoIp', value: '{{ external_ip }}' }
+    - { key: 'localIpAddress', value: '{{ external_ip }}' }
+    - { key: 'acceptSelfSignedCertificate', value: '{{ use_self_signed_certificate }}' }
+    - { key: 'mediaFlowTimeoutDuration', value: '15000' }
+    - { key: 'common-message-version', value: '{% if bigbluebutton_html5 %}2.x{% else %}1.x{% endif %}' }
+    - { key: 'freeswitch.ip', value: '{{ ansible_default_ipv4.address }}' }
+    - { key: 'kurentoUrl', value: 'ws://{{ ansible_default_ipv4.address }}:8888/kurento' }
+    - { key: 'recordScreenSharing', value: '{% if bigbluebutton_html5 %}true{% else %}false{% endif %}' }
+    - { key: 'recordWebcams', value: '{% if bigbluebutton_html5 %}true{% else %}false{% endif %}' }
+    state: present
+  become: yes
+  notify: restart bbb-webrtc-sfu
 
 - name: Open/close redis
   become: true
@@ -86,8 +376,71 @@
   when: not bigbluebutton_redis_bind
   notify: restart redis
 
+- name: Copy presentation
+  copy:
+    src: '{{ bigbluebutton_default_presentation }}'
+    dest: /var/www/bigbluebutton-default/default.pdf
+  when: not bigbluebutton_default_presentation is none
+  become: yes
+
+- include: freeswitch.yml
+
+- include: config-xml.yml
+
+- include: html5.yml
+  when: bigbluebutton_html5
+
+- include: sip.yml
+  when: bigbluebutton_sip
+
+- name: Enable kurento service
+  become: true
+  service:
+    name: kurento-media-server
+    state: started
+    enabled: yes
+
+- include: branding.yml
+  tags:
+    - branding
+
 - include: ufw.yml
+  when: common_ufw_enabled
   tags: [ufw,firewall]
+
+- include: zabbix.yml
+  when: zabbix_agent_enabled
+  tags: [zabbix]
 
 # - include: rap-resque.yml
 #   tags: [rap]
+
+- name: Copy scripts for recordings
+  synchronize:
+    src: files/utils/
+    dest: /usr/local/bigbluebutton/core/scripts/utils/
+  become: yes
+
+- cron:
+    name: "remove norecord"
+    special_time: hourly
+    job: "/usr/bin/ruby /usr/local/bigbluebutton/core/scripts/utils/remove-norecord.rb"
+    user: root
+  become: yes
+
+- cron:
+    name: "remove archived"
+    special_time: hourly
+    job: "/usr/bin/ruby /usr/local/bigbluebutton/core/scripts/utils/clean-recordings-data.rb"
+    user: root
+  become: yes
+
+- name: Check if reboot is required
+  stat:
+    path: /var/run/reboot-required
+  register: reg_reboot
+
+- name: Notify when reboot is required
+  command: 'true'
+  notify: reboot
+  when: reg_reboot.stat.exists

@@ -1,11 +1,8 @@
-- name: Configure ufw rules for Mconf-Live
+- name: Configure ufw rules for Jenkins
   become: true
   ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
   with_items:
     - { rule: 'allow', port: 80, proto: 'tcp' }
     - { rule: 'allow', port: 443, proto: 'tcp' }
-    - { rule: 'allow', port: 1935, proto: 'tcp' }
-    - { rule: 'allow', port: 7443, proto: 'tcp' }
-    - { rule: 'allow', port: '16384:32768', proto: 'udp' }
   notify:
     - restart ufw
