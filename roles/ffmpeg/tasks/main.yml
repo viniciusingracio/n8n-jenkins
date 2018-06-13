@@ -76,6 +76,8 @@
 - name: Install from packages
   apt:
     deb: '{{ ffmpeg_url }}'
+    dpkg_options: force-downgrade
+    force: yes
   become: yes
   when: version_differ and not ffmpeg_build_from_source
 
@@ -113,4 +115,10 @@
 
 - name: Hold ffmpeg package (with aptitude)
   command: aptitude -y hold ffmpeg
+  become: yes
+
+- name: Hold ffmpeg package (with dpkg)
+  dpkg_selections:
+    name: ffmpeg
+    selection: hold
   become: yes

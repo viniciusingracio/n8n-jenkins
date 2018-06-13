@@ -53,10 +53,19 @@
 
 - name: Customize error message on playback
   replace:
-    path: /var/bigbluebutton/playback/presentation/0.9.0/playback.html
-    regexp: '(<p id="load-error-msg">)[^<]*'
-    replace: '\1{{ bigbluebutton_branding_playback_error }}'
+    path: /var/bigbluebutton/playback/presentation/0.9.0/lib/writing.js
+    regexp: '(  document.getElementById\("load-msg"\)\.innerHTML =).*;'
+    replace: '\1 "{{ bigbluebutton_branding_playback_error }}";'
   become: yes
+  when: not bigbluebutton_branding_playback_error is none
+
+- name: Customize loading message on playback
+  replace:
+    path: /var/bigbluebutton/playback/presentation/0.9.0/playback.html
+    regexp: '(<p id="load-msg">)[^<]*'
+    replace: '\1{{ bigbluebutton_branding_playback_loading }}'
+  become: yes
+  when: not bigbluebutton_branding_playback_loading is none
 
 - name: Customize page title on playback
   replace:
@@ -64,19 +73,28 @@
     regexp: '(  document.title =) "[^"]*";'
     replace: '\1 "{{ bigbluebutton_branding_playback_title }}";'
   become: yes
+  when: not bigbluebutton_branding_playback_title is none
+
+- name: Customize copyright on playback
+  replace:
+    path: /var/bigbluebutton/playback/presentation/0.9.0/playback.js
+    regexp: '(const defaultCopyright =).*;'
+    replace: '\1 ''{{ bigbluebutton_branding_playback_copyright }}'';'
+  become: yes
+  when: not bigbluebutton_branding_playback_copyright is none
 
 - name: Check if video recorder is present
   stat:
     path: /usr/local/bigbluebutton/core/scripts/record/video_recorder.rb
   register: reg_recorder
 
-- name: Customize page title 
+- name: Customize page title
   replace:
     path: /usr/local/bigbluebutton/core/scripts/record/video_recorder.rb
     regexp: '([\t ]+playback_window_title =).*'
     replace: '\1 "{{ bigbluebutton_branding_playback_title }}"'
   become: yes
-  when: reg_recorder.stat.exists
+  when: reg_recorder.stat.exists and not bigbluebutton_branding_playback_title is none
 
 - name: Customize copyright on playback
   replace:

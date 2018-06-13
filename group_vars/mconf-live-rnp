@@ -2,6 +2,7 @@
 
 bigbluebutton_branding_welcome_footer: Para mais informações, acesse a <a href="https://wiki.rnp.br/x/oW5jBQ" target="_blank"><u>wiki do serviço</u></a>.
 bigbluebutton_branding_copyright: Servi&#231;o de Confer&#234;ncia Web da RNP &#183; <a href="https://conferenciaweb.rnp.br" target="_blank"><u>conferenciaweb.rnp.br</u></a> &#183; Mconf &#174; 2018
+bigbluebutton_branding_copyright_html5: Serviço de Conferência Web da RNP
 bigbluebutton_branding_toolbar_color: '#243d8f'
 bigbluebutton_branding_toolbar_color_alphas: 0, 0
 
@@ -14,6 +15,7 @@ bigbluebutton_config_xml:
   - { xpath: '//module[@name="PhoneModule"]', attribute: 'showWebRTCStats', value: 'true' }
   - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeExtensionLink', value: '{{ bigbluebutton_screenshare_extension_url }}' }
   - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeExtensionKey', value: '{{ bigbluebutton_screenshare_extension_key }}' }
+  - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeWinHelpLink', value: 'https://medium.com/mconf/compartilhando-a-tela-no-google-chrome-43b6478854c3' }
   - { xpath: '//module[@name="PhoneModule"]', attribute: 'enableOutboundCalls', value: 'true', run: '{{ bigbluebutton_sip }}' }
 
 bigbluebutton_html5_config:

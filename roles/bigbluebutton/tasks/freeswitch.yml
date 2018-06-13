@@ -2,8 +2,6 @@
   set_fact:
     wss_binding_value: '{% if ansible_default_ipv4.address == external_ip %}:7443{% else %}{{ external_ip }}:7443{% endif %}'
     ws_binding_value: ':5066'
-  tags:
-    - always
 
 - name: Read wss-binding attribute
   xml:
@@ -67,8 +65,6 @@
 - name: Define FreeSWITCH external SIP port
   set_fact:
     freeswitch_sip_port: '{% if bigbluebutton_sip %}5062{% else %}5060{% endif %}'
-  tags:
-    - always
 
 - name: Modify FreeSWITCH vars.xml
   xml:

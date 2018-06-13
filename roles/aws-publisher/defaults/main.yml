@@ -8,7 +8,7 @@ aws_publisher_repo_url: git@github.com:mconftec/bigbluebutton.git
 aws_publisher_repo_ref: mconf-commercial-1.1
 
 aws_publisher_image: mconftec/aws-publisher
-aws_publisher_image_version: 0.0.2
+aws_publisher_image_version: 0.0.4
 
 aws_publisher_region:
 aws_publisher_key:

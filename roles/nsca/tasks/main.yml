@@ -66,8 +66,8 @@
     mode: '{{ item.mode }}'
   become: yes
   with_items:
-    - { src: '{{ src_dir }}/sample-config/send_nsca.cfg', dest: '{{ nsca_config_dir }}', mode: 0644 }
-    - { src: '{{ src_dir }}/src/send_nsca', dest: '{{ nsca_binary_dir }}', mode: 0755 }
+    - { src: '{{ src_dir }}/sample-config/send_nsca.cfg', dest: '{{ nsca_config_dir }}', mode: '0644' }
+    - { src: '{{ src_dir }}/src/send_nsca', dest: '{{ nsca_binary_dir }}', mode: '0755' }
   when: build_nsca
 
 - template:

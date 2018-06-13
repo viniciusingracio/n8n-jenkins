@@ -268,8 +268,6 @@
   set_fact:
     # external_ip: "{{ lookup('dig', inventory_hostname, '@8.8.8.8') }}"
     external_ip: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | head -n 1') }}"
-  tags:
-    - always
 - name: Set external IP as internal IP if nothing returns from dig
   set_fact:
     external_ip: '{{ ansible_default_ipv4.address }}'
@@ -317,8 +315,6 @@
   set_fact:
     stun_server_ip: "{{ lookup('pipe', 'dig {{ bigbluebutton_stun_server[0].split(\":\")[1] }} @8.8.8.8 A +short | head -n 1') }}"
     stun_server_port: "{{ bigbluebutton_stun_server[0].split(':')[2] }}"
-  tags:
-    - always
 
 - name: Update KMS config
   lineinfile:
@@ -354,6 +350,8 @@
     - { key: 'common-message-version', value: '{% if bigbluebutton_html5 %}2.x{% else %}1.x{% endif %}' }
     - { key: 'freeswitch.ip', value: '{{ ansible_default_ipv4.address }}' }
     - { key: 'kurentoUrl', value: 'ws://{{ ansible_default_ipv4.address }}:8888/kurento' }
+    - { key: 'recordScreenSharing', value: '{% if bigbluebutton_html5 %}true{% else %}false{% endif %}' }
+    - { key: 'recordWebcams', value: '{% if bigbluebutton_html5 %}true{% else %}false{% endif %}' }
     state: present
   become: yes
   notify: restart bbb-webrtc-sfu
@@ -421,18 +419,21 @@
   synchronize:
     src: files/utils/
     dest: /usr/local/bigbluebutton/core/scripts/utils/
-    delete: yes
   become: yes
 
 - cron:
     name: "remove norecord"
     special_time: hourly
-    job: "ruby /usr/local/bigbluebutton/core/scripts/utils/remove-norecord.rb"
+    job: "/usr/bin/ruby /usr/local/bigbluebutton/core/scripts/utils/remove-norecord.rb"
+    user: root
+  become: yes
 
 - cron:
     name: "remove archived"
     special_time: hourly
-    job: "ruby /usr/local/bigbluebutton/core/scripts/utils/clean-recordings-data.rb"
+    job: "/usr/bin/ruby /usr/local/bigbluebutton/core/scripts/utils/clean-recordings-data.rb"
+    user: root
+  become: yes
 
 - name: Check if reboot is required
   stat:

@@ -36,4 +36,5 @@
   become: true
   systemd:
     enabled: yes
+    state: started
     name: performance_report

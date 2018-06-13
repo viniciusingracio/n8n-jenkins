@@ -4,3 +4,4 @@ bigbluebutton_branding_welcome_footer: For more information, see <a href="https:
 bigbluebutton_branding_playback_error: This recording could not be found
 bigbluebutton_branding_playback_title: Recording playback
 bigbluebutton_branding_playback_copyright: <p>Recorded with <a target="_blank" href="https://mconf.com/">Mconf</a>.</p><p>Use <a target="_blank" href="http://mozilla.org/firefox">Mozilla Firefox</a> or <a target="_blank" href="http://google.com/chrome/">Google Chrome</a> to play this recording.</p>
+bigbluebutton_branding_playback_loading: Loading...

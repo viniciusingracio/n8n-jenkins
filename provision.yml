@@ -63,10 +63,6 @@
   - { role: certbot, when: certbot_enabled }
   - bigbluebutton
 
-- hosts: bigbluebutton-dev
-  roles:
-  - bigbluebutton-dev
-
 # Mconf-Live
 - hosts:
   - mconf-live110
@@ -84,6 +80,10 @@
   - { role: dj-wasabi.zabbix-agent, when: zabbix_agent_enabled }
   - { role: GTI.basic.security, when: inventory_hostname is search(".*\.rnp\.br"), become: yes }
   - mconf-live
+
+- hosts: bigbluebutton-dev
+  roles:
+  - bigbluebutton-dev
 
 - hosts:
   - monitored-by-nagios

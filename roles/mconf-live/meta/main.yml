@@ -1,5 +1,5 @@
 ---
 
 dependencies:
-  - ffmpeg
   - role: handlers
+  - { role: docker-host }

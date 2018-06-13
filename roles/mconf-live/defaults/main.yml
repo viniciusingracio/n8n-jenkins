@@ -13,3 +13,7 @@ mconf_live_rec_proxy_http_port: 8091
 mconf_live_rec_proxy_enabled: false
 
 mconf_live_sounds_hold_music:
+
+mconf_live_presentation_recorder_enabled: yes
+mconf_live_presentation_recorder_image: 'mconftec/mconf-presentation-recorder'
+mconf_live_presentation_recorder_version: '0.0.2'
