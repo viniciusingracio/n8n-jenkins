@@ -1,0 +1,29 @@
+---
+
+mconf_db_type: 'mysql' # only mysql supported for now
+
+# MySQL
+mconf_db_mysql_ver: 5.7
+mconf_db_mysql_pkgs:
+  - mysql-server-{{ mconf_db_mysql_ver }}
+  - mysql-client-{{ mconf_db_mysql_ver }}
+  - libmysqlclient-dev # for the python libs
+mconf_db_mysql_python_pkgs: # needed to run utility commands
+  - mysqlclient    # for python3
+  # - MySQL-python # for python2
+mconf_db_mysql_service: mysql
+mconf_db_mysql_root_db_pass: ''
+mconf_db_mysql_conf_dir: "/etc/mysql/"
+mconf_db_mysql_sql_mode: STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
+
+mconf_db_databases:
+#  - name: foo
+#  - name: bar
+
+mysql_db_users:
+#  - name: mconf
+#    pass: "change-me-now"
+#    priv: "*.*:ALL"
+
+mconf_db_mysql_port: 3306
+mconf_db_mysql_bind_address: "0.0.0.0"
