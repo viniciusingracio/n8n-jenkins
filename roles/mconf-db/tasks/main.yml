@@ -2,4 +2,7 @@
   tags: [ufw,firewall]
 
 - include: mysql.yml
-  when: mconf_db_type == 'mysql'
+  when: mconf_db_install_db == 'mysql'
+
+- include: redis.yml
+  when: mconf_db_install_redis

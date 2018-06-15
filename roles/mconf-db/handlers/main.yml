@@ -1,3 +1,6 @@
 ---
 - name: restart mysql
   service: name={{ mconf_db_mysql_service }} state=restarted 
+
+- name: restart redis
+  service: name={{ mconf_db_redis_service }} state=restarted

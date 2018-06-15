@@ -1,0 +1,17 @@
+---
+
+- name: Install the Redis packages
+  become: true
+  apt: name={{ item }} state=present update_cache=yes
+  with_items: 
+    - "{{ mconf_db_redis_pkgs }}"
+
+- name: Copy the redis configuration file
+  become: true
+  template: src=redis.conf.j2 dest={{ mconf_db_redis_conf_dest }}
+  notify: 
+   - restart redis 
+
+- name: Start the redis service
+  become: true
+  service: name={{ mconf_db_redis_service }} state=started enabled=yes
