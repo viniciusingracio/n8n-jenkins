@@ -1,0 +1,109 @@
+---
+
+- name: Install dependencies
+  become: yes
+  apt:
+    name: '{{ item }}'
+    state: present
+  with_items:
+    - sqlite
+    - libsqlite3-dev
+    - libevent-dev
+    - build-essential
+    - libssl-dev
+
+- name: Download and extract
+  become: yes
+  unarchive:
+    src: https://github.com/coturn/coturn/archive/{{ coturn_version }}.tar.gz
+    dest: /usr/local/src
+    remote_src: True
+  when: coturn_build_from_source
+
+- name: Configure
+  become: yes
+  command: ./configure
+  args:
+    chdir: /usr/local/src/coturn-{{ coturn_version }}
+  when: coturn_build_from_source
+
+- name: Build
+  become: yes
+  make:
+    chdir: /usr/local/src/coturn-{{ coturn_version }}
+    target: '{{ item.target }}'
+  with_items:
+    - target: all
+    - target: install
+  when: coturn_build_from_source
+
+- name: Create user
+  become: true
+  user:
+    name: 'turnserver'
+    shell: /bin/bash
+    groups: adm,syslog
+    append: yes
+
+- name: Copy systemd file
+  become: true
+  copy:
+    src: files/coturn.service
+    dest: /etc/systemd/system/coturn.service
+  notify: restart coturn
+
+- set_fact:
+    ssl_certificate_filename: '{{ coturn_ssl_certificate | basename }}'
+    ssl_certificate_dir: '{{ coturn_ssl_certificate | dirname }}'
+    ssl_certificate_key_filename: '{{ coturn_ssl_certificate_key | basename }}'
+    ssl_certificate_key_dir: '{{ coturn_ssl_certificate_key | dirname }}'
+
+- name: Create certificate dir
+  file:
+    path: '{{ item }}'
+    mode: 0755
+    recurse: yes
+    state: directory
+  with_items:
+    - '{{ ssl_certificate_dir }}'
+    - '{{ ssl_certificate_key_dir }}'
+  become: yes
+
+- name: Copy certificates
+  become: yes
+  copy:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+  with_items:
+    - { src: '{{ coturn_local_ssl_certificate }}', dest: '{{ coturn_ssl_certificate }}' }
+    - { src: '{{ coturn_local_ssl_certificate_key }}', dest: '{{ coturn_ssl_certificate_key }}' }
+  when: not coturn_local_ssl_certificate is none and not coturn_local_ssl_certificate_key is none
+  ignore_errors: yes
+  notify: restart coturn
+
+- name: Determine external IP
+  set_fact:
+    external_ip: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | head -n 1') }}"
+
+- name: Copy templates
+  become: true
+  template:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+    mode: 0644
+  with_items:
+    - { src: files/turnserver.conf.j2, dest: /etc/turnserver.conf }
+    - { src: files/coturn.j2, dest: /etc/default/coturn }
+    - { src: files/turnuserdb.conf.j2, dest: /etc/turnuserdb.conf }
+  notify: restart coturn
+
+- name: Enable coturn service
+  become: true
+  service:
+    name: coturn
+    state: started
+    enabled: yes
+
+- include: ufw.yml
+  when: common_ufw_enabled
+  tags: [ufw,firewall]

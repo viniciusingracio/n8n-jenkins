@@ -4,17 +4,30 @@
   register: reg_recorder
 
 - name: Adjust mconf-presentation-recorder.yml
-  replace:
-    path: /usr/local/bigbluebutton/core/scripts/mconf-presentation-recorder.yml
-    regexp: '{{ item.regexp }}'
-    replace: '{{ item.replace }}'
-  with_items:
-    - { regexp: '^(api_entry_point): .*', replace: '\1: {{ bbb_api_entry_point.stdout }}' }
-    - { regexp: '^(api_shared_secret): .*', replace: '\1: {{ bbb_secret.stdout }}' }
-    - { regexp: '^(local_address): .*', replace: '\1: {{ ansible_default_ipv4.address }}' }
-    - { regexp: '^(simultaneous_meetings): .*', replace: '\1: {{ mconf_live_num_presentation_recorders }}' }
+  yedit:
+    src: /usr/local/bigbluebutton/core/scripts/mconf-presentation-recorder.yml
+    edits:
+    - { key: 'api_entry_point', value: '{{ mconf_live_recording_auth_entry_point | default(bbb_api_entry_point.stdout, true) }}' }
+    - { key: 'api_shared_secret', value: '{{ mconf_live_recording_auth_secret | default(bbb_secret.stdout, true) }}' }
+    - { key: 'local_address', value: '{{ mconf_live_recording_auth_local_address | default(ansible_default_ipv4.address, true) }}' }
+    - { key: 'simultaneous_meetings', value: '{{ mconf_live_num_presentation_recorders }}' }
+    state: present
   become: yes
   when: reg_recorder.stat.exists
+
+- name: Check if presentation_video is installed
+  stat:
+    path: /usr/local/bigbluebutton/core/scripts/presentation_video.yml
+  register: reg_video
+
+- name: Adjust presentation_video.yml
+  yedit:
+    src: /usr/local/bigbluebutton/core/scripts/presentation_video.yml
+    edits:
+    - { key: 'audio_offset', value: '2300' }
+    state: present
+  become: yes
+  when: reg_video.stat.exists
 
 - name: List rap scripts enabled
   find:
@@ -48,6 +61,7 @@
 # tag is needed because the ruby script always use latest
 - name: Tag presentation recorder image to latest
   command: docker tag {{ mconf_live_presentation_recorder_image }}:{{ mconf_live_presentation_recorder_version }} {{ mconf_live_presentation_recorder_image }}:latest
+  when: mconf_live_presentation_recorder_enabled
 
 - name: Add tomcat7 to docker group
   become: true
@@ -55,3 +69,4 @@
     name: 'tomcat7'
     groups: docker
     append: yes
+  when: mconf_live_presentation_recorder_enabled

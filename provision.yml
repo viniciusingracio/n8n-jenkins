@@ -66,14 +66,6 @@
 # Mconf-Live
 - hosts:
   - mconf-live110
-  roles:
-  - { role: certbot, when: certbot_enabled }
-  - { role: dj-wasabi.zabbix-agent, when: zabbix_agent_enabled }
-  - { role: GTI.basic.security, when: inventory_hostname is search(".*\.rnp\.br"), become: yes }
-  - mconf-live
-
-# Mconf-Live
-- hosts:
   - mconf-live200
   roles:
   - { role: certbot, when: certbot_enabled }
@@ -148,7 +140,9 @@
   roles:
   - docker-host
 
-- hosts: mconf-rec
+- hosts:
+  - mconf-rec
+  - mconf-recw
   roles:
   - { role: certbot, when: certbot_enabled }
   - { role: dj-wasabi.zabbix-agent, when: zabbix_agent_enabled }
@@ -158,3 +152,10 @@
 - hosts: aws-publisher
   roles:
   - aws-publisher
+
+- hosts: coturn
+  roles:
+  - { role: certbot, when: certbot_enabled }
+  - { role: dj-wasabi.zabbix-agent, when: zabbix_agent_enabled }
+  - { role: GTI.basic.security, when: inventory_hostname is search(".*\.rnp\.br"), become: yes }
+  - coturn

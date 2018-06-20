@@ -1,0 +1,3 @@
+mconf_rec_share_nfs: no
+mconf_rec_mount_nfs: no
+mconf_rec_enable_local_processing: yes

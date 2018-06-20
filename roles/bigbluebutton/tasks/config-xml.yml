@@ -7,7 +7,7 @@
   command: apt-get download bbb-client
   args:
     chdir: '{{ tmpdir_client.path }}'
-  warn: False
+    warn: False
 
 - name: Reset config.xml
   shell: 'dpkg-deb --fsys-tarfile {{ tmpdir_client.path }}/bbb-client_*.deb | tar -x ./var/www/bigbluebutton/client/conf/config.xml --strip-components=6'

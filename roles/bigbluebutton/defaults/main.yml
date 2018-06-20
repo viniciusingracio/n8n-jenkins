@@ -124,3 +124,7 @@ bigbluebutton_html5_udp_range_begin: 32768
 bigbluebutton_html5_udp_range_end: 49151
 bigbluebutton_sip_udp_range_begin: 49152
 bigbluebutton_sip_udp_range_end: 65535
+
+# these attributes are optional and will be set to default values if empty
+bigbluebutton_playback_host:
+bigbluebutton_playback_protocol:

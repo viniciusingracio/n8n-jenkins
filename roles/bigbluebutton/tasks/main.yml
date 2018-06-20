@@ -206,17 +206,6 @@
   become: yes
   when: not bigbluebutton_demos
 
-- name: Adjust bigbluebutton.yml
-  replace:
-    path: /usr/local/bigbluebutton/core/scripts/bigbluebutton.yml
-    regexp: '{{ item.regexp }}'
-    replace: '{{ item.replace }}'
-  with_items:
-    - { regexp: '^(playback_host): .*', replace: '\1: {{ inventory_hostname }}' }
-    - { regexp: '^(playback_protocol): .*', replace: '\1: https' }
-  become: yes
-  register: reg_bigbluebutton_yml_replace
-
 - name: Get BigBlueButton secret
   # shell: bbb-conf --secret | tr -s ' ' | grep '^ Secret:' | cut -d' ' -f3
   shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
@@ -234,7 +223,7 @@
 
 - name: Determine if setip is needed
   set_fact:
-    setip_needed: '{{ not reg_bbb_url.stdout is search("http[s]?://" + inventory_hostname) or reg_akka_changeme is succeeded or reg_bigbluebutton_yml_replace is changed }}'
+    setip_needed: '{{ not reg_bbb_url.stdout is search("http[s]?://" + inventory_hostname) or reg_akka_changeme is succeeded }}'
     bbb_url: '{{ reg_bbb_url.stdout }}'
     bbb_secret: '{{ reg_bbb_secret.stdout }}'
 
@@ -242,6 +231,15 @@
   become: true
   command: bbb-conf --setip '{{ inventory_hostname }}'
   when: setip_needed
+
+- name: Adjust bigbluebutton.yml
+  become: yes
+  yedit:
+    src: /usr/local/bigbluebutton/core/scripts/bigbluebutton.yml
+    edits:
+    - { key: 'playback_host', value: '{{ bigbluebutton_playback_host | default(inventory_hostname, true) }}' }
+    - { key: 'playback_protocol', value: '{{ bigbluebutton_playback_protocol | default("https", true) }}' }
+    state: present
 
 - name: Set HTTPS on bigbluebutton.properties
   replace:
@@ -311,25 +309,6 @@
   become: yes
   notify: reload nginx
 
-- name: Determine STUN information for Kurento
-  set_fact:
-    stun_server_ip: "{{ lookup('pipe', 'dig {{ bigbluebutton_stun_server[0].split(\":\")[1] }} @8.8.8.8 A +short | head -n 1') }}"
-    stun_server_port: "{{ bigbluebutton_stun_server[0].split(':')[2] }}"
-
-- name: Update KMS config
-  lineinfile:
-    dest: '{{ item.dest }}'
-    state: present
-    regexp: '{{ item.regexp }}'
-    line: '{{ item.line }}'
-  become: yes
-  with_items:
-    - { dest: /etc/kurento/modules/kurento/WebRtcEndpoint.conf.ini, regexp: '^stunServerAddress=', line: 'stunServerAddress={{ stun_server_ip }}' }
-    - { dest: /etc/kurento/modules/kurento/WebRtcEndpoint.conf.ini, regexp: '^stunServerPort=', line: 'stunServerPort={{ stun_server_port }}' }
-    - { dest: /etc/kurento/modules/kurento/BaseRtpEndpoint.conf.ini, regexp: '^minPort=', line: 'minPort={{ bigbluebutton_kms_udp_range_begin }}' }
-    - { dest: /etc/kurento/modules/kurento/BaseRtpEndpoint.conf.ini, regexp: '^maxPort=', line: 'maxPort={{ bigbluebutton_kms_udp_range_end }}' }
-  notify: restart kms
-
 - name: Install dependency for yedit library
   become: true
   pip:
@@ -382,6 +361,8 @@
     dest: /var/www/bigbluebutton-default/default.pdf
   when: not bigbluebutton_default_presentation is none
   become: yes
+
+- include: stun.yml
 
 - include: freeswitch.yml
 

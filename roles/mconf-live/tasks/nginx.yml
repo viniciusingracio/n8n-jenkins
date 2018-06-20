@@ -1,24 +1,16 @@
 - stat:
     path: '{{ item }}'
   with_items:
-    - /etc/bigbluebutton/nginx/presentation.nginx.orig
-    - /etc/bigbluebutton/nginx/presentation_video.nginx.orig
-    - /etc/bigbluebutton/nginx/presentation_export.nginx.orig
-  register: nginx_files
-
-- command: mv {{ item.item }} {{ item.item | regex_replace('\.orig$') }}
-  with_items: '{{ nginx_files.results }}'
-  become: yes
-  when: item.stat.exists and not mconf_live_rec_proxy_enabled
-  notify: reload nginx
-
-- stat:
-    path: '{{ item }}'
-  with_items:
     - /etc/bigbluebutton/nginx/presentation.nginx
     - /etc/bigbluebutton/nginx/presentation_video.nginx
     - /etc/bigbluebutton/nginx/presentation_export.nginx
   register: nginx_files
+
+- command: mv {{ item.item }}.orig {{ item.item }}
+  with_items: '{{ nginx_files.results }}'
+  become: yes
+  when: item.stat.exists and item.stat.islnk and not mconf_live_rec_proxy_enabled
+  notify: reload nginx
 
 - command: mv {{ item.item }} {{ item.item }}.orig
   with_items: '{{ nginx_files.results }}'
@@ -52,7 +44,7 @@
   notify: reload nginx
 
 - file:
-    src: '{{ item.item }}.orig'
+    src: '{{ item.item }}.openresty'
     dest: '{{ item.item }}'
     state: link
   with_items: '{{ nginx_files.results }}'

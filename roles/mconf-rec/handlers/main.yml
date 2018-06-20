@@ -1,0 +1,8 @@
+- name: restart nfs-server
+  become: true
+  service: name=nfs-kernel-server state=restarted
+
+- name: mount all
+  become: yes
+  command: mount -a
+  ignore_errors: yes

@@ -1,0 +1,8 @@
+- name: Configure ufw rules
+  become: true
+  ufw: rule={{ item.rule }} port={{ item.port }}
+  with_items:
+    - { rule: 'allow', port: 3478 }
+    - { rule: 'allow', port: 5349 }
+  notify:
+    - restart ufw

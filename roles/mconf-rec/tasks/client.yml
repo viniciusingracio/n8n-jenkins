@@ -1,0 +1,16 @@
+- name: Install nfs
+  become: yes
+  apt:
+    name: nfs-common
+
+- name: Map nfs
+  become: yes
+  blockinfile:
+    dest: /etc/fstab
+    block: |
+      {{ hostvars[groups['mconf-rec'] | first].nfs_ip }}:/var/bigbluebutton/published                                /var/bigbluebutton/published                    nfs4   minorversion=1,_netdev,auto,clientaddr={{ nfs_ip }}  0  0
+      {{ hostvars[groups['mconf-rec'] | first].nfs_ip }}:/var/bigbluebutton/recording/raw                            /var/bigbluebutton/recording/raw                nfs4   minorversion=1,_netdev,auto,clientaddr={{ nfs_ip }}  0  0
+      {{ hostvars[groups['mconf-rec'] | first].nfs_ip }}:/var/bigbluebutton/recording/status/sanity_{{ nfs_name }}   /var/bigbluebutton/recording/status/sanity      nfs4   minorversion=1,_netdev,auto,clientaddr={{ nfs_ip }}  0  0
+      {{ hostvars[groups['mconf-rec'] | first].nfs_ip }}:/var/bigbluebutton/recording/status/published               /var/bigbluebutton/recording/status/published   nfs4   minorversion=1,_netdev,auto,clientaddr={{ nfs_ip }}  0  0
+    marker: '# {mark} ANSIBLE MANAGED BLOCK mconf-rec nfs'
+  notify: mount all

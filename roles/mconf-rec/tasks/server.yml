@@ -1,0 +1,34 @@
+- name: Install nfs server
+  become: yes
+  apt:
+    name: nfs-kernel-server
+
+- name: Configure ufw rules for nfs
+  become: yes
+  ufw: rule=allow port=nfs src={{ hostvars[item].nfs_ip }}
+  with_items: "{{ groups['mconf-recw'] }}"
+  notify:
+    - restart ufw
+
+- name: Create sanity dir for recw
+  become: yes
+  file:
+    path: /var/bigbluebutton/recording/status/sanity_{{ hostvars[item].nfs_name }}
+    state: directory
+    owner: tomcat7
+    group: tomcat7
+  with_items: "{{ groups['mconf-recw'] }}"
+
+- name: Remove sanity dir
+  become: yes
+  file:
+    path: /var/bigbluebutton/recording/status/sanity
+    state: absent
+  when: not mconf_rec_enable_local_processing
+
+- name: Update exports
+  become: yes
+  template:
+    src: files/exports.j2
+    dest: /etc/exports
+  notify: restart nfs-server

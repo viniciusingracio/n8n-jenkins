@@ -7,6 +7,11 @@
   become: true
   apt: package=ufw state=present
 
+- name: Reset ufw
+  become: true
+  ufw:
+    state: reset
+
 - name: Enable/disable IPv6 on ufw
   become: true
   lineinfile:

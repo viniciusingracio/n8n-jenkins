@@ -14,7 +14,7 @@
     rec_proxy_jwt_secret: '{{ bbb_secret.stdout | to_uuid }}'
     rec_proxy_build_from_source: false
     rec_proxy_image: 'mconftec/mconf-rec'
-    rec_proxy_image_version: 'local-nossl-0.0.3'
+    rec_proxy_image_version: 'local-nossl-0.0.12'
     rec_proxy_local_playback: true
     rec_proxy_http_port: '{{ mconf_live_rec_proxy_http_port }}'
   when: mconf_live_rec_proxy_enabled

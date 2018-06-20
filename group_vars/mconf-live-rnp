@@ -28,6 +28,11 @@ bigbluebutton_html5_config:
   - { path: '/public/app/appName', value: 'Mconf' }
   - { path: '/public/app/copyright', value: '{{ bigbluebutton_branding_copyright_html5 }}' }
 
-bigbluebutton_stun_server:
-  - stun:stun.l.google.com:19302
-  - stun:stun1.mconf.com:3478
+bigbluebutton_freeswitch_udp_range_begin: 6000
+bigbluebutton_freeswitch_udp_range_end: 6999
+bigbluebutton_kms_udp_range_begin: 7000
+bigbluebutton_kms_udp_range_end: 8999
+bigbluebutton_html5_udp_range_begin: 7000
+bigbluebutton_html5_udp_range_end: 7999
+bigbluebutton_sip_udp_range_begin: 8000
+bigbluebutton_sip_udp_range_end: 8999
