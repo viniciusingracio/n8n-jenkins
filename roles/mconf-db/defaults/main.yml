@@ -39,7 +39,7 @@ mconf_db_redis_service: redis-server
 mconf_db_redis_conf_dest: /etc/redis/redis.conf
 mconf_db_redis_bind_address: "0.0.0.0"
 mconf_db_redis_port: 6379
-mconf_db_redis_logfile: /var/log/redis.log
+mconf_db_redis_logfile: /var/log/redis/redis-server.log
 mconf_db_redis_databases: 16
 mconf_db_redis_database_save_times:
   - [900, 1]
