@@ -1,0 +1,73 @@
+---
+
+- name: Install the mysql packages
+  become: true
+  apt: name={{ item }} state=present update_cache=yes
+  with_items:
+    - "{{ mconf_db_mysql_pkgs }}"
+
+- name: Copy the my.cnf file
+  become: true
+  template: src=my.cnf.j2 dest={{ mconf_db_mysql_conf_dir }}/my.cnf
+  notify:
+   - restart mysql
+
+- name: Create the directory /etc/mysql/conf.d
+  become: true
+  file: path=/etc/mysql/conf.d state=directory
+  notify:
+   - restart mysql
+
+- name: Deploy mysql config to conf.d
+  become: true
+  template: src=mysql.cnf.j2 dest=/etc/mysql/conf.d/mysql.cnf
+  notify:
+    - restart mysql
+
+- name: Install the Python modules
+  become: true
+  pip: name={{ item }} state=present
+  with_items:
+    - "{{ mconf_db_mysql_python_pkgs }}"
+
+- name: Start the mysql services
+  become: true
+  service: name={{ mconf_db_mysql_service }} state=started enabled=yes
+
+- name: Abort if root password not set
+  fail:
+    msg: You need to set mconf_db_mysql_root_db_pass to proceed
+  when: mconf_db_mysql_root_db_pass == ''
+
+- name: Update mysql root password for all root accounts
+  mysql_user: name=root host={{ item }} password={{ mconf_db_mysql_root_db_pass }} check_implicit_admin=yes
+  with_items:
+   - "{{ ansible_hostname }}"
+   - 127.0.0.1
+   - ::1
+   - localhost
+
+- name: copy .my.cnf file with root password credentials
+  template: src=.my.cnf.j2 dest="/home/{{ deploy_user }}/.my.cnf" mode=0600
+
+- name: Ensure anonymous users are not in the database
+  mysql_user: name='' host={{ item }} state=absent
+  with_items:
+   - localhost
+   - "{{ ansible_hostname }}"
+
+- name: Remove the test database
+  mysql_db: name=test state=absent
+
+- name: Create the databases
+  mysql_db: name={{ item.name }} state=present
+  with_items:
+    - "{{ mconf_db_databases }}"
+  when: mconf_db_databases is defined and mconf_db_databases != None
+
+- name: Create the database users
+  mysql_user: name={{ item.name }} password={{ item.pass|default("foobar") }}
+              priv={{ item.priv|default("*.*:ALL") }} state=present host={{ item.host | default("localhost") }}
+  with_items:
+    - "{{ mconf_db_users }}"
+  when: mconf_db_users is defined and mconf_db_users != None

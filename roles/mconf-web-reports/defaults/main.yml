@@ -16,4 +16,4 @@ mconf_web_reports_env_file: "envs/{{ env }}/files/mconf-web-reports/.env.local"
 mconf_web_reports_config_file: "envs/{{ env }}/files/mconf-web-reports/config.yml"
 
 # Where the reports will be saved to in the host
-mconf_web_reports_output_dir: /tmp/reports
+mconf_web_reports_output_dir: /var/www/mconf-web/shared/private

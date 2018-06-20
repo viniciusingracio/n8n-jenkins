@@ -1,0 +1,54 @@
+---
+
+# Leave it empty so no db is installed. Set to 'mysql' to use MySQL (only one supported for now).
+mconf_db_install_db: 'mysql'
+
+# Leave it empty or set to false so redis is not installed. Set to true to install.
+mconf_db_install_redis: true
+
+# MySQL
+mconf_db_mysql_ver: 5.7
+mconf_db_mysql_pkgs:
+  - mysql-server-{{ mconf_db_mysql_ver }}
+  - mysql-client-{{ mconf_db_mysql_ver }}
+  - libmysqlclient-dev # for the python libs
+mconf_db_mysql_python_pkgs: # needed to run utility commands
+  - mysqlclient    # for python3
+  # - MySQL-python # for python2
+mconf_db_mysql_service: mysql
+mconf_db_mysql_root_db_pass: ''
+mconf_db_mysql_conf_dir: "/etc/mysql/"
+mconf_db_mysql_sql_mode: STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
+mconf_db_mysql_port: 3306
+mconf_db_mysql_bind_address: "0.0.0.0"
+
+mconf_db_databases:
+#  - name: foo
+#  - name: bar
+
+mysql_db_users:
+#  - name: mconf
+#    pass: "change-me-now"
+#    priv: "*.*:ALL"
+
+# Redis
+mconf_db_redis_pkgs:
+  - redis-server
+  # - python-selinux
+mconf_db_redis_service: redis-server
+mconf_db_redis_conf_dest: /etc/redis/redis.conf
+mconf_db_redis_bind_address: "0.0.0.0"
+mconf_db_redis_port: 6379
+mconf_db_redis_logfile: /var/log/redis/redis-server.log
+mconf_db_redis_databases: 16
+mconf_db_redis_database_save_times:
+  - [900, 1]
+  - [300, 10]
+  - [60, 10000]
+mconf_db_redis_dbfilename: dump.rdb
+mconf_db_redis_db_dir: /var/lib/redis
+mconf_db_redis_pass: # empty = no password
+mconf_db_redis_max_clients: 128
+mconf_db_redis_max_memory: 512mb
+mconf_db_redis_maxmemory_policy: volatile-lru
+mconf_db_redis_appendfsync: everysec
