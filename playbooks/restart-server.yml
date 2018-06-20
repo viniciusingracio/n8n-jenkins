@@ -1,0 +1,19 @@
+---
+
+- name: "Restart the server and wait for it to return"
+  hosts: all
+  tasks:
+
+    - name: "Restart the server"
+      become: true
+      shell: 'sleep 1 && shutdown -r now "Reboot triggered by Ansible" && sleep 1'
+      async: 1
+      poll: 0
+
+
+    - name: "Wait for it"
+      local_action:
+        module: wait_for
+          host={{ inventory_hostname }}
+          port={{ ansible_ssh_port }}
+          delay=20
