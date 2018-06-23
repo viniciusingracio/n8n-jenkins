@@ -1,113 +1,28 @@
-- name: Install FFmpeg dependencies
-  become: yes
-  apt:
-    name: '{{ item }}'
-    state: present
-  with_items:
-    - yasm
-    - nasm
-    - libsdl2-dev
-    - libva-dev
-
-- name: Install FFmpeg build dependencies
-  become: yes
-  apt:
-    name: '{{ item }}'
-    state: present
-  with_items:
-    - checkinstall
-    - texi2html
-    - libx11-dev
-    - libvpx-dev
-    - libxfixes-dev
-    - libxext-dev
-    - libv4l-dev
-    - netcat
-    - librtmp-dev
-    - libx264-dev
-    - libmp3lame-dev
-    - libopus-dev
-    - libwebp-dev
-    - libspeex-dev
-    # from https://trac.ffmpeg.org/wiki/CompilationGuide/Ubuntu
-    - autoconf
-    - automake
-    - build-essential
-    - cmake
-    - git
-    - libass-dev
-    - libfreetype6-dev
-    - libtheora-dev
-    - libtool
-    - libvdpau-dev
-    - libvorbis-dev
-    - libxcb1-dev
-    - libxcb-shm0-dev
-    - libxcb-xfixes0-dev
-    - mercurial
-    - pkg-config
-    - texinfo
-    - zlib1g-dev
-  when: ffmpeg_build_from_source
-
-- include: openh264.yml
-  tags: [openh264]
-
 - name: Get FFmpeg version
   shell: "ffmpeg -version | grep '^ffmpeg' | cut -d' ' -f 3"
   register: reg_ffmpeg_version
   ignore_errors: yes
-  tags:
-    - test_ffmpeg_version
 
 - name: Get FFmpeg configure flags
   shell: "ffmpeg -version | grep '^configuration: ' | sed 's|^configuration: ||g'"
   register: reg_ffmpeg_configure_flags
   ignore_errors: yes
-  tags:
-    - test_ffmpeg_version
 
-- name: Decide if FFmpeg needs to be (re)built
+- name: Decide if FFmpeg needs to be (re)built or reinstalled
   set_fact:
-    version_differ: reg_ffmpeg_version is failed or reg_ffmpeg_version.stdout != '{{ ffmpeg_version }}' or reg_ffmpeg_configure_flags is failed or reg_ffmpeg_configure_flags.stdout != '{{ ffmpeg_configure_flags }}'
-  tags:
-    - test_ffmpeg_version
+    version_differ: reg_ffmpeg_version is failed or reg_ffmpeg_version.stdout != ffmpeg_version or reg_ffmpeg_configure_flags is failed or reg_ffmpeg_configure_flags.stdout != ffmpeg_configure_flags
 
-- name: Install from packages
-  apt:
-    deb: '{{ ffmpeg_url }}'
-    dpkg_options: force-downgrade
-    force: yes
-  become: yes
-  when: version_differ and not ffmpeg_build_from_source
-
-- name: Download and extract FFmpeg
-  unarchive:
-    src: http://ffmpeg.org/releases/ffmpeg-{{ ffmpeg_version }}.tar.bz2
-    dest: /usr/local/src
-    remote_src: True
-  become: yes
+- include: source.yml
   when: version_differ and ffmpeg_build_from_source
 
-- name: Configure FFmpeg
-  command: './configure {{ ffmpeg_configure_flags }}'
-  args:
-    chdir: /usr/local/src/ffmpeg-{{ ffmpeg_version }}
-  become: yes
-  when: version_differ and ffmpeg_build_from_source
+- include: package3.yml
+  when: not ffmpeg_build_from_source and not ffmpeg_version is match('4\.0.*') and version_differ
 
-- name: Build FFmpeg
-  make:
-    chdir: /usr/local/src/ffmpeg-{{ ffmpeg_version }}
-  become: yes
-  when: version_differ and ffmpeg_build_from_source
+- include: package4.yml
+  when: not ffmpeg_build_from_source and ffmpeg_version is match('4\.0.*') and not reg_ffmpeg_version.stdout is match('4\.0.*')
 
-- name: Install FFmpeg
-  command: checkinstall --pkgname=ffmpeg --pkgversion="5:{{ ffmpeg_version }}" --backup=no --deldoc=yes --default
-  args:
-    chdir: /usr/local/src/ffmpeg-{{ ffmpeg_version }}
-  become: yes
-  when: version_differ and ffmpeg_build_from_source
+- include: openh264.yml
+  tags: [openh264]
 
 - name: Hold ffmpeg package
   command: apt-mark hold ffmpeg

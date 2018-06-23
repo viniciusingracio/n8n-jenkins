@@ -1,0 +1,17 @@
+- name: Install FFmpeg dependencies
+  become: yes
+  apt:
+    name: '{{ item }}'
+    state: present
+  with_items:
+    - yasm
+    - nasm
+    - libsdl2-dev
+    - libva-dev
+
+- name: Install from packages
+  become: yes
+  apt:
+    deb: '{{ ffmpeg_url }}'
+    dpkg_options: force-downgrade
+    force: yes
