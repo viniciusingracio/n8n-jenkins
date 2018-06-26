@@ -232,6 +232,14 @@
   command: bbb-conf --setip '{{ inventory_hostname }}'
   when: setip_needed
 
+# TODO move this to a new role/task
+- name: Install dependency for yedit library
+  become: true
+  pip:
+    name: ruamel.yaml
+    version: 0.15.37
+    state: present
+
 - name: Adjust bigbluebutton.yml
   become: yes
   yedit:
@@ -308,13 +316,6 @@
     replace: 'https://{{ external_ip }}:7443'
   become: yes
   notify: reload nginx
-
-- name: Install dependency for yedit library
-  become: true
-  pip:
-    name: ruamel.yaml
-    version: 0.15.37
-    state: present
 
 - name: Update bbb-webrtc-sfu config
   yedit:

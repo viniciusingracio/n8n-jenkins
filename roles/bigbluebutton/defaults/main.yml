@@ -10,6 +10,7 @@ bigbluebutton_apt_package: bigbluebutton
 
 # Install HTML5 client
 bigbluebutton_html5: false
+bigbluebutton_html5_only: false
 # Install Mconf MCS-SIP
 bigbluebutton_sip: false
 
