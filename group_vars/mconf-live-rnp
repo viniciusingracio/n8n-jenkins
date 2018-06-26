@@ -26,6 +26,7 @@ bigbluebutton_html5_config:
   - { path: '/public/kurento/enableVideo', value: true }
   - { path: '/public/kurento/enableVideoStats', value: true }
   - { path: '/public/app/appName', value: 'Mconf' }
+  - { path: '/public/app/clientTitle', value: 'Mconf' }
   - { path: '/public/app/copyright', value: '{{ bigbluebutton_branding_copyright_html5 }}' }
 
 bigbluebutton_freeswitch_udp_range_begin: 6000
