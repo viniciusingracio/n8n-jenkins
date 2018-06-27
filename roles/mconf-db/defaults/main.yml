@@ -48,7 +48,7 @@ mconf_db_redis_database_save_times:
 mconf_db_redis_dbfilename: dump.rdb
 mconf_db_redis_db_dir: /var/lib/redis
 mconf_db_redis_pass: # empty = no password
-mconf_db_redis_max_clients: 128
-mconf_db_redis_max_memory: 512mb
-mconf_db_redis_maxmemory_policy: volatile-lru
+mconf_db_redis_max_clients: # empty = no limit
+mconf_db_redis_max_memory: # empty = no limit # e.g. 512mb
+mconf_db_redis_maxmemory_policy: noeviction #volatile-lru
 mconf_db_redis_appendfsync: everysec
