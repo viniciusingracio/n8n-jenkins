@@ -156,3 +156,7 @@
   - { role: certbot, when: certbot_enabled }
   - { role: dj-wasabi.zabbix-agent, when: zabbix_agent_enabled }
   - coturn
+
+- hosts: sip-proxy
+  roles:
+  - sip-proxy

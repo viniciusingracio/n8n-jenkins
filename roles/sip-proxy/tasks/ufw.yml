@@ -1,0 +1,8 @@
+- name: Configure ufw rules for SIP
+  become: true
+  ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
+  with_items:
+    - { rule: 'allow', port: 5060, proto: 'tcp' }
+    - { rule: 'allow', port: 5060, proto: 'udp' }
+  notify:
+    - restart ufw

@@ -1,0 +1,74 @@
+---
+
+- name: Update apt (if older than 5m)
+  become: true
+  apt: update_cache=yes cache_valid_time=300
+
+- name: Add apt key
+  become: true
+  apt_key:
+    url: https://jenkins-live.mconf.com/apt/public.asc
+    state: present
+  register: aptkey
+
+- name: Add multiverse and repos to apt
+  become: true
+  apt_repository:
+    repo: '{{ item }}'
+    state: present
+  register: aptrepos
+  with_items:
+    - deb http://archive.ubuntu.com/ubuntu/ {{ ansible_lsb.codename }} multiverse
+    - deb http://archive.ubuntu.com/ubuntu/ {{ ansible_lsb.codename }}-security universe multiverse
+    - deb https://jenkins-live.mconf.com/apt/development/v2.0.x-release/{{ ansible_lsb.codename }}-2.0.0 mconf-{{ ansible_lsb.codename }} main
+
+- name: Update apt if keys changed
+  become: true
+  apt: update_cache=yes
+  when: aptkey is changed or aptrepos is changed
+
+- name: Install FreeSWITCH
+  become: true
+  apt:
+    name: bbb-freeswitch-core
+    state: present
+
+- name: Copy resources
+  become: true
+  copy:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+  with_items:
+    - { src: 'files/scripts/bigbluebutton-api.js', dest: '{{ sip_proxy_scripts_dir }}/bigbluebutton-api.js' }
+    - { src: 'files/scripts/mconf_redirect.js', dest: '{{ sip_proxy_scripts_dir }}/mconf_redirect.js' }
+    - { src: 'files/scripts/PhoneFormat.js', dest: '{{ sip_proxy_scripts_dir }}/PhoneFormat.js' }
+    - { src: 'files/scripts/sha1.js', dest: '{{ sip_proxy_scripts_dir }}/sha1.js' }
+    - { src: 'files/dialplan/public.xml', dest: '{{ sip_proxy_dialplan_dir }}/public.xml' }
+    - { src: 'files/directory/default.xml', dest: '{{ sip_proxy_directory_dir }}/default.xml' }
+  notify: restart freeswitch
+
+- name: Copy redirect config
+  become: yes
+  template:
+    src: mconf_redirect_conf.js.j2
+    dest: '{{ sip_proxy_scripts_dir }}/mconf_redirect_conf.js'
+  notify: restart freeswitch
+
+- name: Install lxml
+  become: true
+  pip:
+    name: lxml
+    state: present
+
+- name: Add modules
+  become: yes
+  xml:
+    path: /opt/freeswitch/conf/autoload_configs/modules.conf.xml
+    xpath: '//modules/load[@module="{{ item }}"]'
+    pretty_print: yes
+  with_items: '{{ sip_proxy_modules }}'
+  notify: restart freeswitch
+
+- include: ufw.yml
+  when: common_ufw_enabled
+  tags: [ufw,firewall]

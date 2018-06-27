@@ -96,7 +96,7 @@ user=mconf
     dest: ~/src/rec-proxy
     ```
 * To run a single command (e.g. uptime) in all servers: `ansible all -i envs/dev -m command -a "uptime" -u mconf --extra-vars "ansible_python_interpreter=/usr/bin/python3"`
-
+* To create a new role directory structure: `ansible-galaxy init sip-proxy --init-path=roles/`
 ### Notes
 
 #### Ubuntu 16.04
