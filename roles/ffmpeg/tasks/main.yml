@@ -1,3 +1,7 @@
+- name: Update apt (if older than 5m)
+  become: true
+  apt: update_cache=yes cache_valid_time=300
+
 - name: Get FFmpeg version
   shell: "ffmpeg -version | grep '^ffmpeg' | cut -d' ' -f 3"
   register: reg_ffmpeg_version
