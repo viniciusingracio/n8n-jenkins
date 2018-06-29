@@ -1,0 +1,9 @@
+---
+
+- hosts: mconf-web
+  roles:
+  - mconf-web
+
+- hosts: mconf-web-reports
+  roles:
+  - mconf-web-reports

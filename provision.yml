@@ -1,7 +1,3 @@
-- hosts: with-certbot
-  roles:
-  - certbot
-
 # Recording workers
 - hosts: rec-worker
   roles:
@@ -27,20 +23,6 @@
 - hosts: mconf-db
   roles:
   - mconf-db
-
-# Mconf-Web
-- hosts: mconf-web
-  roles:
-  - mconf-web
-# Mconf-Web-Reports
-- hosts: mconf-web-reports
-  roles:
-  - mconf-web-reports
-
-# Mconf-LB
-- hosts: mconf-lb
-  roles:
-  - mconf-lb
 
 # Mconf-Console
 - hosts: mconf-console
