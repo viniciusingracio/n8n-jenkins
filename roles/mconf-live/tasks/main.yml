@@ -11,20 +11,7 @@
 
 - include: rec-proxy.yml
 
-- name: Copy sound
-  copy:
-    src: files/{{ mconf_live_sounds_hold_music }}
-    dest: /opt/freeswitch/share/freeswitch/sounds/{{ mconf_live_sounds_hold_music }}
-    owner: freeswitch
-    group: daemon
+- include: hold-music.yml
   when: not mconf_live_sounds_hold_music is none
-  become: true
-
-- name: Create wav file
-  command: ffmpeg -y -i /opt/freeswitch/share/freeswitch/sounds/{{ mconf_live_sounds_hold_music }} /opt/freeswitch/share/freeswitch/sounds/{{ (mconf_live_sounds_hold_music | splitext)[0] }}.wav
-  args:
-    creates: /opt/freeswitch/share/freeswitch/sounds/{{ (mconf_live_sounds_hold_music | splitext)[0] }}.wav
-  when: not mconf_live_sounds_hold_music is none
-  become: true
 
 - include: rap.yml

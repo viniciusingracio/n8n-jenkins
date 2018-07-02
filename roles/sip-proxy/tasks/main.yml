@@ -69,6 +69,28 @@
   with_items: '{{ sip_proxy_modules }}'
   notify: restart freeswitch
 
+- name: Modify FreeSWITCH vars.xml
+  become: yes
+  xml:
+    path: /opt/freeswitch/conf/vars.xml
+    xpath: '{{ item.xpath }}'
+    attribute: '{{ item.attribute }}'
+    value: '{{ item.value }}'
+  with_items:
+    - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "external_sip_ip=")]', attribute: 'data', value: 'external_sip_ip={{ sip_proxy_stun | default("stun:stun.freeswitch.org") }}' }
+  notify: restart freeswitch
+
+- name: Modify FreeSWITCH external.xml
+  xml:
+    path: /opt/freeswitch/conf/sip_profiles/external.xml
+    xpath: '{{ item.xpath }}'
+    attribute: '{{ item.attribute }}'
+    value: '{{ item.value }}'
+  with_items:
+    - { xpath: '/profile/settings/param[@name="ext-sip-ip"]', attribute: 'value', value: '$${external_sip_ip}' }
+  become: yes
+  notify: restart freeswitch
+
 - include: ufw.yml
   when: common_ufw_enabled
   tags: [ufw,firewall]

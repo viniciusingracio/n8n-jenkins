@@ -1,0 +1,19 @@
+- name: Determine vars
+  set_fact:
+    music_path: '{{ mconf_live_sounds_hold_music }}'
+    music_basename: '{{ mconf_live_sounds_hold_music | basename }}'
+    music_basename_no_ext: '{{ (mconf_live_sounds_hold_music | basename | splitext)[0] }}'
+
+- name: Copy sound
+  become: true
+  copy:
+    src: '{{ music_path }}'
+    dest: /opt/freeswitch/share/freeswitch/sounds/{{ music_basename }}
+    owner: freeswitch
+    group: daemon
+
+- name: Create wav file
+  become: true
+  command: ffmpeg -y -i /opt/freeswitch/share/freeswitch/sounds/{{ music_basename }} /opt/freeswitch/share/freeswitch/sounds/{{ music_basename_no_ext }}.wav
+  args:
+    creates: /opt/freeswitch/share/freeswitch/sounds/{{ music_basename_no_ext }}.wav

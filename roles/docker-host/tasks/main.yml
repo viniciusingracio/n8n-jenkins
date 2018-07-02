@@ -20,12 +20,19 @@
     name: docker-ce
     state: present
 
-# Need pip and docker-py to manage this docker instance with ansible
-# pip is now installed on setup.yml
-- name: Install docker-py
+# https://github.com/ansible/ansible/issues/42162
+- name: Remove docker-py
   become: true
   pip:
     name: docker-py
+    state: absent
+
+# Need pip and docker to manage this docker instance with ansible
+# pip is now installed on setup.yml
+- name: Install docker
+  become: true
+  pip:
+    name: docker
     state: present
 
 - name: Add user to docker group

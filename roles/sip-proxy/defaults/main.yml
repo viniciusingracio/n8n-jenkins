@@ -10,3 +10,5 @@ sip_proxy_directory_dir: /opt/freeswitch/etc/freeswitch/directory
 sip_proxy_scripts_dir: /opt/freeswitch/share/freeswitch/scripts
 sip_proxy_modules:
   - mod_v8
+
+sip_proxy_stun:

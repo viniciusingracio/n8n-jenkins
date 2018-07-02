@@ -117,7 +117,6 @@ bigbluebutton_sounds_profile:
   - { name: 'alone-sound', value: 'silence' }
   - { name: 'moh-sound', value: 'silence' }
   - { name: 'comfort-noise', value: 'true' }
-mconf_live_sounds_hold_music: local_stream://moh
 
 bigbluebutton_freeswitch_udp_range_begin: 16384
 bigbluebutton_freeswitch_udp_range_end: 32767

@@ -45,3 +45,12 @@
     insert_if_missing: true
   with_items: '{{ bigbluebutton_html5_config }}'
   notify: restart bbb-html5
+
+- name: Set default guest policy on bigbluebutton.properties
+  become: yes
+  replace:
+    path: /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties
+    regexp: '^defaultGuestPolicy=.*'
+    replace: 'defaultGuestPolicy=ALWAYS_ACCEPT'
+    encoding: '{{ properties_charset }}'
+  notify: restart bigbluebutton

@@ -38,3 +38,10 @@ bigbluebutton_html5_udp_range_begin: 7000
 bigbluebutton_html5_udp_range_end: 7999
 bigbluebutton_sip_udp_range_begin: 8000
 bigbluebutton_sip_udp_range_end: 8999
+
+bigbluebutton_sounds_profile:
+  - { name: 'muted-sound', value: 'conference/conf-muted.wav' }
+  - { name: 'unmuted-sound', value: 'conference/conf-unmuted.wav' }
+  - { name: 'alone-sound', value: 'conference/conf-alone.wav' }
+  - { name: 'moh-sound', value: '$${hold_music}' }
+  - { name: 'comfort-noise', value: 'false' }

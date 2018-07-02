@@ -113,6 +113,7 @@ function redirectCall(meeting) {
 		session.execute("redirect", "sip:" + dest_uri);
 	} else {
 		console_log("INFO", "[MCONF-SIP-PROXY] Bridging call to " + dest_uri + "\n");
+		session.setVariable('bypass_media', 'true');
 		session.execute("bridge", "sofia/external/" + dest_uri);
 	}
 }
