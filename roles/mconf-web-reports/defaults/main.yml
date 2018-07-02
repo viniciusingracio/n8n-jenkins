@@ -17,3 +17,6 @@ mconf_web_reports_config_file: "envs/{{ env }}/files/mconf-web-reports/config.ym
 
 # Where the reports will be saved to in the host
 mconf_web_reports_output_dir: /var/www/mconf-web/shared/private
+
+# Log file for the output of cron
+mconf_web_reports_cron_log_file: /var/log/mconf-web-reports.log
