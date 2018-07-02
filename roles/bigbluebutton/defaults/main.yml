@@ -10,8 +10,11 @@ bigbluebutton_apt_package: bigbluebutton
 
 # Install HTML5 client
 bigbluebutton_html5: false
+bigbluebutton_html5_only: false
 # Install Mconf MCS-SIP
 bigbluebutton_sip: false
+# TODO lock 5060 to only specific sources
+bigbluebutton_sip_sources: []
 
 # Setup Chrome extensions for WebRTC Desktop Sharing
 bigbluebutton_screenshare_extension_url: https://chrome.google.com/webstore/detail/bigbluebutton-screenshare/fdebcjabckbgfelopckfkhjldbbkoofj
@@ -128,3 +131,7 @@ bigbluebutton_sip_udp_range_end: 65535
 # these attributes are optional and will be set to default values if empty
 bigbluebutton_playback_host:
 bigbluebutton_playback_protocol:
+
+bigbluebutton_retention_runtime: 5
+bigbluebutton_retention_unrecorded: 14
+bigbluebutton_retention_published_raw:

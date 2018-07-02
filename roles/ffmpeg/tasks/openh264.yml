@@ -1,3 +1,11 @@
+- name: Install openh264 dependencies
+  become: yes
+  apt:
+    name: '{{ item }}'
+    state: present
+  with_items:
+    - nasm
+
 - name: Check if libopenh264 exists
   stat:
     path: /usr/lib/x86_64-linux-gnu/libopenh264.so.0

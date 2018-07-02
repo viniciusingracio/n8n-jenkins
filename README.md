@@ -21,12 +21,23 @@ ansible-playbook -l 10.0.3.105 setup.yml --ask-pass --ask-sudo-pass --extra-vars
 
 # digital ocean, all 'rec-proxy' servers
 ansible-playbook -i envs/dev -l rec-proxy setup.yml --extra-vars "ansible_user=root"
+
+# with certbot
+SSL_CERT_FILE=files/lets-encrypt-x3-cross-signed.pem ansible-playbook ...
 ```
 
 Then, to provision and deploy an application, use `provision.yml`. Examples:
 
 ```bash
 ansible-playbook -i envs/dev -l rec-proxy provision.yml
+```
+
+### Ad-hoc commands
+
+If you just want to run a command on a set of hosts, use:
+
+```bash
+ansible all -v -i envs/rnp/h/hosts -l mconf-recw -m command --become -a "apt-get -y upgrade"
 ```
 
 ### Other playbooks
@@ -96,7 +107,7 @@ user=mconf
     dest: ~/src/rec-proxy
     ```
 * To run a single command (e.g. uptime) in all servers: `ansible all -i envs/dev -m command -a "uptime" -u mconf --extra-vars "ansible_python_interpreter=/usr/bin/python3"`
-
+* To create a new role directory structure: `ansible-galaxy init sip-proxy --init-path=roles/`
 ### Notes
 
 #### Ubuntu 16.04

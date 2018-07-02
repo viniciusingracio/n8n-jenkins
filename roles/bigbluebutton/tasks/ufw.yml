@@ -19,6 +19,7 @@
     - restart ufw
   when: bigbluebutton_sip
 
+# TODO configure zabbix source
 - name: Configure ufw rules for Zabbix
   become: true
   ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
@@ -28,6 +29,7 @@
     - restart ufw
   when: zabbix_agent_enabled
 
+# TODO make interface configurable
 - name: Configure ufw rules for redis on BigBlueButton
   become: true
   ufw: rule=allow port=6379 proto=tcp direction=in interface=docker0

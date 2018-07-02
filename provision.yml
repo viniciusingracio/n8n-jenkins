@@ -52,7 +52,6 @@
   roles:
   - { role: certbot, when: certbot_enabled }
   - { role: dj-wasabi.zabbix-agent, when: zabbix_agent_enabled }
-  - { role: GTI.basic.security, when: inventory_hostname is search(".*\.rnp\.br"), become: yes }
   - mconf-live
 
 - hosts: bigbluebutton-dev
@@ -128,7 +127,6 @@
   roles:
   - { role: certbot, when: certbot_enabled }
   - { role: dj-wasabi.zabbix-agent, when: zabbix_agent_enabled }
-  - { role: GTI.basic.security, when: inventory_hostname is search(".*\.rnp\.br"), become: yes }
   - mconf-rec
 
 - hosts: aws-publisher
@@ -139,5 +137,8 @@
   roles:
   - { role: certbot, when: certbot_enabled }
   - { role: dj-wasabi.zabbix-agent, when: zabbix_agent_enabled }
-  - { role: GTI.basic.security, when: inventory_hostname is search(".*\.rnp\.br"), become: yes }
   - coturn
+
+- hosts: sip-proxy
+  roles:
+  - sip-proxy

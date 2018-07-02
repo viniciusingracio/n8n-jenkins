@@ -3,4 +3,5 @@
 dependencies:
   - jpnewman.json
   - kwoodson.yedit
+  - ffmpeg
   - role: handlers

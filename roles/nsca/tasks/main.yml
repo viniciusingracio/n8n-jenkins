@@ -17,15 +17,13 @@
     build_nsca: reg_nsca_version is failed or reg_nsca_version.stdout != '{{ nsca_version }}'
     src_dir: /usr/local/src/nsca-{{ nsca_version }}
 
-- get_url:
-    url: '{{ nsca_url }}'
-    dest: /usr/local/src
-    remote_src: True
-    checksum: 'sha256:{{ nsca_checksum }}'
+- name: Fetch nsca from repository
   become: yes
+  command: wget {{ nsca_url }} -O /usr/local/src/nsca-{{ nsca_version }}.tar.gz
   when: build_nsca
 
-- unarchive:
+- name: Extract nsca
+  unarchive:
     src: /usr/local/src/nsca-{{ nsca_version }}.tar.gz
     dest: /usr/local/src
     remote_src: True

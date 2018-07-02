@@ -232,6 +232,14 @@
   command: bbb-conf --setip '{{ inventory_hostname }}'
   when: setip_needed
 
+# TODO move this to a new role/task
+- name: Install dependency for yedit library
+  become: true
+  pip:
+    name: ruamel.yaml
+    version: 0.15.37
+    state: present
+
 - name: Adjust bigbluebutton.yml
   become: yes
   yedit:
@@ -309,13 +317,6 @@
   become: yes
   notify: reload nginx
 
-- name: Install dependency for yedit library
-  become: true
-  pip:
-    name: ruamel.yaml
-    version: 0.15.37
-    state: present
-
 - name: Update bbb-webrtc-sfu config
   yedit:
     src: /usr/local/bigbluebutton/bbb-webrtc-sfu/config/default.yml
@@ -362,6 +363,23 @@
   when: not bigbluebutton_default_presentation is none
   become: yes
 
+- name: Configure retention
+  become: true
+  lineinfile:
+    dest: /etc/cron.daily/bigbluebutton
+    state: present
+    regexp: '{{ item.regexp }}'
+    line: '{{ item.line }}'
+  with_items:
+  - { regexp: '^history=', line: 'history={{ bigbluebutton_retention_runtime | default(5) }}' }
+  - { regexp: '^unrecorded_days=', line: 'unrecorded_days={{ bigbluebutton_retention_unrecorded | default(14) }}' }
+  - { regexp: '^published_days=', line: 'published_days={{ bigbluebutton_retention_published_raw | default(14) }}' }
+  - { regexp: '^[#]?remove_raw_of_recordings_without_marks$', line: 'remove_raw_of_recordings_without_marks', when: '{{ not bigbluebutton_retention_unrecorded is undefined }}' }
+  - { regexp: '^[#]?remove_raw_of_recordings_without_marks$', line: '#remove_raw_of_recordings_without_marks', when: '{{ bigbluebutton_retention_unrecorded is undefined }}' }
+  - { regexp: '^[#]?remove_raw_of_published_recordings$', line: 'remove_raw_of_published_recordings', when: '{{ not bigbluebutton_retention_published_raw is undefined }}' }
+  - { regexp: '^[#]?remove_raw_of_published_recordings$', line: '#remove_raw_of_published_recordings', when: '{{ bigbluebutton_retention_published_raw is undefined }}' }
+  when: item.when is undefined or item.when == true
+
 - include: stun.yml
 
 - include: freeswitch.yml
@@ -373,13 +391,6 @@
 
 - include: sip.yml
   when: bigbluebutton_sip
-
-- name: Enable kurento service
-  become: true
-  service:
-    name: kurento-media-server
-    state: started
-    enabled: yes
 
 - include: branding.yml
   tags:

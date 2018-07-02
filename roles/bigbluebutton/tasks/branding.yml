@@ -43,14 +43,6 @@
   become: yes
   when: not bigbluebutton_branding_logo_playback is none
 
-- name: Customize HTML5 Client title
-  replace:
-    path: /usr/share/meteor/bundle/programs/web.browser/head.html
-    regexp: '(<title>)[^<]*'
-    replace: '\1Mconf'
-  become: yes
-  when: bigbluebutton_html5
-
 - name: Customize error message on playback
   replace:
     path: /var/bigbluebutton/playback/presentation/0.9.0/lib/writing.js
@@ -120,6 +112,8 @@
     - { regexp: '^(defaultWelcomeMessage)=.*', replace: '\1={{ bigbluebutton_branding_welcome }}' }
     - { regexp: '^(defaultWelcomeMessageFooter)=.*', replace: '\1={{ bigbluebutton_branding_welcome_footer }}' }
     - { regexp: '^(defaultClientUrl)=.*', replace: '\1=${bigbluebutton.web.serverURL}/client/Mconf-Live.html' }
+    - { regexp: '^(attendeesJoinViaHTML5Client)=.*', replace: '\1={{ bigbluebutton_html5_only }}' }
+    - { regexp: '^(moderatorsJoinViaHTML5Client)=.*', replace: '\1={{ bigbluebutton_html5_only }}' }
   when: not item.replace is none
   become: yes
   notify: restart bigbluebutton
@@ -130,3 +124,8 @@
     regexp: '"BigBlueButton - " \+ title'
     replace: 'title'
   become: yes
+
+- name: Update locale on the HTML5 client
+  become: yes
+  command: 'find /usr/share/meteor/bundle/programs/server/assets/app/locales/ -name "*.json" -exec sed -i "s|BigBlueButton|Mconf|g" {} \;'
+  when: bigbluebutton_html5

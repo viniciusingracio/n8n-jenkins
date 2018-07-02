@@ -1,3 +1,4 @@
 - hosts: all
   roles:
   - common
+  - { role: GTI.basic.security, when: inventory_hostname is search(".*\.rnp\.br"), become: yes }

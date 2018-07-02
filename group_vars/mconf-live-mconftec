@@ -12,6 +12,7 @@ bigbluebutton_config_xml:
   - { xpath: '/config/branding', attribute: 'toolbarColor', value: '{{ bigbluebutton_branding_toolbar_color }}' }
   - { xpath: '/config/branding', attribute: 'toolbarColorAlphas', value: '{{ bigbluebutton_branding_toolbar_color_alphas }}' }
   - { xpath: '/config/help', attribute: 'url', value: 'https://mconf.com' }
+  - { xpath: '/config/layout', attribute: 'showNetworkMonitor', value: 'false' }
   - { xpath: '//module[@name="PhoneModule"]', attribute: 'showWebRTCStats', value: 'true' }
   - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeExtensionLink', value: '{{ bigbluebutton_screenshare_extension_url }}' }
   - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeExtensionKey', value: '{{ bigbluebutton_screenshare_extension_key }}' }
@@ -26,6 +27,7 @@ bigbluebutton_html5_config:
   - { path: '/public/kurento/enableVideo', value: true }
   - { path: '/public/kurento/enableVideoStats', value: true }
   - { path: '/public/app/appName', value: 'Mconf' }
+  - { path: '/public/app/clientTitle', value: 'Mconf' }
   - { path: '/public/app/copyright', value: '{{ bigbluebutton_branding_copyright_html5 }}' }
 
 bigbluebutton_stun_server:
