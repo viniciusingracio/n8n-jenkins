@@ -8,9 +8,3 @@ bigbluebutton_branding_playback_loading: Carregando...
 bigbluebutton_sounds_name_version:
   - { name: 'freeswitch-sounds-pt-BR-karina', version: '1.0.51' }
 bigbluebutton_sounds_prefix: $${sounds_dir}/pt/BR/karina
-bigbluebutton_sounds_profile:
-  - { name: 'muted-sound', value: 'silence' }
-  - { name: 'unmuted-sound', value: 'silence' }
-  - { name: 'alone-sound', value: 'conference/conf-alone.wav' }
-  - { name: 'moh-sound', value: 'silence' }
-  - { name: 'comfort-noise', value: 'false' }

@@ -3,6 +3,13 @@
     music_path: '{{ mconf_live_sounds_hold_music }}'
     music_basename: '{{ mconf_live_sounds_hold_music | basename }}'
     music_basename_no_ext: '{{ (mconf_live_sounds_hold_music | basename | splitext)[0] }}'
+    hold_music: '/opt/freeswitch/share/freeswitch/sounds/{{ (mconf_live_sounds_hold_music | basename | splitext)[0] }}.wav'
+  when: not mconf_live_sounds_hold_music is none
+
+- name: Determine vars
+  set_fact:
+    hold_music: 'silence'
+  when: mconf_live_sounds_hold_music is none
 
 - name: Copy sound
   become: true
@@ -11,9 +18,22 @@
     dest: /opt/freeswitch/share/freeswitch/sounds/{{ music_basename }}
     owner: freeswitch
     group: daemon
+  when: not mconf_live_sounds_hold_music is none
 
 - name: Create wav file
   become: true
   command: ffmpeg -y -i /opt/freeswitch/share/freeswitch/sounds/{{ music_basename }} /opt/freeswitch/share/freeswitch/sounds/{{ music_basename_no_ext }}.wav
   args:
     creates: /opt/freeswitch/share/freeswitch/sounds/{{ music_basename_no_ext }}.wav
+  when: not mconf_live_sounds_hold_music is none
+
+- name: Modify FreeSWITCH vars.xml
+  xml:
+    path: /opt/freeswitch/conf/vars.xml
+    xpath: '{{ item.xpath }}'
+    attribute: '{{ item.attribute }}'
+    value: '{{ item.value }}'
+  with_items:
+    - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "hold_music=")]', attribute: 'data', value: 'hold_music={{ hold_music }}' }
+  become: yes
+  notify: restart bigbluebutton

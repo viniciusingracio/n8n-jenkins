@@ -12,6 +12,5 @@
 - include: rec-proxy.yml
 
 - include: hold-music.yml
-  when: not mconf_live_sounds_hold_music is none
 
 - include: rap.yml
