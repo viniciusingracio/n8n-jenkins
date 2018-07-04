@@ -45,6 +45,15 @@
   notify:
     - restart ufw
 
+- name: Configure custom rules
+  become: true
+  ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
+  with_items:
+    - "{{ common_ufw_rules }}"
+  when: common_ufw_rules is defined
+  notify:
+    - restart ufw
+
 - name: Enable ufw
   become: true
   ufw: state=enabled
