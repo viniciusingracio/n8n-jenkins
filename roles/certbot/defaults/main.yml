@@ -3,9 +3,12 @@
 # Domain get a certificate to
 certbot_domain: '{{ inventory_hostname }}'
 
+# Path to use to serve the files for the webroot verification
+certbot_webroot_path: '/var/www'
+
 # Certbot commands
 certbot_base_cmd: 'certonly --non-interactive --register-unsafely-without-email --agree-tos --expand --domain {{ certbot_domain }}'
-certbot_webroot_cmd: '{{ certbot_base_cmd }} --webroot -w /var/www'
+certbot_webroot_cmd: '{{ certbot_base_cmd }} --webroot -w {{ certbot_webroot_path }}'
 certbot_standalone_cmd: '{{ certbot_base_cmd }} --standalone --preferred-challenges http'
 
 # So other roles can pick up on this to point to certificates

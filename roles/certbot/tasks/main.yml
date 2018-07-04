@@ -52,7 +52,7 @@
     image: certbot/certbot
     command: '{{ certbot_webroot_cmd }}'
     volumes:
-      - /var/www:/var/www # webroot
+      - "{{ certbot_webroot_path }}:{{ certbot_webroot_path }}" # webroot
       - /etc/letsencrypt:/etc/letsencrypt
       - /var/log/letsencrypt:/var/log/letsencrypt
     # auto_remove: true # on ansible 2.4
