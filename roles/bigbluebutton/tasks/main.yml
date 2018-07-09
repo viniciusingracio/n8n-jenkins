@@ -132,7 +132,7 @@
            listen 443 ssl;
            listen [::]:443 ssl;
            ssl_certificate {{ bigbluebutton_ssl_certificate }};
-           ssl_certificate_key {{ bigbluebutton_ssl_certificate_key}};
+           ssl_certificate_key {{ bigbluebutton_ssl_certificate_key }};
            ssl_session_cache shared:SSL:10m;
            ssl_session_timeout 10m;
            # need TLSv1 for the Java calls for the API, otherwise it would be removed

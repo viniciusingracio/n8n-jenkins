@@ -1,2 +1,25 @@
 ---
 env: dev
+
+bigbluebutton_demos: true
+
+bigbluebutton_branding_logo_client: 'envs/{{ env }}/files/logo_client.png'
+bigbluebutton_branding_logo_playback: 'envs/{{ env }}/files/logo_playback.png'
+bigbluebutton_branding_welcome: '<br>Bem-vindo à sala <b>%%CONFNAME%%</b>!<br><br>A partir de um dispositivo SIP, disque <u>sip:%%CONFNUM%%@{{ inventory_hostname }}</u>.<br><br>Para uma melhor experiência, utilize um headset e, sempre que possível, prefira rede cabeada.<br>'
+bigbluebutton_branding_layout: envs/{{ env }}/files/layout.xml
+bigbluebutton_screenshare_extension_url: https://chrome.google.com/webstore/detail/mconf-screenshare/mbfngdphjegmlbfobcblikeefpidfncb
+bigbluebutton_screenshare_extension_key: mbfngdphjegmlbfobcblikeefpidfncb
+
+certbot_domain: '{{ inventory_hostname }}'
+certbot_webroot_cmd: '{{ certbot_base_cmd }} --webroot -w /var/www/bigbluebutton-default/'
+bigbluebutton_ssl_certificate: '{% if certbot_enabled %}{{ certbot_cert_path}}/fullchain.pem{% else %}/etc/nginx/ssl/{{ inventory_hostname }}.crt{% endif %}'
+bigbluebutton_ssl_certificate_key: '{% if certbot_enabled %}{{ certbot_cert_path}}/privkey.pem{% else %}/etc/nginx/ssl/{{ inventory_hostname }}.key{% endif %}'
+bigbluebutton_local_ssl_certificate: '{% if not certbot_enabled %}envs/{{ env }}/files/{{ inventory_hostname }}.crt{% endif %}'
+bigbluebutton_local_ssl_certificate_key: '{% if not certbot_enabled %}envs/{{ env }}/files/{{ inventory_hostname }}.key{% endif %}'
+
+public_keys:
+  - public_keys/daronco.pub
+  - public_keys/fcecagno.pub
+  - public_keys/prlanzarin_cei.pub
+  - public_keys/prlanzarin_note.pub
+  - public_keys/pedrobmarin.pub

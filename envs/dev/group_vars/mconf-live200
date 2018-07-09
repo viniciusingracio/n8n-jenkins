@@ -3,5 +3,7 @@
 bigbluebutton_html5: true
 bigbluebutton_sip: false
 
-bigbluebutton_screenshare_extension_url: https://chrome.google.com/webstore/detail/kurento-screenshare-test/mbfngdphjegmlbfobcblikeefpidfncb
-bigbluebutton_screenshare_extension_key: mbfngdphjegmlbfobcblikeefpidfncb
+bigbluebutton_default_presentation: envs/{{ env }}/files/default_16x9.pdf
+
+mconf_live_enabled_recording_formats:
+  - presentation

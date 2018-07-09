@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<layouts>
+  <layout name="Webconferência" default="true">
+    <window name="ChatWindow" minimized="false" maximized="false" hidden="false" width="0.2875" height="0.5163120567375886" minWidth="-1" x="0.7125" y="0.4836879432624113" order="1"/>
+    <window name="VideoDock" minimized="false" maximized="false" hidden="false" width="0.2875" height="0.4794326241134752" minWidth="-1" x="0.7125" y="0" order="3"/>
+    <window name="UsersWindow" minimized="false" maximized="false" hidden="false" width="0.19444444444444445" height="0.5645390070921986" minWidth="-1" x="0" y="0" order="0"/>
+    <window name="PresentationWindow" minimized="false" maximized="false" hidden="false" width="0.5152777777777777" height="0.9985815602836879" minWidth="-1" x="0.19583333333333333" y="0" order="2"/>
+    <window name="SharedNotesWindow" minimized="false" maximized="false" hidden="false" width="0.19444444444444445" height="0.43120567375886526" minWidth="-1" x="0" y="0.5673758865248227" order="5"/>
+    <window name="CaptionWindow" minimized="false" maximized="false" hidden="true" width="0.2875" height="0.5163120567375886" minWidth="-1" x="0.7125" y="0.4836879432624113" order="1"/>
+  </layout>
+  <layout name="bbb.layout.name.videochat">
+    <window name="ChatWindow" minimized="false" maximized="false" hidden="true" width="0.2875" height="0.5163120567375886" minWidth="-1" x="0.7125" y="0.4836879432624113" order="1"/>
+    <window name="VideoDock" minimized="false" maximized="false" hidden="false" width="1.0" height="1.0" minWidth="-1" x="0" y="0" order="0"/>
+    <window name="UsersWindow" minimized="false" maximized="false" hidden="true" width="0.19444444444444445" height="0.5645390070921986" minWidth="-1" x="0" y="0" order="0"/>
+    <window name="PresentationWindow" minimized="false" maximized="false" hidden="true" width="0.5152777777777777" height="0.9985815602836879" minWidth="-1" x="0.19583333333333333" y="0" order="2"/>
+    <window name="SharedNotesWindow" minimized="false" maximized="false" hidden="true" width="0.19444444444444445" height="0.43120567375886526" minWidth="-1" x="0" y="0.5673758865248227" order="5"/>
+    <window name="CaptionWindow" minimized="false" maximized="false" hidden="true" width="0.2875" height="0.5163120567375886" minWidth="-1" x="0.7125" y="0.4836879432624113" order="1"/>
+  </layout>
+  <layout name="Reunião">
+    <window name="ChatWindow" minimized="false" maximized="false" hidden="true" width="0.2875" height="0.5163120567375886" minWidth="-1" x="0.7125" y="0.4836879432624113" order="1"/>
+    <window name="VideoDock" minimized="false" maximized="false" hidden="false" width="0.6604166666666667" height="1.0" minWidth="-1" x="0" y="0" order="0"/>
+    <window name="UsersWindow" minimized="false" maximized="false" hidden="true" width="0.19444444444444445" height="0.5645390070921986" minWidth="-1" x="0" y="0" order="0"/>
+    <window name="PresentationWindow" minimized="false" maximized="false" hidden="false" width="0.33819444444444446" height="0.625531914893617" minWidth="-1" x="0.6618055555555555" y="0.37446808510638296" order="1"/>
+    <window name="SharedNotesWindow" minimized="false" maximized="false" hidden="false" width="0.33819444444444446" height="0.37163120567375885" minWidth="-1" x="0.6618055555555555" y="0" order="2"/>
+    <window name="CaptionWindow" minimized="false" maximized="false" hidden="true" width="0.2875" height="0.5163120567375886" minWidth="-1" x="0.7125" y="0.4836879432624113" order="1"/>
+  </layout>
+  <layout name="Webinar">
+    <window name="ChatWindow" minimized="false" maximized="false" hidden="false" width="0.33819444444444446" height="0.43829787234042555" minWidth="-1" x="0.6618055555555555" y="0" order="0"/>
+    <window name="VideoDock" minimized="false" maximized="false" hidden="false" width="0.33819444444444446" height="0.5588652482269504" minWidth="-1" x="0.6618055555555555" y="0.44113475177304967" order="1"/>
+    <window name="UsersWindow" minimized="false" maximized="false" hidden="true" width="0.19444444444444445" height="0.5645390070921986" minWidth="-1" x="0" y="0" order="3"/>
+    <window name="PresentationWindow" minimized="false" maximized="false" hidden="false" width="0.6604166666666667" height="1" minWidth="-1" x="0" y="0" order="2"/>
+    <window name="SharedNotesWindow" minimized="false" maximized="false" hidden="true" width="0.19444444444444445" height="0.43120567375886526" minWidth="-1" x="0" y="0.5673758865248227" order="5"/>
+    <window name="CaptionWindow" minimized="false" maximized="false" hidden="true" width="0.28680555555555554" height="0.5163120567375886" minWidth="-1" x="0.7125" y="0.4836879432624113" order="4"/>
+  </layout>
+  <layout name="Webinar com legendas">
+    <window name="UsersWindow" minimized="false" maximized="false" hidden="true" width="0.19444444444444445" height="0.5645390070921986" minWidth="-1" x="0" y="0" order="4"/>
+    <window name="ChatWindow" minimized="false" maximized="false" hidden="false" width="0.20902777777777778" height="0.7134751773049646" minWidth="-1" x="0.7909722222222222" y="0" order="1"/>
+    <window name="PresentationWindow" minimized="false" maximized="false" hidden="false" width="0.5763888888888888" height="1" minWidth="-1" x="0" y="0" order="0"/>
+    <window name="VideoDock" minimized="false" maximized="false" hidden="false" width="0.21180555555555555" height="0.7134751773049646" minWidth="-1" x="0.5777777777777777" y="0" order="2"/>
+    <window name="CaptionWindow" minimized="false" maximized="false" hidden="false" width="0.4222222222222222" height="0.28368794326241137" minWidth="-1" x="0.5777777777777777" y="0.7163120567375887" order="3"/>
+    <window name="SharedNotesWindow" minimized="false" maximized="false" hidden="true" width="0.19444444444444445" height="0.43120567375886526" minWidth="-1" x="0" y="0.5673758865248227" order="5"/>
+  </layout>
+  <layout name="Apresentação">
+    <window name="ChatWindow" minimized="false" maximized="false" hidden="true" width="0.2875" height="0.5163120567375886" minWidth="-1" x="0.7125" y="0.4836879432624113" order="1"/>
+    <window name="VideoDock" minimized="false" maximized="false" hidden="true" width="0.2875" height="0.4794326241134752" minWidth="-1" x="0.7125" y="0" order="3"/>
+    <window name="UsersWindow" minimized="false" maximized="false" hidden="true" width="0.19444444444444445" height="0.5645390070921986" minWidth="-1" x="0" y="0" order="0"/>
+    <window name="PresentationWindow" minimized="false" maximized="false" hidden="false" width="1.0" height="1.0" minWidth="-1" x="0" y="0" order="0"/>
+    <window name="SharedNotesWindow" minimized="false" maximized="false" hidden="true" width="0.19444444444444445" height="0.43120567375886526" minWidth="-1" x="0" y="0.5673758865248227" order="5"/>
+    <window name="CaptionWindow" minimized="false" maximized="false" hidden="true" width="0.2875" height="0.5163120567375886" minWidth="-1" x="0.7125" y="0.4836879432624113" order="1"/>
+  </layout>
+</layouts>

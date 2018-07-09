@@ -21,11 +21,24 @@ kurento-desktopsharing.mconf.com ansible_user=root deploy_user=root
 196.168.0.198
 
 [mconf-live110]
-dev.mconf.local
-# setup with on lxc with:
-# ansible-playbook -v -i envs/dev -l dev.mconf.local setup.yml --extra-vars "ansible_user=ubuntu"
-# provision with:
-# ansible-playbook -v -i envs/dev -l dev.mconf.local provision.yml
+dev.mconf.local ansible_user=ubuntu
 
 [bigbluebutton-dev]
-dev.mconf.local
+dev.mconf.local ansible_user=ubuntu
+test-live110.mconf.com common_ufw_enabled=false
+
+[docker-host]
+felipe-docker.mconf.com
+
+[mconf-live200]
+eduardo.dev.mconf.com certbot_enabled=true
+
+[mconf-live-pt:children]
+mconf-live110
+mconf-live200
+
+[mconf-live-mconftec-pt:children]
+mconf-live-pt
+
+[mconf-live-mconftec:children]
+mconf-live-mconftec-pt

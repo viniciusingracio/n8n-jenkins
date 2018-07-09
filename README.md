@@ -38,6 +38,9 @@ If you just want to run a command on a set of hosts, use:
 
 ```bash
 ansible all -v -i envs/rnp/h/hosts -l mconf-recw -m command --become -a "apt-get -y upgrade"
+
+# restart BigBlueButton application
+ansible all -v -i envs/prod/com/hosts -l mconf-live110 --extra-vars "ansible_user=mconf" --become -m raw -a 'bbb-conf --restart || true'
 ```
 
 ### Other playbooks
@@ -108,6 +111,7 @@ user=mconf
     ```
 * To run a single command (e.g. uptime) in all servers: `ansible all -i envs/dev -m command -a "uptime" -u mconf --extra-vars "ansible_python_interpreter=/usr/bin/python3"`
 * To create a new role directory structure: `ansible-galaxy init sip-proxy --init-path=roles/`
+
 ### Notes
 
 #### Ubuntu 16.04
