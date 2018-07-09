@@ -1,0 +1,6 @@
+---
+
+- hosts: mconf-lb
+  roles:
+  - { role: certbot, when: certbot_enabled }
+  - mconf-lb

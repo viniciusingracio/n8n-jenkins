@@ -6,18 +6,9 @@
   become: true
   cron:
     name: update reports
-    minute: 5
+    minute: "{{ mconf_web_reports_cron_schedule_minute }}"
+    hour: "{{ mconf_web_reports_cron_schedule_hour }}"
+    day: "{{ mconf_web_reports_cron_schedule_day }}"
     user: root
-    job: "docker run --rm -v /root/mconf-web-reports-config.yml:/usr/src/app/config.yml -v /root/mconf-web-reports.env.local:/usr/src/app/.env.local -v {{ mconf_web_reports_output_dir }}:/usr/src/app/output -e SAVE_TO=/usr/src/app/output {{ mconf_web_reports_image }}:{{ mconf_web_reports_image_version }}"
+    job: "docker run --rm -v /root/mconf-web-reports-config.yml:/usr/src/app/config.yml -v /root/mconf-web-reports.env.local:/usr/src/app/.env.local -v {{ mconf_web_reports_output_dir }}:/usr/src/app/output -e SAVE_TO=/usr/src/app/output {{ mconf_web_reports_image }}:{{ mconf_web_reports_image_version }} > {{ mconf_web_reports_cron_log_file }} 2>&1"
     cron_file: mconf-web-reports-run
-
-# - name: Run the container
-#   docker_container:
-#     name: mconf-web-reports
-#     image: '{{ mconf_web_reports_image }}:{{ mconf_web_reports_image_version }}'
-#     volumes:
-#       - '{{ mconf_web_reports_output_dir }}:/usr/src/app/output'
-#       - /root/mconf-web-reports.env.local:/usr/src/app/.env.local
-#       - /root/mconf-web-reports-config.yml:/usr/src/app/config.yml
-#     env:
-#       SAVE_TO: /usr/src/app/output

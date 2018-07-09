@@ -2,3 +2,10 @@
 
 # Enable (true) or disable IPv6 on ufw
 common_ufw_ipv6: true
+
+# Custom rules that can be set for hosts/roles
+common_ufw_rules: []
+# Example:
+# common_ufw_rules:
+#   - { rule: 'limit', port: 22, proto: 'tcp' }
+#   - { rule: 'allow', port: 443, proto: 'tcp' }
