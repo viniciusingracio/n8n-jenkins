@@ -1,10 +1,29 @@
-### Requirements
+### Getting started
 
-* Install ansible
-* Install sshpass (apt-get install sshpass)
-* For docker: `pip install 'docker-py>=1.7.0'`
-* Remote server needs python
-* Run: `ansible-galaxy install -r requirements.yml`
+* Install [ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#latest-releases-via-apt-ubuntu)
+```bash
+sudo apt-get update
+sudo apt-get install software-properties-common
+sudo apt-add-repository ppa:ansible/ansible
+sudo apt-get update
+sudo apt-get install ansible
+```
+* Install/upgrade python libraries
+```bash
+sudo apt-get install python-pip
+sudo pip install --upgrade pip pyopenssl docker
+```
+* Install ansible dependency roles
+```bash
+ansible-galaxy install -r requirements.yml
+```
+* Make sure the remote servers have python3 installed (default on Ubuntu 16.04.2)
+```bash
+python3 --version
+# Output: Python 3.5.2
+```
+* Copy `.docker-auth.example` to `.docker-auth` and set docker credentials
+* Connect to the server using SSH. If you need to provide a password to connection, make sure you pass `--ask-pass --ask-become-pass` when running `ansible-playbook setup.yml`. If you use an user different than `mconf`, make sure you pass `ansible_user=<USER>` when running `ansible-playbook setup.yml`.
 
 ### Run
 
@@ -14,10 +33,10 @@ On the first run, use `setup.yml`. Examples:
 
 ```bash
 # lxc, all 'rec-proxy' servers
-ansible-playbook -i envs/dev -l rec-proxy setup.yml --ask-pass --ask-sudo-pass --extra-vars "ansible_user=ubuntu common_ufw_ipv6=false"
+ansible-playbook -i envs/dev -l rec-proxy setup.yml --ask-pass --ask-become-pass --extra-vars "ansible_user=ubuntu common_ufw_ipv6=false"
 
 # lxc, a single server by IP
-ansible-playbook -l 10.0.3.105 setup.yml --ask-pass --ask-sudo-pass --extra-vars "ansible_user=ubuntu deploy_user=ubuntu"
+ansible-playbook -l 10.0.3.105 setup.yml --ask-pass --ask-become-pass --extra-vars "ansible_user=ubuntu deploy_user=ubuntu"
 
 # digital ocean, all 'rec-proxy' servers
 ansible-playbook -i envs/dev -l rec-proxy setup.yml --extra-vars "ansible_user=root"
@@ -61,7 +80,7 @@ Example:
 
 ```
 # set up the user
-ansible-playbook -i "10.0.3.186," playbooks/ufw.yml --ask-pass --ask-sudo-pass --extra-vars '{"ansible_user": "ubuntu", "common_ufw_ipv6": false, "ufw_rules": [{"rule": "allow", "port": 80, "proto": "tcp"}, {"rule": "reject", "port": 3000, "proto": "tcp"}]}'
+ansible-playbook -i "10.0.3.186," playbooks/ufw.yml --ask-pass --ask-become-pass --extra-vars '{"ansible_user": "ubuntu", "common_ufw_ipv6": false, "ufw_rules": [{"rule": "allow", "port": 80, "proto": "tcp"}, {"rule": "reject", "port": 3000, "proto": "tcp"}]}'
 ```
 
 #### authorize-rec-worker
@@ -100,7 +119,7 @@ user=mconf
 * List tasks and hosts only (don't actually run anything in the server): `ansible-playbook -i envs/dev -l rec-proxy --list-tasks --list-hosts`
 * Dry-run, check mode (don't actually run anything in the server): `ansible-playbook -i envs/dev -l rec-proxy --check`
 * To debug something, add a task like: `- debug: var=my_registered_var`
-* Run setup for a new local lxc server: `ansible-playbook -i '10.0.3.187,' setup.yml --extra-vars="ansible_user=ubuntu deploy_user=ubuntu" --ask-pass --ask-sudo`
+* Run setup for a new local lxc server: `ansible-playbook -i '10.0.3.187,' setup.yml --extra-vars="ansible_user=ubuntu deploy_user=ubuntu" --ask-pass --ask-become-pass`
 * Run just a set of commands (e.g. the firewall): `ansible-playbook -i envs/com/hosts setup.yml --tags ufw`
 * To copy files from a local repository to the server, use something like:
     ```

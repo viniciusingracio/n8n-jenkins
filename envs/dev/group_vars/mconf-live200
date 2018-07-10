@@ -1,6 +1,7 @@
 ---
 
 bigbluebutton_html5: true
+bigbluebutton_html5_only: true
 bigbluebutton_sip: false
 
 bigbluebutton_default_presentation: envs/{{ env }}/files/default_16x9.pdf

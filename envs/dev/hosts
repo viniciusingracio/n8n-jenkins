@@ -32,6 +32,7 @@ felipe-docker.mconf.com
 
 [mconf-live200]
 eduardo.dev.mconf.com certbot_enabled=true
+felipe.dev.mconf.com certbot_enabled=true
 
 [mconf-live-pt:children]
 mconf-live110
