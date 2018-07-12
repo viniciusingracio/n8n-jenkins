@@ -31,8 +31,9 @@ test-live110.mconf.com common_ufw_enabled=false
 felipe-docker.mconf.com
 
 [mconf-live200]
-eduardo.dev.mconf.com certbot_enabled=true
-felipe.dev.mconf.com certbot_enabled=true
+paulo.dev.mconf.com certbot_enabled=true zabbix_agent_enabled=true
+eduardo.dev.mconf.com certbot_enabled=true zabbix_agent_enabled=true
+felipe.dev.mconf.com certbot_enabled=true zabbix_agent_enabled=true
 
 [mconf-live-pt:children]
 mconf-live110

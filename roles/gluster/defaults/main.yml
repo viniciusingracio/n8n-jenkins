@@ -1,0 +1,12 @@
+---
+
+gluster_mount_point:
+gluster_volume_name: volume
+gluster_device:
+gluster_ip:
+
+gluster_ufw_rules:
+  - { rule: 'allow', port: 2049, proto: 'tcp' }          # glusterFS's NFS exports (nfsd process).
+  - { rule: 'allow', port: 24007, proto: 'tcp' }         # glusterd management
+  - { rule: 'allow', port: 24008, proto: 'tcp' }         # glusterd management
+  - { rule: 'allow', port: '49152:49153', proto: 'tcp' } # gluster bricks

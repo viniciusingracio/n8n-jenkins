@@ -142,3 +142,7 @@
 - hosts: sip-proxy
   roles:
   - sip-proxy
+
+- hosts: gluster
+  roles:
+  - gluster

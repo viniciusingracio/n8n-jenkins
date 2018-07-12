@@ -1,0 +1,171 @@
+---
+
+- name: Update apt (if older than 5m)
+  become: yes
+  apt: update_cache=yes cache_valid_time=300
+
+- name: Install gluster dependencies
+  become: yes
+  apt:
+    name: '{{ item }}'
+  with_items:
+    - python-software-properties
+    - software-properties-common
+    - xfsprogs
+
+- name: Add gluster ppa
+  become: yes
+  apt_repository:
+    repo: 'ppa:gluster/glusterfs-3.13'
+    state: present
+  register: aptrepos
+
+- name: Update apt if repo changed
+  become: yes
+  apt: update_cache=yes
+  when: aptrepos is changed
+
+- name: Install gluster
+  become: yes
+  apt:
+    name: glusterfs-server
+
+- fail:
+    msg: Still not doing auto discovery of unformatted devices, please set your unformatted device as gluster_device on the host
+  when: gluster_device is none
+
+- name: Read device information
+  become: yes
+  parted:
+    device: '{{ gluster_device }}'
+    unit: MiB
+  register: device_info
+
+- name: Determine if the device needs to be formatted
+  set_fact:
+    device_needed: '{{ device_info.partitions | length == 0 }}'
+    partition_number: 1
+
+- name: Create a new primary partition
+  become: yes
+  parted:
+    device: '{{ gluster_device }}'
+    number: '{{ partition_number }}'
+    state: present
+  when: device_needed
+
+- name: Check if it's LVM
+  shell: lsblk {{ gluster_device }}1 --raw -o NAME,TYPE --path | grep lvm | cut -d' ' -f1
+  register: reg_lvm
+
+- set_fact:
+    partition_path: '{{ gluster_device }}1'
+  when: reg_lvm | trim == ""
+- set_fact:
+    partition_path: '{{ reg_lvm.stdout }}'
+  when: reg_lvm | trim != ""
+
+- name: Create a xfs filesystem
+  become: yes
+  filesystem:
+    fstype: xfs
+    dev: '{{ partition_path }}'
+    opts: -i size=512
+    force: yes
+  when: device_needed
+
+- debug:
+    msg: 'New device is {{ gluster_device }}, new partition is {{ partition_path }}'
+  when: device_needed
+
+- name: Determine mount point
+  set_fact:
+    gluster_mount_point: '/mnt/{{ gluster_volume_name }}'
+  when: gluster_mount_point is none
+
+- name: Create directory
+  become: yes
+  file:
+    path: '{{ gluster_mount_point }}'
+    recurse: yes
+    state: directory
+
+- name: Mount new partition
+  become: yes
+  mount:
+    path: '{{ gluster_mount_point }}'
+    src: '{{ partition_path }}'
+    fstype: xfs
+    opts: defaults
+    state: mounted
+
+- name: Determine cluster
+  set_fact:
+    cluster: '{{ cluster | default([]) + [ hostvars[item].gluster_ip | default(hostvars[item].ansible_default_ipv4.address) ] | list }}'
+  with_items: '{{ groups["gluster"] }}'
+  when: hostvars[item].gluster_volume_name == gluster_volume_name
+
+- name: Set gluster_ip var in case it's undefined
+  set_fact:
+    gluster_ip: '{{ ansible_default_ipv4.address }}'
+  when: gluster_ip is none
+
+- name: Determine brick path and master
+  set_fact:
+    brick_path: '{{ gluster_mount_point }}/brick'
+    data_path: '{{ gluster_mount_point }}/data'
+    others_in_cluster: '{{ cluster | reject("equalto", gluster_ip) | list }}'
+    im_master: '{{ ( cluster | first ) == gluster_ip }}'
+
+- name: Create directories
+  become: yes
+  file:
+    path: '{{ item }}'
+    recurse: yes
+    state: directory
+  with_items:
+    - '{{ brick_path }}'
+    - '{{ data_path }}'
+
+- include: ufw.yml
+  when: common_ufw_enabled
+  tags: [ufw,firewall]
+
+- name: Probe slaves
+  become: yes
+  command: gluster peer probe {{ item }}
+  with_items: '{{ cluster }}'
+  when: im_master and item != gluster_ip
+
+- name: Create gluster volume
+  become: yes
+  gluster_volume:
+    name: '{{ gluster_volume_name }}'
+    bricks: '{{ brick_path }}'
+    replicas: '{{ cluster | length }}'
+    cluster: '{{ cluster }}'
+    state: present
+  run_once: true
+  when: im_master
+
+- name: Start gluster volume
+  become: yes
+  gluster_volume:
+    state: started
+    name: '{{ gluster_volume_name }}'
+  when: im_master
+
+- name: Enable stats
+  become: yes
+  command: gluster volume profile {{ gluster_volume_name }} start
+  ignore_errors: yes
+  when: im_master
+
+- name: Mount glusterfs
+  become: yes
+  mount:
+    path: '{{ data_path }}'
+    src: '{{ others_in_cluster | first }}:/{{ gluster_volume_name }}'
+    fstype: glusterfs
+    opts: defaults,_netdev,backupvolfile-server={{ gluster_ip }}
+    state: mounted

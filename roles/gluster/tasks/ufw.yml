@@ -1,0 +1,8 @@
+- name: Configure ufw
+  become: true
+  ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
+  with_items:
+    - "{{ gluster_ufw_rules }}"
+  when: gluster_ufw_rules is defined
+  notify:
+    - restart ufw
