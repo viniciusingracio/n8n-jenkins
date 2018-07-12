@@ -16,7 +16,6 @@ bigbluebutton_config_xml:
   - { xpath: '//module[@name="PhoneModule"]', attribute: 'showWebRTCStats', value: 'true' }
   - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeExtensionLink', value: '{{ bigbluebutton_screenshare_extension_url }}' }
   - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeExtensionKey', value: '{{ bigbluebutton_screenshare_extension_key }}' }
-  - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeWinHelpLink', value: 'https://www.technize.net/google-chrome-disable-hardware-acceleration' }
   - { xpath: '//module[@name="PhoneModule"]', attribute: 'enableOutboundCalls', value: 'true', run: '{{ bigbluebutton_sip }}' }
 
 bigbluebutton_html5_config:

@@ -16,7 +16,6 @@ bigbluebutton_config_xml:
   - { xpath: '//module[@name="PhoneModule"]', attribute: 'showWebRTCStats', value: 'true' }
   - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeExtensionLink', value: '{{ bigbluebutton_screenshare_extension_url }}' }
   - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeExtensionKey', value: '{{ bigbluebutton_screenshare_extension_key }}' }
-  - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeWinHelpLink', value: 'https://medium.com/mconf/compartilhando-a-tela-no-google-chrome-43b6478854c3' }
   - { xpath: '//module[@name="PhoneModule"]', attribute: 'enableOutboundCalls', value: 'true', run: '{{ bigbluebutton_sip }}' }
 
 bigbluebutton_html5_config:
@@ -26,9 +25,11 @@ bigbluebutton_html5_config:
   - { path: '/public/kurento/enableScreensharing', value: true }
   - { path: '/public/kurento/enableVideo', value: true }
   - { path: '/public/kurento/enableVideoStats', value: true }
+  - { path: '/public/kurento/enableListenOnly', value: true }
   - { path: '/public/app/appName', value: 'Mconf' }
   - { path: '/public/app/clientTitle', value: 'Mconf' }
   - { path: '/public/app/copyright', value: '{{ bigbluebutton_branding_copyright_html5 }}' }
+  - { path: '/public/app/defaultSettings/application/chatPushNotifications', value: true }
 
 bigbluebutton_stun_server:
   - stun:stun.l.google.com:19302
