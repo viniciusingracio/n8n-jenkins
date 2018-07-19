@@ -7,7 +7,6 @@
 - hosts: rec-proxy
   roles:
   - { role: certbot, when: certbot_enabled }
-  - { role: dj-wasabi.zabbix-agent, when: zabbix_agent_enabled }
   - rec-proxy
 - hosts: rec-proxy-self-signed
   roles:
@@ -51,7 +50,6 @@
   - mconf-live200
   roles:
   - { role: certbot, when: certbot_enabled }
-  - { role: dj-wasabi.zabbix-agent, when: zabbix_agent_enabled }
   - mconf-live
 
 - hosts: bigbluebutton-dev
@@ -114,7 +112,6 @@
 - hosts: mconf-lti
   roles:
   - { role: certbot, when: certbot_enabled }
-  - { role: dj-wasabi.zabbix-agent, when: zabbix_agent_enabled }
   - mconf-lti
 
 - hosts: docker-host
@@ -126,7 +123,6 @@
   - mconf-recw
   roles:
   - { role: certbot, when: certbot_enabled }
-  - { role: dj-wasabi.zabbix-agent, when: zabbix_agent_enabled }
   - mconf-rec
 
 - hosts: aws-publisher
@@ -136,7 +132,6 @@
 - hosts: coturn
   roles:
   - { role: certbot, when: certbot_enabled }
-  - { role: dj-wasabi.zabbix-agent, when: zabbix_agent_enabled }
   - coturn
 
 - hosts: sip-proxy
@@ -146,3 +141,7 @@
 - hosts: gluster
   roles:
   - gluster
+
+- hosts: zabbix-agent
+  roles:
+  - { role: dj-wasabi.zabbix-agent, tags: [ zabbix-agent ] }

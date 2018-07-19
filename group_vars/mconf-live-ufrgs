@@ -1,0 +1,44 @@
+---
+
+bigbluebutton_branding_welcome: '<br>Bem-vindo à sala <b>%%CONFNAME%%</b>!<br><br>A partir de um dispositivo SIP, disque <u>sip:%%CONFNUM%%@{{ inventory_hostname }}</u>.<br><br>Para uma melhor experiência, utilize um headset e, sempre que possível, prefira rede cabeada.<br>'
+bigbluebutton_branding_welcome_footer:
+bigbluebutton_branding_copyright: '&#169; 2018 Mconf &#183; Com apoio da <u><a href="https://mconf.com" target="_blank">Mconf Tecnologia</a></u>'
+bigbluebutton_branding_copyright_html5: '© 2018 Mconf'
+bigbluebutton_branding_toolbar_color: '#024b80'
+bigbluebutton_branding_toolbar_color_alphas: '0, 0'
+
+bigbluebutton_config_xml:
+  - { xpath: '/config/branding', attribute: 'logo', value: 'logo.png' }
+  - { xpath: '/config/branding', attribute: 'copyright', value: '{{ bigbluebutton_branding_copyright }}' }
+  - { xpath: '/config/branding', attribute: 'toolbarColor', value: '{{ bigbluebutton_branding_toolbar_color }}' }
+  - { xpath: '/config/branding', attribute: 'toolbarColorAlphas', value: '{{ bigbluebutton_branding_toolbar_color_alphas }}' }
+  - { xpath: '/config/help', attribute: 'url', value: 'https://www1.ufrgs.br/catalogoti/servicos/servico?servico=13' }
+  - { xpath: '/config/layout', attribute: 'showNetworkMonitor', value: 'false' }
+  - { xpath: '//module[@name="PhoneModule"]', attribute: 'showWebRTCStats', value: 'true' }
+  - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeExtensionLink', value: '{{ bigbluebutton_screenshare_extension_url }}' }
+  - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeExtensionKey', value: '{{ bigbluebutton_screenshare_extension_key }}' }
+  - { xpath: '//module[@name="PhoneModule"]', attribute: 'enableOutboundCalls', value: 'true', run: '{{ bigbluebutton_sip }}' }
+
+bigbluebutton_html5_config:
+  - { path: '/public/kurento/wsUrl', value: 'wss://{{ inventory_hostname }}/bbb-webrtc-sfu' }
+  - { path: '/public/kurento/chromeExtensionKey', value: '{{ bigbluebutton_screenshare_extension_key }}' }
+  - { path: '/public/kurento/chromeExtensionLink', value: '{{ bigbluebutton_screenshare_extension_url }}' }
+  - { path: '/public/kurento/enableScreensharing', value: true }
+  - { path: '/public/kurento/enableVideo', value: true }
+  - { path: '/public/kurento/enableVideoStats', value: true }
+  - { path: '/public/kurento/enableListenOnly', value: true }
+  - { path: '/public/app/appName', value: 'Mconf' }
+  - { path: '/public/app/clientTitle', value: 'Mconf' }
+  - { path: '/public/app/copyright', value: '{{ bigbluebutton_branding_copyright_html5 }}' }
+  - { path: '/public/app/defaultSettings/application/chatPushNotifications', value: true }
+
+bigbluebutton_stun_server:
+  - stun:stun.l.google.com:19302
+  - stun:stun1.mconf.com:3478
+
+bigbluebutton_sounds_profile:
+  - { name: 'muted-sound', value: 'silence' }
+  - { name: 'unmuted-sound', value: 'silence' }
+  - { name: 'alone-sound', value: 'conference/conf-alone.wav' }
+  - { name: 'moh-sound', value: 'silence' }
+  - { name: 'comfort-noise', value: 'false' }
