@@ -18,14 +18,14 @@ deploy_user: mconf
 mconf_registry_org: mconftec
 # mconf_registry_prefix: '{{mconf_registry_host}}/{{mconf_registry_org}}'
 
-# Disable certbot by default, enabled for specific roles/hosts
+# Disable a few things by default, enabled for specific roles/hosts
 certbot_enabled: false
+zabbix_agent_enabled: false
+mconf_web_reports_enabled: false
+test_webrtc_enabled: false
 
 # Enable ufw by default
 common_ufw_enabled: true
-
-# Disable zabbix agent by default
-zabbix_agent_enabled: false
 
 public_keys: 
 - public_keys/daronco.pub

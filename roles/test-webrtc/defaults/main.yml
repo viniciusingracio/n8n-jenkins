@@ -1,0 +1,8 @@
+---
+
+test_webrtc_input_dir: 'test-webrtc'
+
+test_webrtc_output_dir: '/var/www/testwebrtc'
+test_webrtc_output_owner: 'www-data'
+test_webrtc_output_group: 'www-data'
+test_webrtc_output_mode: 'u=rwX,g=rX,o=rX'
