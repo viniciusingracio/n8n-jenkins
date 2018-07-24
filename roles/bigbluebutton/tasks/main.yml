@@ -47,17 +47,32 @@
     - '{{ bigbluebutton_apt_key }}'
     - https://deb.nodesource.com/gpgkey/nodesource.gpg.key
 
+- name: Find repos to remove
+  become: true
+  find:
+    paths: /etc/apt/sources.list.d
+    pattern: 'jenkins_live_mconf_com*'
+  register: jenkins_repos
+
+- name: Clear repos
+  become: true
+  file:
+    path: '{{ item }}'
+    state: absent
+  with_items: "{{ jenkins_repos.files | map(attribute='path') | list + [ '/etc/apt/sources.list.d/archive_ubuntu_com_ubuntu.list', '/etc/apt/sources.list.d/deb_nodesource_com_node_8_x.list' ] | list }}"
+
 - name: Add multiverse and BigBlueButton repos to apt
   become: true
   apt_repository:
-    repo: '{{ item }}'
+    repo: '{{ item.repo }}'
+    filename: '{{ item.filename }}'
     state: present
   register: aptrepos
   with_items:
-    - 'deb http://archive.ubuntu.com/ubuntu/ {{ ansible_lsb.codename }} multiverse'
-    - 'deb http://archive.ubuntu.com/ubuntu/ {{ ansible_lsb.codename }}-security universe multiverse'
-    - '{{ bigbluebutton_apt_source }}'
-    - 'deb http://deb.nodesource.com/node_8.x {{ ansible_lsb.codename }} main'
+    - { repo: 'deb http://archive.ubuntu.com/ubuntu/ {{ ansible_lsb.codename }} multiverse', filename: 'ubuntu' }
+    - { repo: 'deb http://archive.ubuntu.com/ubuntu/ {{ ansible_lsb.codename }}-security universe multiverse', filename: 'ubuntu_security' }
+    - { repo: '{{ bigbluebutton_apt_source }}', filename: '{{ bigbluebutton_apt_package }}' }
+    - { repo: 'deb http://deb.nodesource.com/node_8.x {{ ansible_lsb.codename }} main', filename: 'node' }
 
 - name: Update apt if keys changed
   become: true

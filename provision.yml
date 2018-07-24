@@ -127,7 +127,7 @@
 
 - hosts: aws-publisher
   roles:
-  - aws-publisher
+  - { role: aws-publisher, tags: [ aws-publisher ] }
 
 - hosts: coturn
   roles:
