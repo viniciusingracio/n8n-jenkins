@@ -1,0 +1,25 @@
+- name: Create the output directory
+  become: true
+  file:
+    path: "{{ test_webrtc_output_dir }}"
+    state: directory
+    owner: "{{ test_webrtc_output_owner }}"
+    group: "{{ test_webrtc_output_group }}"
+    mode: "0775"
+
+- name: Copy files to the server
+  become: true
+  synchronize:
+    src: "{{ test_webrtc_input_dir }}/"
+    dest: "{{ test_webrtc_output_dir }}/"
+    archive: false
+    recursive: true
+
+- name: Set file attributes and permission
+  become: true
+  file:
+    path: "{{ test_webrtc_output_dir }}"
+    owner: "{{ test_webrtc_output_owner }}"
+    group: "{{ test_webrtc_output_group }}"
+    mode: "{{ test_webrtc_output_mode }}"
+    recurse: true

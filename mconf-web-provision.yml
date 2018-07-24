@@ -3,7 +3,5 @@
 - hosts: mconf-web
   roles:
   - mconf-web
-
-- hosts: mconf-web-reports
-  roles:
-  - mconf-web-reports
+  - { role: mconf-web-reports, when: mconf_web_reports_enabled }
+  - { role: test-webrtc, when: test_webrtc_enabled }
