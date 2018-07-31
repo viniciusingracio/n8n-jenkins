@@ -1,5 +1,5 @@
 ---
 
 bigbluebutton_apt_package: mconf-live
-bigbluebutton_apt_source: 'deb https://jenkins-live.mconf.com/apt/mconf-live110/releases/201807232234 mconf-xenial main'
+bigbluebutton_apt_source: 'deb https://jenkins-live.mconf.com/apt/development/mconf-comm-110/xenial-1.1.0 mconf-xenial main'
 bigbluebutton_apt_key: 'https://jenkins-live.mconf.com/apt/public.asc'

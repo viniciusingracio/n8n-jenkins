@@ -107,7 +107,7 @@
 - name: Upgrade packages to make sure BigBlueButton packages are updated
   become: true
   apt:
-    upgrade: dist
+    upgrade: safe
   when: bigbluebutton_apt_state == 'latest'
   notify: restart bigbluebutton
 
@@ -450,12 +450,12 @@
     user: root
   become: yes
 
-- name: Check if reboot is required
-  stat:
-    path: /var/run/reboot-required
-  register: reg_reboot
-
-- name: Notify when reboot is required
-  command: 'true'
-  notify: reboot
-  when: reg_reboot.stat.exists
+# - name: Check if reboot is required
+#   stat:
+#     path: /var/run/reboot-required
+#   register: reg_reboot
+# 
+# - name: Notify when reboot is required
+#   command: 'true'
+#   notify: reboot
+#   when: reg_reboot.stat.exists

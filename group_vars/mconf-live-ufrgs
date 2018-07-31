@@ -40,5 +40,5 @@ bigbluebutton_sounds_profile:
   - { name: 'muted-sound', value: 'silence' }
   - { name: 'unmuted-sound', value: 'silence' }
   - { name: 'alone-sound', value: 'conference/conf-alone.wav' }
-  - { name: 'moh-sound', value: 'silence' }
+  - { name: 'moh-sound', value: '$${hold_music}' }
   - { name: 'comfort-noise', value: 'false' }
