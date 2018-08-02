@@ -239,16 +239,24 @@
   shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^bigbluebutton.web.serverURL=' | cut -d'=' -f2 | awk '{print $1"/bigbluebutton/"}'
   register: reg_bbb_url
 
-- name: Check akka configuration
-  shell: cat /usr/share/bbb-apps-akka/conf/application.conf | grep 'sharedSecret.*changeme'
-  register: reg_akka_changeme
-  ignore_errors: yes
-
 - name: Determine if setip is needed
   set_fact:
-    setip_needed: '{{ not reg_bbb_url.stdout is search("http[s]?://" + inventory_hostname) or reg_akka_changeme is succeeded }}'
+    setip_needed: '{{ not reg_bbb_url.stdout is search("http[s]?://" + inventory_hostname) }}'
     bbb_url: '{{ reg_bbb_url.stdout }}'
     bbb_secret: '{{ reg_bbb_secret.stdout }}'
+
+- name: Configure akka apps
+  become: yes
+  lineinfile:
+    dest: /usr/share/bbb-apps-akka/conf/application.conf
+    state: present
+    regexp: '{{ item.regexp }}'
+    line: '{{ item.line }}'
+  with_items:
+    - { regexp: 'bbbWebAPI[ ]*=', line: '  bbbWebAPI = "{{ bbb_url }}api"' }
+    - { regexp: 'sharedSecret[ ]*=', line: '  sharedSecret = "{{ bbb_secret }}"' }
+    - { regexp: 'deskshareip[ ]*=', line: '  deskshareip = "{{ inventory_hostname }}"' }
+  notify: restart bigbluebutton
 
 - name: bbb-conf --setip
   become: true

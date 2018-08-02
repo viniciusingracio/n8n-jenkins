@@ -34,7 +34,4 @@
 
 - name: Enable service
   become: true
-  systemd:
-    enabled: yes
-    state: started
-    name: performance_report
+  service: name=performance_report state=started enabled=yes
