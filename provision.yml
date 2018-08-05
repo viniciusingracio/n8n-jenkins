@@ -145,3 +145,8 @@
 - hosts: zabbix-agent
   roles:
   - { role: dj-wasabi.zabbix-agent, tags: [ zabbix-agent ] }
+
+- hosts: kube-cluster
+  roles:
+  - docker-host
+  - kube-cluster

@@ -1,0 +1,55 @@
+---
+# tasks file for kube-cluster
+
+- name: install APT Transport HTTPS
+  become: yes
+  apt:
+    name: apt-transport-https
+    state: present
+
+- name: add Kubernetes apt-key
+  become: yes
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+
+- name: add Kubernetes' APT repository
+  become: yes
+  apt_repository:
+   repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+   state: present
+   filename: 'kubernetes'
+
+- name: install kubelet
+  become: yes
+  apt:
+    name: kubelet
+    state: present
+    update_cache: true
+
+- name: install kubeadm
+  become: yes
+  apt:
+    name: kubeadm
+    state: present
+
+- name: disable swap
+  become: yes
+  command: swapoff -a
+
+- name: remove swap from fstab
+  become: yes
+  lineinfile:
+    path: /etc/fstab
+    state: absent
+    regexp: '\sswap\s'
+
+- name: determine master
+  set_fact:
+    im_master: '{{ hostvars[groups["kube-cluster"] | first].ansible_default_ipv4 == ansible_default_ipv4 }}'
+
+- include: master.yml
+  when: im_master
+
+- include: workers.yml
+  when: not im_master
