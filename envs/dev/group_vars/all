@@ -20,6 +20,5 @@ bigbluebutton_local_ssl_certificate_key: '{% if not certbot_enabled %}envs/{{ en
 public_keys:
   - public_keys/daronco.pub
   - public_keys/fcecagno.pub
-  - public_keys/prlanzarin_cei.pub
-  - public_keys/prlanzarin_note.pub
+  - public_keys/prlanzarin.pub
   - public_keys/pedrobmarin.pub
