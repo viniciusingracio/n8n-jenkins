@@ -1,0 +1,40 @@
+---
+
+# run it with:
+# ansible-playbook 20180802-update-recw.yml -i recw-cdcrec01.mconf.rnp.br,recw-cdcrec02.mconf.rnp.br,recw-cdcrec03.mconf.rnp.br,recw-cdcrec04.mconf.rnp.br,recw-cdcrec05.mconf.rnp.br,recw-cdcrec06.mconf.rnp.br,
+
+- hosts: all
+
+  vars:
+    ansible_user: mconf
+
+  tasks:
+  - name: Update apt (if older than 5m)
+    become: true
+    apt: update_cache=yes cache_valid_time=300
+
+  - name: Update firefox
+    become: yes
+    apt:
+      name: firefox
+      state: latest
+
+  - name: Adjust config
+    become: true
+    replace:
+      path: /usr/local/bigbluebutton/core/scripts/mconf-presentation-recorder.yml
+      regexp: '{{ item.regexp }}'
+      replace: '{{ item.replace }}'
+    with_items:
+      - { regexp: '^(display_settings):.*', replace: '\1: 1280x829x24' }
+      - { regexp: '^(firefox_width):.*', replace: '\1: 1280' }
+      - { regexp: '^(firefox_height):.*', replace: '\1: 829' }
+      - { regexp: '^(firefox_safemode_wait):.*', replace: '\1: 20' }
+      - { regexp: '^(playback_load_wait):.*', replace: '\1: 300' }
+      - { regexp: '^(xvfb_wait):.*', replace: '\1: 10' }
+      - { regexp: '^(play_button_x_position):.*', replace: '\1: 22' }
+      - { regexp: '^(play_button_y_position):.*', replace: '\1: 812' }
+      - { regexp: '^(record_window_width):.*', replace: '\1: 1280' }
+      - { regexp: '^(record_window_height):.*', replace: '\1: 720' }
+      - { regexp: '^(record_window_x_offset):.*', replace: '\1: 0' }
+      - { regexp: '^(record_window_y_offset):.*', replace: '\1: 76' }
