@@ -7,6 +7,6 @@ coturn_local_ssl_certificate:
 coturn_local_ssl_certificate_key:
 coturn_ssl_certificate: /etc/ssl/certificate.pem
 coturn_ssl_certificate_key: /etc/ssl/private.key
+coturn_ssl_dh_file: /etc/ssl/dhp-2048.pem
 
-coturn_username:
-coturn_password:
+coturn_secret:

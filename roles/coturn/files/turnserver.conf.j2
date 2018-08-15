@@ -1,18 +1,18 @@
 listening-port=3478
 tls-listening-port=5349
-
-listening-ip={{ ansible_default_ipv4.address }}
-
-relay-ip={{ ansible_default_ipv4.address }}
-external-ip={{ external_ip }}
-
-realm={{ inventory_hostname }}
-server-name={{ inventory_hostname }}
-
+min-port=49152
+max-port=65535
+fingerprint
 lt-cred-mech
-user={{ coturn_username }}:{{ coturn_password }}
-
+realm={{ inventory_hostname }}
 cert={{ coturn_ssl_certificate }}
 pkey={{ coturn_ssl_certificate_key }}
+cipher-list="ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:RSA+AESGCM:RSA+AES:!aNULL:!MD5:!DSS:!AES256"
+dh-file={{ coturn_ssl_dh_file }}
+no-tlsv1
+no-tlsv1_1
+external-ip={{ external_ip }}
+use-auth-secret
+static-auth-secret={{ coturn_secret }}
 
 no-stdout-log

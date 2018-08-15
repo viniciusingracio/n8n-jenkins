@@ -81,6 +81,13 @@
   ignore_errors: yes
   notify: restart coturn
 
+- name: Generate dhparam
+  become: yes
+  command: openssl dhparam -out {{ coturn_ssl_dh_file }} 2048
+  args:
+    creates: '{{ coturn_ssl_dh_file }}'
+  notify: restart coturn
+
 - name: Determine external IP
   set_fact:
     external_ip: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | head -n 1') }}"
@@ -94,7 +101,6 @@
   with_items:
     - { src: files/turnserver.conf.j2, dest: /etc/turnserver.conf }
     - { src: files/coturn.j2, dest: /etc/default/coturn }
-    - { src: files/turnuserdb.conf.j2, dest: /etc/turnuserdb.conf }
   notify: restart coturn
 
 - name: Enable coturn service
