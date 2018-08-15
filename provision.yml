@@ -150,3 +150,7 @@
   roles:
   - docker-host
   - kube-cluster
+
+- hosts: all
+  roles:
+  - reboot

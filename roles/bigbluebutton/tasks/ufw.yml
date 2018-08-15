@@ -44,24 +44,7 @@
     regexp: '^[#]?({{ item.name }})=.*'
     replace: \1={{ item.value }}
   with_items: "{{ bigbluebutton_sysctl }}"
-  register: reboot_required
+  register: reboot_required_raw
 
-# https://github.com/ansible/ansible/issues/14413#issuecomment-257887580
-- name: Reboot server
-  shell: sleep 2 && shutdown -r now "Ansible reboot"
-  become: true
-  async: 1
-  poll: 0
-  when: reboot_required is changed
-
-- name: Wait for the server to finish rebooting
-  become: no
-  connection: local
-  local_action: wait_for
-  args:
-    host: '{{ inventory_hostname }}'
-    port: '{{ ansible_ssh_port | default(22) }}'
-    state: started
-    delay: 15
-    timeout: 180
-  when: reboot_required is changed
+- set_fact:
+    reboot_required: '{{ reboot_required | default(false) or reboot_required_raw is changed }}'

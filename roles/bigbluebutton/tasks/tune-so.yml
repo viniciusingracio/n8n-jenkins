@@ -1,0 +1,26 @@
+- name: Add new limits
+  become: yes
+  blockinfile:
+    dest: /etc/security/limits.conf
+    block: |
+      *       soft  nproc       100000
+      *       hard  nproc       100000
+      *       soft  nofile      100000
+      *       hard  nofile      100000
+    marker: '# {mark} ANSIBLE MANAGED BLOCK tune'
+  register: reboot_required_raw
+
+- set_fact:
+    reboot_required: '{{ reboot_required | default(false) or reboot_required_raw is changed }}'
+
+- name: Set file max
+  become: yes
+  blockinfile:
+    dest: /etc/sysctl.conf
+    block: |
+      fs.file-max=100000
+    marker: '# {mark} ANSIBLE MANAGED BLOCK tune'
+  register: reboot_required_raw
+
+- set_fact:
+    reboot_required: '{{ reboot_required | default(false) or reboot_required_raw is changed }}'

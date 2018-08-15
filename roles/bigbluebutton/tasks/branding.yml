@@ -38,42 +38,58 @@
   with_items:
     - /var/bigbluebutton/playback/presentation/0.81/logo.png
     - /var/bigbluebutton/playback/presentation/0.9.0/logo.png
-    - /var/bigbluebutton/playback/presentation_export/logo.png
+    - /var/bigbluebutton/playback/presentation/2.0/logo.png
   ignore_errors: yes
   become: yes
   when: not bigbluebutton_branding_logo_playback is none
 
 - name: Customize error message on playback
   replace:
-    path: /var/bigbluebutton/playback/presentation/0.9.0/lib/writing.js
+    path: '{{ item }}'
     regexp: '(  document.getElementById\("load-msg"\)\.innerHTML =).*;'
     replace: '\1 "{{ bigbluebutton_branding_playback_error }}";'
+  ignore_errors: yes
   become: yes
   when: not bigbluebutton_branding_playback_error is none
+  with_items:
+    - /var/bigbluebutton/playback/presentation/0.9.0/lib/writing.js
+    - /var/bigbluebutton/playback/presentation/2.0/lib/writing.js
 
 - name: Customize loading message on playback
   replace:
-    path: /var/bigbluebutton/playback/presentation/0.9.0/playback.html
+    path: '{{ item }}'
     regexp: '(<p id="load-msg">)[^<]*'
     replace: '\1{{ bigbluebutton_branding_playback_loading }}'
+  ignore_errors: yes
   become: yes
   when: not bigbluebutton_branding_playback_loading is none
+  with_items:
+    - /var/bigbluebutton/playback/presentation/0.9.0/playback.html
+    - /var/bigbluebutton/playback/presentation/2.0/playback.html
 
 - name: Customize page title on playback
   replace:
-    path: /var/bigbluebutton/playback/presentation/0.9.0/lib/writing.js
+    path: '{{ item }}'
     regexp: '(  document.title =) "[^"]*";'
     replace: '\1 "{{ bigbluebutton_branding_playback_title }}";'
+  ignore_errors: yes
   become: yes
   when: not bigbluebutton_branding_playback_title is none
+  with_items:
+    - /var/bigbluebutton/playback/presentation/0.9.0/lib/writing.js
+    - /var/bigbluebutton/playback/presentation/2.0/lib/writing.js
 
 - name: Customize copyright on playback
   replace:
-    path: /var/bigbluebutton/playback/presentation/0.9.0/playback.js
+    path: '{{ item }}'
     regexp: '(const defaultCopyright =).*;'
     replace: '\1 ''{{ bigbluebutton_branding_playback_copyright }}'';'
+  ignore_errors: yes
   become: yes
   when: not bigbluebutton_branding_playback_copyright is none
+  with_items:
+    - /var/bigbluebutton/playback/presentation/0.9.0/playback.js
+    - /var/bigbluebutton/playback/presentation/2.0/playback.js
 
 - name: Check if video recorder is present
   stat:
@@ -90,10 +106,14 @@
 
 - name: Customize copyright on playback
   replace:
-    path: /var/bigbluebutton/playback/presentation/0.9.0/playback.js
+    path: '{{ item }}'
     regexp: '(  copyright = typeof copyright !== ''undefined'' \? copyright :) ''[^'']*'';'
     replace: '\1 ''{{ bigbluebutton_branding_playback_copyright }}'';'
+  ignore_errors: yes
   become: yes
+  with_items:
+    - /var/bigbluebutton/playback/presentation/0.9.0/playback.js
+    - /var/bigbluebutton/playback/presentation/2.0/playback.js
 
 - name: Create link to Mconf-Live.html
   file:

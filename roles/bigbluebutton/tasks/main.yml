@@ -458,6 +458,8 @@
     user: root
   become: yes
 
+- include: tune-so.yml
+
 # - name: Check if reboot is required
 #   stat:
 #     path: /var/run/reboot-required

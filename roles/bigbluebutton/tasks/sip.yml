@@ -21,4 +21,5 @@
     - { path: '/sip/local_ip_address', value: '{{ external_ip }}' }
     - { path: '/sip/min_video_port', value: '{{ bigbluebutton_sip_udp_range_begin }}' }
     - { path: '/sip/max_video_port', value: '{{ bigbluebutton_sip_udp_range_end }}' }
+    - { path: '/conference-media-specs/mconf_main_inbound_codec', value: 'libx264' }
   notify: restart mconf-mcs-sip
