@@ -1,6 +1,6 @@
 ---
 
-mconf_lti_image: mconftec/bbb-lti
+mconf_lti_image: mconf/bbb-lti
 mconf_lti_image_version: latest
 
 mconf_lti_config:
