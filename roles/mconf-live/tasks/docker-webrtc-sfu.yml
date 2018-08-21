@@ -1,0 +1,23 @@
+- name: Start webrtc-sfu container
+  docker_container:
+    name: webrtc-sfu
+    image: mconf/bbb-webrtc-sfu:mconf-2.x
+    pull: yes
+    restart_policy: on-failure
+    ports:
+      - "3008:3008"
+    env:
+      KURENTO_URL: ws://{{ docker_ip }}:8888/kurento
+      KURENTO_IP: '{{ external_ip }}'
+      REDIS_HOST: '{{ docker_ip }}'
+      MCS_PORT: 3009
+      MCS_HOST: localhost
+      FREESWITCH_IP: '{{ docker_ip }}'
+      LOG_LEVEL: trace
+
+- name: Add webhooks to nginx
+  become: yes
+  copy:
+    src: files/webrtc-sfu.nginx
+    dest: /etc/bigbluebutton/nginx/webrtc-sfu.nginx
+  notify: reload nginx

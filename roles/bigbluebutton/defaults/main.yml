@@ -140,3 +140,5 @@ bigbluebutton_playback_protocol:
 bigbluebutton_retention_runtime: 5
 bigbluebutton_retention_unrecorded: 14
 bigbluebutton_retention_published_raw:
+
+bigbluebutton_packages_skip_bbb_webrtc_sfu: false

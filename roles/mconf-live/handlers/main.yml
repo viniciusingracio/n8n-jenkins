@@ -1,3 +1,7 @@
 - name: reload nginx
   become: true
   service: name=nginx state=reloaded
+
+- name: restart bbb-html5
+  become: true
+  service: name=bbb-html5 state=restarted

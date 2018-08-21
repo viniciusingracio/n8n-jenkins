@@ -371,6 +371,7 @@
     - { key: 'recordWebcams', value: '{% if bigbluebutton_html5 %}true{% else %}false{% endif %}' }
     state: present
   become: yes
+  when: not bigbluebutton_packages_skip_bbb_webrtc_sfu
   notify: restart bbb-webrtc-sfu
 
 - name: Open/close redis
@@ -427,7 +428,7 @@
   when: bigbluebutton_html5
 
 - include: sip.yml
-  when: bigbluebutton_sip
+  when: bigbluebutton_sip and not bigbluebutton_packages_skip_mconf_mcs_sip
 
 - include: branding.yml
   tags:

@@ -1,0 +1,11 @@
+- name: Start mcs-sip container
+  docker_container:
+    name: mcs-sip
+    image: mconf/mcs-sip:2.0-gt
+    pull: yes
+    restart_policy: on-failure
+    ports:
+      - "5060:5060"
+      - "5060:5060/udp"
+    env:
+      EXTERNAL_IP: '{{ external_ip }}'

@@ -51,3 +51,8 @@ k8s-node1 common_ufw_enabled=false ansible_host=200.133.39.49
 k8s-node2 common_ufw_enabled=false ansible_host=10.1.1.207 ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -q ubuntu@200.133.39.49"'
 k8s-node3 common_ufw_enabled=false ansible_host=10.1.1.166 ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -q ubuntu@200.133.39.49"'
 k8s-node4 common_ufw_enabled=false ansible_host=10.1.1.155 ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -q ubuntu@200.133.39.49"'
+
+[zabbix-agent]
+paulo.dev.mconf.com
+eduardo.dev.mconf.com
+felipe.dev.mconf.com
