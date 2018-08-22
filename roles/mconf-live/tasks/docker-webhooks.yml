@@ -10,6 +10,7 @@
       REDIS_HOST: '{{ docker_ip }}'
       SHARED_SECRET: '{{ bbb_secret }}'
       BEARER_AUTH: 1
+      SERVER_DOMAIN: '{{ inventory_hostname }}'
 
 - name: Add webhooks to nginx
   become: yes

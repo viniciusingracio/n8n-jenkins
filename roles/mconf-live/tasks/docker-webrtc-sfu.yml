@@ -12,7 +12,7 @@
       REDIS_HOST: '{{ docker_ip }}'
       MCS_PORT: 3009
       MCS_HOST: localhost
-      FREESWITCH_IP: '{{ docker_ip }}'
+      FREESWITCH_IP: '{{ external_ip }}'
       LOG_LEVEL: trace
 
 - name: Add webhooks to nginx
