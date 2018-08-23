@@ -1,7 +1,7 @@
 - name: Start mcs-sip container
   docker_container:
     name: mcs-sip
-    image: mconf/mcs-sip:2.0-gt
+    image: mconf/mcs-sip:2.0.1-new-api
     pull: yes
     restart_policy: on-failure
     ports:
@@ -9,3 +9,6 @@
       - "5060:5060/udp"
     env:
       EXTERNAL_IP: '{{ external_ip }}'
+      BIND_IP: 0.0.0.0
+      MCS_PORT: 443
+      MCS_HOST: '{{ inventory_hostname }}'
