@@ -37,10 +37,13 @@
 - include: docker-etherpad.yml
   when: mconf_live_docker_etherpad
 
-- include: docker-mcs-sip.yml
-  when: mconf_live_docker_mcs_sip
+# - include: docker-mcs-sip.yml
+#   when: mconf_live_docker_mcs_sip
+# 
+# - include: docker-webrtc-sfu.yml
+#   when: mconf_live_docker_webrtc_sfu
 
-- include: docker-webrtc-sfu.yml
+- include: docker-mcs.yml
   when: mconf_live_docker_webrtc_sfu
 
 - include: docker-webhooks.yml

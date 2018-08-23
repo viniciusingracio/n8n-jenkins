@@ -15,7 +15,7 @@
       FREESWITCH_IP: '{{ external_ip }}'
       LOG_LEVEL: trace
 
-- name: Add webhooks to nginx
+- name: Add webrtc-sfu to nginx
   become: yes
   copy:
     src: files/webrtc-sfu.nginx
