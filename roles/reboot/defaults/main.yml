@@ -1,2 +1,3 @@
 ---
 # defaults file for reboot
+reboot_required: false
