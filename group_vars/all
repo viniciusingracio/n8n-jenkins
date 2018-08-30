@@ -15,7 +15,7 @@ deploy_user: mconf
 
 # Default registry where images for Mconf components are pulled from
 # mconf_registry_host: registry.hub.docker.com
-mconf_registry_org: mconftec
+mconf_registry_org: mconf
 # mconf_registry_prefix: '{{mconf_registry_host}}/{{mconf_registry_org}}'
 
 # Disable a few things by default, enabled for specific roles/hosts
