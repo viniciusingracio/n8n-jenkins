@@ -18,6 +18,7 @@ bigbluebutton_config_xml:
   - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeExtensionLink', value: '{{ bigbluebutton_screenshare_extension_url }}' }
   - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeExtensionKey', value: '{{ bigbluebutton_screenshare_extension_key }}' }
   - { xpath: '//module[@name="PhoneModule"]', attribute: 'enableOutboundCalls', value: 'true', run: '{{ bigbluebutton_sip }}' }
+  - { xpath: '//module[@name="PresentModule"]', attribute: 'disableFirefoxF60Upload', value: 'false' }
 
 bigbluebutton_html5_config:
   - { path: '/public/kurento/wsUrl', value: 'wss://{{ inventory_hostname }}/bbb-webrtc-sfu' }

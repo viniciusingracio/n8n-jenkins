@@ -91,6 +91,7 @@ bigbluebutton_config_xml:
   - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'tryKurentoWebRTC', value: 'true', run: '{{ bigbluebutton_html5 }}' }
   - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'tryWebRTCFirst', value: 'true', run: '{{ bigbluebutton_html5 }}' }
   - { xpath: '//module[@name="PhoneModule"]', attribute: 'enableOutboundCalls', value: 'true', run: '{{ bigbluebutton_sip }}' }
+  - { xpath: '//module[@name="PresentModule"]', attribute: 'disableFirefoxF60Upload', value: 'false' }
 
 bigbluebutton_config_xml_custom: []
 
@@ -103,6 +104,8 @@ bigbluebutton_html5_config:
 
 bigbluebutton_stun_server:
   - stun:stun.l.google.com:19302
+
+bigbluebutton_turn_server: []
 
 bigbluebutton_sounds_frequency:
   - 48000

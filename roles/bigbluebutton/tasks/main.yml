@@ -104,6 +104,12 @@
     state: '{{ bigbluebutton_apt_state }}'
   notify: restart bigbluebutton
 
+- name: Install bbb-webrtc-sfu
+  become: true
+  apt:
+    name: bbb-webrtc-sfu
+    state: '{{ bigbluebutton_apt_state }}'
+
 - name: Upgrade packages to make sure BigBlueButton packages are updated
   become: true
   apt:

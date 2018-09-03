@@ -1,9 +1,9 @@
 ---
 
-bigbluebutton_branding_welcome_footer: Para mais informações, acesse <a href="https://mconf.com" target="_blank"><u>mconf.com</u></a>.
-bigbluebutton_branding_copyright: '&#169; 2018 Mconf Tecnologia &#183; <u><a href="https://mconf.com" target="_blank">https://mconf.com</a></u>'
-bigbluebutton_branding_copyright_html5: '© 2018 Mconf Tecnologia'
-bigbluebutton_branding_toolbar_color: '#33132A'
+bigbluebutton_branding_welcome_footer: Para mais informações, acesse <a href="https://www.elos.vc" target="_blank"><u>elos.vc</u></a>.
+bigbluebutton_branding_copyright: '&#169; 2018 &#183; <u><a href="https://www.elos.vc" target="_blank">elos.vc</a></u>'
+bigbluebutton_branding_copyright_html5: '© 2018 · elos.vc'
+bigbluebutton_branding_toolbar_color: '#2dccd3'
 bigbluebutton_branding_toolbar_color_alphas: '0, 0'
 
 bigbluebutton_config_xml:
@@ -17,6 +17,7 @@ bigbluebutton_config_xml:
   - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeExtensionLink', value: '{{ bigbluebutton_screenshare_extension_url }}' }
   - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeExtensionKey', value: '{{ bigbluebutton_screenshare_extension_key }}' }
   - { xpath: '//module[@name="PhoneModule"]', attribute: 'enableOutboundCalls', value: 'true', run: '{{ bigbluebutton_sip }}' }
+  - { xpath: '//module[@name="PresentModule"]', attribute: 'disableFirefoxF60Upload', value: 'false' }
 
 bigbluebutton_html5_config:
   - { path: '/public/kurento/wsUrl', value: 'wss://{{ inventory_hostname }}/bbb-webrtc-sfu' }
@@ -32,8 +33,12 @@ bigbluebutton_html5_config:
   - { path: '/public/app/defaultSettings/application/chatPushAlerts', value: true }
 
 bigbluebutton_stun_server:
-  - stun:stun.l.google.com:19302
   - stun:stun1.mconf.com:3478
+  - stun:stun.l.google.com:19302
+
+bigbluebutton_turn_server:
+ - { url: 'turn:stun1.mconf.com:3478', secret: '58b14d9c3def68b4e70f1d32b58c607e', ttl: '86400' }
+ - { url: 'turn:stun1.mconf.com:5349?transport=tcp', secret: '58b14d9c3def68b4e70f1d32b58c607e', ttl: '86400' }
 
 bigbluebutton_sounds_profile:
   - { name: 'muted-sound', value: 'silence' }
