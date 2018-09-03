@@ -2,7 +2,7 @@
   docker_image:
     name: '{{ mconf_web_reports_image }}:{{ mconf_web_reports_image_version }}'
 
-- name: Setup cron to run the container
+- name: Setup cron to update the current reports
   become: true
   cron:
     name: update reports
@@ -12,3 +12,14 @@
     user: root
     job: "docker run --rm -v /root/mconf-web-reports-config.yml:/usr/src/app/config.yml -v /root/mconf-web-reports.env.local:/usr/src/app/.env.local -v {{ mconf_web_reports_output_dir }}:/usr/src/app/output -e SAVE_TO=/usr/src/app/output {{ mconf_web_reports_image }}:{{ mconf_web_reports_image_version }} > {{ mconf_web_reports_cron_log_file }} 2>&1"
     cron_file: mconf-web-reports-run
+
+- name: Setup cron to update the report of the previous month
+  become: true
+  cron:
+    name: update reports
+    minute: "{{ mconf_web_reports_cron_previous_month_schedule_minute }}"
+    hour: "{{ mconf_web_reports_cron_previous_month_schedule_hour }}"
+    day: "{{ mconf_web_reports_cron_previous_month_schedule_day }}"
+    user: root
+    job: "docker run --rm -e START_DATE=$(date -d \"-1 month -$(expr $(date +%d) - 1) days\" +\"%Y-%m-%d\") -e END_DATE=$(date -d \"-$(expr $(date +%d)) days\" +\"%Y-%m-%d\") -v /root/mconf-web-reports-config.yml:/usr/src/app/config.yml -v /root/mconf-web-reports.env.local:/usr/src/app/.env.local -v {{ mconf_web_reports_output_dir }}:/usr/src/app/output -e SAVE_TO=/usr/src/app/output {{ mconf_web_reports_image }}:{{ mconf_web_reports_image_version }} > {{ mconf_web_reports_cron_log_file }} 2>&1"
+    cron_file: mconf-web-reports-previous-month
