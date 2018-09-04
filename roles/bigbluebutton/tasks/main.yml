@@ -109,6 +109,8 @@
   apt:
     name: bbb-webrtc-sfu
     state: '{{ bigbluebutton_apt_state }}'
+  when: not bigbluebutton_packages_skip_bbb_webrtc_sfu
+  notify: restart bigbluebutton
 
 - name: Upgrade packages to make sure BigBlueButton packages are updated
   become: true

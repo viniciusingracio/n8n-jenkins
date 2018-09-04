@@ -3,7 +3,7 @@
     name: webhooks
     image: mconf/bbb-webhooks
     pull: yes
-    restart_policy: on-failure
+    restart_policy: unless-stopped
     ports:
       - "3005:3005"
     env:

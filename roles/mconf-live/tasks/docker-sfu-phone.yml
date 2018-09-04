@@ -3,10 +3,10 @@
     name: sfu-phone
     image: mconf/sfu-phone:mconf-2.x
     pull: yes
-    restart_policy: on-failure
+    restart_policy: unless-stopped
     ports:
       - "3011:3011"
     env:
       REDIS_HOST: '{{ docker_ip }}'
-      MCS_PORT: 443
-      MCS_ADDRESS: '{{ inventory_hostname }}'
+      MCS_PORT: 3009
+      MCS_ADDRESS: '{{ docker_ip }}'

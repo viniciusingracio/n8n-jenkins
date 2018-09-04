@@ -3,7 +3,7 @@
     name: etherpad
     image: mconf/etherpad-lite:mconf
     pull: yes
-    restart_policy: on-failure
+    restart_policy: unless-stopped
     ports:
       - "3006:9001"
     env:

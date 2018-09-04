@@ -43,6 +43,7 @@
       with_value: '{{ item.value }}'
     indent: 4
     insert_if_missing: true
+  ignore_errors: yes
   with_items: '{{ bigbluebutton_html5_config }}'
   notify: restart bbb-html5
 

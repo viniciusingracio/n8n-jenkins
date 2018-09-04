@@ -3,15 +3,16 @@
     name: webrtc-sfu
     image: mconf/bbb-webrtc-sfu:mconf-2.x
     pull: yes
-    restart_policy: on-failure
+    restart_policy: unless-stopped
     ports:
       - "3008:3008"
+      - "3009:3009"
     env:
       KURENTO_URL: ws://{{ docker_ip }}:8888/kurento
       KURENTO_IP: '{{ external_ip }}'
       REDIS_HOST: '{{ docker_ip }}'
       MCS_PORT: 3009
-      MCS_HOST: localhost
+      MCS_HOST: '{{ docker_ip }}'
       FREESWITCH_IP: '{{ external_ip }}'
       LOG_LEVEL: trace
 
