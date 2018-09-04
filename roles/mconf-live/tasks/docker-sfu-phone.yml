@@ -9,4 +9,4 @@
     env:
       REDIS_HOST: '{{ docker_ip }}'
       MCS_PORT: 3009
-      MCS_ADDRESS: '{{ docker_ip }}'
+      MCS_HOST: '{{ docker_ip }}'

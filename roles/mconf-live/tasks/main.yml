@@ -47,6 +47,9 @@
 - include: docker-mcs-sip.yml
   when: mconf_live_docker_mcs_sip
 
+- include: docker-sfu-phone.yml
+  when: mconf_live_docker_mcs_sip
+
 - include: docker-webrtc-sfu.yml
   when: mconf_live_docker_webrtc_sfu
 
