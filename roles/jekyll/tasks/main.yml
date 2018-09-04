@@ -1,0 +1,38 @@
+- name: Create the output directory
+  become: true
+  file:
+    path: '{{ item }}'
+    state: directory
+    owner: '{{ jekyll_usr }}'
+    group: '{{ jekyll_grp }}'
+    mode: 0755
+  with_items:
+    - '{{ jekyll_output_dir }}'
+
+- name: Clean tmp directory
+  file:
+    state: absent
+    path: '{{ jekyll_tmp_path }}/'
+
+- name: Download source code
+  git:
+    repo: '{{ jekyll_repo_url }}'
+    dest: '{{ jekyll_tmp_path }}'
+    version: '{{ jekyll_repo_ref }}'
+    depth: 1
+    accept_hostkey: true
+    force: true
+
+- name: Ansible copy files remote to remote
+  synchronize:
+    src: '{{ jekyll_tmp_path }}/{{ jekyll_dir_to_copy }}'
+    dest: '{{ jekyll_output_dir }}'
+  delegate_to: '{{ inventory_hostname }}'
+
+- name: Set permissions
+  become: true
+  file:
+    path: '{{ jekyll_output_dir }}'
+    owner: '{{ jekyll_usr }}'
+    group: '{{ jekyll_grp }}'
+    recurse: true

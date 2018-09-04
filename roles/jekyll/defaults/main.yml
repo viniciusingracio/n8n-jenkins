@@ -1,0 +1,9 @@
+---
+
+jekyll_usr: '{{ deploy_user }}'
+jekyll_grp: www-data
+jekyll_output_dir: /var/www/jekyll/
+jekyll_repo_url: "edit-me"
+jekyll_repo_ref: master
+jekyll_dir_to_copy: _site
+jekyll_tmp_path: /tmp/jekyll/repo
