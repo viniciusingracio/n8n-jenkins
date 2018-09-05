@@ -62,4 +62,7 @@
       API_SECRET: '{{ rec_proxy_api_secret }}'
       JWT_SECRET: '{{ rec_proxy_jwt_secret }}'
       REDIRECT_UNAUTHORIZED: '{{ rec_proxy_redirect_unauthorized }}'
+      CACHE_NUM_KEYS: '{{ rec_proxy_cache_num_keys }}'
+      CACHE_EXPIRE_AFTER: '{{ rec_proxy_cache_expire_after }}'
+      CACHE_MAX_SIZE: '{{ rec_proxy_cache_max_size }}'
   notify: clean docker
