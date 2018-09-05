@@ -408,13 +408,13 @@
     regexp: '{{ item.regexp }}'
     line: '{{ item.line }}'
   with_items:
-  - { regexp: '^history=', line: 'history={{ bigbluebutton_retention_runtime | default(5) }}' }
-  - { regexp: '^unrecorded_days=', line: 'unrecorded_days={{ bigbluebutton_retention_unrecorded | default(14) }}' }
-  - { regexp: '^published_days=', line: 'published_days={{ bigbluebutton_retention_published_raw | default(14) }}' }
-  - { regexp: '^[#]?remove_raw_of_recordings_without_marks$', line: 'remove_raw_of_recordings_without_marks', when: '{{ not bigbluebutton_retention_unrecorded is undefined }}' }
-  - { regexp: '^[#]?remove_raw_of_recordings_without_marks$', line: '#remove_raw_of_recordings_without_marks', when: '{{ bigbluebutton_retention_unrecorded is undefined }}' }
-  - { regexp: '^[#]?remove_raw_of_published_recordings$', line: 'remove_raw_of_published_recordings', when: '{{ not bigbluebutton_retention_published_raw is undefined }}' }
-  - { regexp: '^[#]?remove_raw_of_published_recordings$', line: '#remove_raw_of_published_recordings', when: '{{ bigbluebutton_retention_published_raw is undefined }}' }
+  - { regexp: '^history=', line: 'history={{ bigbluebutton_retention_runtime }}' }
+  - { regexp: '^unrecorded_days=', line: 'unrecorded_days={{ bigbluebutton_retention_unrecorded }}' }
+  - { regexp: '^published_days=', line: 'published_days={{ bigbluebutton_retention_published_raw }}' }
+  - { regexp: '^[#]?remove_raw_of_recordings_without_marks$', line: 'remove_raw_of_recordings_without_marks', when: '{{ not bigbluebutton_retention_unrecorded is none }}' }
+  - { regexp: '^[#]?remove_raw_of_recordings_without_marks$', line: '#remove_raw_of_recordings_without_marks', when: '{{ bigbluebutton_retention_unrecorded is none }}' }
+  - { regexp: '^[#]?remove_raw_of_published_recordings$', line: 'remove_raw_of_published_recordings', when: '{{ not bigbluebutton_retention_published_raw is none }}' }
+  - { regexp: '^[#]?remove_raw_of_published_recordings$', line: '#remove_raw_of_published_recordings', when: '{{ bigbluebutton_retention_published_raw is none }}' }
   when: item.when is undefined or item.when == true
 
 - include: stun.yml
@@ -461,6 +461,13 @@
     name: "remove archived"
     special_time: hourly
     job: "/usr/bin/ruby /usr/local/bigbluebutton/core/scripts/utils/clean-recordings-data.rb"
+    user: root
+  become: yes
+
+- cron:
+    name: "remove encrypted"
+    special_time: daily
+    job: "/usr/local/bigbluebutton/core/scripts/utils/remove-encrypted.sh"
     user: root
   become: yes
 
