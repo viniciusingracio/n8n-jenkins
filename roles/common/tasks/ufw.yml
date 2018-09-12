@@ -9,7 +9,11 @@
 
 - name: Reset iptables
   become: true
-  command: iptables -F
+  shell: |
+    iptables -P INPUT ACCEPT
+    iptables -P FORWARD ACCEPT
+    iptables -P OUTPUT ACCEPT
+    iptables -F
 
 - name: Reset ufw
   become: true
