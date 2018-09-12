@@ -15,6 +15,7 @@
       MCS_HOST: '{{ docker_ip }}'
       FREESWITCH_IP: '{{ external_ip }}'
       LOG_LEVEL: trace
+  notify: restart sfu-phone
 
 - name: Add webrtc-sfu to nginx
   become: yes
