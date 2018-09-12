@@ -7,6 +7,7 @@
   apt:
     name: language-pack-en
     state: '{{ bigbluebutton_apt_state }}'
+    autoremove: yes
 
 - name: Install entropy daemon
   become: true

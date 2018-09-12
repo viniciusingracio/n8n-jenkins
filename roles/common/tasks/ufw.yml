@@ -7,6 +7,10 @@
   become: true
   apt: package=ufw state=present
 
+- name: Reset iptables
+  become: true
+  command: iptables -F
+
 - name: Reset ufw
   become: true
   ufw:
