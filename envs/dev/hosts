@@ -29,6 +29,8 @@ test-live110.mconf.com common_ufw_enabled=false
 
 [docker-host]
 felipe-docker.mconf.com
+test-live1.dev.mconf.com
+test-live2.dev.mconf.com
 
 [mconf-live200]
 paulo.dev.mconf.com certbot_enabled=true zabbix_agent_enabled=true
