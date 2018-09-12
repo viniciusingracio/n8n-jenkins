@@ -10,10 +10,17 @@
 - name: Reset iptables
   become: true
   shell: |
+    set -e
     iptables -P INPUT ACCEPT
-    iptables -P FORWARD ACCEPT
-    iptables -P OUTPUT ACCEPT
     iptables -F
+    iptables -X
+    iptables -Z
+    ip6tables -P INPUT ACCEPT
+    ip6tables -F
+    ip6tables -X
+    ip6tables -Z
+  args:
+    executable: /bin/bash
 
 - name: Reset ufw
   become: true

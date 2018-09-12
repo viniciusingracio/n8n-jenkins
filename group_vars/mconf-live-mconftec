@@ -1,7 +1,7 @@
 ---
 
-bigbluebutton_branding_welcome_footer: Para mais informações, acesse <a href="https://www.elos.vc" target="_blank"><u>elos.vc</u></a>.
-bigbluebutton_branding_copyright: '&#169; 2018 &#183; <u><a href="https://www.elos.vc" target="_blank">elos.vc</a></u>'
+bigbluebutton_branding_welcome_footer: Para mais informações, acesse <a href="https://elos.vc" target="_blank"><u>elos.vc</u></a>.
+bigbluebutton_branding_copyright: '&#169; 2018 &#183; <u><a href="https://elos.vc" target="_blank">elos.vc</a></u>'
 bigbluebutton_branding_copyright_html5: '© 2018 · elos.vc'
 bigbluebutton_branding_toolbar_color: '#2dccd3'
 bigbluebutton_branding_toolbar_color_alphas: '0, 0'
