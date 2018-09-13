@@ -22,12 +22,9 @@
 
 - name: Add to sudoers
   become: true
-  lineinfile:
-    dest: /etc/sudoers
-    state: present
-    regexp: '^{{ deploy_user }}\s'
-    line: '{{ deploy_user }} ALL=(ALL) NOPASSWD: ALL'
-    validate: 'visudo -cf %s'
+  template:
+    src: templates/sudoers.j2
+    dest: /etc/sudoers.d/{{ deploy_user }}
 
 # For some servers we want to upload an specific ssh key for the deploy user
 - name: Set up ssh key (private)

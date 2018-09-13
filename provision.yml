@@ -1,3 +1,7 @@
+- hosts: zabbix-agent
+  roles:
+  - { role: dj-wasabi.zabbix-agent, tags: [ zabbix-agent ] }
+
 # Recording workers
 - hosts: rec-worker
   roles:
@@ -141,10 +145,6 @@
 - hosts: gluster
   roles:
   - gluster
-
-- hosts: zabbix-agent
-  roles:
-  - { role: dj-wasabi.zabbix-agent, tags: [ zabbix-agent ] }
 
 - hosts: kube-cluster
   roles:
