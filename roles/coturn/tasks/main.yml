@@ -7,10 +7,15 @@
     state: present
   with_items:
     - sqlite
-    - libsqlite3-dev
-    - libevent-dev
+    - redis-server
     - build-essential
     - libssl-dev
+    - libsqlite3-dev
+    - libevent-dev
+    - libpq-dev
+    - mysql-client
+    - libmysqlclient-dev
+    - libhiredis-dev
 
 - name: Download and extract
   become: yes
@@ -37,20 +42,14 @@
     - target: install
   when: coturn_build_from_source
 
-- name: Create user
-  become: true
-  user:
-    name: 'turnserver'
-    shell: /bin/bash
-    groups: adm,syslog
-    append: yes
-
 - name: Copy systemd file
   become: true
   copy:
     src: files/coturn.service
     dest: /etc/systemd/system/coturn.service
-  notify: restart coturn
+  notify:
+    - reload systemctl
+    - restart coturn
 
 - set_fact:
     ssl_certificate_filename: '{{ coturn_ssl_certificate | basename }}'
@@ -67,6 +66,7 @@
   with_items:
     - '{{ ssl_certificate_dir }}'
     - '{{ ssl_certificate_key_dir }}'
+  when: not coturn_local_ssl_certificate is none and not coturn_local_ssl_certificate_key is none
   become: yes
 
 - name: Copy certificates
@@ -99,8 +99,8 @@
     dest: '{{ item.dest }}'
     mode: 0644
   with_items:
-    - { src: files/turnserver.conf.j2, dest: /etc/turnserver.conf }
-    - { src: files/coturn.j2, dest: /etc/default/coturn }
+    - { src: templates/turnserver.conf.j2, dest: /etc/turnserver.conf }
+    - { src: templates/coturn.j2, dest: /etc/default/coturn }
   notify: restart coturn
 
 - name: Enable coturn service

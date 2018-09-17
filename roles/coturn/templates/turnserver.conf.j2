@@ -15,4 +15,6 @@ external-ip={{ external_ip }}
 use-auth-secret
 static-auth-secret={{ coturn_secret }}
 
+redis-statsdb="ip=127.0.0.1 port=6379 dbname=3 connect_timeout=30"
+
 no-stdout-log

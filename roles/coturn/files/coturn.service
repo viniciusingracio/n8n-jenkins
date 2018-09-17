@@ -5,8 +5,8 @@ After=syslog.target network.target
 
 [Service]
 Type=forking
-User=turnserver
-Group=turnserver
+User=root
+Group=root
 RuntimeDirectory=turnserver
 RuntimeDirectoryMode=0750
 EnvironmentFile=/etc/default/coturn
