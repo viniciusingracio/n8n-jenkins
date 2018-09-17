@@ -13,8 +13,8 @@ bigbluebutton_html5: false
 bigbluebutton_html5_only: false
 # Install Mconf MCS-SIP
 bigbluebutton_sip: false
-# TODO lock 5060 to only specific sources
-bigbluebutton_sip_sources: []
+bigbluebutton_sip_sources:
+  - any
 
 # Setup Chrome extensions for WebRTC Desktop Sharing
 bigbluebutton_screenshare_extension_url: https://chrome.google.com/webstore/detail/bigbluebutton-screenshare/fdebcjabckbgfelopckfkhjldbbkoofj
