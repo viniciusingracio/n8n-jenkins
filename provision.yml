@@ -153,4 +153,4 @@
 
 - hosts: all
   roles:
-  - reboot
+  - { role: reboot, tags: always }

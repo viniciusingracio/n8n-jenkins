@@ -1,6 +1,6 @@
 - include_role:
     name: bigbluebutton
-  tags: [bigbluebutton]
+  tags: always
 
 - name: Install extra recording formats
   become: true

@@ -43,11 +43,10 @@
   notify:
     - restart ufw
 
-- name: Configure default rules
+- name: Configure ssh rule
   become: true
-  ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
-  with_items:
-    - { rule: 'limit', port: '{{ ansible_port | default("22") }}', proto: 'tcp' }
+  ufw: rule=limit port={{ ansible_port | default("22") }} proto=tcp from_ip={{ item }}
+  with_items: '{{ common_ufw_ssh_sources }}'
   notify:
     - restart ufw
 
