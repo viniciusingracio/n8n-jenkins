@@ -15,6 +15,7 @@ bigbluebutton_html5_only: false
 bigbluebutton_sip: false
 bigbluebutton_sip_sources:
   - any
+bigbluebutton_sip_default_gateway:
 
 # Setup Chrome extensions for WebRTC Desktop Sharing
 bigbluebutton_screenshare_extension_url: https://chrome.google.com/webstore/detail/bigbluebutton-screenshare/fdebcjabckbgfelopckfkhjldbbkoofj
