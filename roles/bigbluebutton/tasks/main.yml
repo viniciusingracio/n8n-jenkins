@@ -474,6 +474,10 @@
 
 - include: tune-so.yml
 
+- include: storage-partition.yml
+  when: bigbluebutton_storage_dir is not none
+  tags: [storage]
+
 # - name: Check if reboot is required
 #   stat:
 #     path: /var/run/reboot-required

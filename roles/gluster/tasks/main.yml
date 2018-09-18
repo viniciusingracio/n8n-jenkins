@@ -60,10 +60,10 @@
 
 - set_fact:
     partition_path: '{{ gluster_device }}1'
-  when: reg_lvm | trim == ""
+  when: reg_lvm.stdout | trim == ""
 - set_fact:
     partition_path: '{{ reg_lvm.stdout }}'
-  when: reg_lvm | trim != ""
+  when: reg_lvm.stdout | trim != ""
 
 - name: Create a xfs filesystem
   become: yes

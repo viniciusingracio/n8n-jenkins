@@ -3,4 +3,4 @@
   service: name=ufw state=restarted
 
 - name: docker logout
-  command: 'docker logout'
+  command: docker logout
