@@ -11,7 +11,7 @@ sudo apt-get install ansible
 * Install/upgrade python libraries
 ```bash
 sudo apt-get install python-pip
-sudo pip install --upgrade pip pyopenssl docker
+sudo pip install --upgrade pip pyopenssl docker zabbix-api
 ```
 * Install ansible dependency roles
 ```bash
