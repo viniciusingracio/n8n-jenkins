@@ -21,6 +21,8 @@
     ip6tables -Z
   args:
     executable: /bin/bash
+  notify:
+    - restart docker
 
 - name: Reset ufw
   become: true
