@@ -151,6 +151,17 @@
   - docker-host
   - kube-cluster
 
+- hosts: mconf-lb
+  roles:
+  - { role: certbot, when: certbot_enabled }
+  - mconf-lb
+
+- hosts: mconf-web
+  roles:
+  - mconf-web
+  - { role: mconf-web-reports, when: mconf_web_reports_enabled }
+  - { role: test-webrtc, when: test_webrtc_enabled }
+
 - hosts: all
   roles:
   - reboot
