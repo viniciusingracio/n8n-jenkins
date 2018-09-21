@@ -20,7 +20,6 @@ DOCUMENTATION = '''
 import os
 import time
 import sys
-import subprocess
 
 from ansible.plugins.callback import CallbackBase
 
@@ -39,9 +38,8 @@ class CallbackModule(CallbackBase):
         super(CallbackModule, self).__init__()
 
     def v2_playbook_on_stats(self, stats):
-        revision = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).strip()
         now = time.strftime(self.TIME_FORMAT, time.localtime())
-        filename = "%s_%s.log" % (now, revision)
+        filename = "%s.log" % now
         path = os.path.join("log_deploy", filename)
         command = " ".join(sys.argv)
         hosts = sorted(stats.processed.keys())

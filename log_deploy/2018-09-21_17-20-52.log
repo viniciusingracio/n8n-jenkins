@@ -1,0 +1,4 @@
+/usr/bin/ansible-playbook -v -i envs/dev/hosts -l test-live1.dev.mconf.com,test-live2.dev.mconf.com provision.yml -T 180
+
+test-live1.dev.mconf.com: 166 OK, 37 changed, 0 unreachable, 0 failed
+test-live2.dev.mconf.com: 166 OK, 37 changed, 0 unreachable, 0 failed
