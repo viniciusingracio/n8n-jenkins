@@ -101,9 +101,7 @@
 
 - name: Determine cluster
   set_fact:
-    cluster: '{{ cluster | default([]) + [ hostvars[item].gluster_ip | default(hostvars[item].ansible_default_ipv4.address) ] | list }}'
-  with_items: '{{ groups["gluster"] }}'
-  when: hostvars[item].gluster_volume_name == gluster_volume_name
+    cluster: '{{ cluster | default([]) + groups["gluster"] | map("extract", hostvars, ["ansible_default_ipv4", "address"]) | list }}'
 
 - name: Set gluster_ip var in case it's undefined
   set_fact:
@@ -127,6 +125,17 @@
     - '{{ brick_path }}'
     - '{{ data_path }}'
 
+- name: Create user data directories
+  become: yes
+  file:
+    path: '{{ data_path }}/{{ item.name }}'
+    recurse: yes
+    state: directory
+    owner: '{{ item.owner }}'
+    group: '{{ item.group }}'
+  with_items:
+    - '{{ gluster_dirs }}'
+
 - include: ufw.yml
   when: common_ufw_enabled
   tags: [ufw,firewall]
@@ -145,7 +154,6 @@
     replicas: '{{ cluster | length }}'
     cluster: '{{ cluster }}'
     state: present
-  run_once: true
   when: im_master
 
 - name: Start gluster volume
