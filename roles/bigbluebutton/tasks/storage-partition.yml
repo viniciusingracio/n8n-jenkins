@@ -1,0 +1,91 @@
+- name: Read device information
+  become: yes
+  parted:
+    device: '{{ bigbluebutton_storage_device }}'
+    unit: MiB
+  register: device_info
+
+- name: Determine if the device needs to be formatted
+  set_fact:
+    device_needed: '{{ device_info.partitions | length == 0 }}'
+    partition_number: 1
+
+- name: Create a new primary partition
+  become: yes
+  parted:
+    device: '{{ bigbluebutton_storage_device }}'
+    number: '{{ partition_number }}'
+    state: present
+  when: device_needed
+
+- name: Check if it's LVM
+  shell: lsblk {{ bigbluebutton_storage_device }}1 --raw -o NAME,TYPE --path | grep lvm | cut -d' ' -f1
+  register: reg_lvm
+
+- set_fact:
+    partition_path: '{{ bigbluebutton_storage_device }}1'
+  when: reg_lvm.stdout | trim == ""
+- set_fact:
+    partition_path: '{{ reg_lvm.stdout }}'
+  when: reg_lvm.stdout | trim != ""
+
+- name: Create a ext4 filesystem
+  become: yes
+  filesystem:
+    fstype: ext4
+    dev: '{{ partition_path }}'
+  when: device_needed
+
+- debug:
+    msg: 'New device is {{ bigbluebutton_storage_device }}, new partition is {{ partition_path }}'
+  when: device_needed
+
+- name: Create directory
+  become: yes
+  file:
+    path: '{{ bigbluebutton_storage_dir }}'
+    recurse: yes
+    state: directory
+
+- name: Mount new partition
+  become: yes
+  mount:
+    path: '{{ bigbluebutton_storage_dir }}'
+    src: '{{ partition_path }}'
+    fstype: ext4
+    opts: defaults
+    state: mounted
+  when: device_needed
+
+- stat:
+    path: '{{ item }}'
+  with_items:
+    - /var/bigbluebutton
+    - /var/freeswitch
+    - /var/kurento
+  register: reg_dir
+
+- name: Create parent directories to move 
+  become: yes
+  file:
+    path: '{{ bigbluebutton_storage_dir }}{{ item.item | dirname }}'
+    recurse: yes
+    state: directory
+  with_items: '{{ reg_dir.results }}'
+
+- name: Move directories to storage
+  become: yes
+  command: mv {{ item.item }} {{ bigbluebutton_storage_dir }}{{ item.item }}
+  with_items: '{{ reg_dir.results }}'
+  when: item.stat.exists and not item.stat.islnk
+  notify: restart bigbluebutton
+
+- name: Create links to storage
+  become: yes
+  file:
+    src: '{{ bigbluebutton_storage_dir }}{{ item.item }}'
+    dest: '{{ item.item }}'
+    state: link
+  with_items: '{{ reg_dir.results }}'
+  when: item.stat.exists and not item.stat.islnk
+  notify: restart bigbluebutton

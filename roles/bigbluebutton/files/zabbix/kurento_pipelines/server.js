@@ -304,11 +304,8 @@ function getPipelinesInfo(server, callback) {
                         return callback(error);
                     }
                     Promise.all(firstPromises).then(function(value) {
-                        // Do not retrieve detailed stats if there are more than 50 endpoints,
-                        // so it won't flood the KMS API
-                        if (endpointsCount >= 50) {
-                            return callback();
-                        }
+                        // Do not retrieve detailed stats to avoid flooding the KMS API
+                        return callback();
 
                         Promise.all(promises).then(function(value) {
                             return callback();

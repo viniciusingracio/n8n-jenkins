@@ -11,10 +11,12 @@
 
 - name: Configure ufw rules for SIP
   become: true
-  ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
-  with_items:
-    - { rule: 'allow', port: 5060, proto: 'tcp' }
-    - { rule: 'allow', port: 5060, proto: 'udp' }
+  ufw: rule={{ item[0].rule }} port={{ item[0].port }} proto={{ item[0].proto }} from_ip={{ item[1] }}
+  with_nested:
+    -
+      - { rule: 'allow', port: 5060, proto: 'tcp' }
+      - { rule: 'allow', port: 5060, proto: 'udp' }
+    - '{{ bigbluebutton_sip_sources }}'
   notify:
     - restart ufw
   when: bigbluebutton_sip
@@ -40,10 +42,14 @@
 - name: Modify sysctl
   become: true
   replace:
-    path: /etc/ufw/sysctl.conf
-    regexp: '^[#]?({{ item.name }})=.*'
-    replace: \1={{ item.value }}
-  with_items: "{{ bigbluebutton_sysctl }}"
+    path: '{{ item[0] }}'
+    regexp: '^[#]?({{ item[1].name }})=.*'
+    replace: \1={{ item[1].value }}
+  with_nested:
+    -
+      - /etc/ufw/sysctl.conf
+      - /etc/sysctl.conf
+    - '{{ bigbluebutton_sysctl }}'
   register: reboot_required_raw
 
 - set_fact:

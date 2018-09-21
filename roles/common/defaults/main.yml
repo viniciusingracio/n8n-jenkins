@@ -9,3 +9,6 @@ common_ufw_rules: []
 # common_ufw_rules:
 #   - { rule: 'limit', port: 22, proto: 'tcp' }
 #   - { rule: 'allow', port: 443, proto: 'tcp' }
+
+common_ufw_ssh_sources:
+  - any

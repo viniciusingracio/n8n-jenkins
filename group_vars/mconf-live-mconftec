@@ -32,14 +32,6 @@ bigbluebutton_html5_config:
   - { path: '/public/app/copyright', value: '{{ bigbluebutton_branding_copyright_html5 }}' }
   - { path: '/public/app/defaultSettings/application/chatPushAlerts', value: true }
 
-bigbluebutton_stun_server:
-  - stun:stun1.mconf.com:3478
-  - stun:stun.l.google.com:19302
-
-bigbluebutton_turn_server:
- - { url: 'turn:stun1.mconf.com:3478', secret: '58b14d9c3def68b4e70f1d32b58c607e', ttl: '86400' }
- - { url: 'turn:stun1.mconf.com:5349?transport=tcp', secret: '58b14d9c3def68b4e70f1d32b58c607e', ttl: '86400' }
-
 bigbluebutton_sounds_profile:
   - { name: 'muted-sound', value: 'silence' }
   - { name: 'unmuted-sound', value: 'silence' }
