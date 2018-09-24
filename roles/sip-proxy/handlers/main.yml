@@ -2,8 +2,8 @@
 
 - name: restart freeswitch
   become: yes
-  service: name=freeswitch state=restarted
+  systemd: name=freeswitch state=restarted
 
 - name: restart fail2ban
   become: yes
-  service: name=fail2ban state=restarted
+  systemd: name=fail2ban state=restarted
