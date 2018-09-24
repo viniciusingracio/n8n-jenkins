@@ -12,8 +12,8 @@ bigbluebutton_screenshare_extension_key: mbfngdphjegmlbfobcblikeefpidfncb
 
 certbot_domain: '{{ inventory_hostname }}'
 certbot_webroot_cmd: '{{ certbot_base_cmd }} --webroot -w /var/www/bigbluebutton-default/'
-bigbluebutton_ssl_certificate: '{% if certbot_enabled %}{{ certbot_cert_path}}/fullchain.pem{% else %}/etc/nginx/ssl/{{ inventory_hostname }}.crt{% endif %}'
-bigbluebutton_ssl_certificate_key: '{% if certbot_enabled %}{{ certbot_cert_path}}/privkey.pem{% else %}/etc/nginx/ssl/{{ inventory_hostname }}.key{% endif %}'
+bigbluebutton_ssl_certificate: '{% if certbot_enabled %}{{ certbot_cert_path }}/fullchain.pem{% else %}/etc/nginx/ssl/{{ inventory_hostname }}.crt{% endif %}'
+bigbluebutton_ssl_certificate_key: '{% if certbot_enabled %}{{ certbot_cert_path }}/privkey.pem{% else %}/etc/nginx/ssl/{{ inventory_hostname }}.key{% endif %}'
 bigbluebutton_local_ssl_certificate: '{% if not certbot_enabled %}envs/{{ env }}/files/{{ inventory_hostname }}.crt{% endif %}'
 bigbluebutton_local_ssl_certificate_key: '{% if not certbot_enabled %}envs/{{ env }}/files/{{ inventory_hostname }}.key{% endif %}'
 
@@ -22,3 +22,6 @@ public_keys:
   - public_keys/fcecagno.pub
   - public_keys/prlanzarin.pub
   - public_keys/pedrobmarin.pub
+
+bigbluebutton_stun_server:
+  - stun:stun1.mconf.com:3478

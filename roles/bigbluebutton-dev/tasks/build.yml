@@ -67,9 +67,11 @@
 
 - include: build-red5-apps.yml
   tags: [build-bbb,build-red5-apps]
+  when: not biglbuebutton_dev_html5_only
 
 - include: build-flash.yml
   tags: [build-bbb,build-flash]
+  when: not biglbuebutton_dev_html5_only
 
 - include: build-web.yml
   tags: [build-bbb,build-web]

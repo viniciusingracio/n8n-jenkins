@@ -53,3 +53,35 @@
     chdir: '{{ ansible_env.HOME }}/dev/bigbluebutton/bbb-screenshare/app'
   environment:
     PATH: '{{ ansible_env.HOME }}/dev/tools/gradle/bin:{{ ansible_env.PATH }}'
+
+- name: Compile and deploy screenshare
+  shell: |
+    sbt clean
+    sbt compile
+    sbt package
+    rm -rf /usr/share/red5/webapps/screenshare
+    cp -r target/webapp /usr/share/red5/webapps/screenshare
+    find /usr/share/red5/webapps/screenshare/WEB-INF/lib/ -type f \
+      -not -name bbb-screenshare-akka_* \
+      -not -name scala-library-* \
+      -not -name scala-reflect-* \
+      -not -name jackson-* \
+      -not -name paranamer-* \
+      -not -name akka-* \
+      -not -name config-* \
+      -not -name gson-* \
+      -not -name jedis-*.jar \
+      -not -name commons-pool* \
+      -not -name spring-webmvc-* \
+      -not -name rediscala_* \
+      -not -name bbb-common-message* \
+      -exec rm -vf {} \;
+    mkdir -p /usr/share/red5/webapps/screenshare/lib
+    cp -r jws/lib/* /usr/share/red5/webapps/screenshare/lib/
+    cp jws/screenshare.jnlp /usr/share/red5/webapps/screenshare/
+  args:
+    chdir: '{{ ansible_env.HOME }}/dev/bigbluebutton/{{ item }}'
+  environment:
+    PATH: '{{ ansible_env.HOME }}/dev/tools/sbt/bin:{{ ansible_env.PATH }}'
+  with_items:
+    - bbb-screenshare/app

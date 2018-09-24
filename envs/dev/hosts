@@ -23,10 +23,6 @@ kurento-desktopsharing.mconf.com ansible_user=root deploy_user=root
 [mconf-live110]
 dev.mconf.local ansible_user=ubuntu
 
-[bigbluebutton-dev]
-dev.mconf.local ansible_user=ubuntu
-test-live110.mconf.com common_ufw_enabled=false
-
 [docker-host]
 felipe-docker.mconf.com
 test-live1.dev.mconf.com
@@ -53,3 +49,8 @@ k8s-node1 common_ufw_enabled=false ansible_host=200.133.39.49
 k8s-node2 common_ufw_enabled=false ansible_host=10.1.1.207 ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -q ubuntu@200.133.39.49"'
 k8s-node3 common_ufw_enabled=false ansible_host=10.1.1.166 ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -q ubuntu@200.133.39.49"'
 k8s-node4 common_ufw_enabled=false ansible_host=10.1.1.155 ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -q ubuntu@200.133.39.49"'
+
+[bigbluebutton-dev]
+dev.mconf.local ansible_user=ubuntu
+test-live110.mconf.com common_ufw_enabled=false
+felipe.dev.mconf.com bigbluebutton_dev_repo=git@github.com:bigbluebutton/bigbluebutton.git bigbluebutton_dev_repo_ref=v2.0.x-release

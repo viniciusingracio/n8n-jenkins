@@ -4,7 +4,14 @@ bigbluebutton_html5: true
 bigbluebutton_html5_only: true
 bigbluebutton_sip: false
 
-bigbluebutton_default_presentation: envs/{{ env }}/files/default_16x9.pdf
+bigbluebutton_default_presentation: envs/{{ env }}/files/default.pdf
 
 mconf_live_enabled_recording_formats:
   - presentation
+
+bigbluebutton_redis_bind:
+  - 0.0.0.0
+
+certbot_webroot_cmd: '{{ certbot_base_cmd }} --webroot -w /var/www/bigbluebutton-default/'
+
+aws_publisher_available_formats: presentation
