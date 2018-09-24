@@ -1,5 +1,9 @@
 ---
 
 - name: restart freeswitch
-  become: true
+  become: yes
   service: name=freeswitch state=restarted
+
+- name: restart fail2ban
+  become: yes
+  service: name=fail2ban state=restarted

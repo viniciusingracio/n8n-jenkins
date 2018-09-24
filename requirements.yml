@@ -7,3 +7,7 @@
 
 - src: https://github.com/kwoodson/yedit
   name: kwoodson.yedit
+
+- src: oefenweb.fail2ban
+  version: v3.2.13
+

@@ -94,3 +94,5 @@
 - include: ufw.yml
   when: common_ufw_enabled
   tags: [ufw,firewall]
+
+- include: fail2ban.yml
