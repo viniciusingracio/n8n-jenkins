@@ -22,7 +22,7 @@
   args:
     executable: /bin/bash
   notify:
-    - restart docker
+    - recreate docker rules on iptables
 
 - name: Reset ufw
   become: true
