@@ -32,3 +32,26 @@
     src: files/exports.j2
     dest: /etc/exports
   notify: restart nfs-server
+
+- name: Copy script to update mconf-decrypter.yml
+  copy:
+    src: files/update-mconf-decrypter.rb
+    dest: /usr/local/bigbluebutton/core/scripts/utils/update-mconf-decrypter.rb
+  become: yes
+  when: mconf_rec_update_decrypter_enabled
+
+- cron:
+    name: update decrypter
+    minute: 0
+    hour: */4
+    job: mysql -N -u {{ mconf_rec_update_decrypter_db_user }}-r -p'{{ mconf_rec_update_decrypter_db_password }}' -h {{ mconf_rec_update_decrypter_db_host }} -P {{ mconf_rec_update_decrypter_db_port }} {{ mconf_rec_update_decrypter_db_name }} -e "SELECT name, salt FROM Integrations JOIN Plans on Integrations.ownerId = Plans.id  WHERE ownerType = 'Plan' AND (expireAt IS NULL OR expireAt > now());" | ruby /usr/local/bigbluebutton/core/scripts/get-recordings.rb --api-server {{ mconf_rec_update_decrypter_api_server }} --rec-server {{ mconf_rec_update_decrypter_rec_server}}
+    user: root
+  become: yes
+  when: mconf_rec_update_decrypter_enabled
+
+- cron:
+    name: cleanup published done
+    special_time: daily
+    job: mkdir -p /var/bigbluebutton/recording/status/old_published && find /var/bigbluebutton/recording/status/published/ -name "*.done" -mtime +30 -exec mv {} /var/bigbluebutton/recording/status/old_published/ \;
+    user: root
+  become: yes
