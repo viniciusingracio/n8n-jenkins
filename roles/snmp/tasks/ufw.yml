@@ -1,0 +1,8 @@
+---
+
+- name: Configure ufw rules for snmp
+  become: true
+  ufw: rule=allow port=161 proto=udp from_ip={{ item }}
+  with_items: '{{ snmp_sources }}'
+  notify:
+    - restart ufw

@@ -162,6 +162,10 @@
   - { role: mconf-web-reports, when: mconf_web_reports_enabled }
   - { role: test-webrtc, when: test_webrtc_enabled }
 
+- hosts: snmp
+  roles:
+  - snmp
+
 - hosts: all
   roles:
   - { role: reboot, tags: always }

@@ -5,6 +5,7 @@ bigbluebutton_branding_copyright: '&#169; 2018 &#183; <u><a href="https://elos.v
 bigbluebutton_branding_copyright_html5: '© 2018 · elos.vc'
 bigbluebutton_branding_toolbar_color: '#2dccd3'
 bigbluebutton_branding_toolbar_color_alphas: '0, 0'
+bigbluebutton_branding_playback_copyright: <p>Gravado no <a target="_blank" href="https://elos.vc/">Elos</a></p>
 
 bigbluebutton_config_xml:
   - { xpath: '/config/branding', attribute: 'logo', value: 'logo.png' }

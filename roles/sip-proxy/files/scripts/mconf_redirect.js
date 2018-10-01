@@ -161,10 +161,21 @@ function redirectCall(meeting) {
         session.execute("redirect", "sip:" + dest_uri);
     } else {
         console_log("INFO", "[MCONF-SIP-PROXY] Bridging call to " + dest_uri + "\n");
+
         session.setVariable('bypass_media', 'true');
-        session.execute("bridge", "sofia/external/" + dest_uri);
-    }
-    return true;
+        session.setVariable('bypass_keep_codec', 'true');
+        session.setVariable('inbound_late_negotiation', 'true');
+        session.setVariable('inherit_codec', 'true');
+        session.setVariable('rtp_pass_codecs_on_stream_change', 'true');
+        session.setVariable('sip_route_uri', 'sip:' + dest_uri + ':5060');
+        session.setVariable('sip_renegotiate_codec_on_reinvite', 'true');
+        session.setVariable('sip_ignore_reinvites', 'true');
+        session.setVariable('sip_enable_soa', 'false');
+        session.setVariable('enable-timer', 'false');
+        session.setVariable('sip-force-contact', 'NDLB-connectile-dysfunction');
+
+        session.execute("bridge", '{sip-force-contact=NDLB-connectile-dysfunction,enable-timer=false,sip_ignore_reinvites=true,inbound_late_negotiation=true,inherit_codec=true,bypass_keep_codec=true,sip_renegotiate_codec-on_reinvite=true,sip_route_uri=sip:' + dest_uri + ':5060}sofia/external/' + dest_uri);
+        return true;
 }
 
 function getMeetings(server_url, server_salt) {

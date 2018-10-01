@@ -451,24 +451,36 @@
     dest: /usr/local/bigbluebutton/core/scripts/utils/
   become: yes
 
-- cron:
-    name: "remove norecord"
+- name: Install cron job to remove media files from non-recorded meetings
+  cron:
+    name: remove norecord
     special_time: hourly
-    job: "/usr/bin/ruby /usr/local/bigbluebutton/core/scripts/utils/remove-norecord.rb"
+    job: /usr/bin/ruby /usr/local/bigbluebutton/core/scripts/utils/remove-norecord.rb
     user: root
   become: yes
 
-- cron:
-    name: "remove archived"
+- name: Install cron job to remove media files already archived
+  cron:
+    name: remove archived
     special_time: hourly
-    job: "/usr/bin/ruby /usr/local/bigbluebutton/core/scripts/utils/clean-recordings-data.rb"
+    job: /usr/bin/ruby /usr/local/bigbluebutton/core/scripts/utils/clean-recordings-data.rb
     user: root
   become: yes
 
-- cron:
-    name: "remove encrypted"
+- name: Install cron job to remove encrypted files after 7 days
+  cron:
+    name: remove encrypted
     special_time: daily
-    job: "/usr/local/bigbluebutton/core/scripts/utils/remove-encrypted.sh"
+    job: /usr/local/bigbluebutton/core/scripts/utils/remove-encrypted.sh
+    user: root
+  become: yes
+
+- name: Install cron job to restart KMS daily
+  cron:
+    name: restart kms
+    minute: 0
+    hour: 4
+    job: systemctl restart kurento-media-server.service
     user: root
   become: yes
 

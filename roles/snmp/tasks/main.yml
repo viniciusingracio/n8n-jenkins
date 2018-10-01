@@ -1,0 +1,21 @@
+---
+
+- name: Update apt (if older than 5m)
+  become: true
+  apt: update_cache=yes cache_valid_time=300
+
+- name: Install snmpd
+  become: true
+  apt:
+    name: snmpd
+
+- name: Update snmpd conf
+  become: yes
+  template:
+    src: templates/snmpd.conf.j2
+    dest: /etc/snmp/snmpd.conf
+  notify: restart snmpd
+
+- include: ufw.yml
+  when: common_ufw_enabled
+  tags: [ufw,firewall]
