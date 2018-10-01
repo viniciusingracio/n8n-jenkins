@@ -164,7 +164,7 @@
 
 - hosts: snmp
   roles:
-  - snmp
+  - { role: snmp, tags: [ snmp ] }
 
 - hosts: all
   roles:
