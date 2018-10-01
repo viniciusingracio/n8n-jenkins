@@ -1,0 +1,12 @@
+/usr/bin/ansible-playbook -v -i envs/rnp/h/hosts -l mconf-live110,mconf-live200,mconf-rec,mconf-recw,sip-proxy,coturn provision.yml -T 180
+
+live-compute01.h.mconf.rnp.br: 136 OK, 25 changed, 0 unreachable, 0 failed
+live-compute02.h.mconf.rnp.br: 136 OK, 25 changed, 0 unreachable, 0 failed
+live-compute03.h.mconf.rnp.br: 144 OK, 25 changed, 0 unreachable, 0 failed
+live-compute04.h.mconf.rnp.br: 144 OK, 25 changed, 0 unreachable, 0 failed
+rec-compute01.h.mconf.rnp.br: 163 OK, 35 changed, 0 unreachable, 0 failed
+rec-ufg01.h.mconf.rnp.br: 161 OK, 32 changed, 0 unreachable, 0 failed
+recw-compute01.h.mconf.rnp.br: 127 OK, 29 changed, 0 unreachable, 0 failed
+recw-compute02.h.mconf.rnp.br: 127 OK, 29 changed, 0 unreachable, 0 failed
+sip.h.mconf.rnp.br: 18 OK, 4 changed, 0 unreachable, 1 failed
+stun-compute01.h.mconf.rnp.br: 14 OK, 2 changed, 0 unreachable, 0 failed
