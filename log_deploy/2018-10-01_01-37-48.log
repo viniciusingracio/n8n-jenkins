@@ -1,0 +1,5 @@
+/usr/bin/ansible-playbook -v -i envs/prod/ufrgs/hosts provision.yml -T 180
+
+mconf-gravacao.ufrgs.br: 132 OK, 47 changed, 0 unreachable, 1 failed
+mconf1.ufrgs.br: 133 OK, 43 changed, 0 unreachable, 0 failed
+mconf2.ufrgs.br: 133 OK, 43 changed, 0 unreachable, 0 failed

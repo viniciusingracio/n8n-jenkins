@@ -28,10 +28,11 @@ bigbluebutton_html5_config:
   - { path: '/public/kurento/enableVideo', value: true }
   - { path: '/public/kurento/enableVideoStats', value: true }
   - { path: '/public/kurento/enableListenOnly', value: true }
-  - { path: '/public/app/appName', value: 'Mconf' }
-  - { path: '/public/app/clientTitle', value: 'Mconf' }
+  - { path: '/public/app/appName', value: 'Elos' }
+  - { path: '/public/app/clientTitle', value: 'Elos' }
   - { path: '/public/app/copyright', value: '{{ bigbluebutton_branding_copyright_html5 }}' }
   - { path: '/public/app/defaultSettings/application/chatPushAlerts', value: true }
+  - { path: '/public/app/showHelpButton', value: false }
 
 bigbluebutton_sounds_profile:
   - { name: 'muted-sound', value: 'silence' }

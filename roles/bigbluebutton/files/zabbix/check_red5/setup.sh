@@ -1,3 +1,3 @@
 #!/bin/bash -e
 
-apt-get -y install rtmpdump
+sudo apt-get -y install rtmpdump
