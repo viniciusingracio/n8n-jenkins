@@ -1,0 +1,3 @@
+/usr/bin/ansible-playbook -v -i envs/prod/com/hosts -l live06.mconf.com provision.yml -T 180
+
+live06.mconf.com: 190 OK, 40 changed, 0 unreachable, 0 failed
