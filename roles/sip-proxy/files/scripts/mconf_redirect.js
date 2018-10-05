@@ -176,6 +176,7 @@ function redirectCall(meeting) {
 
         session.execute("bridge", '{sip-force-contact=NDLB-connectile-dysfunction,enable-timer=false,sip_ignore_reinvites=true,inbound_late_negotiation=true,inherit_codec=true,bypass_keep_codec=true,sip_renegotiate_codec-on_reinvite=true,sip_route_uri=sip:' + dest_uri + ':5060}sofia/external/' + dest_uri);
         return true;
+    }
 }
 
 function getMeetings(server_url, server_salt) {
