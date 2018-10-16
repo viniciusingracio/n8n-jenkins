@@ -49,7 +49,7 @@
 
 - name: Copy custom nginx config file
   template:
-    src: files/nginx.conf.j2
+    src: templates/nginx.conf.j2
     dest: /etc/nginx/nginx.conf
     mode: 0644
   become: yes
