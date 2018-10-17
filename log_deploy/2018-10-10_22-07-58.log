@@ -1,0 +1,3 @@
+/usr/bin/ansible-playbook -v -i envs/prod/redclara/hosts -l sip-proxy --become provision.yml -T 180
+
+mconf-sip.redclara.net: 19 OK, 6 changed, 0 unreachable, 0 failed
