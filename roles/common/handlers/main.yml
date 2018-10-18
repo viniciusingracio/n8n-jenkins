@@ -1,0 +1,5 @@
+- name: recreate docker rules on iptables
+  become: true
+  service: name=docker state=restarted
+  ignore_errors: yes
+

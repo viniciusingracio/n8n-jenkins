@@ -1,0 +1,5 @@
+/usr/bin/ansible-playbook -v -i envs/prod/redclara/hosts -l mconf-live110,mconf-rec provision.yml -T 180
+
+mconf-live1.redclara.net: 125 OK, 25 changed, 0 unreachable, 0 failed
+mconf-live2.redclara.net: 133 OK, 83 changed, 0 unreachable, 0 failed
+mconf-recordings.redclara.net: 11 OK, 4 changed, 0 unreachable, 1 failed

@@ -13,7 +13,9 @@
       BIGBLUEBUTTON_SHARED_SECRET: '{{ item.bigbluebutton_shared_secret }}'
       LTI_ENDPOINT: '{{ inventory_hostname }}/{{ item.id }}'
       LTI_CONSUMERS: '{{ item.lti_customers }}'
+      LTI_CONTEXT_PATH: '{{ item.id }}#lti'
       JAVA_OPTS: -Xmx128m
+      RECORDED_BY_DEFAULT: true
   with_items: '{{ mconf_lti_config }}'
   loop_control:
     index_var: loop_index

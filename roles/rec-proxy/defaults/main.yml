@@ -32,3 +32,7 @@ rec_proxy_http_port: 80
 rec_proxy_api_secret:
 rec_proxy_jwt_secret:
 rec_proxy_redirect_unauthorized:
+
+rec_proxy_cache_num_keys: 10m
+rec_proxy_cache_expire_after: 30d
+rec_proxy_cache_max_size: 10g

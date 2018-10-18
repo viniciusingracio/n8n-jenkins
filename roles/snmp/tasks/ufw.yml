@@ -1,0 +1,10 @@
+---
+
+- name: Configure ufw rules for snmp
+  become: true
+  ufw: rule=allow port={{ item[0].port }} proto={{ item[0].proto }} from_ip={{ item[1] }}
+  with_nested:
+    - '{{ snmp_ufw_rules }}'
+    - '{{ snmp_sources }}'
+  notify:
+    - restart ufw

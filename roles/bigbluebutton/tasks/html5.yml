@@ -55,3 +55,16 @@
     replace: 'defaultGuestPolicy=ALWAYS_ACCEPT'
     encoding: '{{ properties_charset }}'
   notify: restart bigbluebutton
+
+- name: Configure webhooks
+  become: yes
+  lineinfile:
+    dest: /usr/local/bigbluebutton/bbb-webhooks/config_local.js
+    regexp: '{{ item.regexp }}'
+    line: '{{ item.line }}'
+  with_items:
+    - { regexp: '^config.bbb.serverDomain', line: 'config.bbb.serverDomain = "{{ inventory_hostname }}"' }
+    - { regexp: '^config.bbb.sharedSecret', line: 'config.bbb.sharedSecret = "{{ bbb_secret }}"' }
+    - { regexp: '^config.bbb.auth2_0', line: 'config.bbb.auth2_0 = true' }
+  when: bigbluebutton_webhooks
+  notify: restart webhooks

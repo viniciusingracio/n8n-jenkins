@@ -1,0 +1,4 @@
+/usr/bin/ansible-playbook -v -i envs/prod/redclara/hosts -l coturn,sip-proxy --extra-vars ansible_user=mconf --ask-pass --ask-become setup.yml -T 180
+
+mconf-coturn.redclara.net: 23 OK, 14 changed, 0 unreachable, 0 failed
+mconf-sip.redclara.net: 23 OK, 14 changed, 0 unreachable, 0 failed

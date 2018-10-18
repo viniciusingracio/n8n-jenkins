@@ -1,0 +1,9 @@
+/usr/bin/ansible-playbook -v -i envs/rnp/prod/hosts -l mconf-rec,mconf-recw provision.yml -T 180
+
+rec01.mconf.rnp.br: 170 OK, 60 changed, 0 unreachable, 0 failed
+recw01-p.mconf.rnp.br: 128 OK, 40 changed, 0 unreachable, 0 failed
+recw02-p.mconf.rnp.br: 128 OK, 40 changed, 0 unreachable, 0 failed
+recw03-p.mconf.rnp.br: 128 OK, 40 changed, 0 unreachable, 0 failed
+recw04-p.mconf.rnp.br: 128 OK, 40 changed, 0 unreachable, 0 failed
+recw05-p.mconf.rnp.br: 128 OK, 40 changed, 0 unreachable, 0 failed
+recw06-p.mconf.rnp.br: 128 OK, 40 changed, 0 unreachable, 0 failed

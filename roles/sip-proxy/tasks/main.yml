@@ -41,8 +41,8 @@
   with_items:
     - { src: 'files/scripts/bigbluebutton-api.js', dest: '{{ sip_proxy_scripts_dir }}/bigbluebutton-api.js' }
     - { src: 'files/scripts/mconf_redirect.js', dest: '{{ sip_proxy_scripts_dir }}/mconf_redirect.js' }
-    - { src: 'files/scripts/PhoneFormat.js', dest: '{{ sip_proxy_scripts_dir }}/PhoneFormat.js' }
-    - { src: 'files/scripts/sha1.js', dest: '{{ sip_proxy_scripts_dir }}/sha1.js' }
+    - { src: 'files/scripts/phone-format.min.js', dest: '{{ sip_proxy_scripts_dir }}/phone-format.min.js' }
+    - { src: 'files/scripts/sha.js', dest: '{{ sip_proxy_scripts_dir }}/sha.js' }
     - { src: 'files/dialplan/public.xml', dest: '{{ sip_proxy_dialplan_dir }}/public.xml' }
     - { src: 'files/directory/default.xml', dest: '{{ sip_proxy_directory_dir }}/default.xml' }
   notify: restart freeswitch
@@ -94,3 +94,5 @@
 - include: ufw.yml
   when: common_ufw_enabled
   tags: [ufw,firewall]
+
+- include: fail2ban.yml

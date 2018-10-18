@@ -3,3 +3,5 @@
 bigbluebutton_dev_repo: git@github.com:mconftec/bigbluebutton.git
 bigbluebutton_dev_repo_ref: mconf-commercial-1.1
 bigbluebutton_dev_stash_changes: no
+
+biglbuebutton_dev_html5_only: yes

@@ -7,13 +7,25 @@
   yedit:
     src: /usr/local/bigbluebutton/core/scripts/mconf-presentation-recorder.yml
     edits:
-    - { key: 'api_entry_point', value: '{{ mconf_live_recording_auth_entry_point | default(bbb_api_entry_point, true) }}' }
-    - { key: 'api_shared_secret', value: '{{ mconf_live_recording_auth_secret | default(bbb_secret, true) }}' }
-    - { key: 'local_address', value: '{{ mconf_live_recording_auth_local_address | default(ansible_default_ipv4.address, true) }}' }
-    - { key: 'simultaneous_meetings', value: '{{ mconf_live_num_presentation_recorders }}' }
+      - { key: 'api_entry_point', value: '{{ mconf_live_recording_auth_entry_point | default(bbb_api_entry_point.stdout, true) }}' }
+      - { key: 'api_shared_secret', value: '{{ mconf_live_recording_auth_secret | default(bbb_secret.stdout, true) }}' }
+      - { key: 'local_address', value: '{{ mconf_live_recording_auth_local_address | default(ansible_default_ipv4.address, true) }}' }
+      - { key: 'simultaneous_meetings', value: '{{ mconf_live_num_presentation_recorders }}' }
     state: present
   become: yes
   when: reg_recorder.stat.exists
+
+- name: Configure video formats
+  become: yes
+  yedit:
+    src: '{{ item }}'
+    edits:
+      - { key: 'video_formats', value: '{{ mconf_live_video_formats }}' }
+    state: present
+  with_items:
+    - /usr/local/bigbluebutton/core/scripts/presentation.yml
+    - /usr/local/bigbluebutton/core/scripts/presentation_video.yml
+  ignore_errors: yes
 
 - name: Check if presentation_video is installed
   stat:

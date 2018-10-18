@@ -1,10 +1,11 @@
 ---
 
-bigbluebutton_branding_welcome_footer: Para mais informações, acesse <a href="https://www.elos.vc" target="_blank"><u>elos.vc</u></a>.
-bigbluebutton_branding_copyright: '&#169; 2018 &#183; <u><a href="https://www.elos.vc" target="_blank">elos.vc</a></u>'
+bigbluebutton_branding_welcome_footer: Para mais informações, acesse <a href="https://elos.vc" target="_blank"><u>elos.vc</u></a>.
+bigbluebutton_branding_copyright: '&#169; 2018 &#183; <u><a href="https://elos.vc" target="_blank">elos.vc</a></u>'
 bigbluebutton_branding_copyright_html5: '© 2018 · elos.vc'
 bigbluebutton_branding_toolbar_color: '#2dccd3'
 bigbluebutton_branding_toolbar_color_alphas: '0, 0'
+bigbluebutton_branding_playback_copyright: <p>Gravado no <a target="_blank" href="https://elos.vc/">Elos</a></p>
 
 bigbluebutton_config_xml:
   - { xpath: '/config/branding', attribute: 'logo', value: 'logo.png' }
@@ -27,18 +28,11 @@ bigbluebutton_html5_config:
   - { path: '/public/kurento/enableVideo', value: true }
   - { path: '/public/kurento/enableVideoStats', value: true }
   - { path: '/public/kurento/enableListenOnly', value: true }
-  - { path: '/public/app/appName', value: 'Mconf' }
-  - { path: '/public/app/clientTitle', value: 'Mconf' }
+  - { path: '/public/app/appName', value: 'Elos' }
+  - { path: '/public/app/clientTitle', value: 'Elos' }
   - { path: '/public/app/copyright', value: '{{ bigbluebutton_branding_copyright_html5 }}' }
   - { path: '/public/app/defaultSettings/application/chatPushAlerts', value: true }
-
-bigbluebutton_stun_server:
-  - stun:stun1.mconf.com:3478
-  - stun:stun.l.google.com:19302
-
-bigbluebutton_turn_server:
- - { url: 'turn:stun1.mconf.com:3478', secret: '58b14d9c3def68b4e70f1d32b58c607e', ttl: '86400' }
- - { url: 'turn:stun1.mconf.com:5349?transport=tcp', secret: '58b14d9c3def68b4e70f1d32b58c607e', ttl: '86400' }
+  - { path: '/public/app/showHelpButton', value: false }
 
 bigbluebutton_sounds_profile:
   - { name: 'muted-sound', value: 'silence' }

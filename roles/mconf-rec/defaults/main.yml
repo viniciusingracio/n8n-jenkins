@@ -1,3 +1,15 @@
-mconf_rec_share_nfs: no
-mconf_rec_mount_nfs: no
-mconf_rec_enable_local_processing: yes
+mconf_rec_share_nfs: false
+mconf_rec_mount_nfs: false
+mconf_rec_enable_local_processing: true
+
+mconf_rec_get_recordings_url: []
+
+mconf_rec_update_decrypter_enabled: false
+mconf_rec_update_decrypter_db_user:
+mconf_rec_update_decrypter_db_password:
+mconf_rec_update_decrypter_db_host:
+mconf_rec_update_decrypter_db_port:
+mconf_rec_update_decrypter_db_name:
+mconf_rec_update_decrypter_api_server:
+
+mconf_rec_remote_var_bigbluebutton: /var/bigbluebutton

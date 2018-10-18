@@ -1,3 +1,5 @@
 [client]
-user=root
-password={{ mconf_db_mysql_root_db_pass }}
+user     = root
+password = {{ mconf_db_mysql_root_db_pass }}
+host     = localhost
+socket   = /var/run/mysqld/mysqld.sock

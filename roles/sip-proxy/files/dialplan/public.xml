@@ -15,6 +15,9 @@
 
     <extension name="redirect">
       <condition field="destination_number" expression="^(.*)$">
+        <action application="set" data="sip_ignore_reinvites=true"/>
+        <action application="set" data="enable-timer=false"/>
+        <action application="export" data="sip_enable_soa=false"/>
         <action application="javascript" data="mconf_redirect.js ${destination_number} ${network_addr} '${caller_id_name}' '${sip_user_agent}'"/>
       </condition>
     </extension>

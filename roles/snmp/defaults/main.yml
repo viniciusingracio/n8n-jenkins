@@ -1,0 +1,9 @@
+---
+
+snmp_syslocation: Sitting on the Dock of the Bay
+snmp_syscontact: Me <me@example.org>
+snmp_rocommunity: public  default    -V systemonly
+snmp_sources: []
+
+snmp_ufw_rules:
+  - { port: 161, proto: "udp" }

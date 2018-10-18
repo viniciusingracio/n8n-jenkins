@@ -1,5 +1,5 @@
 - src: dj-wasabi.zabbix-agent
-  version: 1.1.0
+  version: 1.4.0
 
 - src: https://github.com/mconftec/ansible-role-json
   version: include-if-missing
@@ -7,3 +7,7 @@
 
 - src: https://github.com/kwoodson/yedit
   name: kwoodson.yedit
+
+- src: oefenweb.fail2ban
+  version: v3.2.13
+

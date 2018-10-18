@@ -38,3 +38,7 @@
 - name: reboot
   become: true
   command: shutdown -r 1
+
+- name: restart webhooks
+  become: true
+  service: name=bbb-webhooks state=restarted

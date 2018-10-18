@@ -2,5 +2,9 @@
   become: true
   service: name=ufw state=restarted
 
+- name: restart docker
+  become: true
+  service: name=docker state=restarted
+
 - name: docker logout
-  command: 'docker logout'
+  command: docker logout

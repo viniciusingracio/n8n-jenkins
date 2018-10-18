@@ -2,8 +2,6 @@
 
 sip_proxy_version: 0.0.1
 sip_proxy_default_int_code: BR
-sip_proxy_server_url:
-sip_proxy_server_salt:
 sip_proxy_mode: bridge
 sip_proxy_dialplan_dir: /opt/freeswitch/etc/freeswitch/dialplan
 sip_proxy_directory_dir: /opt/freeswitch/etc/freeswitch/directory
@@ -12,3 +10,6 @@ sip_proxy_modules:
   - mod_v8
 
 sip_proxy_stun:
+
+sip_proxy_credentials: []
+  # - { url: "/bigbluebutton/api", secret: "1234567890" }

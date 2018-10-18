@@ -7,6 +7,23 @@
   become: true
   apt: package=ufw state=present
 
+- name: Reset iptables
+  become: true
+  shell: |
+    set -e
+    iptables -P INPUT ACCEPT
+    iptables -F
+    iptables -X
+    iptables -Z
+    ip6tables -P INPUT ACCEPT
+    ip6tables -F
+    ip6tables -X
+    ip6tables -Z
+  args:
+    executable: /bin/bash
+  notify:
+    - recreate docker rules on iptables
+
 - name: Reset ufw
   become: true
   ufw:
@@ -28,11 +45,10 @@
   notify:
     - restart ufw
 
-- name: Configure default rules
+- name: Configure ssh rule
   become: true
-  ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
-  with_items:
-    - { rule: 'limit', port: '{{ ansible_port | default("22") }}', proto: 'tcp' }
+  ufw: rule=limit port={{ ansible_port | default("22") }} proto=tcp from_ip={{ item }}
+  with_items: '{{ common_ufw_ssh_sources }}'
   notify:
     - restart ufw
 

@@ -1,0 +1,19 @@
+/usr/bin/ansible-playbook -v -i envs/rnp/prod/hosts -l mconf-live110 provision.yml -T 180
+
+live-ac01.mconf.rnp.br: 138 OK, 33 changed, 0 unreachable, 0 failed
+live-al01.mconf.rnp.br: 139 OK, 45 changed, 0 unreachable, 0 failed
+live-cdcrec05.mconf.rnp.br: 138 OK, 33 changed, 0 unreachable, 0 failed
+live-cdcrec06.mconf.rnp.br: 138 OK, 33 changed, 0 unreachable, 0 failed
+live-cdcrec07.mconf.rnp.br: 138 OK, 33 changed, 0 unreachable, 0 failed
+live-cdcrec08.mconf.rnp.br: 138 OK, 33 changed, 0 unreachable, 0 failed
+live-cdcrec09.mconf.rnp.br: 138 OK, 33 changed, 0 unreachable, 0 failed
+live-cdcrec10.mconf.rnp.br: 138 OK, 33 changed, 0 unreachable, 0 failed
+live-cdcrec11.mconf.rnp.br: 138 OK, 34 changed, 0 unreachable, 0 failed
+live-ce01.mconf.rnp.br: 138 OK, 33 changed, 0 unreachable, 0 failed
+live-ma01.mconf.rnp.br: 138 OK, 33 changed, 0 unreachable, 0 failed
+live-ms01.mconf.rnp.br: 138 OK, 33 changed, 0 unreachable, 0 failed
+live-mt01.mconf.rnp.br: 138 OK, 33 changed, 0 unreachable, 0 failed
+live-pb01.mconf.rnp.br: 138 OK, 33 changed, 0 unreachable, 0 failed
+live-pe01.mconf.rnp.br: 138 OK, 33 changed, 0 unreachable, 0 failed
+live-sc01.mconf.rnp.br: 138 OK, 33 changed, 0 unreachable, 0 failed
+live-to01.mconf.rnp.br: 138 OK, 33 changed, 0 unreachable, 0 failed

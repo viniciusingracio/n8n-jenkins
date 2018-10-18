@@ -10,3 +10,12 @@ gluster_ufw_rules:
   - { rule: 'allow', port: 24007, proto: 'tcp' }         # glusterd management
   - { rule: 'allow', port: 24008, proto: 'tcp' }         # glusterd management
   - { rule: 'allow', port: '49152:49153', proto: 'tcp' } # gluster bricks
+
+gluster_dirs: []
+# example:
+# [
+#   { name: 'mconf-web',
+#     owner: '{{ deploy_user }}',
+#     group: '{{ deploy_user }}'
+#   }
+# ]

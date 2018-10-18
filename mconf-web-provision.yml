@@ -1,7 +1,0 @@
----
-
-- hosts: mconf-web
-  roles:
-  - mconf-web
-  - { role: mconf-web-reports, when: mconf_web_reports_enabled }
-  - { role: test-webrtc, when: test_webrtc_enabled }

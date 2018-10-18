@@ -1,6 +1,6 @@
 - include_role:
     name: bigbluebutton
-  tags: [bigbluebutton]
+  tags: always
 
 - name: Get BigBlueButton secret
   shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2

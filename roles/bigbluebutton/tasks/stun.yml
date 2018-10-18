@@ -20,6 +20,6 @@
 - name: Update tomcat7 stun/turn file
   become: yes
   template:
-    src: files/turn-stun-servers.xml.j2
+    src: templates/turn-stun-servers.xml.j2
     dest: /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/spring/turn-stun-servers.xml
   notify: restart bigbluebutton

@@ -12,8 +12,9 @@
     state: present
     executable: pip2
 
+# TODO reload systemd files before restart performance_report
 - template:
-    src: files/performance_report.service.j2
+    src: templates/performance_report.service.j2
     dest: /etc/systemd/system/performance_report.service
   become: yes
   notify: restart performance_report
