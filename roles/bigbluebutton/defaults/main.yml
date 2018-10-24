@@ -140,7 +140,7 @@ bigbluebutton_playback_protocol:
 
 bigbluebutton_retention_runtime: 5
 bigbluebutton_retention_unrecorded: 14
-bigbluebutton_retention_published_raw:
+bigbluebutton_retention_published_raw: 30
 
 bigbluebutton_storage_device:
 bigbluebutton_storage_dir:

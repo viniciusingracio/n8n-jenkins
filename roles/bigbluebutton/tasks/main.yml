@@ -365,6 +365,7 @@
     - { key: 'localIpAddress', value: '{{ external_ip }}' }
     - { key: 'acceptSelfSignedCertificate', value: '{{ use_self_signed_certificate }}' }
     - { key: 'mediaFlowTimeoutDuration', value: '15000' }
+    - { key: 'websocketPongTimeout', value: '15000' }
     - { key: 'common-message-version', value: '{% if bigbluebutton_html5 %}2.x{% else %}1.x{% endif %}' }
     - { key: 'freeswitch.ip', value: '{{ ansible_default_ipv4.address }}' }
     - { key: 'kurentoUrl', value: 'ws://{{ ansible_default_ipv4.address }}:8888/kurento' }
@@ -480,7 +481,7 @@
     name: restart kms
     minute: 0
     hour: 4
-    job: systemctl restart kurento-media-server.service
+    job: systemctl restart kurento-media-server.service bbb-webrtc-sfu.service mconf-mcs-sip.service
     user: root
   become: yes
 
