@@ -1,10 +1,12 @@
 ---
 
+bigbluebutton_apt_source: deb https://jenkins-live.mconf.com/apt/development/v2.0.x-release/xenial-2.0.0 mconf-xenial main
+
 bigbluebutton_html5: true
 bigbluebutton_html5_only: true
 bigbluebutton_sip: true
 
-bigbluebutton_default_presentation: envs/{{ env }}/files/default.pdf
+bigbluebutton_default_presentation: envs/{{ env }}/files/elos200.pdf
 
 mconf_live_enabled_recording_formats:
   - presentation

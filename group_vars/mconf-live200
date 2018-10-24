@@ -4,8 +4,6 @@ bigbluebutton_apt_package: bigbluebutton
 bigbluebutton_apt_source: deb https://jenkins-live.mconf.com/apt/development/mconf-200/xenial-2.0.0 mconf-xenial main
 bigbluebutton_apt_key: https://jenkins-live.mconf.com/apt/public.asc
 
-bigbluebutton_packages_skip_bbb_webrtc_sfu: true
-bigbluebutton_packages_skip_mconf_mcs_sip: true
 bigbluebutton_webhooks: false
 bigbluebutton_redis_bind:
   - 0.0.0.0

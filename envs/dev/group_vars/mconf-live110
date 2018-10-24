@@ -1,12 +1,13 @@
 ---
 
-bigbluebutton_html5: false
+bigbluebutton_apt_source: deb https://jenkins-live.mconf.com/apt/development/mconf-comm-110/xenial-1.1.0 mconf-xenial main
+
 bigbluebutton_sip: true
 
 bigbluebutton_config_xml_custom:
   - { xpath: '//module[@name="VideoconfModule"]', attribute: 'showExpandVideosButton', value: 'true' }
 
-bigbluebutton_default_presentation: envs/{{ env }}/files/default.pdf
+bigbluebutton_default_presentation: envs/{{ env }}/files/elos110.pdf
 
 mconf_live_enabled_recording_formats:
   - presentation

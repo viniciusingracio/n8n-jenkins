@@ -105,14 +105,6 @@
     state: '{{ bigbluebutton_apt_state }}'
   notify: restart bigbluebutton
 
-- name: Install bbb-webrtc-sfu
-  become: true
-  apt:
-    name: bbb-webrtc-sfu
-    state: '{{ bigbluebutton_apt_state }}'
-  when: not bigbluebutton_packages_skip_bbb_webrtc_sfu
-  notify: restart bigbluebutton
-
 - name: Upgrade packages to make sure BigBlueButton packages are updated
   become: true
   apt:
@@ -367,6 +359,7 @@
     - { key: 'localIpAddress', value: '{{ external_ip }}' }
     - { key: 'acceptSelfSignedCertificate', value: '{{ use_self_signed_certificate }}' }
     - { key: 'mediaFlowTimeoutDuration', value: '15000' }
+    - { key: 'websocketPongTimeout', value: '15000' }
     - { key: 'common-message-version', value: '{% if bigbluebutton_html5 %}2.x{% else %}1.x{% endif %}' }
     - { key: 'freeswitch.ip', value: '{{ ansible_default_ipv4.address }}' }
     - { key: 'kurentoUrl', value: 'ws://{{ ansible_default_ipv4.address }}:8888/kurento' }
@@ -374,7 +367,7 @@
     - { key: 'recordWebcams', value: '{% if bigbluebutton_html5 %}true{% else %}false{% endif %}' }
     state: present
   become: yes
-  when: not bigbluebutton_packages_skip_bbb_webrtc_sfu
+  when: not mconf_live_docker_webrtc_sfu
   notify: restart bbb-webrtc-sfu
 
 - name: Open/close redis
@@ -431,7 +424,7 @@
   when: bigbluebutton_html5
 
 - include: sip.yml
-  when: bigbluebutton_sip and not bigbluebutton_packages_skip_mconf_mcs_sip
+  when: bigbluebutton_sip and not mconf_live_docker_mcs_sip
 
 - include: branding.yml
   tags:
@@ -483,7 +476,7 @@
     name: restart kms
     minute: 0
     hour: 4
-    job: systemctl restart kurento-media-server.service
+    job: systemctl restart kurento-media-server.service bbb-webrtc-sfu.service mconf-mcs-sip.service
     user: root
   become: yes
 

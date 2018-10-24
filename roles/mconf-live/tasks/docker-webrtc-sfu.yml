@@ -1,3 +1,32 @@
+- name: Copy dummy package for bbb-webrtc-sfu to /tmp
+  copy:
+    src: files/bbb-webrtc-sfu_1.0_all.deb
+    dest: /tmp/bbb-webrtc-sfu_1.0_all.deb
+
+- name: Install dummy package
+  apt:
+    deb: /tmp/bbb-webrtc-sfu_1.0_all.deb
+    force: yes
+  become: yes
+
+- name: Hold package
+  command: apt-mark hold bbb-webrtc-sfu
+  become: yes
+
+- name: Hold package (with aptitude)
+  command: aptitude -y hold bbb-webrtc-sfu
+  become: yes
+
+- name: Hold package (with dpkg)
+  dpkg_selections:
+    name: bbb-webrtc-sfu
+    selection: hold
+  become: yes
+
+- name: Pull streaming image
+  docker_image:
+    name: mconf/mconf-presentation-recorder:latest
+
 - name: Start webrtc-sfu container
   docker_container:
     name: webrtc-sfu
@@ -15,6 +44,11 @@
       MCS_HOST: '{{ docker_ip }}'
       FREESWITCH_IP: '{{ external_ip }}'
       LOG_LEVEL: trace
+      STREAM_IMAGE_NAME: mconf/mconf-presentation-recorder:latest
+      STREAM_BIGBLUEBUTTON_URL: '{{ bbb_api_entry_point | regex_replace("/api") }}'
+      STREAM_BIGBLUEBUTTON_SECRET: '{{ bbb_secret }}'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
   notify: restart sfu-phone
 
 - name: Add webrtc-sfu to nginx

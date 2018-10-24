@@ -140,10 +140,12 @@ bigbluebutton_playback_protocol:
 
 bigbluebutton_retention_runtime: 5
 bigbluebutton_retention_unrecorded: 14
-bigbluebutton_retention_published_raw:
-
-bigbluebutton_packages_skip_bbb_webrtc_sfu: false
+bigbluebutton_retention_published_raw: 30
 
 bigbluebutton_storage_device:
 bigbluebutton_storage_dir:
 
+bigbluebutton_html5_external_log_enabled: false
+bigbluebutton_html5_external_log_level: info
+bigbluebutton_html5_external_log_url: 'https://{{ inventory_hostname }}/html5Log'
+bigbluebutton_html5_external_log_method: POST

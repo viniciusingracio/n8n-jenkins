@@ -10,3 +10,4 @@
       REDIS_HOST: '{{ docker_ip }}'
       MCS_PORT: 3009
       MCS_HOST: '{{ docker_ip }}'
+      SIP_API_ADDRESS: wss://{{ inventory_hostname }}/mcs-sip

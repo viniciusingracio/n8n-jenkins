@@ -34,6 +34,14 @@
 
 - include: json-deps.yml
 
+- set_fact:
+    bigbluebutton_html5_config: "{{ bigbluebutton_html5_config + [ item ] }}"
+  with_items:
+    - { path: '/public/clientLog/external/enabled', value: '{{ bigbluebutton_html5_external_log_enabled }}' }
+    - { path: '/public/clientLog/external/level', value: '{{ bigbluebutton_html5_external_log_level }}' }
+    - { path: '/public/clientLog/external/url', value: '{{ bigbluebutton_html5_external_log_url }}' }
+    - { path: '/public/clientLog/external/method', value: '{{ bigbluebutton_html5_external_log_method }}' }
+
 - name: Update json values
   become: true
   json:
@@ -46,6 +54,43 @@
   ignore_errors: yes
   with_items: '{{ bigbluebutton_html5_config }}'
   notify: restart bbb-html5
+
+- name: Install full nginx
+  become: yes
+  apt:
+    name: nginx-full
+    state: '{{ bigbluebutton_apt_state }}'
+  when: bigbluebutton_html5_external_log_enabled
+  notify: restart nginx
+
+- name: Setup external log on nginx
+  become: yes
+  copy:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+  with_items:
+    - { src: 'files/client-log.nginx', dest: '/etc/bigbluebutton/nginx/client-log.nginx' }
+    - { src: 'files/client-log.conf', dest: '/etc/nginx/conf.d/client-log.conf' }
+  when: bigbluebutton_html5_external_log_enabled
+  notify: reload nginx
+
+- name: Configure log file
+  become: yes
+  file:
+    path: /var/log/nginx/html5-client.log
+    owner: www-data
+    group: adm
+    mode: 0640
+    state: touch
+  when: bigbluebutton_html5_external_log_enabled
+
+- name: Remove nginx entry when external log is disabled
+  become: yes
+  file:
+    path: /etc/bigbluebutton/nginx/client-log.nginx
+    state: absent
+  when: not bigbluebutton_html5_external_log_enabled
+  notify: reload nginx
 
 - name: Set default guest policy on bigbluebutton.properties
   become: yes
