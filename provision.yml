@@ -166,6 +166,10 @@
   roles:
   - { role: snmp, tags: [ snmp ] }
 
+- hosts: jekyll
+  roles:
+  - jekyll
+
 - hosts: all
   roles:
   - { role: reboot, tags: always }
