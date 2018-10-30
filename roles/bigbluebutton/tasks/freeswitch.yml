@@ -3,65 +3,6 @@
     wss_binding_value: '{% if ansible_default_ipv4.address == external_ip %}:7443{% else %}{{ external_ip }}:7443{% endif %}'
     ws_binding_value: ':5066'
 
-- name: Read wss-binding attribute
-  xml:
-    path: /opt/freeswitch/conf/sip_profiles/external.xml
-    xpath: '{{ item }}'
-    content: attribute
-    attribute: value
-  with_items:
-    - /profile/settings/param[@name="ws-binding"]
-    - /profile/settings/param[@name="wss-binding"]
-  register: hits
-  ignore_errors: yes
-  become: yes
-
-- name: Modify ws-binding if it exists
-  xml:
-    path: /opt/freeswitch/conf/sip_profiles/external.xml
-    xpath: /profile/settings/param[@name="ws-binding"]
-    attribute: value
-    value: '{{ ws_binding_value }}'
-  become: yes
-  when: hits.results[0] is succeeded
-  notify: restart bigbluebutton
-
-- name: Add ws-binding if it doesn't exist
-  xml:
-    path: /opt/freeswitch/conf/sip_profiles/external.xml
-    xpath: /profile/settings
-    add_children:
-      - param:
-          name: ws-binding
-          value: '{{ ws_binding_value }}'
-    pretty_print: yes
-  become: yes
-  when: hits.results[0] is failed
-  notify: restart bigbluebutton
-
-- name: Modify wss-binding if it exists
-  xml:
-    path: /opt/freeswitch/conf/sip_profiles/external.xml
-    xpath: /profile/settings/param[@name="wss-binding"]
-    attribute: value
-    value: '{{ wss_binding_value }}'
-  become: yes
-  when: hits.results[1] is succeeded
-  notify: restart bigbluebutton
-
-- name: Add wss-binding if it doesn't exist
-  xml:
-    path: /opt/freeswitch/conf/sip_profiles/external.xml
-    xpath: /profile/settings
-    add_children:
-      - param:
-          name: wss-binding
-          value: '{{ wss_binding_value }}'
-    pretty_print: yes
-  become: yes
-  when: hits.results[1] is failed
-  notify: restart bigbluebutton
-
 - name: Define FreeSWITCH external SIP port
   set_fact:
     freeswitch_sip_port: '{% if bigbluebutton_sip %}5062{% else %}5060{% endif %}'
@@ -81,15 +22,52 @@
   become: yes
   notify: restart bigbluebutton
 
-- name: Modify FreeSWITCH external.xml
+- name: Determine properties to modify external.xml
+  set_fact:
+    external_props: 
+      - { name: "ext-rtp-ip", value: '$${external_rtp_ip}' }
+      - { name: "ext-sip-ip", value: '$${external_sip_ip}' }
+      - { name: "outbound-use-callid-as-uuid", value: "true" }
+      - { name: "inbound-use-callid-as-uuid", value: "true" }
+      - { name: "enable-3pcc", value: "proxy" }
+      - { name: "disable-rtp-auto-adjust", value: "true" }
+      - { name: "rtp-autofix-timing", value: "false" }
+      - { name: "ws-binding", value: "{{ ws_binding_value }}" }
+      - { name: "wss-binding", value: "{{ wss_binding_value }}" }
+
+- name: Read external_props
   xml:
     path: /opt/freeswitch/conf/sip_profiles/external.xml
-    xpath: '{{ item.xpath }}'
-    attribute: '{{ item.attribute }}'
-    value: '{{ item.value }}'
-  with_items:
-    - { xpath: '/profile/settings/param[@name="ext-rtp-ip"]', attribute: 'value', value: '$${external_rtp_ip}' }
-    - { xpath: '/profile/settings/param[@name="ext-sip-ip"]', attribute: 'value', value: '$${external_sip_ip}' }
+    xpath: /profile/settings/param[@name="{{ item.name }}"]
+    content: attribute
+    attribute: value
+  with_items: '{{ external_props }}'
+  register: external_props_read
+  ignore_errors: yes
+  become: yes
+
+- name: Add external_prop if it doesn't exist
+  xml:
+    path: /opt/freeswitch/conf/sip_profiles/external.xml
+    xpath: /profile/settings
+    add_children:
+      - param:
+          name: '{{ item.item.name }}'
+          value: '{{ item.item.value }}'
+    pretty_print: yes
+  with_items: '{{ external_props_read.results }}'
+  when: item is failed
+  become: yes
+  notify: restart bigbluebutton
+
+- name: Modify external_prop if it exists
+  xml:
+    path: /opt/freeswitch/conf/sip_profiles/external.xml
+    xpath: /profile/settings/param[@name="{{ item.item.name }}"]
+    attribute: value
+    value: '{{ item.item.value }}'
+  with_items: '{{ external_props_read.results }}'
+  when: item is succeeded
   become: yes
   notify: restart bigbluebutton
 
