@@ -28,4 +28,3 @@
     state: absent
   when: not mconf_live_webhooks
   notify: reload nginx
-
