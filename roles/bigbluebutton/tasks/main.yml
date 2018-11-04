@@ -223,12 +223,6 @@
     state: absent
   when: not bigbluebutton_demos
 
-- name: Remove webhooks package
-  become: true
-  apt:
-    name: bbb-webhooks
-    state: absent
-
 - name: Make sure demo is removed
   file:
     path: /var/lib/tomcat7/demo
@@ -424,6 +418,8 @@
 - include: freeswitch.yml
 
 - include: config-xml.yml
+
+- include: webhooks.yml
 
 - include: html5.yml
   when: bigbluebutton_html5

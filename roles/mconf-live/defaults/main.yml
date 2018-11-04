@@ -25,5 +25,3 @@ mconf_live_presentation_recorder_version: '0.0.3'
 mconf_live_recording_auth_entry_point:
 mconf_live_recording_auth_secret:
 mconf_live_recording_auth_local_address:
-
-mconf_live_webhooks: true
