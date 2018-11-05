@@ -52,6 +52,3 @@
 
 - include: docker-webrtc-sfu.yml
   when: mconf_live_docker_webrtc_sfu
-
-- include: docker-webhooks.yml
-  when: mconf_live_docker_webhooks

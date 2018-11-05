@@ -13,4 +13,3 @@ ffmpeg_version: '4.0'
 mconf_live_docker_etherpad: true
 mconf_live_docker_mcs_sip: true
 mconf_live_docker_webrtc_sfu: true
-mconf_live_docker_webhooks: true
