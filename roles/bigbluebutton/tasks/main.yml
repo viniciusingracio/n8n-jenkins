@@ -109,6 +109,8 @@
   become: true
   apt:
     upgrade: safe
+    autoremove: true
+    autoclean: true
   when: bigbluebutton_apt_state == 'latest'
   notify: restart bigbluebutton
 
@@ -216,12 +218,6 @@
     name: bbb-demo
     state: absent
   when: not bigbluebutton_demos
-
-- name: Install/remove webhooks
-  become: true
-  apt:
-    name: bbb-webhooks
-    state: '{% if bigbluebutton_webhooks %}{{ bigbluebutton_apt_state }}{% else %}absent{% endif %}'
 
 - name: Make sure demo is removed
   file:
@@ -420,6 +416,8 @@
 
 - include: config-xml.yml
 
+- include: webhooks.yml
+
 - include: html5.yml
   when: bigbluebutton_html5
 
@@ -476,7 +474,7 @@
     name: restart kms
     minute: 0
     hour: 4
-    job: systemctl restart kurento-media-server.service bbb-webrtc-sfu.service mconf-mcs-sip.service
+    job: systemctl restart red5.service tomcat7.service kurento-media-server.service bbb-webrtc-sfu.service mconf-mcs-sip.service
     user: root
   become: yes
 

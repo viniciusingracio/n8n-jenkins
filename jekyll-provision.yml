@@ -1,5 +1,0 @@
----
-
-- hosts: jekyll
-  roles:
-  - jekyll
