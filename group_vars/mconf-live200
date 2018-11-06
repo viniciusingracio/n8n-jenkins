@@ -4,7 +4,7 @@ bigbluebutton_apt_package: bigbluebutton
 bigbluebutton_apt_source: deb https://jenkins-live.mconf.com/apt/development/mconf-200/xenial-2.0.0 mconf-xenial main
 bigbluebutton_apt_key: https://jenkins-live.mconf.com/apt/public.asc
 
-bigbluebutton_webhooks: false
+bigbluebutton_webhooks: true
 bigbluebutton_redis_bind:
   - 0.0.0.0
 
@@ -13,3 +13,7 @@ ffmpeg_version: '4.0'
 mconf_live_docker_etherpad: true
 mconf_live_docker_mcs_sip: true
 mconf_live_docker_webrtc_sfu: true
+
+# TODO figure about a better way to share vars between bigbluebutton and mconf-live
+bigbluebutton_kms_udp_range_begin: 7000
+bigbluebutton_kms_udp_range_end: 8999

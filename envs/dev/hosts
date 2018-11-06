@@ -31,7 +31,7 @@ test-live2.dev.mconf.com
 [mconf-live200]
 paulo.dev.mconf.com certbot_enabled=true zabbix_agent_enabled=true
 eduardo.dev.mconf.com certbot_enabled=true zabbix_agent_enabled=true
-felipe.dev.mconf.com certbot_enabled=true zabbix_agent_enabled=true
+felipe.dev.mconf.com certbot_enabled=true bigbluebutton_html5_external_log_enabled=true
 m113.freddixon.ca certbot_enabled=true
 
 [mconf-live-pt:children]
@@ -58,5 +58,3 @@ felipe.dev.mconf.com
 [bigbluebutton-dev]
 dev.mconf.local ansible_user=ubuntu
 test-live110.mconf.com common_ufw_enabled=false
-felipe.dev.mconf.com bigbluebutton_dev_repo=git@github.com:bigbluebutton/bigbluebutton.git bigbluebutton_dev_repo_ref=v2.0.x-release
-
