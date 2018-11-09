@@ -70,8 +70,9 @@
     state: present
   register: aptrepos
   with_items:
-    - { repo: 'deb http://archive.ubuntu.com/ubuntu/ {{ ansible_lsb.codename }} multiverse', filename: 'ubuntu' }
+    - { repo: 'deb http://archive.ubuntu.com/ubuntu/ {{ ansible_lsb.codename }} universe multiverse', filename: 'ubuntu' }
     - { repo: 'deb http://archive.ubuntu.com/ubuntu/ {{ ansible_lsb.codename }}-security universe multiverse', filename: 'ubuntu_security' }
+    - { repo: 'deb http://archive.ubuntu.com/ubuntu/ {{ ansible_lsb.codename }}-updates universe multiverse', filename: 'ubuntu_updates' }
     - { repo: '{{ bigbluebutton_apt_source }}', filename: '{{ bigbluebutton_apt_package }}' }
     - { repo: 'deb http://deb.nodesource.com/node_8.x {{ ansible_lsb.codename }} main', filename: 'node' }
 
@@ -104,6 +105,13 @@
     name: '{{ bigbluebutton_apt_package }}'
     state: '{{ bigbluebutton_apt_state }}'
   notify: restart bigbluebutton
+
+- name: Install bbb-webrtc-sfu
+  become: true
+  apt:
+    name: bbb-webrtc-sfu
+    state: '{{ bigbluebutton_apt_state }}'
+  ignore_errors: yes
 
 - name: Upgrade packages to make sure BigBlueButton packages are updated
   become: true

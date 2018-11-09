@@ -66,6 +66,7 @@
   set_fact:
     freeswitch_sip_port: '{% if bigbluebutton_sip %}5062{% else %}5060{% endif %}'
 
+# TODO restart freeswitch right away if external_sip_port is changed
 - name: Modify FreeSWITCH vars.xml
   xml:
     path: /opt/freeswitch/conf/vars.xml

@@ -32,6 +32,7 @@ test-live2.dev.mconf.com
 paulo.dev.mconf.com certbot_enabled=true zabbix_agent_enabled=true
 eduardo.dev.mconf.com certbot_enabled=true zabbix_agent_enabled=true
 felipe.dev.mconf.com certbot_enabled=true bigbluebutton_html5_external_log_enabled=true
+live-ca.dev.mconf.com certbot_enabled=true bigbluebutton_html5_external_log_enabled=true
 m113.freddixon.ca certbot_enabled=true
 
 [mconf-live-pt:children]
