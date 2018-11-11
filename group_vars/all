@@ -19,7 +19,6 @@ mconf_registry_org: mconf
 # mconf_registry_prefix: '{{mconf_registry_host}}/{{mconf_registry_org}}'
 
 # Disable a few things by default, enabled for specific roles/hosts
-certbot_enabled: false
 zabbix_agent_enabled: false
 mconf_web_reports_enabled: false
 test_webrtc_enabled: false
