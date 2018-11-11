@@ -9,3 +9,7 @@
 - name: restart sfu-phone
   command: docker restart sfu-phone
   ignore_errors: yes
+
+- name: restart webrtc-sfu
+  command: docker restart webrtc-sfu
+  ignore_errors: yes

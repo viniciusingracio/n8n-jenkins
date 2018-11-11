@@ -31,7 +31,10 @@
       RTP_MIN_PORT: '{{ bigbluebutton_kms_udp_range_begin }}'
       RTP_MAX_PORT: '{{ bigbluebutton_kms_udp_range_end }}'
   with_items: '{{ kurento_ports }}'
-  notify: clean docker
+  notify:
+    - clean docker
+    - restart webrtc-sfu
+    - restart sfu-phone
 
 - name: Copy dummy package for bbb-webrtc-sfu to /tmp
   copy:
@@ -58,6 +61,12 @@
     selection: hold
   become: yes
 
+- name: Install node (webrtc-sfu dependency, set to automatic)
+  apt:
+    name: nodejs
+    state: latest
+  become: yes
+
 - name: Pull streaming image
   docker_image:
     name: mconf/mconf-presentation-recorder:latest
@@ -65,7 +74,7 @@
 - name: Start webrtc-sfu container
   docker_container:
     name: webrtc-sfu
-    image: mconf/bbb-webrtc-sfu:mconf-2.x-multiple-kms
+    image: mconf/bbb-webrtc-sfu:mconf-2.x
     pull: yes
     restart_policy: unless-stopped
     ports:
