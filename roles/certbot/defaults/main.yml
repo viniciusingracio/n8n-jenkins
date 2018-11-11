@@ -1,5 +1,7 @@
 ---
 
+certbot_enabled: false
+
 # Domain get a certificate to
 certbot_domain: '{{ inventory_hostname }}'
 
