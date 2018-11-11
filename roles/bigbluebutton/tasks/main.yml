@@ -105,6 +105,12 @@
     state: '{{ bigbluebutton_apt_state }}'
   notify: restart bigbluebutton
 
+- name: Install bbb-webrtc-sfu
+  become: true
+  apt:
+    name: bbb-webrtc-sfu
+    state: '{{ bigbluebutton_apt_state }}'
+
 - name: Upgrade packages to make sure BigBlueButton packages are updated
   become: true
   apt:
@@ -361,6 +367,7 @@
     - { key: 'kurentoUrl', value: 'ws://{{ ansible_default_ipv4.address }}:8888/kurento' }
     - { key: 'recordScreenSharing', value: '{% if bigbluebutton_html5 %}true{% else %}false{% endif %}' }
     - { key: 'recordWebcams', value: '{% if bigbluebutton_html5 %}true{% else %}false{% endif %}' }
+    - { key: 'kurento-websocket-pool-size', value: '1' }
     state: present
   become: yes
   notify: restart bbb-webrtc-sfu
