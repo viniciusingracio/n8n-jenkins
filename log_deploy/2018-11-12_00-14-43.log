@@ -1,0 +1,4 @@
+/usr/bin/ansible-playbook -v -i envs/prod/redclara/hosts -l cedia provision.yml -T 180
+
+vce-live2.cedia.org.ec: 144 OK, 29 changed, 0 unreachable, 0 failed
+vce-rec2.cedia.org.ec: 147 OK, 31 changed, 0 unreachable, 0 failed
