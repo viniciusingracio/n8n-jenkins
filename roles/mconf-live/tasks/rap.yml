@@ -82,3 +82,4 @@
     groups: docker
     append: yes
   when: mconf_live_presentation_recorder_enabled
+  notify: restart mconf-presentation-recorder
