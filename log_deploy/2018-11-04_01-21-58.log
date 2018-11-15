@@ -1,0 +1,3 @@
+/usr/bin/ansible-playbook -v -i envs/prod/com-staging/hosts -l test-live2.dev.mconf.com provision.yml -T 180 --skip-tags zabbix-agent
+
+test-live2.dev.mconf.com: 156 OK, 36 changed, 0 unreachable, 0 failed

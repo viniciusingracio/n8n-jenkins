@@ -1,0 +1,30 @@
+- name: Start etherpad container
+  docker_container:
+    name: etherpad
+    image: mconf/etherpad-lite:mconf
+    pull: yes
+    restart_policy: unless-stopped
+    ports:
+      - "3006:9001"
+    env:
+      SETTINGS_MODIFIER: '.dbSettings.host = "{{ docker_ip }}"'
+
+- name: Add notes to nginx
+  become: yes
+  copy:
+    src: files/notes.nginx
+    dest: /etc/bigbluebutton/nginx/notes.nginx
+  notify: reload nginx
+
+- name: Update json values
+  become: true
+  json:
+    path: /usr/share/meteor/bundle/programs/server/assets/app/config/settings-production.json
+    replace:
+      json_path: '{{ item.path }}'
+      with_value: '{{ item.value }}'
+    indent: 4
+    insert_if_missing: true
+  with_items:
+    - { path: '/public/note/url', value: 'https://{{ inventory_hostname }}/pad' }
+  notify: restart bbb-html5

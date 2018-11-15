@@ -1,3 +1,15 @@
 - name: reload nginx
   become: true
   service: name=nginx state=reloaded
+
+- name: restart bbb-html5
+  become: true
+  service: name=bbb-html5 state=restarted
+
+- name: restart sfu-phone
+  command: docker restart sfu-phone
+  ignore_errors: yes
+
+- name: restart webrtc-sfu
+  command: docker restart webrtc-sfu
+  ignore_errors: yes

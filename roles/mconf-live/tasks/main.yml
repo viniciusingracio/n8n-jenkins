@@ -2,6 +2,25 @@
     name: bigbluebutton
   tags: always
 
+- name: Get BigBlueButton secret
+  shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
+  register: bbb_secret_raw
+
+- name: Get BigBlueButton URL
+  shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^bigbluebutton.web.serverURL=' | cut -d'=' -f2 | awk '{print $1"/bigbluebutton/api"}'
+  register: bbb_api_entry_point_raw
+
+- set_fact:
+    bbb_secret: '{{ bbb_secret_raw.stdout }}'
+    bbb_api_entry_point: '{{ bbb_api_entry_point_raw.stdout }}'
+
+- name: Register Docker host IP
+  shell: "ifconfig docker0 | grep 'inet addr:' | cut -d: -f2 | awk '{print $1}'"
+  register: docker_ip_raw
+
+- set_fact:
+    docker_ip: '{{ docker_ip_raw.stdout }}'
+
 - name: Install extra recording formats
   become: true
   apt:
@@ -14,3 +33,15 @@
 - include: hold-music.yml
 
 - include: rap.yml
+
+- include: docker-etherpad.yml
+  when: mconf_live_docker_etherpad
+
+- include: docker-mcs-sip.yml
+  when: mconf_live_docker_mcs_sip
+
+- include: docker-sfu-phone.yml
+  when: mconf_live_docker_mcs_sip
+
+- include: docker-webrtc-sfu.yml
+  when: mconf_live_docker_webrtc_sfu

@@ -70,8 +70,9 @@
     state: present
   register: aptrepos
   with_items:
-    - { repo: 'deb http://archive.ubuntu.com/ubuntu/ {{ ansible_lsb.codename }} multiverse', filename: 'ubuntu' }
+    - { repo: 'deb http://archive.ubuntu.com/ubuntu/ {{ ansible_lsb.codename }} universe multiverse', filename: 'ubuntu' }
     - { repo: 'deb http://archive.ubuntu.com/ubuntu/ {{ ansible_lsb.codename }}-security universe multiverse', filename: 'ubuntu_security' }
+    - { repo: 'deb http://archive.ubuntu.com/ubuntu/ {{ ansible_lsb.codename }}-updates universe multiverse', filename: 'ubuntu_updates' }
     - { repo: '{{ bigbluebutton_apt_source }}', filename: '{{ bigbluebutton_apt_package }}' }
     - { repo: 'deb http://deb.nodesource.com/node_8.x {{ ansible_lsb.codename }} main', filename: 'node' }
 
@@ -110,11 +111,14 @@
   apt:
     name: bbb-webrtc-sfu
     state: '{{ bigbluebutton_apt_state }}'
+  ignore_errors: yes
 
 - name: Upgrade packages to make sure BigBlueButton packages are updated
   become: true
   apt:
     upgrade: safe
+    autoremove: true
+    autoclean: true
   when: bigbluebutton_apt_state == 'latest'
   notify: restart bigbluebutton
 
@@ -222,12 +226,6 @@
     name: bbb-demo
     state: absent
   when: not bigbluebutton_demos
-
-- name: Install/remove webhooks
-  become: true
-  apt:
-    name: bbb-webhooks
-    state: '{% if bigbluebutton_webhooks %}{{ bigbluebutton_apt_state }}{% else %}absent{% endif %}'
 
 - name: Make sure demo is removed
   file:
@@ -371,8 +369,10 @@
     - { key: 'kurentoUrl', value: 'ws://{{ ansible_default_ipv4.address }}:8888/kurento' }
     - { key: 'recordScreenSharing', value: '{% if bigbluebutton_html5 %}true{% else %}false{% endif %}' }
     - { key: 'recordWebcams', value: '{% if bigbluebutton_html5 %}true{% else %}false{% endif %}' }
+    - { key: 'kurento-websocket-pool-size', value: '1' }
     state: present
   become: yes
+  when: not mconf_live_docker_webrtc_sfu
   notify: restart bbb-webrtc-sfu
 
 - name: Open/close redis
@@ -425,11 +425,13 @@
 
 - include: config-xml.yml
 
+- include: webhooks.yml
+
 - include: html5.yml
   when: bigbluebutton_html5
 
 - include: sip.yml
-  when: bigbluebutton_sip
+  when: bigbluebutton_sip and not mconf_live_docker_mcs_sip
 
 - include: branding.yml
   tags:
@@ -481,7 +483,7 @@
     name: restart kms
     minute: 0
     hour: 4
-    job: systemctl restart kurento-media-server.service bbb-webrtc-sfu.service mconf-mcs-sip.service
+    job: systemctl restart red5.service tomcat7.service kurento-media-server.service bbb-webrtc-sfu.service mconf-mcs-sip.service
     user: root
   become: yes
 

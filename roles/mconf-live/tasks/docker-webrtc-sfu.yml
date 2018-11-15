@@ -1,0 +1,120 @@
+- name: Stop kurento
+  become: true
+  service: name=kurento-media-server state=stopped
+
+- name: Get number of cores
+  shell: "grep -c ^processor /proc/cpuinfo"
+  register: num_proc_auto_raw
+
+- name: Determine number of kurento instances, in case it isn't set
+  set_fact:
+    num_proc_auto: '{{ [ num_proc_auto_raw.stdout|int * 2, 8 ] | min }}'
+
+- name: Determine number of kurento instances
+  set_fact:
+    num_proc: '{{ mconf_live_docker_num_kurento | default(num_proc_auto, true) }}'
+
+- name: Determine kurento ports
+  set_fact:
+    kurento_ports: '{{ kurento_ports|default([]) + [ (3100 + item|int)|string ] }}'
+  with_sequence: start=0 count={{ num_proc }}
+
+- name: Determine kurento running instances
+  shell: docker ps | grep 'kurento_[0-9]*' | sed 's:.*kurento_\([0-9]*\)$:\1:g' | sort
+  register: running_kurento_raw
+
+- name: Stop kurento instances that we don't need
+  docker_container:
+    name: kurento_{{ item }}
+    state: stopped
+  with_items: '{{ running_kurento_raw.stdout_lines | difference(kurento_ports) }}'
+
+- name: Determine kurento URLs to configure bbb-webrtc-sfu
+  set_fact:
+    kurento_config: "{{ kurento_config|default([]) + [ { 'ip': external_ip, 'url': 'ws://' + docker_ip + ':' + item + '/kurento' } ] }}"
+  with_items: '{{ kurento_ports }}'
+
+- name: Start kurento containers
+  docker_container:
+    name: kurento_{{ item }}
+    image: mconf/kurento:latest
+    pull: yes
+    restart_policy: unless-stopped
+    network_mode: host
+    volumes:
+      - /var/kurento:/var/kurento
+    env:
+      PORT: '{{ item }}'
+      RTP_MIN_PORT: '{{ bigbluebutton_kms_udp_range_begin }}'
+      RTP_MAX_PORT: '{{ bigbluebutton_kms_udp_range_end }}'
+  with_items: '{{ kurento_ports }}'
+  notify:
+    - clean docker
+    - restart webrtc-sfu
+    - restart sfu-phone
+
+- name: Copy dummy package for bbb-webrtc-sfu to /tmp
+  copy:
+    src: files/bbb-webrtc-sfu_1.0_all.deb
+    dest: /tmp/bbb-webrtc-sfu_1.0_all.deb
+
+- name: Install dummy package
+  apt:
+    deb: /tmp/bbb-webrtc-sfu_1.0_all.deb
+    force: yes
+  become: yes
+
+- name: Hold package
+  command: apt-mark hold bbb-webrtc-sfu
+  become: yes
+
+- name: Hold package (with aptitude)
+  command: aptitude -y hold bbb-webrtc-sfu
+  become: yes
+
+- name: Hold package (with dpkg)
+  dpkg_selections:
+    name: bbb-webrtc-sfu
+    selection: hold
+  become: yes
+
+- name: Install node (webrtc-sfu dependency, set to automatic)
+  apt:
+    name: nodejs
+    state: latest
+  become: yes
+
+- name: Pull streaming image
+  docker_image:
+    name: mconf/mconf-presentation-recorder:latest
+
+- name: Start webrtc-sfu container
+  docker_container:
+    name: webrtc-sfu
+    image: mconf/bbb-webrtc-sfu:mconf-2.x
+    pull: yes
+    restart_policy: unless-stopped
+    ports:
+      - 3008:3008
+      - 3009:3009
+    env:
+      KURENTO: '{{ kurento_config | to_json }}'
+      REDIS_HOST: '{{ docker_ip }}'
+      MCS_PORT: 3009
+      MCS_HOST: '{{ docker_ip }}'
+      FREESWITCH_IP: '{{ external_ip }}'
+      LOG_LEVEL: info
+      STREAM_CONTAINER_TYPE: docker
+      STREAM_IMAGE_NAME: mconf/mconf-presentation-recorder:latest
+      STREAM_BIGBLUEBUTTON_URL: '{{ bbb_api_entry_point | regex_replace("/api") }}'
+      STREAM_BIGBLUEBUTTON_SECRET: '{{ bbb_secret }}'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  notify: restart sfu-phone
+
+- name: Add webrtc-sfu to nginx
+  become: yes
+  copy:
+    src: files/webrtc-sfu.nginx
+    dest: /etc/bigbluebutton/nginx/webrtc-sfu.nginx
+  notify: reload nginx

@@ -1,0 +1,43 @@
+- name: Remove webhooks package
+  become: true
+  apt:
+    name: bbb-webhooks
+    state: absent
+
+- name: Register Docker host IP
+  shell: "ifconfig docker0 | grep 'inet addr:' | cut -d: -f2 | awk '{print $1}'"
+  register: docker_ip_raw
+
+- set_fact:
+    docker_ip: '{{ docker_ip_raw.stdout }}'
+
+- name: Start bbb-webhooks container
+  docker_container:
+    name: webhooks
+    image: mconf/bbb-webhooks:latest
+    pull: yes
+    restart_policy: unless-stopped
+    ports:
+      - "3005:3005"
+    env:
+      REDIS_HOST: '{{ docker_ip }}'
+      SHARED_SECRET: '{{ bbb_secret }}'
+      BEARER_AUTH: 1
+      SERVER_DOMAIN: '{{ inventory_hostname }}'
+    state: '{% if bigbluebutton_webhooks %}started{% else %}absent{% endif %}'
+
+- name: Add webhooks to nginx
+  become: yes
+  copy:
+    src: files/webhooks.nginx
+    dest: /etc/bigbluebutton/nginx/webhooks.nginx
+  when: bigbluebutton_webhooks
+  notify: reload nginx
+
+- name: Remove webhooks from nginx
+  become: yes
+  file:
+    path: /etc/bigbluebutton/nginx/webhooks.nginx
+    state: absent
+  when: not bigbluebutton_webhooks
+  notify: reload nginx

@@ -31,13 +31,17 @@
     - restart ufw
   when: zabbix_agent_enabled
 
-# TODO make interface configurable
-- name: Configure ufw rules for redis on BigBlueButton
+- name: Remove ufw rule specific for redis from docker
   become: true
-  ufw: rule=allow port=6379 proto=tcp direction=in interface=docker0
+  ufw: rule=allow port=6379 proto=tcp direction=in interface=docker0 delete=yes
   notify:
     - restart ufw
-  when: bigbluebutton_redis_bind
+
+- name: Allow all traffic from the docker interface
+  become: true
+  ufw: rule=allow direction=in interface=docker0
+  notify:
+    - restart ufw
 
 - name: Modify sysctl
   become: true

@@ -1,0 +1,13 @@
+- name: Start mcs-sip container
+  docker_container:
+    name: sfu-phone
+    image: mconf/sfu-phone:mconf-2.x
+    pull: yes
+    restart_policy: unless-stopped
+    ports:
+      - "3011:3011"
+    env:
+      REDIS_HOST: '{{ docker_ip }}'
+      MCS_PORT: 3009
+      MCS_HOST: '{{ docker_ip }}'
+      SIP_API_ADDRESS: wss://{{ inventory_hostname }}/mcs-sip

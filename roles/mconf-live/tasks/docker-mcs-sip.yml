@@ -1,0 +1,43 @@
+- name: Copy dummy package for mconf-mcs-sip to /tmp
+  copy:
+    src: files/mconf-mcs-sip_1.0_all.deb
+    dest: /tmp/mconf-mcs-sip_1.0_all.deb
+
+- name: Install dummy package 
+  apt:
+    deb: /tmp/mconf-mcs-sip_1.0_all.deb
+    force: yes
+  become: yes
+
+- name: Hold package
+  command: apt-mark hold mconf-mcs-sip
+  become: yes
+
+- name: Hold package (with aptitude)
+  command: aptitude -y hold mconf-mcs-sip
+  become: yes
+
+- name: Hold package (with dpkg)
+  dpkg_selections:
+    name: mconf-mcs-sip
+    selection: hold
+  become: yes
+
+- name: Start mcs-sip container
+  docker_container:
+    name: mcs-sip
+    image: mconf/mcs-sip:2.0.1-new-api
+    pull: yes
+    restart_policy: unless-stopped
+    ports:
+      - 5060:5060
+      - 5060:5060/udp
+      - 3012:3012
+    env:
+      EXTERNAL_IP: '{{ external_ip }}'
+      BIND_IP: 0.0.0.0
+      MCS_PORT: 3009
+      MCS_HOST: '{{ docker_ip }}'
+      SIP_API_PORT: 3012
+      SIP_API_PATH: /mcs-sip
+      ENABLE_EXTERNAL_API: true

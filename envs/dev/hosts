@@ -31,7 +31,8 @@ test-live2.dev.mconf.com
 [mconf-live200]
 paulo.dev.mconf.com certbot_enabled=true zabbix_agent_enabled=true
 eduardo.dev.mconf.com certbot_enabled=true zabbix_agent_enabled=true
-felipe.dev.mconf.com certbot_enabled=true zabbix_agent_enabled=true
+felipe.dev.mconf.com certbot_enabled=true bigbluebutton_html5_external_log_enabled=true
+live-ca.dev.mconf.com certbot_enabled=true bigbluebutton_html5_external_log_enabled=true
 m113.freddixon.ca certbot_enabled=true
 
 [mconf-live-pt:children]
@@ -50,7 +51,11 @@ k8s-node2 common_ufw_enabled=false ansible_host=10.1.1.207 ansible_ssh_common_ar
 k8s-node3 common_ufw_enabled=false ansible_host=10.1.1.166 ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -q ubuntu@200.133.39.49"'
 k8s-node4 common_ufw_enabled=false ansible_host=10.1.1.155 ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -q ubuntu@200.133.39.49"'
 
+[zabbix-agent]
+paulo.dev.mconf.com
+eduardo.dev.mconf.com
+felipe.dev.mconf.com
+
 [bigbluebutton-dev]
 dev.mconf.local ansible_user=ubuntu
 test-live110.mconf.com common_ufw_enabled=false
-felipe.dev.mconf.com bigbluebutton_dev_repo=git@github.com:bigbluebutton/bigbluebutton.git bigbluebutton_dev_repo_ref=v2.0.x-release

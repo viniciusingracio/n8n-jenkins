@@ -3,9 +3,9 @@ env: dev
 
 bigbluebutton_demos: true
 
-bigbluebutton_branding_logo_client: 'envs/{{ env }}/files/logo_client.png'
-bigbluebutton_branding_logo_playback: 'envs/{{ env }}/files/logo_playback.png'
-bigbluebutton_branding_welcome: '<br>Bem-vindo à sala <b>%%CONFNAME%%</b>!<br><br>A partir de um dispositivo SIP, disque <u>sip:%%CONFNUM%%@{{ inventory_hostname }}</u>.<br><br>Para uma melhor experiência, utilize um headset e, sempre que possível, prefira rede cabeada.<br>'
+bigbluebutton_branding_logo_client: envs/{{ env }}/files/logo_client.png
+bigbluebutton_branding_logo_playback: envs/{{ env }}/files/logo_playback.png
+bigbluebutton_branding_welcome: <br>Bem-vindo à sala <b>%%CONFNAME%%</b>!<br><br>A partir de um dispositivo SIP, disque <u>sip:%%CONFNUM%%@{{ inventory_hostname }}</u>.<br><br>Para uma melhor experiência, utilize um headset e, sempre que possível, prefira rede cabeada.<br>
 bigbluebutton_branding_layout: envs/{{ env }}/files/layout.xml
 bigbluebutton_screenshare_extension_url: https://chrome.google.com/webstore/detail/mconf-screenshare/mbfngdphjegmlbfobcblikeefpidfncb
 bigbluebutton_screenshare_extension_key: mbfngdphjegmlbfobcblikeefpidfncb

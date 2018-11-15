@@ -1,17 +1,9 @@
-- name: Get BigBlueButton secret
-  shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
-  register: bbb_secret
-
-- name: Get BigBlueButton URL
-  shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^bigbluebutton.web.serverURL=' | cut -d'=' -f2 | awk '{print $1"/bigbluebutton/api"}'
-  register: bbb_api_entry_point
-
 - include_role:
     name: rec-proxy
     private: false
   vars:
-    rec_proxy_api_secret: '{{ bbb_secret.stdout }}'
-    rec_proxy_jwt_secret: '{{ bbb_secret.stdout | to_uuid }}'
+    rec_proxy_api_secret: '{{ bbb_secret }}'
+    rec_proxy_jwt_secret: '{{ bbb_secret | to_uuid }}'
     rec_proxy_build_from_source: false
     rec_proxy_image: 'mconf/mconf-rec'
     rec_proxy_image_version: 'local-nossl-0.0.12'

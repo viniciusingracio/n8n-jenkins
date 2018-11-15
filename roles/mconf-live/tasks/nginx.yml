@@ -3,7 +3,6 @@
   with_items:
     - /etc/bigbluebutton/nginx/presentation.nginx
     - /etc/bigbluebutton/nginx/presentation_video.nginx
-    - /etc/bigbluebutton/nginx/presentation_export.nginx
   register: nginx_files
 
 - command: mv {{ item.item }}.orig {{ item.item }}
@@ -19,7 +18,7 @@
   notify: reload nginx
 
 - template:
-    src: files/{{ item.item | basename }}.j2
+    src: templates/{{ item.item | basename }}.j2
     dest: '{{ item.item }}.openresty'
   with_items: '{{ nginx_files.results }}'
   become: yes
@@ -53,7 +52,7 @@
   notify: reload nginx
 
 - template:
-    src: files/rec_auth_token.nginx.j2
+    src: templates/rec_auth_token.nginx.j2
     dest: '/etc/bigbluebutton/nginx/rec_auth_token.nginx'
   become: yes
   when: mconf_live_rec_proxy_enabled

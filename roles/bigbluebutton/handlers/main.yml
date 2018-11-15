@@ -15,6 +15,10 @@
   become: true
   service: name=nginx state=reloaded
 
+- name: restart nginx
+  become: true
+  service: name=nginx state=restarted
+
 - name: start mongo
   become: true
   service: name=mongod state=started
