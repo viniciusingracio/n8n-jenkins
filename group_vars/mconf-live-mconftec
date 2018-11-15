@@ -33,6 +33,9 @@ bigbluebutton_html5_config:
   - { path: '/public/app/copyright', value: '{{ bigbluebutton_branding_copyright_html5 }}' }
   - { path: '/public/app/defaultSettings/application/chatPushAlerts', value: true }
   - { path: '/public/app/showHelpButton', value: false }
+  - { path: '/public/acl/enabled', value: false }
+  - { path: '/public/app/enableSIP', value: true }
+  - { path: '/public/app/enableStreaming', value: true }
 
 bigbluebutton_sounds_profile:
   - { name: 'muted-sound', value: 'silence' }

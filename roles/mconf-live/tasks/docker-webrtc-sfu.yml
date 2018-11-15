@@ -4,17 +4,34 @@
 
 - name: Get number of cores
   shell: "grep -c ^processor /proc/cpuinfo"
-  register: num_proc_raw
+  register: num_proc_auto_raw
 
-- set_fact:
-    num_proc: '{{ [ num_proc_raw.stdout|int * 2, 8 ] | min }}'
+- name: Determine number of kurento instances, in case it isn't set
+  set_fact:
+    num_proc_auto: '{{ [ num_proc_auto_raw.stdout|int * 2, 8 ] | min }}'
 
-- set_fact:
-    kurento_ports: '{{ kurento_ports|default([]) + [ 3100 + item|int ] }}'
+- name: Determine number of kurento instances
+  set_fact:
+    num_proc: '{{ mconf_live_docker_num_kurento | default(num_proc_auto, true) }}'
+
+- name: Determine kurento ports
+  set_fact:
+    kurento_ports: '{{ kurento_ports|default([]) + [ (3100 + item|int)|string ] }}'
   with_sequence: start=0 count={{ num_proc }}
 
-- set_fact:
-    kurento_config: "{{ kurento_config|default([]) + [ { 'ip': external_ip, 'url': 'ws://' + docker_ip + ':' + item|string + '/kurento' } ] }}"
+- name: Determine kurento running instances
+  shell: docker ps | grep 'kurento_[0-9]*' | sed 's:.*kurento_\([0-9]*\)$:\1:g' | sort
+  register: running_kurento_raw
+
+- name: Stop kurento instances that we don't need
+  docker_container:
+    name: kurento_{{ item }}
+    state: stopped
+  with_items: '{{ running_kurento_raw.stdout_lines | difference(kurento_ports) }}'
+
+- name: Determine kurento URLs to configure bbb-webrtc-sfu
+  set_fact:
+    kurento_config: "{{ kurento_config|default([]) + [ { 'ip': external_ip, 'url': 'ws://' + docker_ip + ':' + item + '/kurento' } ] }}"
   with_items: '{{ kurento_ports }}'
 
 - name: Start kurento containers
@@ -86,7 +103,8 @@
       MCS_PORT: 3009
       MCS_HOST: '{{ docker_ip }}'
       FREESWITCH_IP: '{{ external_ip }}'
-      LOG_LEVEL: trace
+      LOG_LEVEL: info
+      STREAM_CONTAINER_TYPE: docker
       STREAM_IMAGE_NAME: mconf/mconf-presentation-recorder:latest
       STREAM_BIGBLUEBUTTON_URL: '{{ bbb_api_entry_point | regex_replace("/api") }}'
       STREAM_BIGBLUEBUTTON_SECRET: '{{ bbb_secret }}'
