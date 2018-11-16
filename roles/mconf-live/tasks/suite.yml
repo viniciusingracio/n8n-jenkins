@@ -37,15 +37,3 @@
       KURENTO_IP: "{{ external_ip }}"
       FREESWITCH_IP: "{{ external_ip }}"
       FREESWITCH_PORT: 5066
-
-- name: Start mcs-sip container
-  docker_container:
-    name: mcs-sip
-    image: mconf/suite:mcs-sip-0.0.1-test
-    pull: yes
-    restart_policy: unless-stopped
-    ports:
-      - 5060:5060
-    env:
-      BIND_IP: 0.0.0.0
-      MCS_HOST: "{{ inventory_hostname }}"
