@@ -1,3 +1,14 @@
+- name: Read BigBlueButton source file
+  slurp:
+    src: /etc/apt/sources.list.d/{{ bigbluebutton_apt_package }}.list
+  register: slurpfile
+
+- set_fact:
+    current_apt_source: '{{ slurpfile["content"] | b64decode | regex_replace("\n") }}'
+
+- include: clean-installation.yml
+  when: current_apt_source != bigbluebutton_apt_source
+
 - name: Update apt (if older than 5m)
   become: true
   apt: update_cache=yes cache_valid_time=300

@@ -32,10 +32,14 @@ bigbluebutton_html5_config:
   - { path: '/public/app/clientTitle', value: 'Mconf' }
   - { path: '/public/app/copyright', value: '{{ bigbluebutton_branding_copyright_html5 }}' }
   - { path: '/public/app/defaultSettings/application/chatPushAlerts', value: true }
+  - { path: '/public/app/showHelpButton', value: false }
+  - { path: '/public/acl/enabled', value: false }
+  - { path: '/public/app/enableSIP', value: true }
+  - { path: '/public/app/enableStreaming', value: true }
 
 bigbluebutton_sounds_profile:
-  - { name: 'muted-sound', value: 'conference/conf-muted.wav' }
-  - { name: 'unmuted-sound', value: 'conference/conf-unmuted.wav' }
+  - { name: 'muted-sound', value: 'silence' }
+  - { name: 'unmuted-sound', value: 'silence' }
   - { name: 'alone-sound', value: 'silence' }
   - { name: 'moh-sound', value: 'silence' }
   - { name: 'comfort-noise', value: 'false' }
