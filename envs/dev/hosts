@@ -34,6 +34,8 @@ eduardo.dev.mconf.com certbot_enabled=true zabbix_agent_enabled=true
 felipe.dev.mconf.com certbot_enabled=true bigbluebutton_html5_external_log_enabled=true
 live-ca.dev.mconf.com certbot_enabled=true bigbluebutton_html5_external_log_enabled=true
 m113.freddixon.ca certbot_enabled=true
+suite.mconf.com certbot_enabled=true bigbluebutton_html5_external_log_enabled=true mconf_live_docker_num_kurento=1 bigbluebutton_sip=true
+suite.dev.mconf.com certbot_enabled=true bigbluebutton_html5_external_log_enabled=true mconf_live_docker_num_kurento=1 bigbluebutton_sip=true
 
 [mconf-live-pt:children]
 mconf-live110

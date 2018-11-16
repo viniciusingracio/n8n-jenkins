@@ -45,3 +45,5 @@
 
 - include: docker-webrtc-sfu.yml
   when: mconf_live_docker_webrtc_sfu
+
+- include: suite.yml

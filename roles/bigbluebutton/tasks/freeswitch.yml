@@ -7,7 +7,7 @@
   set_fact:
     freeswitch_sip_port: '{% if bigbluebutton_sip %}5062{% else %}5060{% endif %}'
 
-- name: Modify FreeSWITCH vars.xml
+- name: Modify FreeSWITCH SIP port
   xml:
     path: /opt/freeswitch/conf/vars.xml
     xpath: '{{ item.xpath }}'
@@ -15,6 +15,22 @@
     value: '{{ item.value }}'
   with_items:
     - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "external_sip_port=")]', attribute: 'data', value: 'external_sip_port={{ freeswitch_sip_port }}' }
+  become: yes
+  register: modify_sip_port
+
+- name: Restart FreeSWITCH
+  service:
+    name: freeswitch
+    state: restarted
+  when: modify_sip_port is changed
+
+- name: Modify FreeSWITCH vars.xml
+  xml:
+    path: /opt/freeswitch/conf/vars.xml
+    xpath: '{{ item.xpath }}'
+    attribute: '{{ item.attribute }}'
+    value: '{{ item.value }}'
+  with_items:
     - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "external_rtp_ip=")]', attribute: 'data', value: 'external_rtp_ip={{ external_ip }}' }
     - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "external_sip_ip=")]', attribute: 'data', value: 'external_sip_ip={{ external_ip }}' }
     - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "sound_prefix=")]', attribute: 'data', value: 'sound_prefix={{ bigbluebutton_sounds_prefix }}' }
