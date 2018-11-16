@@ -494,7 +494,7 @@
     name: restart kms
     minute: 0
     hour: 4
-    job: systemctl restart red5.service tomcat7.service kurento-media-server.service bbb-webrtc-sfu.service mconf-mcs-sip.service
+    job: systemctl restart red5.service tomcat7.service; docker restart $(docker ps -f "name=kurento_*" -q); docker restart webrtc-sfu
     user: root
   become: yes
 
