@@ -68,12 +68,12 @@
 - name: Pull mconf-presentation-recorder
   docker_image:
     name: '{{ mconf_live_presentation_recorder_image }}:{{ mconf_live_presentation_recorder_version }}'
-  when: mconf_live_presentation_recorder_enabled
+  when: reg_recorder.stat.exists
 
 # tag is needed because the ruby script always use latest
 - name: Tag presentation recorder image to latest
   command: docker tag {{ mconf_live_presentation_recorder_image }}:{{ mconf_live_presentation_recorder_version }} {{ mconf_live_presentation_recorder_image }}:latest
-  when: mconf_live_presentation_recorder_enabled
+  when: reg_recorder.stat.exists
 
 - name: Add tomcat7 to docker group
   become: true
@@ -81,5 +81,5 @@
     name: 'tomcat7'
     groups: docker
     append: yes
-  when: mconf_live_presentation_recorder_enabled
+  when: reg_recorder.stat.exists
   notify: restart mconf-presentation-recorder
