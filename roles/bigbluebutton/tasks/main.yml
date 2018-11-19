@@ -206,6 +206,12 @@
   become: yes
   notify: reload nginx
 
+- name: Make sure nginx is running
+  become: yes
+  service:
+    name: nginx
+    state: started
+
 - name: Install demos
   become: true
   apt:
@@ -246,12 +252,10 @@
   when: not bigbluebutton_demos
 
 - name: Get BigBlueButton secret
-  # shell: bbb-conf --secret | tr -s ' ' | grep '^ Secret:' | cut -d' ' -f3
   shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
   register: reg_bbb_secret
 
 - name: Get BigBlueButton URL
-  # shell: bbb-conf --secret | tr -s ' ' | grep '^ URL:' | cut -d' ' -f3
   shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^bigbluebutton.web.serverURL=' | cut -d'=' -f2 | awk '{print $1"/bigbluebutton/"}'
   register: reg_bbb_url
 
@@ -260,6 +264,27 @@
     setip_needed: '{{ not reg_bbb_url.stdout is search("http[s]?://" + inventory_hostname) }}'
     bbb_url: '{{ reg_bbb_url.stdout }}'
     bbb_secret: '{{ reg_bbb_secret.stdout }}'
+
+- name: bbb-conf --setip
+  become: true
+  command: bbb-conf --setip '{{ inventory_hostname }}'
+  when: setip_needed
+
+- name: Get BigBlueButton secret again
+  shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
+  register: reg_bbb_secret
+  when: setip_needed
+
+- name: Get BigBlueButton URL again
+  shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^bigbluebutton.web.serverURL=' | cut -d'=' -f2 | awk '{print $1"/bigbluebutton/"}'
+  register: reg_bbb_url
+  when: setip_needed
+
+- name: Determine URL and secret again
+  set_fact:
+    bbb_url: '{{ reg_bbb_url.stdout }}'
+    bbb_secret: '{{ reg_bbb_secret.stdout }}'
+  when: setip_needed
 
 - name: Configure akka apps
   become: yes
@@ -273,11 +298,6 @@
     - { regexp: 'sharedSecret[ ]*=', line: '  sharedSecret = "{{ bbb_secret }}"' }
     - { regexp: 'deskshareip[ ]*=', line: '  deskshareip = "{{ inventory_hostname }}"' }
   notify: restart bigbluebutton
-
-- name: bbb-conf --setip
-  become: true
-  command: bbb-conf --setip '{{ inventory_hostname }}'
-  when: setip_needed
 
 # TODO move this to a new role/task
 - name: Install dependency for yedit library
@@ -489,12 +509,22 @@
     user: root
   become: yes
 
+- set_fact:
+    restart_kms_command: systemctl restart red5.service tomcat7.service; docker restart $(docker ps -f "name=kurento_*" -q); docker restart webrtc-sfu; docker restart sfu-phone
+  when: mconf_live_docker_webrtc_sfu
+- set_fact:
+    restart_kms_command: systemctl restart red5.service tomcat7.service kurento-media-server.service bbb-webrtc-sfu.service
+  when: not mconf_live_docker_webrtc_sfu
+- set_fact:
+    restart_kms_command: '{{ restart_kms_command }} mconf-mcs-sip.service'
+  when: bigbluebutton_sip and not mconf_live_docker_mcs_sip
+
 - name: Install cron job to restart KMS daily
   cron:
     name: restart kms
     minute: 0
     hour: 4
-    job: systemctl restart red5.service tomcat7.service; docker restart $(docker ps -f "name=kurento_*" -q); docker restart webrtc-sfu
+    job: '{{ restart_kms_command }}'
     user: root
   become: yes
 

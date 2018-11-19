@@ -13,3 +13,7 @@
 - name: restart webrtc-sfu
   command: docker restart webrtc-sfu
   ignore_errors: yes
+
+- name: restart mconf-presentation-recorder
+  become: true
+  service: name=mconf-presentation-recorder state=restarted

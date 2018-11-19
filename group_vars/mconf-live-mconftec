@@ -34,7 +34,7 @@ bigbluebutton_html5_config:
   - { path: '/public/app/defaultSettings/application/chatPushAlerts', value: true }
   - { path: '/public/app/showHelpButton', value: false }
   - { path: '/public/acl/enabled', value: false }
-  - { path: '/public/app/enableSIP', value: true }
+  - { path: '/public/app/enableSIP', value: '{{ bigbluebutton_sip }}' }
   - { path: '/public/app/enableStreaming', value: true }
 
 bigbluebutton_sounds_profile:

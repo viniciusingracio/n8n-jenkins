@@ -24,9 +24,8 @@
 - name: Install extra recording formats
   become: true
   apt:
-    name: '{{ item }}'
+    name: '{{ mconf_live_extra_recording_packages }}'
     state: 'latest'
-  with_items: '{{ mconf_live_extra_recording_packages }}'
 
 - include: rec-proxy.yml
 
