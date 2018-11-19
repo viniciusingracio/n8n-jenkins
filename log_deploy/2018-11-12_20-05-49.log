@@ -1,0 +1,9 @@
+/usr/bin/ansible-playbook -v -i envs/rnp/h/hosts -l mconf-live110,mconf-rec,mconf-recw,sip-proxy provision.yml -T 180
+
+live-compute01.h.mconf.rnp.br: 149 OK, 28 changed, 0 unreachable, 0 failed
+live-compute02.h.mconf.rnp.br: 149 OK, 28 changed, 0 unreachable, 0 failed
+rec-compute01.h.mconf.rnp.br: 173 OK, 43 changed, 0 unreachable, 0 failed
+rec-ufg01.h.mconf.rnp.br: 168 OK, 42 changed, 0 unreachable, 0 failed
+recw-compute01.h.mconf.rnp.br: 141 OK, 44 changed, 0 unreachable, 0 failed
+recw-compute02.h.mconf.rnp.br: 141 OK, 44 changed, 0 unreachable, 0 failed
+sip.h.mconf.rnp.br: 19 OK, 3 changed, 0 unreachable, 0 failed

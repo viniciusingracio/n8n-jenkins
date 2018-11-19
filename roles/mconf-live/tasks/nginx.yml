@@ -64,3 +64,21 @@
   become: yes
   when: not mconf_live_rec_proxy_enabled
   notify: reload nginx
+
+- name: Add recording server fallback
+  blockinfile:
+    dest: '{{ item.dest }}'
+    block: |2
+                      if (!-f {{ item.check }}) {
+                              return 302 {{ mconf_live_rec_fallback }}$request_uri;
+                      }
+
+    insertafter: '{{ item.after }}'
+    marker: '                # {mark} ANSIBLE MANAGED BLOCK server fallback'
+  with_items:
+    - { dest: "/etc/bigbluebutton/nginx/presentation.nginx", check: "/var/bigbluebutton/published/presentation/$arg_meetingId/shapes.svg", after: ".*location \\/playback\\/presentation {$" }
+    - { dest: "/etc/bigbluebutton/nginx/presentation_video.nginx", check: "/var/bigbluebutton/published$uri", after: ".*location ~\\* \\/presentation_video\\/.*" }
+  become: yes
+  when: not mconf_live_rec_fallback is none
+  ignore_errors: yes
+  notify: reload nginx

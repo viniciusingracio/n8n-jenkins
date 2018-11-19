@@ -1,0 +1,5 @@
+/usr/bin/ansible-playbook -v -i envs/prod/com/hosts -l live02.mconf.com,live04.mconf.com,live06.mconf.com provision.yml -T 180 --skip-tags zabbix-agent
+
+live02.mconf.com: 185 OK, 40 changed, 0 unreachable, 0 failed
+live04.mconf.com: 187 OK, 45 changed, 0 unreachable, 0 failed
+live06.mconf.com: 186 OK, 43 changed, 0 unreachable, 0 failed

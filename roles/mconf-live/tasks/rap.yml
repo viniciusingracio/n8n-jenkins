@@ -81,5 +81,5 @@
     name: 'tomcat7'
     groups: docker
     append: yes
-  notify: restart mconf-presentation-recorder
   when: reg_recorder.stat.exists
+  notify: restart mconf-presentation-recorder

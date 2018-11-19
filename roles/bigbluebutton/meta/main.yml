@@ -4,5 +4,5 @@ dependencies:
   - jpnewman.json
   - kwoodson.yedit
   - ffmpeg
-  - role: docker-host
+  - docker-host
   - role: handlers

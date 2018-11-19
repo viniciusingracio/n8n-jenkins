@@ -4,7 +4,6 @@ mconf_live_extra_recording_packages: []
 
 mconf_live_enabled_recording_formats:
   - presentation
-  - presentation_video
 
 mconf_live_video_formats:
   - webm
