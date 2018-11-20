@@ -100,4 +100,3 @@
     replace: 'defaultGuestPolicy=ALWAYS_ACCEPT'
     encoding: '{{ properties_charset }}'
   notify: restart bigbluebutton
-
