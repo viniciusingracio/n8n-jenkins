@@ -40,4 +40,4 @@
       MCS_HOST: '{{ docker_ip }}'
       SIP_API_PORT: 3012
       SIP_API_PATH: /mcs-sip
-      ENABLE_EXTERNAL_API: true
+      # ENABLE_EXTERNAL_API: true
