@@ -92,11 +92,14 @@
   when: not bigbluebutton_html5_external_log_enabled
   notify: reload nginx
 
-- name: Set default guest policy on bigbluebutton.properties
+- name: Set bigbluebutton.properties
   become: yes
   replace:
     path: /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties
-    regexp: '^defaultGuestPolicy=.*'
-    replace: 'defaultGuestPolicy=ALWAYS_ACCEPT'
+    regexp: '{{ item.regexp }}'
+    replace: '{{ item.replace }}'
     encoding: '{{ properties_charset }}'
+  with_items:
+    - { regexp: '^defaultGuestPolicy=.*', replace: 'defaultGuestPolicy=ALWAYS_ACCEPT' }
+    - { regexp: '^svgImagesRequired=.*', replace: 'svgImagesRequired=True' }
   notify: restart bigbluebutton
