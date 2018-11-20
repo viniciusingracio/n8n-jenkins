@@ -1,6 +1,7 @@
 - name: Stop BigBlueButton
   become: true
   command: bbb-conf --stop
+  ignore_errors: true
 
 - name: Find path to packages installed from the specific apt repository
   set_fact:

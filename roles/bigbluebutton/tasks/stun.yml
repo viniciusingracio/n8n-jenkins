@@ -2,6 +2,7 @@
   set_fact:
     stun_server_ip: "{{ lookup('pipe', 'dig {{ bigbluebutton_stun_server[0].split(\":\")[1] }} @8.8.8.8 A +short | head -n 1') }}"
     stun_server_port: "{{ bigbluebutton_stun_server[0].split(':')[2] }}"
+  when: not mconf_live_docker_webrtc_sfu
 
 - name: Update KMS config
   lineinfile:
@@ -16,6 +17,7 @@
     - { dest: /etc/kurento/modules/kurento/BaseRtpEndpoint.conf.ini, regexp: '^minPort=', line: 'minPort={{ bigbluebutton_kms_udp_range_begin }}' }
     - { dest: /etc/kurento/modules/kurento/BaseRtpEndpoint.conf.ini, regexp: '^maxPort=', line: 'maxPort={{ bigbluebutton_kms_udp_range_end }}' }
   notify: restart kms
+  when: not mconf_live_docker_webrtc_sfu
 
 - name: Update tomcat7 stun/turn file
   become: yes

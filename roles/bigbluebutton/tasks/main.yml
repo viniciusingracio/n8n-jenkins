@@ -122,7 +122,7 @@
   apt:
     name: bbb-webrtc-sfu
     state: '{{ bigbluebutton_apt_state }}'
-  ignore_errors: yes
+  when: not mconf_live_docker_webrtc_sfu
 
 - name: Upgrade packages to make sure BigBlueButton packages are updated
   become: true
@@ -205,12 +205,6 @@
     replace: '\1 {{ inventory_hostname }};'
   become: yes
   notify: reload nginx
-
-- name: Make sure nginx is running
-  become: yes
-  service:
-    name: nginx
-    state: started
 
 - name: Install demos
   become: true
@@ -351,6 +345,19 @@
   command: 'curl --max-time 5 --trace-ascii - -k https://{{ external_ip }}:443/favicon.ico'
   ignore_errors: yes
   register: reg_external_ip_access
+
+- name: Restart nginx just to make sure
+  become: yes
+  service:
+    name: nginx
+    state: restarted
+  when: reg_external_ip_access is failed
+
+- name: Check if external IP is accessible again
+  command: 'curl --max-time 5 --trace-ascii - -k https://{{ external_ip }}:443/favicon.ico'
+  ignore_errors: yes
+  register: reg_external_ip_access
+  when: reg_external_ip_access is failed
 
 - name: Check if external IP is assigned to any interface
   shell: ip addr | grep 'inet {{ external_ip }}'
