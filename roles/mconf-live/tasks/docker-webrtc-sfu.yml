@@ -12,7 +12,7 @@
 
 - name: Determine number of kurento instances
   set_fact:
-    num_proc: '{{ mconf_live_docker_num_kurento | default(num_proc_auto, true) }}'
+    num_proc: '{{ bigbluebutton_docker_num_kurento | default(num_proc_auto, true) }}'
 
 - name: Determine kurento ports
   set_fact:
@@ -43,10 +43,12 @@
     network_mode: host
     volumes:
       - /var/kurento:/var/kurento
+      - /var/log/kurento-media-server:/var/log/kurento-media-server
     env:
       PORT: '{{ item }}'
       RTP_MIN_PORT: '{{ bigbluebutton_kms_udp_range_begin }}'
       RTP_MAX_PORT: '{{ bigbluebutton_kms_udp_range_end }}'
+      KURENTO_LOGS_PATH: /var/log/kurento-media-server
   with_items: '{{ kurento_ports }}'
   notify:
     - clean docker

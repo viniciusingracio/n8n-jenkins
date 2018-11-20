@@ -124,7 +124,7 @@
   apt:
     name: bbb-webrtc-sfu
     state: '{{ bigbluebutton_apt_state }}'
-  when: not mconf_live_docker_webrtc_sfu
+  when: not bigbluebutton_docker_webrtc_sfu
 
 - name: Upgrade packages to make sure BigBlueButton packages are updated
   become: true
@@ -412,7 +412,7 @@
     - { key: 'kurento-websocket-pool-size', value: '1' }
     state: present
   become: yes
-  when: not mconf_live_docker_webrtc_sfu
+  when: not bigbluebutton_docker_webrtc_sfu
   notify: restart bbb-webrtc-sfu
 
 - name: Open/close redis
@@ -471,7 +471,7 @@
   when: bigbluebutton_html5
 
 - include: sip.yml
-  when: bigbluebutton_sip and not mconf_live_docker_mcs_sip
+  when: bigbluebutton_sip and not bigbluebutton_docker_mcs_sip
 
 - include: branding.yml
   tags:
@@ -520,13 +520,13 @@
 
 - set_fact:
     restart_kms_command: systemctl restart red5.service tomcat7.service; docker restart $(docker ps -f "name=kurento_*" -q); docker restart webrtc-sfu; docker restart sfu-phone
-  when: mconf_live_docker_webrtc_sfu
+  when: bigbluebutton_docker_webrtc_sfu
 - set_fact:
     restart_kms_command: systemctl restart red5.service tomcat7.service kurento-media-server.service bbb-webrtc-sfu.service
-  when: not mconf_live_docker_webrtc_sfu
+  when: not bigbluebutton_docker_webrtc_sfu
 - set_fact:
     restart_kms_command: '{{ restart_kms_command }} mconf-mcs-sip.service'
-  when: bigbluebutton_sip and not mconf_live_docker_mcs_sip
+  when: bigbluebutton_sip and not bigbluebutton_docker_mcs_sip
 
 - name: Install cron job to restart KMS daily
   cron:

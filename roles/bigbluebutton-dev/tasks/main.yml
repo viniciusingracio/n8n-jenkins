@@ -2,15 +2,34 @@
   become: true
   apt: update_cache=yes cache_valid_time=300
 
+- name: Get BigBlueButton secret for dev
+  shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
+  register: reg_bbb_secret
+
+- name: Get BigBlueButton URL
+  shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^bigbluebutton.web.serverURL=' | cut -d'=' -f2 | awk '{print $1"/bigbluebutton/"}'
+  register: reg_bbb_url
+
+- name: Determine URL and secret
+  set_fact:
+    bbb_url: '{{ reg_bbb_url.stdout }}'
+    bbb_secret: '{{ reg_bbb_secret.stdout }}'
+
 - name: Install BigBlueButton dev dependencies
   become: yes
   apt:
-    name: '{{ item }}'
+    name:
+      - git-core
+      - ant
+      - openjdk-8-jdk-headless
+      - curl
+      - nodejs
     state: present
-  with_items:
-    - git-core
-    - ant
-    - openjdk-8-jdk-headless
+
+- name: Install meteor
+  shell: curl https://install.meteor.com/ | sh
+  args:
+    creates: '{{ ansible_env.HOME }}/.meteor/meteor'
 
 - name: Add dev tools to .bashrc
   blockinfile:
@@ -36,12 +55,14 @@
     marker: '# {mark} ANSIBLE MANAGED BLOCK - bbb-dev'
     create: yes 
 
-- file:
+- name: Create dir for tools
+  file:
     path: "{{ ansible_env.HOME }}/dev/tools"
     state: directory
     mode: 0755
 
-- unarchive:
+- name: Fetch dev tools
+  unarchive:
     src: '{{ item.src }}'
     dest: '{{ ansible_env.HOME }}/dev/tools'
     remote_src: True
@@ -50,49 +71,59 @@
     - { src: 'http://services.gradle.org/distributions/gradle-2.12-bin.zip', creates: 'gradle-2.12/bin/gradle' }
     - { src: 'https://github.com/grails/grails-core/releases/download/v2.5.2/grails-2.5.2.zip', creates: 'grails-2.5.2/bin/grails' }
     - { src: 'https://dl.bintray.com/sbt/native-packages/sbt/0.13.9/sbt-0.13.9.tgz', creates: 'sbt/bin/sbt' }
-    - { src: 'https://archive.apache.org/dist/flex/4.13.0/binaries/apache-flex-sdk-4.13.0-bin.tar.gz', creates: 'apache-flex-sdk-4.13.0-bin/bin/mxmlc' }
+    - { src: 'https://archive.apache.org/dist/flex/4.13.0/binaries/apache-flex-sdk-4.13.0-bin.tar.gz', creates: 'apache-flex-sdk-4.13.0-bin/bin/mxmlc', when: '{{ not biglbuebutton_dev_html5_only }}' }
     - { src: 'https://archive.apache.org/dist/maven/maven-3/3.3.3/binaries/apache-maven-3.3.3-bin.tar.gz', creates: 'apache-maven-3.3.3/bin/mvn' }
+  when: item.when is undefined or item.when == true
 
-- file:
+- name: Create dirs for flex
+  file:
     path: '{{ item }}'
     state: directory
     mode: 0755
   with_items:
     - '{{ ansible_env.HOME }}/dev/tools/apache-flex-sdk-4.13.0-bin/in'
     - '{{ ansible_env.HOME }}/dev/tools/apache-flex-sdk-4.13.0-bin/frameworks/libs/player/11.2'
+  when: not biglbuebutton_dev_html5_only
 
-- unarchive:
+- name: Fetch flex lib
+  unarchive:
     src: http://download.macromedia.com/pub/flex/sdk/builds/flex4.6/flex_sdk_4.6.0.23201B.zip
     dest: '{{ ansible_env.HOME }}/dev/tools/apache-flex-sdk-4.13.0-bin/in'
     remote_src: True
     creates: '{{ ansible_env.HOME }}/dev/tools/apache-flex-sdk-4.13.0-bin/bin/mxmlc'
+  when: not biglbuebutton_dev_html5_only
 
 - name: Download swfobject
   get_url:
     url: https://github.com/swfobject/swfobject/archive/2.2.tar.gz
     dest: '{{ ansible_env.HOME }}/dev/tools/swfobject-2.2.tar.gz'
     mode: 0644
+  when: not biglbuebutton_dev_html5_only
 
 - name: Extract swfobject
   command: 'tar -xvf swfobject-2.2.tar.gz'
   args:
     chdir: '{{ ansible_env.HOME }}/dev/tools'
     creates: '{{ ansible_env.HOME }}/dev/tools/swfobject-2.2/swfobject/swfobject.js'
+  when: not biglbuebutton_dev_html5_only
 
 - name: Copy swfobject to flex
   command: cp -r '{{ ansible_env.HOME }}/dev/tools/swfobject-2.2/swfobject' '{{ ansible_env.HOME }}/dev/tools/apache-flex-sdk-4.13.0-bin/templates'
   args:
     creates: '{{ ansible_env.HOME }}/dev/tools/apache-flex-sdk-4.13.0-bin/templates/swfobject/swfobject.js'
+  when: not biglbuebutton_dev_html5_only
 
-- file:
+- name: Create soft links for dev tools
+  file:
     src: '{{ ansible_env.HOME }}/dev/tools/{{ item.src }}'
     dest: '{{ ansible_env.HOME }}/dev/tools/{{ item.dest }}'
     state: link
   with_items:
     - { src: 'gradle-2.12', dest: 'gradle' }
     - { src: 'grails-2.5.2', dest: 'grails' }
-    - { src: 'apache-flex-sdk-4.13.0-bin', dest: 'flex' }
+    - { src: 'apache-flex-sdk-4.13.0-bin', dest: 'flex', when: '{{ not biglbuebutton_dev_html5_only }}' }
     - { src: 'apache-maven-3.3.3', dest: 'maven' }
+  when: item.when is undefined or item.when == true
 
 - name: Create global sbt config file
   file:
@@ -112,12 +143,14 @@
   args:
     chdir: '{{ ansible_env.HOME }}/dev/tools/apache-flex-sdk-4.13.0-bin'
     creates: '{{ ansible_env.HOME }}/dev/tools/apache-flex-sdk-4.13.0-bin/in/osmf.swc'
+  when: not biglbuebutton_dev_html5_only
 
 - name: Download flash player
   get_url:
     url: http://fpdownload.macromedia.com/get/flashplayer/installers/archive/playerglobal/playerglobal11_2.swc
     dest: '{{ ansible_env.HOME }}/dev/tools/apache-flex-sdk-4.13.0-bin/frameworks/libs/player/11.2/playerglobal.swc'
     mode: 0644
+  when: not biglbuebutton_dev_html5_only
 
 - name: Adjust permissions and versions on flex
   shell: |
@@ -129,6 +162,7 @@
     sed -i "s/{playerglobalHome}\/{targetPlayerMajorVersion}.{targetPlayerMinorVersion}/libs\/player\/11.2/g" frameworks/flex-config.xml
   args:
     chdir: '{{ ansible_env.HOME }}/dev/tools/apache-flex-sdk-4.13.0-bin'
+  when: not biglbuebutton_dev_html5_only
 
 - include: build.yml
   tags:

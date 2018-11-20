@@ -34,13 +34,13 @@
 - include: rap.yml
 
 - include: docker-etherpad.yml
-  when: mconf_live_docker_etherpad
+  when: bigbluebutton_docker_etherpad
 
 - include: docker-mcs-sip.yml
-  when: mconf_live_docker_mcs_sip
+  when: bigbluebutton_docker_mcs_sip
 
 - include: docker-sfu-phone.yml
-  when: mconf_live_docker_mcs_sip
+  when: bigbluebutton_docker_mcs_sip
 
 - include: docker-webrtc-sfu.yml
-  when: mconf_live_docker_webrtc_sfu
+  when: bigbluebutton_docker_webrtc_sfu

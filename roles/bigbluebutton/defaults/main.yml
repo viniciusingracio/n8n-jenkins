@@ -152,3 +152,5 @@ bigbluebutton_html5_external_log_enabled: false
 bigbluebutton_html5_external_log_level: info
 bigbluebutton_html5_external_log_url: 'https://{{ inventory_hostname }}/html5Log'
 bigbluebutton_html5_external_log_method: POST
+
+bigbluebutton_docker_webrtc_sfu: false

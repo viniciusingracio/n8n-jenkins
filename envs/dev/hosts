@@ -1,6 +1,9 @@
 [bigbluebutton]
 10.0.3.245 ansible_user=ubuntu deploy_user=ubuntu common_ufw_ipv6=false
 
+[bigbluebutton220]
+felipe2.dev.mconf.com
+
 [rec-proxy-self-signed]
 10.0.3.5
 
@@ -58,3 +61,4 @@ felipe.dev.mconf.com
 [bigbluebutton-dev]
 dev.mconf.local ansible_user=ubuntu
 test-live110.mconf.com common_ufw_enabled=false
+felipe2.dev.mconf.com

@@ -43,7 +43,9 @@
   - zabbix
 
 # BigBlueButton
-- hosts: bigbluebutton
+- hosts:
+  - bigbluebutton
+  - bigbluebutton220
   roles:
   - { role: certbot, when: certbot_enabled }
   - bigbluebutton

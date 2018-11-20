@@ -1,4 +1,4 @@
-- name: Start mcs-sip container
+- name: Start sfu-phone container
   docker_container:
     name: sfu-phone
     image: mconf/sfu-phone:mconf-2.x

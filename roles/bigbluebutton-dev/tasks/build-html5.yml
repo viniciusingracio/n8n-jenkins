@@ -1,0 +1,4 @@
+- name: Install HTML5 dependencies
+  command: meteor npm install
+  args:
+    chdir: '{{ ansible_env.HOME }}/dev/bigbluebutton/bigbluebutton-html5'
