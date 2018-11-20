@@ -2,12 +2,14 @@
   slurp:
     src: /etc/apt/sources.list.d/{{ bigbluebutton_apt_package }}.list
   register: slurpfile
+  ignore_errors: yes
 
 - set_fact:
     current_apt_source: '{{ slurpfile["content"] | b64decode | regex_replace("\n") }}'
+  when: slurpfile is succeeded
 
 - include: clean-installation.yml
-  when: current_apt_source != bigbluebutton_apt_source
+  when: slurpfile is succeeded and current_apt_source != bigbluebutton_apt_source
 
 - name: Update apt (if older than 5m)
   become: true
