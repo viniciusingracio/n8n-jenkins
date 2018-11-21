@@ -3,7 +3,7 @@
 # Built with:
 # docker build -t mconf/bbb-lti --build-arg title=Elos --build-arg description='Single sign-on into Elos' --build-arg vendor_code=mconf --build-arg vendor_name=Mconf --build-arg vendor_description='Mconf web conferencing' --build-arg vendor_url=https://mconf.com .
 mconf_lti_image: mconf/bbb-lti
-mconf_lti_image_version: 0.0.4-f09da58
+mconf_lti_image_version: 0.0.4-d7a477f
 
 mconf_lti_config:
 
