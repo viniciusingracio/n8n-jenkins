@@ -1,7 +1,11 @@
+- name: Determine default docker image
+  set_fact:
+    default_image: '{{ mconf_lti_image }}:{{ mconf_lti_image_version }}'
+
 - name: Start the mconf-lti container
   docker_container:
     name: mconf-lti_{{ item.id }}
-    image: '{{ mconf_lti_image }}:{{ mconf_lti_image_version }}'
+    image: '{{ item.lti_image | default(default_image) }}'
     pull: yes
     restart_policy: unless-stopped
     published_ports:
