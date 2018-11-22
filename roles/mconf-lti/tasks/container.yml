@@ -18,6 +18,8 @@
       LTI_ENDPOINT: '{{ inventory_hostname }}/{{ item.id }}'
       LTI_CONSUMERS: '{{ item.lti_customers }}'
       LTI_CONTEXT_PATH: '{{ item.id }}#lti'
+      LTI_CANVAS_PLACEMENTS: '{{ item.lti_canvas_placements | default("") }}'
+      LTI_CANVAS_PLACEMENT_NAME: '{{ item.lti_canvas_placement_name | default("Elos") }}'
       JAVA_OPTS: -Xmx128m
       RECORDED_BY_DEFAULT: true
   with_items: '{{ mconf_lti_config }}'
