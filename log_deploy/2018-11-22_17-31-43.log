@@ -1,0 +1,3 @@
+/usr/bin/ansible-playbook -v -i envs/prod/com/hosts -l mconf-lti provision.yml -T 180 --skip-tags zabbix-agent --tags container
+
+lti.mconf.com: 6 OK, 2 changed, 0 unreachable, 0 failed
