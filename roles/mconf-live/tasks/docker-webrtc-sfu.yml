@@ -37,7 +37,7 @@
 - name: Start kurento containers
   docker_container:
     name: kurento_{{ item }}
-    image: mconf/kurento:latest
+    image: mconf/kurento:6.8.1-dev
     pull: yes
     restart_policy: unless-stopped
     network_mode: host
