@@ -1,3 +1,16 @@
+- name: Read BigBlueButton source file
+  slurp:
+    src: /etc/apt/sources.list.d/{{ bigbluebutton_apt_package }}.list
+  register: slurpfile
+  ignore_errors: yes
+
+- set_fact:
+    current_apt_source: '{{ slurpfile["content"] | b64decode | regex_replace("\n") }}'
+  when: slurpfile is succeeded
+
+- include: clean-installation.yml
+  when: slurpfile is succeeded and current_apt_source != bigbluebutton_apt_source
+
 - name: Update apt (if older than 5m)
   become: true
   apt: update_cache=yes cache_valid_time=300
@@ -111,7 +124,7 @@
   apt:
     name: bbb-webrtc-sfu
     state: '{{ bigbluebutton_apt_state }}'
-  ignore_errors: yes
+  when: not bigbluebutton_docker_webrtc_sfu
 
 - name: Upgrade packages to make sure BigBlueButton packages are updated
   become: true
@@ -235,12 +248,10 @@
   when: not bigbluebutton_demos
 
 - name: Get BigBlueButton secret
-  # shell: bbb-conf --secret | tr -s ' ' | grep '^ Secret:' | cut -d' ' -f3
   shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
   register: reg_bbb_secret
 
 - name: Get BigBlueButton URL
-  # shell: bbb-conf --secret | tr -s ' ' | grep '^ URL:' | cut -d' ' -f3
   shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^bigbluebutton.web.serverURL=' | cut -d'=' -f2 | awk '{print $1"/bigbluebutton/"}'
   register: reg_bbb_url
 
@@ -249,6 +260,27 @@
     setip_needed: '{{ not reg_bbb_url.stdout is search("http[s]?://" + inventory_hostname) }}'
     bbb_url: '{{ reg_bbb_url.stdout }}'
     bbb_secret: '{{ reg_bbb_secret.stdout }}'
+
+- name: bbb-conf --setip
+  become: true
+  command: bbb-conf --setip '{{ inventory_hostname }}'
+  when: setip_needed
+
+- name: Get BigBlueButton secret again
+  shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
+  register: reg_bbb_secret
+  when: setip_needed
+
+- name: Get BigBlueButton URL again
+  shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^bigbluebutton.web.serverURL=' | cut -d'=' -f2 | awk '{print $1"/bigbluebutton/"}'
+  register: reg_bbb_url
+  when: setip_needed
+
+- name: Determine URL and secret again
+  set_fact:
+    bbb_url: '{{ reg_bbb_url.stdout }}'
+    bbb_secret: '{{ reg_bbb_secret.stdout }}'
+  when: setip_needed
 
 - name: Configure akka apps
   become: yes
@@ -262,11 +294,6 @@
     - { regexp: 'sharedSecret[ ]*=', line: '  sharedSecret = "{{ bbb_secret }}"' }
     - { regexp: 'deskshareip[ ]*=', line: '  deskshareip = "{{ inventory_hostname }}"' }
   notify: restart bigbluebutton
-
-- name: bbb-conf --setip
-  become: true
-  command: bbb-conf --setip '{{ inventory_hostname }}'
-  when: setip_needed
 
 # TODO move this to a new role/task
 - name: Install dependency for yedit library
@@ -321,6 +348,19 @@
   ignore_errors: yes
   register: reg_external_ip_access
 
+- name: Restart nginx just to make sure
+  become: yes
+  service:
+    name: nginx
+    state: restarted
+  when: reg_external_ip_access is failed
+
+- name: Check if external IP is accessible again
+  command: 'curl --max-time 5 --trace-ascii - -k https://{{ external_ip }}:443/favicon.ico'
+  ignore_errors: yes
+  register: reg_external_ip_access
+  when: reg_external_ip_access is failed
+
 - name: Check if external IP is assigned to any interface
   shell: ip addr | grep 'inet {{ external_ip }}'
   ignore_errors: yes
@@ -372,7 +412,7 @@
     - { key: 'kurento-websocket-pool-size', value: '1' }
     state: present
   become: yes
-  when: not mconf_live_docker_webrtc_sfu
+  when: not bigbluebutton_docker_webrtc_sfu
   notify: restart bbb-webrtc-sfu
 
 - name: Open/close redis
@@ -431,7 +471,7 @@
   when: bigbluebutton_html5
 
 - include: sip.yml
-  when: bigbluebutton_sip and not mconf_live_docker_mcs_sip
+  when: bigbluebutton_sip and not bigbluebutton_docker_mcs_sip
 
 - include: branding.yml
   tags:
@@ -478,12 +518,22 @@
     user: root
   become: yes
 
+- set_fact:
+    restart_kms_command: systemctl restart red5.service tomcat7.service; docker restart $(docker ps -f "name=kurento_*" -q); docker restart webrtc-sfu; docker restart sfu-phone
+  when: bigbluebutton_docker_webrtc_sfu
+- set_fact:
+    restart_kms_command: systemctl restart red5.service tomcat7.service kurento-media-server.service bbb-webrtc-sfu.service
+  when: not bigbluebutton_docker_webrtc_sfu
+- set_fact:
+    restart_kms_command: '{{ restart_kms_command }} mconf-mcs-sip.service'
+  when: bigbluebutton_sip and not bigbluebutton_docker_mcs_sip
+
 - name: Install cron job to restart KMS daily
   cron:
     name: restart kms
     minute: 0
     hour: 4
-    job: systemctl restart red5.service tomcat7.service kurento-media-server.service bbb-webrtc-sfu.service mconf-mcs-sip.service
+    job: '{{ restart_kms_command }}'
     user: root
   become: yes
 
@@ -492,6 +542,8 @@
 - include: storage-partition.yml
   when: bigbluebutton_storage_dir is not none
   tags: [storage]
+
+- include: log.yml
 
 # - name: Check if reboot is required
 #   stat:

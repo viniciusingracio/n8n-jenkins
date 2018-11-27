@@ -1,0 +1,7 @@
+---
+
+bigbluebutton_apt_package: bigbluebutton
+bigbluebutton_apt_key: http://ubuntu.bigbluebutton.org/repo/bigbluebutton.asc
+bigbluebutton_apt_source: deb https://ubuntu.bigbluebutton.org/xenial-220-dev22 bigbluebutton-xenial main
+
+ffmpeg_version: '4.0'

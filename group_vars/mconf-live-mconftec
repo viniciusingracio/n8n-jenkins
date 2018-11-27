@@ -6,6 +6,7 @@ bigbluebutton_branding_copyright_html5: '© 2018 · elos.vc'
 bigbluebutton_branding_toolbar_color: '#2dccd3'
 bigbluebutton_branding_toolbar_color_alphas: '0, 0'
 bigbluebutton_branding_playback_copyright: <p>Gravado no <a target="_blank" href="https://elos.vc/">Elos</a></p>
+bigbluebutton_branding_name: Elos
 
 bigbluebutton_config_xml:
   - { xpath: '/config/branding', attribute: 'logo', value: 'logo.png' }
@@ -28,13 +29,13 @@ bigbluebutton_html5_config:
   - { path: '/public/kurento/enableVideo', value: true }
   - { path: '/public/kurento/enableVideoStats', value: true }
   - { path: '/public/kurento/enableListenOnly', value: true }
-  - { path: '/public/app/appName', value: 'Elos' }
-  - { path: '/public/app/clientTitle', value: 'Elos' }
+  - { path: '/public/app/appName', value: '{{ bigbluebutton_branding_name }}' }
+  - { path: '/public/app/clientTitle', value: '{{ bigbluebutton_branding_name }}' }
   - { path: '/public/app/copyright', value: '{{ bigbluebutton_branding_copyright_html5 }}' }
   - { path: '/public/app/defaultSettings/application/chatPushAlerts', value: true }
   - { path: '/public/app/showHelpButton', value: false }
   - { path: '/public/acl/enabled', value: false }
-  - { path: '/public/app/enableSIP', value: true }
+  - { path: '/public/app/enableSIP', value: '{{ bigbluebutton_sip }}' }
   - { path: '/public/app/enableStreaming', value: true }
 
 bigbluebutton_sounds_profile:

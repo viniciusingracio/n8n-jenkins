@@ -1,6 +1,9 @@
 [bigbluebutton]
 10.0.3.245 ansible_user=ubuntu deploy_user=ubuntu common_ufw_ipv6=false
 
+[bigbluebutton220]
+felipe2.dev.mconf.com
+
 [rec-proxy-self-signed]
 10.0.3.5
 
@@ -32,7 +35,6 @@ test-live2.dev.mconf.com
 paulo.dev.mconf.com certbot_enabled=true zabbix_agent_enabled=true
 eduardo.dev.mconf.com certbot_enabled=true zabbix_agent_enabled=true
 felipe.dev.mconf.com certbot_enabled=true bigbluebutton_html5_external_log_enabled=true
-live-ca.dev.mconf.com certbot_enabled=true bigbluebutton_html5_external_log_enabled=true
 m113.freddixon.ca certbot_enabled=true
 suite.mconf.com     certbot_enabled=true bigbluebutton_html5_external_log_enabled=true mconf_live_docker_num_kurento=1 bigbluebutton_sip=true mconf_live_docker_mcs_sip_image=mconf/suite:mcs-sip-0.0.1-test
 suite.dev.mconf.com certbot_enabled=true bigbluebutton_html5_external_log_enabled=true mconf_live_docker_num_kurento=1 bigbluebutton_sip=true mconf_live_docker_mcs_sip_image=mconf/suite:mcs-sip-0.0.1-test
@@ -61,3 +63,4 @@ felipe.dev.mconf.com
 [bigbluebutton-dev]
 dev.mconf.local ansible_user=ubuntu
 test-live110.mconf.com common_ufw_enabled=false
+felipe2.dev.mconf.com

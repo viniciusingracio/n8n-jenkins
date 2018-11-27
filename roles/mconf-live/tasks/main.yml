@@ -9,9 +9,8 @@
 - name: Install extra recording formats
   become: true
   apt:
-    name: '{{ item }}'
+    name: '{{ mconf_live_extra_recording_packages }}'
     state: 'latest'
-  with_items: '{{ mconf_live_extra_recording_packages }}'
 
 - include: rec-proxy.yml
 
@@ -20,18 +19,18 @@
 - include: rap.yml
 
 - include: docker-etherpad.yml
-  when: mconf_live_docker_etherpad
+  when: bigbluebutton_docker_etherpad
 
 - include: docker-mcs-sip.yml
-  when: mconf_live_docker_mcs_sip
-  tags:
-    - sip
+  when: bigbluebutton_docker_mcs_sip
 
 - include: docker-sfu-phone.yml
-  when: mconf_live_docker_mcs_sip
+  when: bigbluebutton_docker_mcs_sip
 
 - include: docker-webrtc-sfu.yml
-  when: mconf_live_docker_webrtc_sfu
+  when: bigbluebutton_docker_webrtc_sfu
+  tags:
+    - webrtc-sfu
 
 - include: suite.yml
   tags:

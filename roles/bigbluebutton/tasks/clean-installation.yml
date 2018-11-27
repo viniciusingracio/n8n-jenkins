@@ -1,0 +1,31 @@
+- name: Stop BigBlueButton
+  become: true
+  command: bbb-conf --stop
+  ignore_errors: true
+
+- name: Find path to packages installed from the specific apt repository
+  set_fact:
+    apt_path: /var/lib/apt/lists/{{ current_apt_source | regex_search("http[s]?:\/\/[^ ]*") | regex_replace("http[s]?:\/\/") | replace("/", "_") }}*Packages
+
+- name: Find packages installed from the specific apt repository
+  shell: awk '$1 == "Package:" { if (a[$2]++ == 0) print $2; }' {{ apt_path }}
+  register: list_of_packages
+
+- name: Remove packages from specific apt repository
+  become: true
+  apt:
+    name: '{{ list_of_packages.stdout_lines }}'
+    purge: yes
+    state: absent
+  when: list_of_packages.stdout_lines | length > 0
+
+- name: Remove apt repository
+  become: true
+  apt_repository:
+    repo: '{{ current_apt_source }}'
+    filename: '{{ bigbluebutton_apt_package }}'
+    state: absent
+
+- name: Cleanup tmp directory
+  become: true
+  command: find /tmp -type f -delete

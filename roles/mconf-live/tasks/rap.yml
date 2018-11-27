@@ -7,8 +7,8 @@
   yedit:
     src: /usr/local/bigbluebutton/core/scripts/mconf-presentation-recorder.yml
     edits:
-      - { key: 'api_entry_point', value: '{{ mconf_live_recording_auth_entry_point | default(bbb_api_entry_point.stdout, true) }}' }
-      - { key: 'api_shared_secret', value: '{{ mconf_live_recording_auth_secret | default(bbb_secret.stdout, true) }}' }
+      - { key: 'api_entry_point', value: '{{ mconf_live_recording_auth_entry_point | default(bbb_api_entry_point, true) }}' }
+      - { key: 'api_shared_secret', value: '{{ mconf_live_recording_auth_secret | default(bbb_secret, true) }}' }
       - { key: 'local_address', value: '{{ mconf_live_recording_auth_local_address | default(ansible_default_ipv4.address, true) }}' }
       - { key: 'simultaneous_meetings', value: '{{ mconf_live_num_presentation_recorders }}' }
     state: present
@@ -68,12 +68,12 @@
 - name: Pull mconf-presentation-recorder
   docker_image:
     name: '{{ mconf_live_presentation_recorder_image }}:{{ mconf_live_presentation_recorder_version }}'
-  when: mconf_live_presentation_recorder_enabled
+  when: reg_recorder.stat.exists
 
-# tag is needed because the ruby script always use latest
+# tag is needed because the rap script always use latest
 - name: Tag presentation recorder image to latest
   command: docker tag {{ mconf_live_presentation_recorder_image }}:{{ mconf_live_presentation_recorder_version }} {{ mconf_live_presentation_recorder_image }}:latest
-  when: mconf_live_presentation_recorder_enabled
+  when: reg_recorder.stat.exists
 
 - name: Add tomcat7 to docker group
   become: true
@@ -81,4 +81,5 @@
     name: 'tomcat7'
     groups: docker
     append: yes
-  when: mconf_live_presentation_recorder_enabled
+  when: reg_recorder.stat.exists
+  notify: restart mconf-presentation-recorder

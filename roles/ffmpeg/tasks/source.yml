@@ -1,46 +1,45 @@
 - name: Install FFmpeg build dependencies
   become: yes
   apt:
-    name: '{{ item }}'
+    name:
+      - yasm
+      - nasm
+      - libsdl2-dev
+      - libva-dev
+      - checkinstall
+      - texi2html
+      - libx11-dev
+      - libvpx-dev
+      - libxfixes-dev
+      - libxext-dev
+      - libv4l-dev
+      - netcat
+      - librtmp-dev
+      - libx264-dev
+      - libmp3lame-dev
+      - libopus-dev
+      - libwebp-dev
+      - libspeex-dev
+      # from https://trac.ffmpeg.org/wiki/CompilationGuide/Ubuntu
+      - autoconf
+      - automake
+      - build-essential
+      - cmake
+      - git
+      - libass-dev
+      - libfreetype6-dev
+      - libtheora-dev
+      - libtool
+      - libvdpau-dev
+      - libvorbis-dev
+      - libxcb1-dev
+      - libxcb-shm0-dev
+      - libxcb-xfixes0-dev
+      - mercurial
+      - pkg-config
+      - texinfo
+      - zlib1g-dev
     state: present
-  with_items:
-    - yasm
-    - nasm
-    - libsdl2-dev
-    - libva-dev
-    - checkinstall
-    - texi2html
-    - libx11-dev
-    - libvpx-dev
-    - libxfixes-dev
-    - libxext-dev
-    - libv4l-dev
-    - netcat
-    - librtmp-dev
-    - libx264-dev
-    - libmp3lame-dev
-    - libopus-dev
-    - libwebp-dev
-    - libspeex-dev
-    # from https://trac.ffmpeg.org/wiki/CompilationGuide/Ubuntu
-    - autoconf
-    - automake
-    - build-essential
-    - cmake
-    - git
-    - libass-dev
-    - libfreetype6-dev
-    - libtheora-dev
-    - libtool
-    - libvdpau-dev
-    - libvorbis-dev
-    - libxcb1-dev
-    - libxcb-shm0-dev
-    - libxcb-xfixes0-dev
-    - mercurial
-    - pkg-config
-    - texinfo
-    - zlib1g-dev
 
 - name: Download and extract FFmpeg
   become: yes

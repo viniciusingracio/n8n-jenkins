@@ -147,5 +147,5 @@
 
 - name: Update locale on the HTML5 client
   become: yes
-  command: 'find /usr/share/meteor/bundle/programs/server/assets/app/locales/ -name "*.json" -exec sed -i "s|BigBlueButton|Mconf|g" {} \;'
+  command: 'find /usr/share/meteor/bundle/programs/server/assets/app/locales/ -name "*.json" -exec sed -i "s|BigBlueButton|{{ bigbluebutton_branding_name }}|g" {} \;'
   when: bigbluebutton_html5

@@ -21,6 +21,7 @@ bigbluebutton_sip_default_gateway:
 bigbluebutton_screenshare_extension_url: https://chrome.google.com/webstore/detail/bigbluebutton-screenshare/fdebcjabckbgfelopckfkhjldbbkoofj
 bigbluebutton_screenshare_extension_key: fdebcjabckbgfelopckfkhjldbbkoofj
 
+bigbluebutton_branding_name: BigBlueButton
 bigbluebutton_branding_welcome:
 bigbluebutton_branding_welcome_footer:
 bigbluebutton_branding_layout:
@@ -145,7 +146,11 @@ bigbluebutton_retention_published_raw: 30
 bigbluebutton_storage_device:
 bigbluebutton_storage_dir:
 
+bigbluebutton_log_retention: 30
+
 bigbluebutton_html5_external_log_enabled: false
 bigbluebutton_html5_external_log_level: info
 bigbluebutton_html5_external_log_url: 'https://{{ inventory_hostname }}/html5Log'
 bigbluebutton_html5_external_log_method: POST
+
+bigbluebutton_docker_webrtc_sfu: false

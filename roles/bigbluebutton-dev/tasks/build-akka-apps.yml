@@ -3,7 +3,7 @@
     dest: '{{ ansible_env.HOME }}/dev/bigbluebutton/{{ item }}/build.sbt'
     block: |
       publishTo := Some(Resolver.file("file",  new File(Path.userHome.absolutePath+"/.m2/repository")))
-    marker: '// {mark} ANSIBLE MANAGED BLOCK - bbb-dev'
+    marker: '// {mark} ANSIBLE MANAGED BLOCK - bbb-dev local'
     create: yes 
   with_items:
     - bbb-common-message
@@ -25,14 +25,6 @@
     - bbb-fsesl-client
     - bbb-common-web
 
-- name: Get BigBlueButton secret
-  shell: bbb-conf --secret | tr -s ' ' | grep '^ Secret:' | cut -d' ' -f3
-  register: bbb_secret
-
-- name: Get BigBlueButton URL
-  shell: bbb-conf --secret | tr -s ' ' | grep '^ URL:' | cut -d' ' -f3
-  register: bbb_url
-
 - name: Configure akka apps
   lineinfile:
     dest: '{{ ansible_env.HOME }}/dev/bigbluebutton/akka-bbb-apps/src/main/resources/application.conf'
@@ -40,9 +32,24 @@
     regexp: '{{ item.regexp }}'
     line: '{{ item.line }}'
   with_items:
-    - { regexp: 'bbbWebAPI[ ]*=', line: '  bbbWebAPI = "{{ bbb_url.stdout }}api"' }
-    - { regexp: 'sharedSecret[ ]*=', line: '  sharedSecret = "{{ bbb_secret.stdout }}"' }
+    - { regexp: 'bbbWebAPI[ ]*=', line: '  bbbWebAPI = "{{ bbb_url }}api"' }
+    - { regexp: 'sharedSecret[ ]*=', line: '  sharedSecret = "{{ bbb_secret }}"' }
     - { regexp: 'deskshareip[ ]*=', line: '  deskshareip = "{{ inventory_hostname }}"' }
+
+- name: Add systemd specifics to akka apps
+  blockinfile:
+    dest: '{{ ansible_env.HOME }}/dev/bigbluebutton/akka-bbb-apps/build.sbt'
+    block: |
+      enablePlugins(SystemdPlugin)
+      serverLoading in Debian := Some(com.typesafe.sbt.packager.archetypes.systemloader.ServerLoader.Systemd)
+    marker: '// {mark} ANSIBLE MANAGED BLOCK - bbb-dev systemd'
+    create: yes 
+
+- name: Remove JAVA_OPTS from akka apps
+  lineinfile:
+    dest: '{{ ansible_env.HOME }}/dev/bigbluebutton/akka-bbb-apps/src/templates/etc-default'
+    state: absent
+    regexp: '^JAVA_OPTS='
 
 - name: Compile akka apps
   shell: |

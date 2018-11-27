@@ -3,6 +3,7 @@
   apt:
     name: ffmpeg
     state: absent
+    force: yes
 
 - name: Add ffmpeg 4.0 repo to apt
   become: true

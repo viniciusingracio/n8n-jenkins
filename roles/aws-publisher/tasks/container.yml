@@ -22,7 +22,7 @@
 
 - name: Start the aws-publisher container
   docker_container:
-    command: bundle exec ruby s3.rb --resync --watch
+    command: bundle exec ruby s3.rb --watch
     name: mconf-aws-publisher
     image: '{{ aws_publisher_image }}:{{ aws_publisher_image_version }}'
     pull: yes
