@@ -26,7 +26,7 @@
 - name: Start mcs-sip container
   docker_container:
     name: mcs-sip
-    image: '{{ mconf_live_docker_mcs_sip_image }}'
+    image: '{{ bigbluebutton_docker_mcs_sip_image }}'
     pull: yes
     restart_policy: unless-stopped
     ports:
