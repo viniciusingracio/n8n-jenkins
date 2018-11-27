@@ -1,13 +1,12 @@
 - name: Install FFmpeg dependencies
   become: yes
   apt:
-    name: '{{ item }}'
+    name:
+      - yasm
+      - nasm
+      - libsdl2-dev
+      - libva-dev
     state: present
-  with_items:
-    - yasm
-    - nasm
-    - libsdl2-dev
-    - libva-dev
 
 - name: Install from packages
   become: yes
