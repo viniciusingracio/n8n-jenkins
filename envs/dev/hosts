@@ -36,8 +36,24 @@ paulo.dev.mconf.com certbot_enabled=true zabbix_agent_enabled=true
 eduardo.dev.mconf.com certbot_enabled=true zabbix_agent_enabled=true
 felipe.dev.mconf.com certbot_enabled=true bigbluebutton_html5_external_log_enabled=true
 m113.freddixon.ca certbot_enabled=true
-suite.mconf.com     certbot_enabled=true bigbluebutton_html5_external_log_enabled=true bigbluebutton_docker_num_kurento=1 bigbluebutton_sip=true bigbluebutton_docker_mcs_sip_image=mconf/suite:mcs-sip-0.0.1-test
-suite.dev.mconf.com certbot_enabled=true bigbluebutton_html5_external_log_enabled=true bigbluebutton_docker_num_kurento=1 bigbluebutton_sip=true bigbluebutton_docker_mcs_sip_image=mconf/suite:mcs-sip-0.0.1-test
+
+[mconf-live200:children]
+suite
+
+[suite]
+suite.mconf.com
+suite.dev.mconf.com
+
+[suite:vars]
+certbot_enabled=true
+bigbluebutton_html5_external_log_enabled=true
+bigbluebutton_docker_num_kurento=1
+bigbluebutton_sip=true
+bigbluebutton_docker_mcs_sip=true
+bigbluebutton_docker_webrtc_sfu=true
+bigbluebutton_docker_sfu_phone=false
+bigbluebutton_kms_udp_range_begin=7000
+bigbluebutton_kms_udp_range_end=8999
 
 [mconf-live-pt:children]
 mconf-live110

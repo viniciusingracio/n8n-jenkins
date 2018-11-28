@@ -25,7 +25,7 @@
   when: bigbluebutton_docker_mcs_sip
 
 - include: docker-sfu-phone.yml
-  when: bigbluebutton_docker_mcs_sip
+  when: bigbluebutton_docker_sfu_phone
 
 - include: docker-webrtc-sfu.yml
   when: bigbluebutton_docker_webrtc_sfu

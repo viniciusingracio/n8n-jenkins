@@ -29,6 +29,8 @@ mconf_live_recording_auth_local_address:
 bigbluebutton_docker_etherpad: false
 bigbluebutton_docker_mcs_sip: false
 bigbluebutton_docker_mcs_sip_image: mconf/mcs-sip:2.0.1-new-api
+bigbluebutton_docker_sfu_phone: false
 bigbluebutton_docker_webrtc_sfu: false
+bigbluebutton_docker_suite: false
 
 bigbluebutton_docker_num_kurento:
