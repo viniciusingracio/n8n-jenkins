@@ -37,3 +37,4 @@
       KURENTO_IP: "{{ external_ip }}"
       FREESWITCH_IP: "{{ external_ip }}"
       FREESWITCH_PORT: 5066
+      ESL_IP: "{{ docker_ip }}"
