@@ -44,7 +44,6 @@
   become: yes
   file:
     path: '{{ bigbluebutton_storage_dir }}'
-    recurse: yes
     state: directory
 
 - name: Mount new partition
@@ -69,16 +68,26 @@
   become: yes
   file:
     path: '{{ bigbluebutton_storage_dir }}{{ item.item | dirname }}'
-    recurse: yes
     state: directory
   with_items: '{{ reg_dir.results }}'
 
-- name: Move directories to storage
+- name: Remove directories from the storage in order to do a fresh copy
   become: yes
-  command: mv {{ item.item }} {{ bigbluebutton_storage_dir }}{{ item.item }}
+  command: rm -r {{ bigbluebutton_storage_dir }}{{ item.item }}
   with_items: '{{ reg_dir.results }}'
   when: item.stat.exists and not item.stat.islnk
-  notify: restart bigbluebutton
+
+- name: Copy directories to storage
+  become: yes
+  command: cp -r {{ item.item }} {{ bigbluebutton_storage_dir }}{{ item.item }}
+  with_items: '{{ reg_dir.results }}'
+  when: item.stat.exists and not item.stat.islnk
+
+- name: Remove directories from local disk
+  become: yes
+  command: rm -r {{ item.item }}
+  with_items: '{{ reg_dir.results }}'
+  when: item.stat.exists and not item.stat.islnk
 
 - name: Create links to storage
   become: yes

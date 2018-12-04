@@ -1,6 +1,6 @@
 - name: Determine STUN information for Kurento
   set_fact:
-    stun_server_ip: "{{ lookup('pipe', 'dig {{ bigbluebutton_stun_server[0].split(\":\")[1] }} @8.8.8.8 A +short | head -n 1') }}"
+    stun_server_ip: "{{ lookup('pipe', 'dig {{ bigbluebutton_stun_server[0].split(\":\")[1] }} @8.8.8.8 A +short | grep \"[0-9]*\\.[0-9]*\\.[0-9]*\\.[0-9]*\" | head -n 1') }}"
     stun_server_port: "{{ bigbluebutton_stun_server[0].split(':')[2] }}"
   when: not bigbluebutton_docker_webrtc_sfu
 

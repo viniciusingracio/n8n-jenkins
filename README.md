@@ -60,6 +60,12 @@ ansible all -v -i envs/rnp/h/hosts -l mconf-recw -m command --become -a "apt-get
 
 # restart BigBlueButton application
 ansible all -v -i envs/prod/com/hosts -l mconf-live110 --extra-vars "ansible_user=mconf" --become -m raw -a 'bbb-conf --restart || true'
+
+# check bandwidth capacity
+ansible all -v -i envs/prod/tjrr/hosts -l live-comarcas --extra-vars "ansible_user=mconf" --become -m raw -a 'curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python -'
+
+# check if server has access to the Internet
+ansible all -v -i envs/prod/tjrr/hosts -l live-comarcas --extra-vars "ansible_user=mconf" -m raw -a 'echo -e "GET http://google.com HTTP/1.0\n\n" | nc -w 10 google.com 80 > /dev/null 2>&1; if [ $? -eq 0 ]; then echo "ONLINE"; else echo "OFFLINE"; fi'
 ```
 
 ### Other playbooks

@@ -3,19 +3,18 @@
 - name: Install dependencies
   become: yes
   apt:
-    name: '{{ item }}'
+    name:
+      - sqlite
+      - redis-server
+      - build-essential
+      - libssl-dev
+      - libsqlite3-dev
+      - libevent-dev
+      - libpq-dev
+      - mysql-client
+      - libmysqlclient-dev
+      - libhiredis-dev
     state: present
-  with_items:
-    - sqlite
-    - redis-server
-    - build-essential
-    - libssl-dev
-    - libsqlite3-dev
-    - libevent-dev
-    - libpq-dev
-    - mysql-client
-    - libmysqlclient-dev
-    - libhiredis-dev
 
 - name: Download and extract
   become: yes
@@ -51,46 +50,12 @@
     - reload systemctl
     - restart coturn
 
-- set_fact:
-    ssl_certificate_filename: '{{ coturn_ssl_certificate | basename }}'
-    ssl_certificate_dir: '{{ coturn_ssl_certificate | dirname }}'
-    ssl_certificate_key_filename: '{{ coturn_ssl_certificate_key | basename }}'
-    ssl_certificate_key_dir: '{{ coturn_ssl_certificate_key | dirname }}'
-
-- name: Create certificate dir
-  file:
-    path: '{{ item }}'
-    mode: 0755
-    recurse: yes
-    state: directory
-  with_items:
-    - '{{ ssl_certificate_dir }}'
-    - '{{ ssl_certificate_key_dir }}'
-  when: not coturn_local_ssl_certificate is none and not coturn_local_ssl_certificate_key is none
-  become: yes
-
-- name: Copy certificates
-  become: yes
-  copy:
-    src: '{{ item.src }}'
-    dest: '{{ item.dest }}'
-  with_items:
-    - { src: '{{ coturn_local_ssl_certificate }}', dest: '{{ coturn_ssl_certificate }}' }
-    - { src: '{{ coturn_local_ssl_certificate_key }}', dest: '{{ coturn_ssl_certificate_key }}' }
-  when: not coturn_local_ssl_certificate is none and not coturn_local_ssl_certificate_key is none
-  ignore_errors: yes
-  notify: restart coturn
-
-- name: Generate dhparam
-  become: yes
-  command: openssl dhparam -out {{ coturn_ssl_dh_file }} 2048
-  args:
-    creates: '{{ coturn_ssl_dh_file }}'
-  notify: restart coturn
+- include: ssl.yml
+  when: coturn_ssl_enabled
 
 - name: Determine external IP
   set_fact:
-    external_ip: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | head -n 1') }}"
+    external_ip: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | grep \"[0-9]*\\.[0-9]*\\.[0-9]*\\.[0-9]*\" | head -n 1') }}"
 
 - name: Copy templates
   become: true

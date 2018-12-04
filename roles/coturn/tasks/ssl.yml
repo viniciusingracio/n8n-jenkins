@@ -1,0 +1,38 @@
+---
+
+- set_fact:
+    ssl_certificate_filename: '{{ coturn_ssl_certificate | basename }}'
+    ssl_certificate_dir: '{{ coturn_ssl_certificate | dirname }}'
+    ssl_certificate_key_filename: '{{ coturn_ssl_certificate_key | basename }}'
+    ssl_certificate_key_dir: '{{ coturn_ssl_certificate_key | dirname }}'
+
+- name: Create certificate dir
+  file:
+    path: '{{ item }}'
+    mode: 0755
+    recurse: yes
+    state: directory
+  with_items:
+    - '{{ ssl_certificate_dir }}'
+    - '{{ ssl_certificate_key_dir }}'
+  when: not coturn_local_ssl_certificate is none and not coturn_local_ssl_certificate_key is none
+  become: yes
+
+- name: Copy certificates
+  become: yes
+  copy:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+  with_items:
+    - { src: '{{ coturn_local_ssl_certificate }}', dest: '{{ coturn_ssl_certificate }}' }
+    - { src: '{{ coturn_local_ssl_certificate_key }}', dest: '{{ coturn_ssl_certificate_key }}' }
+  when: not coturn_local_ssl_certificate is none and not coturn_local_ssl_certificate_key is none
+  ignore_errors: yes
+  notify: restart coturn
+
+- name: Generate dhparam
+  become: yes
+  command: openssl dhparam -out {{ coturn_ssl_dh_file }} 2048
+  args:
+    creates: '{{ coturn_ssl_dh_file }}'
+  notify: restart coturn

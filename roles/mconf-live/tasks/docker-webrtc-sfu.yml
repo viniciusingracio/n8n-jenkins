@@ -8,7 +8,7 @@
 
 - name: Determine number of kurento instances, in case it isn't set
   set_fact:
-    num_proc_auto: '{{ [ num_proc_auto_raw.stdout|int * 2, 8 ] | min }}'
+    num_proc_auto: '{{ [ num_proc_auto_raw.stdout|int, 4 ] | min }}'
 
 - name: Determine number of kurento instances
   set_fact:
@@ -104,7 +104,7 @@
       REDIS_HOST: '{{ docker_ip }}'
       MCS_PORT: 3009
       MCS_HOST: '{{ docker_ip }}'
-      FREESWITCH_IP: '{{ external_ip }}'
+      FREESWITCH_IP: '{{ ansible_default_ipv4.address }}'
       LOG_LEVEL: info
       STREAM_CONTAINER_TYPE: docker
       STREAM_IMAGE_NAME: mconf/mconf-presentation-recorder:latest

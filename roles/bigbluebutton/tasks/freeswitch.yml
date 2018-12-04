@@ -130,4 +130,31 @@
   when: item is failed
   notify: restart bigbluebutton
 
+- name: Check if IPv6 is supported
+  shell: ip addr | grep inet6
+  ignore_errors: yes
+  register: reg_ipv6
+
+- name: Change listen-ip on the socket layer since it can't handle IPv6
+  become: yes
+  xml:
+    path: /opt/freeswitch/etc/freeswitch/autoload_configs/event_socket.conf.xml
+    xpath: //param[@name="listen-ip"]
+    attribute: value
+    value: '127.0.0.1'
+  when: reg_ipv6 is failed
+  notify: restart bigbluebutton
+
+- name: Remove IPv6 configuration from FreeSWITCH profiles
+  become: yes
+  command: mv {{ item }} {{ item }}_
+  args:
+    creates: '{{ item }}_'
+    removes: '{{ item }}'
+  with_items:
+    - /opt/freeswitch/etc/freeswitch/sip_profiles/internal-ipv6.xml
+    - /opt/freeswitch/etc/freeswitch/sip_profiles/external-ipv6.xml
+  when: reg_ipv6 is failed
+  notify: restart bigbluebutton
+
 - include: sounds.yml

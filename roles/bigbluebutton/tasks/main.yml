@@ -336,7 +336,7 @@
 - name: Determine external IP
   set_fact:
     # external_ip: "{{ lookup('dig', inventory_hostname, '@8.8.8.8') }}"
-    external_ip: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | head -n 1') }}"
+    external_ip: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | grep \"[0-9]*\\.[0-9]*\\.[0-9]*\\.[0-9]*\" | head -n 1') }}"
 - name: Set external IP as internal IP if nothing returns from dig
   set_fact:
     external_ip: '{{ ansible_default_ipv4.address }}'
@@ -465,6 +465,7 @@
 - include: freeswitch.yml
 
 - include: config-xml.yml
+  when: not bigbluebutton_html5_only
 
 - include: webhooks.yml
 
