@@ -521,21 +521,27 @@
   become: yes
 
 - set_fact:
-    restart_kms_command: docker restart $(docker ps -f "name=kurento_*" -q); docker restart webrtc-sfu; docker restart sfu-phone
+    restart_mconf_command: bbb-conf --restart; docker restart $(docker ps -f "name=kurento_*" -q); docker restart webrtc-sfu; docker restart sfu-phone
   when: bigbluebutton_docker_webrtc_sfu
 - set_fact:
-    restart_kms_command: systemctl restart kurento-media-server.service bbb-webrtc-sfu.service
+    restart_mconf_command: bbb-conf --restart
   when: not bigbluebutton_docker_webrtc_sfu
-- set_fact:
-    restart_kms_command: '{{ restart_kms_command }} mconf-mcs-sip.service'
-  when: bigbluebutton_sip and not bigbluebutton_docker_mcs_sip
 
 - name: Install cron job to restart KMS daily
   cron:
     name: restart kms
     minute: 0
     hour: 4
-    job: '{{ restart_kms_command }}'
+    user: root
+    state: absent
+  become: yes
+
+- name: Install cron job to restart Mconf daily
+  cron:
+    name: restart mconf
+    minute: 0
+    hour: 4
+    job: '{{ restart_mconf_command }}'
     user: root
   become: yes
 

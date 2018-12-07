@@ -62,24 +62,25 @@
     - /var/bigbluebutton
     - /var/freeswitch
     - /var/kurento
+    - /var/lib/docker
   register: reg_dir
 
-- name: Create parent directories to move 
+- name: Stop docker daemon
+  become: yes
+  service: name=docker state=stopped
+  with_items: '{{ reg_dir.results }}'
+  when: item.item == '/var/lib/docker' and item.stat.exists and not item.stat.islnk
+
+- name: Create parent directories to move
   become: yes
   file:
     path: '{{ bigbluebutton_storage_dir }}{{ item.item | dirname }}'
     state: directory
   with_items: '{{ reg_dir.results }}'
 
-- name: Remove directories from the storage in order to do a fresh copy
-  become: yes
-  command: rm -r {{ bigbluebutton_storage_dir }}{{ item.item }}
-  with_items: '{{ reg_dir.results }}'
-  when: item.stat.exists and not item.stat.islnk
-
 - name: Copy directories to storage
   become: yes
-  command: cp -r {{ item.item }} {{ bigbluebutton_storage_dir }}{{ item.item }}
+  command: rsync -aqxP {{ item.item }} {{ bigbluebutton_storage_dir }}{{ item.item | dirname }}
   with_items: '{{ reg_dir.results }}'
   when: item.stat.exists and not item.stat.islnk
 
@@ -98,3 +99,9 @@
   with_items: '{{ reg_dir.results }}'
   when: item.stat.exists and not item.stat.islnk
   notify: restart bigbluebutton
+
+- name: Start docker daemon
+  become: yes
+  service: name=docker state=started
+  with_items: '{{ reg_dir.results }}'
+  when: item.item == '/var/lib/docker' and item.stat.exists and not item.stat.islnk

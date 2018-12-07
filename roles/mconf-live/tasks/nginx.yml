@@ -77,7 +77,7 @@
     marker: '                # {mark} ANSIBLE MANAGED BLOCK server fallback'
   with_items:
     - { dest: "/etc/bigbluebutton/nginx/presentation.nginx", check: "/var/bigbluebutton/published/presentation/$arg_meetingId/shapes.svg", after: ".*location \\/playback\\/presentation {$" }
-    - { dest: "/etc/bigbluebutton/nginx/presentation_video.nginx", check: "/var/bigbluebutton/published$uri", after: ".*location ~\\* \\/presentation_video\\/.*" }
+    - { dest: "/etc/bigbluebutton/nginx/presentation_video.nginx", check: "/var/bigbluebutton/published$uri", after: ".*location.* \\/presentation_video.*{$" }
   become: yes
   when: not mconf_live_rec_fallback is none
   ignore_errors: yes

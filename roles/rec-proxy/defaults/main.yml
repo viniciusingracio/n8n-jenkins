@@ -9,7 +9,7 @@ rec_proxy_repo_ref: master
 
 # Docker image name and version
 rec_proxy_image: '{{ mconf_registry_host }}/mconf/rec-server-proxy-s3-noauth'
-rec_proxy_image_version: 'latest'
+rec_proxy_image_version: latest
 
 # Domain nginx will respond to
 rec_proxy_app_host: '{{ inventory_hostname }}'

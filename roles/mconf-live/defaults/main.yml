@@ -14,6 +14,8 @@ mconf_live_rec_proxy_http_port: 8091
 
 mconf_live_rec_proxy_enabled: false
 
+mconf_live_rec_proxy_image_version: latest
+
 mconf_live_sounds_hold_music:
 
 mconf_live_presentation_recorder_image: mconf/mconf-presentation-recorder
@@ -24,6 +26,7 @@ mconf_live_recording_auth_entry_point:
 mconf_live_recording_auth_secret:
 mconf_live_recording_auth_local_address:
 
+bigbluebutton_docker_webrtc_sfu: false
 bigbluebutton_docker_etherpad: false
 bigbluebutton_docker_mcs_sip: false
 

@@ -1,0 +1,4 @@
+/usr/bin/ansible-playbook -v -i envs/rnp/h/hosts -l mconf-live200 provision.yml -T 180
+
+live-compute03.h.mconf.rnp.br: 194 OK, 39 changed, 0 unreachable, 0 failed
+live-compute04.h.mconf.rnp.br: 194 OK, 39 changed, 0 unreachable, 0 failed

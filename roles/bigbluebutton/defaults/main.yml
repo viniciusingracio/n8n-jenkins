@@ -108,6 +108,7 @@ bigbluebutton_stun_server:
   - stun:stun.l.google.com:19302
 
 bigbluebutton_turn_server: []
+bigbluebutton_artificial_ice_candidates: []
 
 bigbluebutton_sounds_frequency:
   - 48000
