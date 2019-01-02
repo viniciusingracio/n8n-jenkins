@@ -1,0 +1,4 @@
+/usr/bin/ansible-playbook -i envs/prod/com -l mconf-lb setup.yml
+
+167.99.158.163: 23 OK, 11 changed, 0 unreachable, 0 failed
+167.99.158.166: 23 OK, 10 changed, 0 unreachable, 0 failed
