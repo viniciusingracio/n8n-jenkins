@@ -1,0 +1,2 @@
+Cmnd_Alias NAGIOS = /usr/lib/nagios/plugins/check_mconf.pl
+nagios ALL=(ALL) NOPASSWD: NAGIOS

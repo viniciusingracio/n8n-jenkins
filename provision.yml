@@ -1,3 +1,7 @@
+- hosts: nrpe
+  roles:
+  - { role: nrpe, tags: [ nrpe ] }
+
 - hosts: zabbix-agent
   roles:
   - { role: dj-wasabi.zabbix-agent, tags: [ zabbix-agent ] }
@@ -171,6 +175,10 @@
 - hosts: jekyll
   roles:
   - jekyll
+
+- hosts: certbot
+  roles:
+  - certbot
 
 - hosts: all
   roles:

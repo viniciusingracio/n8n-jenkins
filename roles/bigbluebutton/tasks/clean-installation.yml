@@ -11,6 +11,15 @@
   shell: awk '$1 == "Package:" { if (a[$2]++ == 0) print $2; }' {{ apt_path }}
   register: list_of_packages
 
+# need to execute this just because of an issue in the debian package, 
+# which expects bbb-record to be installed when this package is being uninstalled
+- name: Remove mconf-recording-decrypter
+  become: true
+  apt:
+    name: mconf-recording-decrypter
+    purge: yes
+    state: absent
+
 - name: Remove packages from specific apt repository
   become: true
   apt:

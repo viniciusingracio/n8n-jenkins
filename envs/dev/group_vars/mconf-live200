@@ -1,19 +1,33 @@
 ---
 
-bigbluebutton_apt_source: deb https://jenkins-live.mconf.com/apt/development/v2.0.x-release/xenial-2.0.0 mconf-xenial main
+bigbluebutton_apt_package: bigbluebutton
+bigbluebutton_apt_key: https://jenkins-live.mconf.com/apt/public.asc
+bigbluebutton_apt_source: deb https://jenkins-live.mconf.com/apt/development/mconf-200/xenial-2.0.0 mconf-xenial main
+
+bigbluebutton_sip: true
 
 bigbluebutton_html5: true
 bigbluebutton_html5_only: true
-bigbluebutton_sip: true
+bigbluebutton_html5_external_log_enabled: true
 
 bigbluebutton_default_presentation: envs/{{ env }}/files/elos200.pdf
 
 mconf_live_enabled_recording_formats:
   - presentation
+  - presentation_video
+mconf_live_extra_recording_packages:
+  - mconf-presentation-video
 
 bigbluebutton_redis_bind:
   - 0.0.0.0
 
-certbot_webroot_cmd: '{{ certbot_base_cmd }} --webroot -w /var/www/bigbluebutton-default/'
+bigbluebutton_webhooks: true
 
-aws_publisher_available_formats: presentation
+ffmpeg_version: '4.0'
+
+bigbluebutton_docker_etherpad: true
+bigbluebutton_docker_mcs_sip: true
+bigbluebutton_docker_webrtc_sfu: true
+
+bigbluebutton_kms_udp_range_begin: 7000
+bigbluebutton_kms_udp_range_end: 8999

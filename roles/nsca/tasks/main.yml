@@ -1,11 +1,10 @@
 - name: Install dependencies
   become: true
   apt:
-    name: '{{ item }}'
+    name:
+      - zlib1g-dev
+      - libmcrypt-dev
     state: 'latest'
-  with_items:
-    - zlib1g-dev
-    - libmcrypt-dev
 
 - name: Get nsca version
   shell: "/usr/local/nagios/bin/send_nsca --version | grep '^NSCA Client' | cut -d' ' -f 3"

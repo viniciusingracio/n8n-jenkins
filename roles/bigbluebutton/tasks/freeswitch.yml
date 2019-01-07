@@ -20,7 +20,7 @@
 
 - name: Restart FreeSWITCH
   become: yes
-  service:
+  systemd:
     name: freeswitch
     state: restarted
   when: modify_sip_port is changed

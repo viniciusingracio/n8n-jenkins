@@ -1,15 +1,23 @@
 - name: Read BigBlueButton source file
   slurp:
-    src: /etc/apt/sources.list.d/{{ bigbluebutton_apt_package }}.list
+    src: /etc/apt/sources.list.d/mconf-live.list
   register: slurpfile
   ignore_errors: yes
+  when: bigbluebutton_apt_clean_installation
+
+- name: Read BigBlueButton source file
+  slurp:
+    src: /etc/apt/sources.list.d/bigbluebutton.list
+  register: slurpfile
+  ignore_errors: yes
+  when: bigbluebutton_apt_clean_installation and slurpfile is failed
 
 - set_fact:
     current_apt_source: '{{ slurpfile["content"] | b64decode | regex_replace("\n") }}'
-  when: slurpfile is succeeded
+  when: bigbluebutton_apt_clean_installation and slurpfile is succeeded
 
 - include: clean-installation.yml
-  when: slurpfile is succeeded and current_apt_source != bigbluebutton_apt_source
+  when: bigbluebutton_apt_clean_installation and slurpfile is succeeded and current_apt_source != bigbluebutton_apt_source
 
 - name: Update apt (if older than 5m)
   become: true
@@ -521,11 +529,10 @@
   become: yes
 
 - set_fact:
-    restart_mconf_command: bbb-conf --restart; docker restart $(docker ps -f "name=kurento_*" -q); docker restart webrtc-sfu; docker restart sfu-phone
-  when: bigbluebutton_docker_webrtc_sfu
+    restart_mconf_command: /usr/local/bigbluebutton/core/scripts/utils/restart-mconf.sh >> /var/log/restart-mconf.log 2>&1
 - set_fact:
-    restart_mconf_command: bbb-conf --restart
-  when: not bigbluebutton_docker_webrtc_sfu
+    restart_mconf_command: '{{ restart_mconf_command }}; docker restart $(docker ps -f "name=kurento_*" -q); docker restart webrtc-sfu; docker restart sfu-phone'
+  when: bigbluebutton_docker_webrtc_sfu
 
 - name: Install cron job to restart KMS daily
   cron:

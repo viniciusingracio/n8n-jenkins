@@ -1,6 +1,6 @@
 - name: Stop kurento
   become: true
-  service: name=kurento-media-server state=stopped
+  service: name=kurento-media-server state=stopped enabled=false
 
 - name: Get number of cores
   shell: "grep -c ^processor /proc/cpuinfo"
@@ -93,7 +93,7 @@
 - name: Start webrtc-sfu container
   docker_container:
     name: webrtc-sfu
-    image: mconf/bbb-webrtc-sfu:mconf-2.x
+    image: mconf/bbb-webrtc-sfu:v2.2.2
     pull: yes
     restart_policy: unless-stopped
     ports:

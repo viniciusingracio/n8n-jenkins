@@ -1,4 +1,0 @@
----
-
-bigbluebutton_apt_package: mconf-live
-bigbluebutton_apt_key: https://jenkins-live.mconf.com/apt/public.asc

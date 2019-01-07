@@ -13,3 +13,6 @@ mconf_rec_update_decrypter_db_name:
 mconf_rec_update_decrypter_api_server:
 
 mconf_rec_remote_var_bigbluebutton: /var/bigbluebutton
+
+nfs_ip:
+nfs_name:

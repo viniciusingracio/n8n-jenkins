@@ -20,6 +20,13 @@
     - bbb-html5
   ignore_errors: yes
 
+- set_fact:
+    nfs_ip: '{{ ansible_default_ipv4.address }}'
+  when: nfs_ip is none
+- set_fact:
+    nfs_name: '{{ inventory_hostname.split(".")[0] }}'
+  when: nfs_name is none
+
 - include: server.yml
   when: mconf_rec_share_nfs
 
