@@ -1,6 +1,7 @@
 - name: Determine external IP
   set_fact:
     external_ip: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | grep \"[0-9]*\\.[0-9]*\\.[0-9]*\\.[0-9]*\" | head -n 1') }}"
+  when: external_ip | trim == ""
 - name: Set external IP as internal IP if nothing returns from dig
   set_fact:
     external_ip: '{{ ansible_default_ipv4.address }}'
@@ -24,3 +25,8 @@
 
 - set_fact:
     docker_ip: '{{ docker_ip_raw.stdout }}'
+
+- name: Determine STUN information for Kurento
+  set_fact:
+    stun_server_ip: "{{ lookup('pipe', 'dig {{ bigbluebutton_stun_server[0].split(\":\")[1] }} @8.8.8.8 A +short | grep \"[0-9]*\\.[0-9]*\\.[0-9]*\\.[0-9]*\" | head -n 1') }}"
+    stun_server_port: "{{ bigbluebutton_stun_server[0].split(':')[2] }}"

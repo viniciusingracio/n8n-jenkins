@@ -1,0 +1,57 @@
+---
+
+- name: Update apt (if older than 60m)
+  become: yes
+  apt: update_cache=yes cache_valid_time=3600
+
+- name: Install package for sponge
+  become: yes
+  apt:
+    name: moreutils
+
+- name: Create directories for scripts and results
+  become: yes
+  file:
+    path: '{{ item }}'
+    recurse: yes
+    state: directory
+  with_items:
+    - /usr/local/etc/bigbluebutton-prometheus
+    - /usr/local/share/prometheus
+
+- name: Copy scripts
+  become: yes
+  synchronize:
+    src: files/etc/
+    dest: /usr/local/etc/bigbluebutton-prometheus/
+    delete: yes
+
+- name: Install cron job monitor metrics
+  become: yes
+  cron:
+    name: bbb-prometheus-exporter
+    job: /usr/bin/ruby /usr/local/etc/bigbluebutton-prometheus/bbb-prometheus-exporter.rb --ssl true | sponge /usr/local/share/prometheus/bbb-prometheus-exporter.prom
+    user: root
+
+- name: Install package for htpasswd
+  become: yes
+  apt:
+    name: apache2-utils
+
+- name: Get BigBlueButton secret
+  shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
+  register: bbb_secret_raw
+
+- set_fact:
+    bbb_secret: '{{ bbb_secret_raw.stdout }}'
+
+- name: Create password file
+  become: yes
+  shell: echo {{ bbb_secret | hash('sha256') }} | htpasswd -i -c /etc/apache2/.htpasswd prometheus
+
+- name: Setup reverse proxy on nginx
+  become: yes
+  copy:
+    src: files/node-exporter.nginx
+    dest: /etc/bigbluebutton/nginx/node-exporter.nginx
+  notify: reload nginx

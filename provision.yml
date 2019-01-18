@@ -180,6 +180,11 @@
   roles:
   - certbot
 
+- hosts: bbb-prometheus
+  roles:
+  - bigbluebutton-prometheus
+  - node-exporter
+
 - hosts: all
   roles:
   - { role: reboot, tags: always }

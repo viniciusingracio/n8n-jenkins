@@ -8,7 +8,7 @@
 
 - name: Determine number of kurento instances, in case it isn't set
   set_fact:
-    num_proc_auto: '{{ [ num_proc_auto_raw.stdout|int, 4 ] | min }}'
+    num_proc_auto: '{{ [ num_proc_auto_raw.stdout|int, 2 ] | min }}'
 
 - name: Determine number of kurento instances
   set_fact:
@@ -29,15 +29,18 @@
     state: stopped
   with_items: '{{ running_kurento_raw.stdout_lines | difference(kurento_ports) }}'
 
+- set_fact:
+    kurento_ip: "{% if bigbluebutton_kurento_use_internal_ip %}{{ ansible_default_ipv4.address }}{% else %}{{ external_ip }}{% endif %}"
+
 - name: Determine kurento URLs to configure bbb-webrtc-sfu
   set_fact:
-    kurento_config: "{{ kurento_config|default([]) + [ { 'ip': external_ip, 'url': 'ws://' + docker_ip + ':' + item + '/kurento' } ] }}"
+    kurento_config: "{{ kurento_config|default([]) + [ { 'ip': kurento_ip, 'url': 'ws://' + docker_ip + ':' + item + '/kurento' } ] }}"
   with_items: '{{ kurento_ports }}'
 
 - name: Start kurento containers
   docker_container:
     name: kurento_{{ item }}
-    image: mconf/kurento:6.8.1-dev
+    image: mconf/kurento:bbb220-dev
     pull: yes
     restart_policy: unless-stopped
     network_mode: host
@@ -49,11 +52,10 @@
       RTP_MIN_PORT: '{{ bigbluebutton_kms_udp_range_begin }}'
       RTP_MAX_PORT: '{{ bigbluebutton_kms_udp_range_end }}'
       KURENTO_LOGS_PATH: /var/log/kurento-media-server
+      STUN_IP: '{{ stun_server_ip }}'
+      STUN_PORT: '{{ stun_server_port }}'
   with_items: '{{ kurento_ports }}'
-  notify:
-    - clean docker
-    - restart webrtc-sfu
-    - restart sfu-phone
+  notify: restart docker components
 
 - name: Copy dummy package for bbb-webrtc-sfu to /tmp
   copy:
@@ -93,7 +95,7 @@
 - name: Start webrtc-sfu container
   docker_container:
     name: webrtc-sfu
-    image: mconf/bbb-webrtc-sfu:v2.2.2
+    image: mconf/bbb-webrtc-sfu:v2.2.2-dev
     pull: yes
     restart_policy: unless-stopped
     ports:
@@ -112,7 +114,7 @@
       STREAM_BIGBLUEBUTTON_SECRET: '{{ bbb_secret }}'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-  notify: restart sfu-phone
+  notify: restart docker components
 
 - name: Add webrtc-sfu to nginx
   become: yes

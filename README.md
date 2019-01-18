@@ -66,6 +66,15 @@ ansible all -v -i envs/prod/tjrr/hosts -l live-comarcas --extra-vars "ansible_us
 
 # check if server has access to the Internet
 ansible all -v -i envs/prod/tjrr/hosts -l live-comarcas --extra-vars "ansible_user=mconf" -m raw -a 'echo -e "GET http://google.com HTTP/1.0\n\n" | nc -w 10 google.com 80 > /dev/null 2>&1; if [ $? -eq 0 ]; then echo "ONLINE"; else echo "OFFLINE"; fi'
+
+# get all client side errors and dump into a file
+ansible all -v -i envs/rnp/prod/hosts -l mconf-live200 --extra-vars "ansible_user=mconf" -m raw -a 'zgrep "error" /var/log/nginx/html5-client.log*' | grep error | sed -u -e 's/\\x22/"/g' -e 's/\\x5C/ /g' > errors_html5.log
+
+# reload and restart performance_report
+ansible all -v -i envs/prod/tjrr/hosts -l mconf-live200,mconf-rec --extra-vars "ansible_user=mconf" --become -m raw -a 'systemctl daemon-reload; systemctl restart performance_report'
+
+# get /metrics password for node-exporter
+ansible all -v -i envs/prod/tjrr/hosts -l mconf-live200,mconf-rec,mconf-recw --extra-vars "ansible_user=mconf" --become -m raw -a "cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2 | tr -d '\n' | sha256sum"
 ```
 
 ### Other playbooks

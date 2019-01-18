@@ -46,6 +46,7 @@
       - { name: "ext-sip-ip", value: '$${external_sip_ip}' }
       - { name: "ws-binding", value: "{{ ws_binding_value }}" }
       - { name: "wss-binding", value: "{{ wss_binding_value }}" }
+      - { name: "apply-candidate-acl", value: "0.0.0.0/0" }
 
 - name: Read external_props
   xml:

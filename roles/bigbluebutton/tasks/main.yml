@@ -19,9 +19,9 @@
 - include: clean-installation.yml
   when: bigbluebutton_apt_clean_installation and slurpfile is succeeded and current_apt_source != bigbluebutton_apt_source
 
-- name: Update apt (if older than 5m)
+- name: Update apt (if older than 60m)
   become: true
-  apt: update_cache=yes cache_valid_time=300
+  apt: update_cache=yes cache_valid_time=3600
 
 - name: Install language pack
   become: true
@@ -339,12 +339,10 @@
   become: yes
   notify: restart bigbluebutton
 
-# http://docs.ansible.com/ansible/latest/playbooks_lookups.html#the-dns-lookup-dig
-# couldn't make dig lookup use dnspython on the guest
 - name: Determine external IP
   set_fact:
-    # external_ip: "{{ lookup('dig', inventory_hostname, '@8.8.8.8') }}"
     external_ip: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | grep \"[0-9]*\\.[0-9]*\\.[0-9]*\\.[0-9]*\" | head -n 1') }}"
+  when: external_ip | trim == ""
 - name: Set external IP as internal IP if nothing returns from dig
   set_fact:
     external_ip: '{{ ansible_default_ipv4.address }}'
@@ -531,8 +529,11 @@
 - set_fact:
     restart_mconf_command: /usr/local/bigbluebutton/core/scripts/utils/restart-mconf.sh >> /var/log/restart-mconf.log 2>&1
 - set_fact:
-    restart_mconf_command: '{{ restart_mconf_command }}; docker restart $(docker ps -f "name=kurento_*" -q); docker restart webrtc-sfu; docker restart sfu-phone'
+    restart_mconf_command: '{{ restart_mconf_command }}; systemctl stop bbb-webrtc-sfu kurento; systemctl disable bbb-webrtc-sfu kurento; docker restart $(docker ps -f "name=kurento_*" -q); docker restart webrtc-sfu mcs-sip sfu-phone'
   when: bigbluebutton_docker_webrtc_sfu
+- set_fact:
+    restart_mconf_command: '{{ restart_mconf_command }}; systemctl stop red5 bbb-transcode-akka; systemctl disable red5 bbb-transcode-akka'
+  when: bigbluebutton_html5_only
 
 - name: Install cron job to restart KMS daily
   cron:
