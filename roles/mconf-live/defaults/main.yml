@@ -38,3 +38,5 @@ bigbluebutton_sip_registrar_username:
 bigbluebutton_sip_registrar_password:
 
 bigbluebutton_kurento_use_internal_ip: false
+
+bigbluebutton_notes_multiple_enabled: false

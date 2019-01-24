@@ -5,6 +5,10 @@
   ignore_errors: yes
   when: bigbluebutton_apt_clean_installation
 
+- set_fact:
+    current_apt_source: '{{ slurpfile["content"] | b64decode | regex_replace("\n") }}'
+  when: bigbluebutton_apt_clean_installation and slurpfile is succeeded and not slurpfile is skipped
+
 - name: Read BigBlueButton source file
   slurp:
     src: /etc/apt/sources.list.d/bigbluebutton.list
@@ -14,7 +18,7 @@
 
 - set_fact:
     current_apt_source: '{{ slurpfile["content"] | b64decode | regex_replace("\n") }}'
-  when: bigbluebutton_apt_clean_installation and slurpfile is succeeded
+  when: bigbluebutton_apt_clean_installation and slurpfile is succeeded and not slurpfile is skipped
 
 - include: clean-installation.yml
   when: bigbluebutton_apt_clean_installation and slurpfile is succeeded and current_apt_source != bigbluebutton_apt_source
@@ -96,6 +100,7 @@
     - { repo: 'deb http://archive.ubuntu.com/ubuntu/ {{ ansible_lsb.codename }}-updates universe multiverse', filename: 'ubuntu_updates' }
     - { repo: '{{ bigbluebutton_apt_source }}', filename: '{{ bigbluebutton_apt_package }}' }
     - { repo: 'deb http://deb.nodesource.com/node_8.x {{ ansible_lsb.codename }} main', filename: 'node' }
+    - { repo: 'ppa:rmescandon/yq', filename: 'yq' }
 
 - name: Update apt if keys changed
   become: true
@@ -342,11 +347,11 @@
 - name: Determine external IP
   set_fact:
     external_ip: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | grep \"[0-9]*\\.[0-9]*\\.[0-9]*\\.[0-9]*\" | head -n 1') }}"
-  when: external_ip | trim == ""
+  when: external_ip is none
 - name: Set external IP as internal IP if nothing returns from dig
   set_fact:
     external_ip: '{{ ansible_default_ipv4.address }}'
-  when: external_ip | trim == ""
+  when: external_ip is none or external_ip | trim == ""
 
 # http://docs.bigbluebutton.org/install/install.html#configure-a-dummy-nic-if-required
 - name: Check if external IP is accessible

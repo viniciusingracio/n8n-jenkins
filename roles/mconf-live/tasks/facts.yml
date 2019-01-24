@@ -1,11 +1,11 @@
 - name: Determine external IP
   set_fact:
     external_ip: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | grep \"[0-9]*\\.[0-9]*\\.[0-9]*\\.[0-9]*\" | head -n 1') }}"
-  when: external_ip | trim == ""
+  when: external_ip is none
 - name: Set external IP as internal IP if nothing returns from dig
   set_fact:
     external_ip: '{{ ansible_default_ipv4.address }}'
-  when: external_ip | trim == ""
+  when: external_ip is none or external_ip | trim == ""
 
 - name: Get BigBlueButton secret
   shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2

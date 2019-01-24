@@ -1,0 +1,21 @@
+/usr/bin/ansible-playbook -v -i envs/prod/tjrr/hosts -l mconf-live200,mconf-rec,mconf-recw,coturn provision.yml -T 180 --force-handlers
+
+aer-vc.tjrr.jus.br: 215 OK, 49 changed, 0 unreachable, 0 failed
+bfi-vc.tjrr.jus.br: 215 OK, 47 changed, 0 unreachable, 0 failed
+fcr-vc.tjrr.jus.br: 215 OK, 48 changed, 0 unreachable, 0 failed
+fcv-vc.tjrr.jus.br: 215 OK, 47 changed, 0 unreachable, 0 failed
+live01-vc.tjrr.jus.br: 217 OK, 47 changed, 0 unreachable, 0 failed
+live02-vc.tjrr.jus.br: 40 OK, 13 changed, 0 unreachable, 1 failed
+live03-vc.tjrr.jus.br: 217 OK, 47 changed, 0 unreachable, 0 failed
+live04-vc.tjrr.jus.br: 217 OK, 47 changed, 0 unreachable, 0 failed
+mji-vc.tjrr.jus.br: 215 OK, 49 changed, 0 unreachable, 0 failed
+pac-vc.tjrr.jus.br: 215 OK, 48 changed, 0 unreachable, 0 failed
+pjs-vc.tjrr.jus.br: 215 OK, 47 changed, 0 unreachable, 0 failed
+rec-vc.tjrr.jus.br: 222 OK, 55 changed, 0 unreachable, 0 failed
+recw01-vc.tjrr.jus.br: 183 OK, 51 changed, 0 unreachable, 0 failed
+recw02-vc.tjrr.jus.br: 183 OK, 51 changed, 0 unreachable, 0 failed
+rli-vc.tjrr.jus.br: 215 OK, 48 changed, 0 unreachable, 0 failed
+slz-vc.tjrr.jus.br: 215 OK, 47 changed, 0 unreachable, 0 failed
+stun01-vc.tjrr.jus.br: 13 OK, 4 changed, 0 unreachable, 0 failed
+stun02-vc.tjrr.jus.br: 12 OK, 2 changed, 0 unreachable, 0 failed
+vij-vc.tjrr.jus.br: 215 OK, 47 changed, 0 unreachable, 0 failed

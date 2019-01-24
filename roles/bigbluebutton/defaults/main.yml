@@ -105,6 +105,13 @@ bigbluebutton_html5_config:
   - { path: '/public/kurento/enableScreensharing', value: true }
   - { path: '/public/kurento/enableVideo', value: true }
 
+bigbluebutton_html5_config_yml:
+  - { key: 'public.kurento.wsUrl', value: 'wss://{{ inventory_hostname }}/bbb-webrtc-sfu' }
+  - { key: 'public.kurento.chromeExtensionKey', value: '{{ bigbluebutton_screenshare_extension_key }}' }
+  - { key: 'public.kurento.chromeExtensionLink', value: '{{ bigbluebutton_screenshare_extension_url }}' }
+  - { key: 'public.kurento.enableScreensharing', value: true }
+  - { key: 'public.kurento.enableVideo', value: true }
+
 bigbluebutton_stun_server:
   - stun:stun.l.google.com:19302
 

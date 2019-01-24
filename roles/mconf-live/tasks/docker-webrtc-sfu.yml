@@ -95,7 +95,7 @@
 - name: Start webrtc-sfu container
   docker_container:
     name: webrtc-sfu
-    image: mconf/bbb-webrtc-sfu:v2.2.2-dev
+    image: mconf/bbb-webrtc-sfu:v2.2.2
     pull: yes
     restart_policy: unless-stopped
     ports:

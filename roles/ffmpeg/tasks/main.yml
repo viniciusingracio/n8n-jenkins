@@ -20,10 +20,10 @@
   when: version_differ and ffmpeg_build_from_source
 
 - include: package3.yml
-  when: not ffmpeg_build_from_source and not ffmpeg_version is match('4\.0.*') and version_differ
+  when: not ffmpeg_build_from_source and not ffmpeg_version is match('4\.*') and version_differ
 
 - include: package4.yml
-  when: not ffmpeg_build_from_source and ffmpeg_version is match('4\.0.*') and not reg_ffmpeg_version.stdout is match('4\.0.*')
+  when: not ffmpeg_build_from_source and ffmpeg_version is match('4\.*') and not reg_ffmpeg_version.stdout is match('4\.*')
 
 - include: openh264.yml
   tags: [openh264]

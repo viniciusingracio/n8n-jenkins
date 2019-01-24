@@ -39,15 +39,17 @@
     name: apache2-utils
 
 - name: Get BigBlueButton secret
-  shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
+  shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2  | hash('sha256')
   register: bbb_secret_raw
+  when: bigbluebutton_prometheus_password is none
 
 - set_fact:
-    bbb_secret: '{{ bbb_secret_raw.stdout }}'
+    bigbluebutton_prometheus_password: '{{ bbb_secret_raw.stdout }}'
+  when: bigbluebutton_prometheus_password is none
 
 - name: Create password file
   become: yes
-  shell: echo {{ bbb_secret | hash('sha256') }} | htpasswd -i -c /etc/apache2/.htpasswd prometheus
+  shell: echo {{ bigbluebutton_prometheus_password }} | htpasswd -i -c /etc/apache2/.htpasswd prometheus
 
 - name: Setup reverse proxy on nginx
   become: yes
