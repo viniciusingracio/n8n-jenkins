@@ -231,45 +231,17 @@ end
 def fill_template(results)
   template =
   <<~HEREDOC
-    # HELP bbb_api_response_code Response code of the BBB API
-    # TYPE bbb_api_response_code gauge
-    bbb_api_response_code <%= results[:bbb_api_response_code] %>
+    # HELP bbb_recordings_response_code Response code of getRecordings call
+    # TYPE bbb_recordings_response_code gauge
+    bbb_recordings_response_code <%= results[:bbb_recordings_response_code] %>
 
-    # HELP bbb_demo_response_code Response code of the demo API
-    # TYPE bbb_demo_response_code gauge
-    bbb_demo_response_code <%= results[:bbb_demo_response_code] %>
+    # HELP bbb_recordings_total The total number of recordings
+    # TYPE bbb_recordings_total gauge
+    bbb_recordings_total <%= results[:bbb_recordings_total] %>
 
-    # HELP bbb_meetings_response_code Response code of getMeetings call
-    # TYPE bbb_meetings_response_code gauge
-    bbb_meetings_response_code <%= results[:bbb_meetings_response_code] %>
-
-    # HELP bbb_meetings_total The total number of meetings running
-    # TYPE bbb_meetings_total gauge
-    bbb_meetings_total <%= results[:bbb_meetings_total] %>
-
-    # HELP bbb_meetings_participants_total The total number of participants
-    # TYPE bbb_meetings_participants_total gauge
-    bbb_meetings_participants_total <%= results[:bbb_meetings_participants_total] %>
-
-    # HELP bbb_meetings_sent_videos The total number of videos
-    # TYPE bbb_meetings_sent_videos gauge
-    bbb_meetings_sent_videos <%= results[:bbb_meetings_sent_videos] %>
-
-    # HELP bbb_meetings_received_videos The total number of videos received
-    # TYPE bbb_meetings_received_videos gauge
-    bbb_meetings_received_videos <%= results[:bbb_meetings_received_videos] %>
-
-    # HELP bbb_meetings_sent_audio The total number of audio sent
-    # TYPE bbb_meetings_sent_audio gauge
-    bbb_meetings_sent_audio <%= results[:bbb_meetings_sent_audio] %>
-
-    # HELP bbb_meetings_received_audio The total number of audio received
-    # TYPE bbb_meetings_received_audio gauge
-    bbb_meetings_received_audio <%= results[:bbb_meetings_received_audio] %>
-
-    # HELP bbb_api_create_response_code Response code of the create endpoint of the API
-    # TYPE bbb_api_create_response_code gauge
-    bbb_api_create_response_code{method="get",messageKey="<%= results[:bbb_api_create_message_key] %>"} <%= results[:bbb_api_create_response_code] %>
+    # HELP bbb_recordings_response_time The response time for recordings
+    # TYPE bbb_recordings_response_time gauge
+    bbb_recordings_response_time <%= results[:bbb_recordings_response_time] %>
   HEREDOC
 
   ERB.new(template).result
@@ -304,15 +276,7 @@ Recordings.requester = requester
 
 results = Hash.new(0)
 
-results[:bbb_api_response_code] = requester.get_response_code(URIBuilder.api_uri)
-results[:bbb_demo_response_code] = requester.get_response_code(URIBuilder.demo_uri)
-results[:bbb_api_create_response_code], results[:bbb_api_create_message_key] = requester.process(URIBuilder.create_uri) do |code, data|
-  message_key = parse_xml(data, "/response/messageKey")
-
-  [code, message_key]
-end
-
-results.merge!(Meetings.process_meetings)
+results.merge!(Recordings.process_recordings)
 
 filled_template = fill_template(results)
 
