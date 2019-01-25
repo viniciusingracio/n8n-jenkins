@@ -1,0 +1,4 @@
+/usr/bin/ansible-playbook -i envs/prod/com-staging -l jekyll provision.yml
+
+d.elos.vc: 24 OK, 8 changed, 0 unreachable, 0 failed
+d.mconf.com: 9 OK, 5 changed, 0 unreachable, 0 failed
