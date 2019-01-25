@@ -10,6 +10,8 @@ bigbluebutton_branding_layout: envs/{{ env }}/files/layout.xml
 bigbluebutton_screenshare_extension_url: https://chrome.google.com/webstore/detail/mconf-screenshare/mbfngdphjegmlbfobcblikeefpidfncb
 bigbluebutton_screenshare_extension_key: mbfngdphjegmlbfobcblikeefpidfncb
 
+bigbluebutton_default_presentation: envs/{{ env }}/files/default.pdf
+
 certbot_domain: '{{ inventory_hostname }}'
 certbot_webroot_cmd: '{{ certbot_base_cmd }} --webroot -w /var/www/bigbluebutton-default/'
 bigbluebutton_ssl_certificate: '{% if certbot_enabled %}{{ certbot_cert_path }}/fullchain.pem{% else %}/etc/nginx/ssl/{{ inventory_hostname }}.crt{% endif %}'
@@ -30,3 +32,5 @@ bigbluebutton_stun_server:
   - stun:stun1.mconf.com:3478
 
 bigbluebutton_apt_clean_installation: true
+
+bigbluebutton_prometheus_password: 4b2e352355e6b02ac0f93c962052dcca07821eca1dc94de734fbe7bf6d49ec96

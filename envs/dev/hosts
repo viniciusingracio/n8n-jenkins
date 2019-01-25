@@ -25,6 +25,7 @@ kurento-desktopsharing.mconf.com ansible_user=root deploy_user=root
 
 [mconf-live110]
 dev.mconf.local ansible_user=ubuntu
+test-live1.dev.mconf.com
 
 [docker-host]
 felipe-docker.mconf.com
@@ -37,6 +38,7 @@ paulo.dev.mconf.com certbot_enabled=true zabbix_agent_enabled=true
 eduardo.dev.mconf.com certbot_enabled=true zabbix_agent_enabled=true
 felipe.dev.mconf.com certbot_enabled=true
 m113.freddixon.ca certbot_enabled=true
+test-live2.dev.mconf.com
 
 [mconf-live-pt:children]
 mconf-live110
@@ -65,3 +67,6 @@ felipe2.dev.mconf.com
 
 [certbot]
 kamailio.dev.mconf.com
+
+[mconf-live]
+test-live220.dev.mconf.com certbot_enabled=true

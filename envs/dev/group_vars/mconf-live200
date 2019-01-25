@@ -10,8 +10,6 @@ bigbluebutton_html5: true
 bigbluebutton_html5_only: true
 bigbluebutton_html5_external_log_enabled: true
 
-bigbluebutton_default_presentation: envs/{{ env }}/files/elos200.pdf
-
 mconf_live_enabled_recording_formats:
   - presentation
   - presentation_video
