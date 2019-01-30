@@ -11,8 +11,8 @@
 
 - name: Add notes to nginx
   become: yes
-  copy:
-    src: files/notes.nginx
+  template:
+    src: templates/notes.nginx.j2
     dest: /etc/bigbluebutton/nginx/notes.nginx
   notify: reload nginx
 

@@ -92,15 +92,22 @@
   docker_image:
     name: mconf/mconf-presentation-recorder:latest
 
+- name:
+  become: yes
+  copy:
+    content: '{{ bigbluebutton_streaming_secret }}'
+    dest: /usr/local/bigbluebutton/bbb-webrtc-sfu/config/client_secret.json
+
 - name: Start webrtc-sfu container
   docker_container:
     name: webrtc-sfu
-    image: mconf/bbb-webrtc-sfu:v2.2.2
+    image: mconf/bbb-webrtc-sfu:stream-extra-oauth2
     pull: yes
     restart_policy: unless-stopped
     ports:
       - 3008:3008
       - 3009:3009
+      - 3010:8009
     env:
       KURENTO: '{{ kurento_config | to_json }}'
       REDIS_HOST: '{{ docker_ip }}'
@@ -114,11 +121,12 @@
       STREAM_BIGBLUEBUTTON_SECRET: '{{ bbb_secret }}'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/local/bigbluebutton/bbb-webrtc-sfu/config/client_secret.json:/app/client_secret.json
   notify: restart docker components
 
 - name: Add webrtc-sfu to nginx
   become: yes
-  copy:
-    src: files/webrtc-sfu.nginx
+  template:
+    src: templates/webrtc-sfu.nginx.j2
     dest: /etc/bigbluebutton/nginx/webrtc-sfu.nginx
   notify: reload nginx

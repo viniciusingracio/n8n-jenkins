@@ -34,28 +34,11 @@ bigbluebutton_branding_playback_title: Recording Playback
 bigbluebutton_branding_playback_loading: Carregando...
 bigbluebutton_branding_playback_copyright: <p>Gravado no <a target="_blank" href="https://elos.vc/">Elos</a></p>
 bigbluebutton_branding_welcome_footer:
-bigbluebutton_branding_copyright: '&#169; 2018 &#183; <u><a href="https://elos.vc" target="_blank">elos.vc</a></u>'
-bigbluebutton_branding_copyright_html5: '© 2018 · elos.vc'
+bigbluebutton_branding_copyright: '&#169; 2019 &#183; <u><a href="https://elos.vc" target="_blank">elos.vc</a></u>'
+bigbluebutton_branding_copyright_html5: '© 2019 · elos.vc'
 bigbluebutton_branding_toolbar_color: '#2dccd3'
 bigbluebutton_branding_toolbar_color_alphas: '0, 0'
 bigbluebutton_branding_name: Elos
-
-bigbluebutton_html5_config:
-  - { path: '/public/kurento/wsUrl', value: 'wss://{{ inventory_hostname }}/bbb-webrtc-sfu' }
-  - { path: '/public/kurento/chromeExtensionKey', value: '{{ bigbluebutton_screenshare_extension_key }}' }
-  - { path: '/public/kurento/chromeExtensionLink', value: '{{ bigbluebutton_screenshare_extension_url }}' }
-  - { path: '/public/kurento/enableScreensharing', value: true }
-  - { path: '/public/kurento/enableVideo', value: true }
-  - { path: '/public/kurento/enableVideoStats', value: true }
-  - { path: '/public/kurento/enableListenOnly', value: true }
-  - { path: '/public/app/appName', value: '{{ bigbluebutton_branding_name }}' }
-  - { path: '/public/app/clientTitle', value: '{{ bigbluebutton_branding_name }}' }
-  - { path: '/public/app/copyright', value: '{{ bigbluebutton_branding_copyright_html5 }}' }
-  - { path: '/public/app/defaultSettings/application/chatPushAlerts', value: true }
-  - { path: '/public/app/showHelpButton', value: false }
-  - { path: '/public/acl/enabled', value: false }
-  - { path: '/public/app/enableSIP', value: '{{ bigbluebutton_sip }}' }
-  - { path: '/public/app/enableStreaming', value: true }
 
 bigbluebutton_html5_config_yml:
   - { key: 'public.kurento.wsUrl', value: 'wss://{{ inventory_hostname }}/bbb-webrtc-sfu' }
@@ -72,6 +55,7 @@ bigbluebutton_html5_config_yml:
   - { key: 'public.app.showHelpButton', value: false }
   - { key: 'public.acl.enabled', value: false }
   - { key: 'public.app.enableSIP', value: '{{ bigbluebutton_sip }}' }
+  - { key: 'public.app.enableExternalVideo', value: 'true' }
   - { key: 'public.streaming.enabled', value: true }
   - { key: 'public.streaming.option.youtube', value: true }
   - { key: 'public.streaming.option.rtmp', value: true }
@@ -85,4 +69,5 @@ bigbluebutton_sounds_profile:
   - { name: 'comfort-noise', value: 'false' }
 
 bigbluebutton_notes_multiple_enabled: true
+
 bigbluebutton_streaming_secret: {"web":{"client_id":"815163372732-b18hbpmhj33atj201b2nuj91cc3k25iq.apps.googleusercontent.com","project_id":"mconf-streaming-oauth","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"7evKbFJE9F2Zl4KMLTTJi6sy","redirect_uris":["https://test-live220.dev.mconf.com/oauth2_redirect"],"javascript_origins":["https://test-live220.dev.mconf.com"]}}
