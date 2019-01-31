@@ -32,6 +32,7 @@ bigbluebutton_docker_mcs_sip: false
 
 bigbluebutton_docker_num_kurento:
 
+bigbluebutton_sip_default_gateway:
 bigbluebutton_sip_registrar_enabled: false
 bigbluebutton_sip_registrar_address:
 bigbluebutton_sip_registrar_username:
@@ -44,6 +45,7 @@ bigbluebutton_notes_auth_enabled: false
 
 bigbluebutton_sfu_auth_enabled: false
 
+bigbluebutton_streaming_enabled: false
 bigbluebutton_streaming_secret: {}
 
 external_ip:

@@ -98,10 +98,25 @@
     content: '{{ bigbluebutton_streaming_secret }}'
     dest: /usr/local/bigbluebutton/bbb-webrtc-sfu/config/client_secret.json
 
+- name:
+  set_fact:
+    sfu_processes: "{{ sfu_processes|default([]) + [ { 'path': item } ] }}"
+  with_items:
+    - ./lib/mcs-core/process.js
+    - ./lib/screenshare/ScreenshareProcess
+    - ./lib/video/VideoProcess.js
+    - ./lib/audio/AudioProcess.js
+- name:
+  set_fact:
+    sfu_processes: "{{ sfu_processes|default([]) + [ { 'path': item } ] }}"
+  with_items:
+    - ./lib/stream/StreamProcess.js
+  when: bigbluebutton_streaming_enabled
+
 - name: Start webrtc-sfu container
   docker_container:
     name: webrtc-sfu
-    image: mconf/bbb-webrtc-sfu:stream-extra-oauth2
+    image: mconf/bbb-webrtc-sfu:v2.2.4
     pull: yes
     restart_policy: unless-stopped
     ports:
@@ -114,11 +129,14 @@
       MCS_PORT: 3009
       MCS_HOST: '{{ docker_ip }}'
       FREESWITCH_IP: '{{ ansible_default_ipv4.address }}'
+      ESL_IP: '{{ docker_ip }}'
+      ESL_PORT: 8021
       LOG_LEVEL: info
       STREAM_CONTAINER_TYPE: docker
       STREAM_IMAGE_NAME: mconf/mconf-presentation-recorder:latest
       STREAM_BIGBLUEBUTTON_URL: '{{ bbb_api_entry_point | regex_replace("/api") }}'
       STREAM_BIGBLUEBUTTON_SECRET: '{{ bbb_secret }}'
+      SFU_PROCESSES: '{{ sfu_processes | to_json }}'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /usr/local/bigbluebutton/bbb-webrtc-sfu/config/client_secret.json:/app/client_secret.json

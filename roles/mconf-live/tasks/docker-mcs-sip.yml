@@ -49,4 +49,5 @@
       SIP_API_PATH: /mcs-sip
       ENABLE_EXTERNAL_API: true
       REGISTRAR: '{{ registrar_config | to_json }}'
+      SIP_DEFAULT_GATEWAY: '{{ bigbluebutton_sip_default_gateway }}'
   notify: restart docker components

@@ -70,4 +70,5 @@ bigbluebutton_sounds_profile:
 
 bigbluebutton_notes_multiple_enabled: true
 
+bigbluebutton_streaming_enabled: true
 bigbluebutton_streaming_secret: {"web":{"client_id":"815163372732-b18hbpmhj33atj201b2nuj91cc3k25iq.apps.googleusercontent.com","project_id":"mconf-streaming-oauth","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"7evKbFJE9F2Zl4KMLTTJi6sy","redirect_uris":["https://test-live220.dev.mconf.com/oauth2_redirect"],"javascript_origins":["https://test-live220.dev.mconf.com"]}}
