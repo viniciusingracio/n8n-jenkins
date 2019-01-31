@@ -50,6 +50,7 @@
   docker_container:
     name: certbot
     image: certbot/certbot
+    pull: yes
     command: '{{ certbot_webroot_cmd }}'
     volumes:
       - "{{ certbot_webroot_path }}:{{ certbot_webroot_path }}" # webroot

@@ -134,6 +134,7 @@
     - { regexp: '^(defaultClientUrl)=.*', replace: '\1=${bigbluebutton.web.serverURL}/client/Mconf-Live.html' }
     - { regexp: '^(attendeesJoinViaHTML5Client)=.*', replace: '\1={{ bigbluebutton_html5_only }}' }
     - { regexp: '^(moderatorsJoinViaHTML5Client)=.*', replace: '\1={{ bigbluebutton_html5_only }}' }
+    - { regexp: '^(keepEvents)=.*', replace: '\1=true' }
   when: not item.replace is none
   become: yes
   notify: restart bigbluebutton
