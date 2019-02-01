@@ -1,5 +1,5 @@
 - include: etherpad-dummy.yml
-  when: bigbluebutton_docker_etherpad
+  when: bigbluebutton_docker_etherpad_enabled
 
 - include_role:
     name: bigbluebutton
@@ -22,15 +22,18 @@
 - include: rap.yml
 
 - include: docker-etherpad.yml
-  when: bigbluebutton_docker_etherpad
+  when: bigbluebutton_docker_etherpad_enabled
 
 - include: docker-mcs-sip.yml
-  when: bigbluebutton_docker_mcs_sip
+  when: bigbluebutton_docker_mcs_sip_enabled
 
 - include: docker-sfu-phone.yml
-  when: bigbluebutton_docker_mcs_sip
+  when: bigbluebutton_docker_mcs_sip_enabled
 
 - include: docker-webrtc-sfu.yml
-  when: bigbluebutton_docker_webrtc_sfu
+  when: bigbluebutton_docker_webrtc_sfu_enabled
   tags:
     - webrtc-sfu
+
+- include: docker-mcs-bfcp.yml
+  when: bigbluebutton_docker_mcs_bfcp_enabled

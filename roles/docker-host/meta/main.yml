@@ -1,5 +1,4 @@
 ---
 
 dependencies:
-  - docker-host
   - role: handlers

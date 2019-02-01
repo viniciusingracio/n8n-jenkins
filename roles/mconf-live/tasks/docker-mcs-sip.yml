@@ -30,10 +30,13 @@
     registrar_config: '{{ { "register": false, "registrarServer": { "server": "", "authorizationUser": "", "password": "" } } }}'
   when: not bigbluebutton_sip_registrar_enabled
 
+- set_fact:
+    contact_ip: "{% if bigbluebutton_kurento_use_internal_ip %}{{ ansible_default_ipv4.address }}{% else %}{{ external_ip }}{% endif %}"
+
 - name: Start mcs-sip container
   docker_container:
     name: mcs-sip
-    image: mconf/mcs-sip:registrar-support
+    image: '{{ bigbluebutton_docker_mcs_sip_image }}'
     pull: yes
     restart_policy: unless-stopped
     ports:
@@ -41,7 +44,7 @@
       - 5060:5060/udp
       - 3012:3012
     env:
-      EXTERNAL_IP: '{{ external_ip }}'
+      EXTERNAL_IP: '{{ contact_ip }}'
       BIND_IP: 0.0.0.0
       MCS_PORT: 3009
       MCS_HOST: '{{ docker_ip }}'
@@ -49,5 +52,9 @@
       SIP_API_PATH: /mcs-sip
       ENABLE_EXTERNAL_API: true
       REGISTRAR: '{{ registrar_config | to_json }}'
-      SIP_DEFAULT_GATEWAY: '{{ bigbluebutton_sip_default_gateway }}'
+      SIP_DEFAULT_GATEWAY: '{{ bigbluebutton_sip_default_gateway | default(bigbluebutton_sip_registrar_address, true) }}'
   notify: restart docker components
+
+- name: Remove old images
+  shell: docker images {{ bigbluebutton_docker_mcs_sip_image.split(":")[0] }} --filter 'before={{ bigbluebutton_docker_mcs_sip_image }}' -q | xargs -r docker rmi
+  notify: clean docker

@@ -1,14 +1,19 @@
 - name: Start sfu-phone container
   docker_container:
     name: sfu-phone
-    image: mconf/sfu-phone:v2.0.4
+    image: '{{ bigbluebutton_docker_sfu_phone_image }}'
     pull: yes
     restart_policy: unless-stopped
     ports:
-      - "3011:3011"
+      - 3011:3011
     env:
       REDIS_HOST: '{{ docker_ip }}'
       MCS_PORT: 3009
       MCS_HOST: '{{ docker_ip }}'
       SIP_API_ADDRESS: wss://{{ inventory_hostname }}/mcs-sip
   notify: restart docker components
+
+- name: Remove old images
+  shell: docker images {{ bigbluebutton_docker_sfu_phone_image.split(":")[0] }} --filter 'before={{ bigbluebutton_docker_sfu_phone_image }}' -q | xargs -r docker rmi
+  notify: clean docker
+

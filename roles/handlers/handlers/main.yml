@@ -8,3 +8,6 @@
 
 - name: docker logout
   command: docker logout
+
+- name: clean docker
+  command: docker system prune --force

@@ -162,6 +162,6 @@ bigbluebutton_html5_external_log_level: info
 bigbluebutton_html5_external_log_url: 'https://{{ inventory_hostname }}/html5Log'
 bigbluebutton_html5_external_log_method: POST
 
-bigbluebutton_docker_webrtc_sfu: false
+bigbluebutton_docker_webrtc_sfu_enabled: false
 
 external_ip:
