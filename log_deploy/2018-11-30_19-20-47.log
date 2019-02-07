@@ -1,0 +1,6 @@
+/usr/bin/ansible-playbook -v -i envs/prod/tjrr/hosts -l mconf-live200 provision.yml -T 180
+
+live01.vc.tjrr.jus.br: 177 OK, 34 changed, 0 unreachable, 0 failed
+live02.vc.tjrr.jus.br: 177 OK, 34 changed, 0 unreachable, 0 failed
+live03.vc.tjrr.jus.br: 177 OK, 34 changed, 0 unreachable, 0 failed
+live04.vc.tjrr.jus.br: 177 OK, 34 changed, 0 unreachable, 0 failed

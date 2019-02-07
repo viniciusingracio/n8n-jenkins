@@ -1,3 +1,3 @@
 - name: restart performance_report
   become: true
-  service: name=performance_report state=restarted
+  service: name=performance_report state=restarted daemon_reload=yes

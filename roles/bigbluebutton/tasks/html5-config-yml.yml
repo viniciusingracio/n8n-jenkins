@@ -1,0 +1,13 @@
+- set_fact:
+    bigbluebutton_html5_config_yml: "{{ bigbluebutton_html5_config_yml + [ item ] }}"
+  with_items:
+    - { key: 'public.clientLog.external.enabled', value: '{{ bigbluebutton_html5_external_log_enabled }}' }
+    - { key: 'public.clientLog.external.level', value: '{{ bigbluebutton_html5_external_log_level }}' }
+    - { key: 'public.clientLog.external.url', value: '{{ bigbluebutton_html5_external_log_url }}' }
+    - { key: 'public.clientLog.external.method', value: '{{ bigbluebutton_html5_external_log_method }}' }
+
+- name: Update yml values
+  become: yes
+  command: yq w -i /usr/share/meteor/bundle/programs/server/assets/app/config/settings.yml {{ item.key }} "{{ item.value }}"
+  with_items: '{{ bigbluebutton_html5_config_yml }}'
+  notify: restart bbb-html5

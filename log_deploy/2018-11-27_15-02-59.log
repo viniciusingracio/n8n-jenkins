@@ -1,0 +1,6 @@
+/usr/bin/ansible-playbook -v -i envs/prod/redclara/hosts -l conare,cedia provision.yml -T 180
+
+vce-live1.conare.ac.cr: 151 OK, 28 changed, 0 unreachable, 0 failed
+vce-live2.cedia.org.ec: 161 OK, 61 changed, 0 unreachable, 0 failed
+vce-rec2.cedia.org.ec: 163 OK, 66 changed, 0 unreachable, 0 failed
+vce-recordings.conare.ac.cr: 154 OK, 33 changed, 0 unreachable, 0 failed

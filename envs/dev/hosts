@@ -25,17 +25,20 @@ kurento-desktopsharing.mconf.com ansible_user=root deploy_user=root
 
 [mconf-live110]
 dev.mconf.local ansible_user=ubuntu
+test-live1.dev.mconf.com
 
 [docker-host]
 felipe-docker.mconf.com
 test-live1.dev.mconf.com
 test-live2.dev.mconf.com
+kamailio.dev.mconf.com
 
 [mconf-live200]
 paulo.dev.mconf.com certbot_enabled=true zabbix_agent_enabled=true
 eduardo.dev.mconf.com certbot_enabled=true zabbix_agent_enabled=true
-felipe.dev.mconf.com certbot_enabled=true bigbluebutton_html5_external_log_enabled=true
+felipe.dev.mconf.com certbot_enabled=true
 m113.freddixon.ca certbot_enabled=true
+test-live2.dev.mconf.com
 
 [mconf-live200:children]
 suite
@@ -74,9 +77,14 @@ k8s-node4 common_ufw_enabled=false ansible_host=10.1.1.155 ansible_ssh_common_ar
 [zabbix-agent]
 paulo.dev.mconf.com
 eduardo.dev.mconf.com
-felipe.dev.mconf.com
 
 [bigbluebutton-dev]
 dev.mconf.local ansible_user=ubuntu
 test-live110.mconf.com common_ufw_enabled=false
 felipe2.dev.mconf.com
+
+[certbot]
+kamailio.dev.mconf.com
+
+[mconf-live]
+test-live220.dev.mconf.com certbot_enabled=true

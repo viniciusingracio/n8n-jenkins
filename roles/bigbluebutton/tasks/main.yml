@@ -1,19 +1,31 @@
 - name: Read BigBlueButton source file
   slurp:
-    src: /etc/apt/sources.list.d/{{ bigbluebutton_apt_package }}.list
+    src: /etc/apt/sources.list.d/mconf-live.list
   register: slurpfile
   ignore_errors: yes
+  when: bigbluebutton_apt_clean_installation
 
 - set_fact:
     current_apt_source: '{{ slurpfile["content"] | b64decode | regex_replace("\n") }}'
-  when: slurpfile is succeeded
+  when: bigbluebutton_apt_clean_installation and slurpfile is succeeded and not slurpfile is skipped
+
+- name: Read BigBlueButton source file
+  slurp:
+    src: /etc/apt/sources.list.d/bigbluebutton.list
+  register: slurpfile
+  ignore_errors: yes
+  when: bigbluebutton_apt_clean_installation and slurpfile is failed
+
+- set_fact:
+    current_apt_source: '{{ slurpfile["content"] | b64decode | regex_replace("\n") }}'
+  when: bigbluebutton_apt_clean_installation and slurpfile is succeeded and not slurpfile is skipped
 
 - include: clean-installation.yml
-  when: slurpfile is succeeded and current_apt_source != bigbluebutton_apt_source
+  when: bigbluebutton_apt_clean_installation and slurpfile is succeeded and current_apt_source != bigbluebutton_apt_source
 
-- name: Update apt (if older than 5m)
+- name: Update apt (if older than 60m)
   become: true
-  apt: update_cache=yes cache_valid_time=300
+  apt: update_cache=yes cache_valid_time=3600
 
 - name: Install language pack
   become: true
@@ -88,6 +100,7 @@
     - { repo: 'deb http://archive.ubuntu.com/ubuntu/ {{ ansible_lsb.codename }}-updates universe multiverse', filename: 'ubuntu_updates' }
     - { repo: '{{ bigbluebutton_apt_source }}', filename: '{{ bigbluebutton_apt_package }}' }
     - { repo: 'deb http://deb.nodesource.com/node_8.x {{ ansible_lsb.codename }} main', filename: 'node' }
+    - { repo: 'ppa:rmescandon/yq', filename: 'yq' }
 
 - name: Update apt if keys changed
   become: true
@@ -331,16 +344,14 @@
   become: yes
   notify: restart bigbluebutton
 
-# http://docs.ansible.com/ansible/latest/playbooks_lookups.html#the-dns-lookup-dig
-# couldn't make dig lookup use dnspython on the guest
 - name: Determine external IP
   set_fact:
-    # external_ip: "{{ lookup('dig', inventory_hostname, '@8.8.8.8') }}"
-    external_ip: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | head -n 1') }}"
+    external_ip: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | grep \"[0-9]*\\.[0-9]*\\.[0-9]*\\.[0-9]*\" | head -n 1') }}"
+  when: external_ip is none
 - name: Set external IP as internal IP if nothing returns from dig
   set_fact:
     external_ip: '{{ ansible_default_ipv4.address }}'
-  when: external_ip | trim == ""
+  when: external_ip is none or external_ip | trim == ""
 
 # http://docs.bigbluebutton.org/install/install.html#configure-a-dummy-nic-if-required
 - name: Check if external IP is accessible
@@ -410,6 +421,7 @@
     - { key: 'recordScreenSharing', value: '{% if bigbluebutton_html5 %}true{% else %}false{% endif %}' }
     - { key: 'recordWebcams', value: '{% if bigbluebutton_html5 %}true{% else %}false{% endif %}' }
     - { key: 'kurento-websocket-pool-size', value: '1' }
+    - { key: 'maxAudioConnections', value: '300' }
     state: present
   become: yes
   when: not bigbluebutton_docker_webrtc_sfu
@@ -464,6 +476,7 @@
 - include: freeswitch.yml
 
 - include: config-xml.yml
+  when: not bigbluebutton_html5_only
 
 - include: webhooks.yml
 
@@ -519,21 +532,29 @@
   become: yes
 
 - set_fact:
-    restart_kms_command: systemctl restart red5.service tomcat7.service; docker restart $(docker ps -f "name=kurento_*" -q); docker restart webrtc-sfu; docker restart sfu-phone
+    restart_mconf_command: /usr/local/bigbluebutton/core/scripts/utils/restart-mconf.sh >> /var/log/restart-mconf.log 2>&1
+- set_fact:
+    restart_mconf_command: '{{ restart_mconf_command }}; systemctl stop bbb-webrtc-sfu kurento; systemctl disable bbb-webrtc-sfu kurento; docker restart $(docker ps -f "name=kurento_*" -q); docker restart webrtc-sfu mcs-sip sfu-phone'
   when: bigbluebutton_docker_webrtc_sfu
 - set_fact:
-    restart_kms_command: systemctl restart red5.service tomcat7.service kurento-media-server.service bbb-webrtc-sfu.service
-  when: not bigbluebutton_docker_webrtc_sfu
-- set_fact:
-    restart_kms_command: '{{ restart_kms_command }} mconf-mcs-sip.service'
-  when: bigbluebutton_sip and not bigbluebutton_docker_mcs_sip
+    restart_mconf_command: '{{ restart_mconf_command }}; systemctl stop red5 bbb-transcode-akka; systemctl disable red5 bbb-transcode-akka'
+  when: bigbluebutton_html5_only
 
 - name: Install cron job to restart KMS daily
   cron:
     name: restart kms
     minute: 0
     hour: 4
-    job: '{{ restart_kms_command }}'
+    user: root
+    state: absent
+  become: yes
+
+- name: Install cron job to restart Mconf daily
+  cron:
+    name: restart mconf
+    minute: 0
+    hour: 4
+    job: '{{ restart_mconf_command }}'
     user: root
   become: yes
 

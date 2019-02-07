@@ -1,0 +1,7 @@
+---
+
+nrpe_sources:
+  - 127.0.0.1
+
+nrpe_ufw_rules:
+  - { port: 5666, proto: "tcp" }

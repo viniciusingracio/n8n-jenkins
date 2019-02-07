@@ -1,6 +1,6 @@
 - name: Stop kurento
   become: true
-  service: name=kurento-media-server state=stopped
+  service: name=kurento-media-server state=stopped enabled=false
 
 - name: Get number of cores
   shell: "grep -c ^processor /proc/cpuinfo"
@@ -8,7 +8,7 @@
 
 - name: Determine number of kurento instances, in case it isn't set
   set_fact:
-    num_proc_auto: '{{ [ num_proc_auto_raw.stdout|int * 2, 8 ] | min }}'
+    num_proc_auto: '{{ [ num_proc_auto_raw.stdout|int, 2 ] | min }}'
 
 - name: Determine number of kurento instances
   set_fact:
@@ -29,15 +29,18 @@
     state: stopped
   with_items: '{{ running_kurento_raw.stdout_lines | difference(kurento_ports) }}'
 
+- set_fact:
+    kurento_ip: "{% if bigbluebutton_kurento_use_internal_ip %}{{ ansible_default_ipv4.address }}{% else %}{{ external_ip }}{% endif %}"
+
 - name: Determine kurento URLs to configure bbb-webrtc-sfu
   set_fact:
-    kurento_config: "{{ kurento_config|default([]) + [ { 'ip': external_ip, 'url': 'ws://' + docker_ip + ':' + item + '/kurento' } ] }}"
+    kurento_config: "{{ kurento_config|default([]) + [ { 'ip': kurento_ip, 'url': 'ws://' + docker_ip + ':' + item + '/kurento' } ] }}"
   with_items: '{{ kurento_ports }}'
 
 - name: Start kurento containers
   docker_container:
     name: kurento_{{ item }}
-    image: mconf/kurento:6.8.1-dev
+    image: mconf/kurento:bbb220-dev
     pull: yes
     restart_policy: unless-stopped
     network_mode: host
@@ -49,11 +52,10 @@
       RTP_MIN_PORT: '{{ bigbluebutton_kms_udp_range_begin }}'
       RTP_MAX_PORT: '{{ bigbluebutton_kms_udp_range_end }}'
       KURENTO_LOGS_PATH: /var/log/kurento-media-server
+      STUN_IP: '{{ stun_server_ip }}'
+      STUN_PORT: '{{ stun_server_port }}'
   with_items: '{{ kurento_ports }}'
-  notify:
-    - clean docker
-    - restart webrtc-sfu
-    - restart sfu-phone
+  notify: restart docker components
 
 - name: Copy dummy package for bbb-webrtc-sfu to /tmp
   copy:
@@ -90,21 +92,28 @@
   docker_image:
     name: mconf/mconf-presentation-recorder:latest
 
+- name:
+  become: yes
+  copy:
+    content: '{{ bigbluebutton_streaming_secret }}'
+    dest: /usr/local/bigbluebutton/bbb-webrtc-sfu/config/client_secret.json
+
 - name: Start webrtc-sfu container
   docker_container:
     name: webrtc-sfu
-    image: mconf/bbb-webrtc-sfu:mconf-2.x
+    image: mconf/bbb-webrtc-sfu:stream-extra-oauth2
     pull: yes
     restart_policy: unless-stopped
     ports:
       - 3008:3008
       - 3009:3009
+      - 3010:8009
     env:
       KURENTO: '{{ kurento_config | to_json }}'
       REDIS_HOST: '{{ docker_ip }}'
       MCS_PORT: 3009
       MCS_HOST: '{{ docker_ip }}'
-      FREESWITCH_IP: '{{ external_ip }}'
+      FREESWITCH_IP: '{{ ansible_default_ipv4.address }}'
       LOG_LEVEL: info
       STREAM_CONTAINER_TYPE: docker
       STREAM_IMAGE_NAME: mconf/mconf-presentation-recorder:latest
@@ -112,11 +121,12 @@
       STREAM_BIGBLUEBUTTON_SECRET: '{{ bbb_secret }}'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-  notify: restart sfu-phone
+      - /usr/local/bigbluebutton/bbb-webrtc-sfu/config/client_secret.json:/app/client_secret.json
+  notify: restart docker components
 
 - name: Add webrtc-sfu to nginx
   become: yes
-  copy:
-    src: files/webrtc-sfu.nginx
+  template:
+    src: templates/webrtc-sfu.nginx.j2
     dest: /etc/bigbluebutton/nginx/webrtc-sfu.nginx
   notify: reload nginx

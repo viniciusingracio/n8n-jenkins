@@ -11,6 +11,11 @@
     create_swap: '{{ free_swap.stdout == "0B" }}'
     swap_size: '{{ free_mem.stdout }}'
 
+- name: Convert swap size to integer
+  set_fact:
+    swap_size: '{{ swap_size[:-1]|float|round|int }}{{ swap_size[-1] }}'
+  when: ansible_distribution_release == "trusty"
+
 - name: Create swap file
   command: fallocate -l {{ swap_size }} /swapfile
   become: yes

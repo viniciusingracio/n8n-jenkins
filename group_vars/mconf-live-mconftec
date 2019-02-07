@@ -1,6 +1,6 @@
 ---
 
-bigbluebutton_branding_welcome_footer: Para mais informações, acesse <a href="https://elos.vc" target="_blank"><u>elos.vc</u></a>.
+bigbluebutton_branding_welcome_footer:
 bigbluebutton_branding_copyright: '&#169; 2018 &#183; <u><a href="https://elos.vc" target="_blank">elos.vc</a></u>'
 bigbluebutton_branding_copyright_html5: '© 2018 · elos.vc'
 bigbluebutton_branding_toolbar_color: '#2dccd3'
@@ -41,6 +41,6 @@ bigbluebutton_html5_config:
 bigbluebutton_sounds_profile:
   - { name: 'muted-sound', value: 'silence' }
   - { name: 'unmuted-sound', value: 'silence' }
-  - { name: 'alone-sound', value: 'conference/conf-alone.wav' }
+  - { name: 'alone-sound', value: 'silence' }
   - { name: 'moh-sound', value: 'silence' }
   - { name: 'comfort-noise', value: 'false' }

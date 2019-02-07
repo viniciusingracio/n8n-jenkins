@@ -12,20 +12,23 @@ mconf_live_video_formats:
 mconf_live_num_presentation_recorders: 1
 
 mconf_live_rec_proxy_http_port: 8091
-
 mconf_live_rec_proxy_enabled: false
+mconf_live_rec_proxy_api_enabled: false
+mconf_live_rec_proxy_image_version: latest
+mconf_live_rec_proxy_jwt_secret:
 
 mconf_live_sounds_hold_music:
 
 mconf_live_presentation_recorder_enabled: no
 mconf_live_presentation_recorder_image: mconf/mconf-presentation-recorder
-mconf_live_presentation_recorder_version: latest
+mconf_live_presentation_recorder_version: 0.0.6-662a346
 
 # these attributes are optional and will be set to default values if empty
 mconf_live_recording_auth_entry_point:
 mconf_live_recording_auth_secret:
 mconf_live_recording_auth_local_address:
 
+bigbluebutton_docker_webrtc_sfu: false
 bigbluebutton_docker_etherpad: false
 bigbluebutton_docker_mcs_sip: false
 bigbluebutton_docker_mcs_sip_image: mconf/mcs-sip:2.0.1-new-api
@@ -34,3 +37,19 @@ bigbluebutton_docker_webrtc_sfu: false
 bigbluebutton_docker_suite: false
 
 bigbluebutton_docker_num_kurento:
+
+bigbluebutton_sip_registrar_enabled: false
+bigbluebutton_sip_registrar_address:
+bigbluebutton_sip_registrar_username:
+bigbluebutton_sip_registrar_password:
+
+bigbluebutton_kurento_use_internal_ip: false
+
+bigbluebutton_notes_multiple_enabled: false
+bigbluebutton_notes_auth_enabled: false
+
+bigbluebutton_sfu_auth_enabled: false
+
+bigbluebutton_streaming_secret: {}
+
+external_ip:

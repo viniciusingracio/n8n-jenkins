@@ -23,10 +23,17 @@
     selection: hold
   become: yes
 
+- set_fact:
+    registrar_config: '{{ { "register": true, "registrarServer": { "server": bigbluebutton_sip_registrar_address, "authorizationUser": bigbluebutton_sip_registrar_username, "password": bigbluebutton_sip_registrar_password } } }}'
+  when: bigbluebutton_sip_registrar_enabled
+- set_fact:
+    registrar_config: '{{ { "register": false, "registrarServer": { "server": "", "authorizationUser": "", "password": "" } } }}'
+  when: not bigbluebutton_sip_registrar_enabled
+
 - name: Start mcs-sip container
   docker_container:
     name: mcs-sip
-    image: '{{ bigbluebutton_docker_mcs_sip_image }}'
+    image: mconf/mcs-sip:registrar-support
     pull: yes
     restart_policy: unless-stopped
     ports:
@@ -40,4 +47,6 @@
       MCS_HOST: '{{ docker_ip }}'
       SIP_API_PORT: 3012
       SIP_API_PATH: /mcs-sip
-      # ENABLE_EXTERNAL_API: true
+      ENABLE_EXTERNAL_API: true
+      REGISTRAR: '{{ registrar_config | to_json }}'
+  notify: restart docker components

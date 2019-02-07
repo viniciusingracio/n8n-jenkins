@@ -11,10 +11,15 @@
 
 - name: Add notes to nginx
   become: yes
-  copy:
-    src: files/notes.nginx
+  template:
+    src: templates/notes.nginx.j2
     dest: /etc/bigbluebutton/nginx/notes.nginx
   notify: reload nginx
+
+- name: Determine if json or yml config
+  stat:
+    path: /usr/share/meteor/bundle/programs/server/assets/app/config/settings-production.json
+  register: reg_settings_json
 
 - name: Update json values
   become: true
@@ -28,3 +33,13 @@
   with_items:
     - { path: '/public/note/url', value: 'https://{{ inventory_hostname }}/pad' }
   notify: restart bbb-html5
+  when: reg_settings_json.stat.exists
+
+- name: Update yml values
+  become: yes
+  command: yq w -i /usr/share/meteor/bundle/programs/server/assets/app/config/settings.yml {{ item.key }} "{{ item.value }}"
+  with_items:
+    - { key: 'public.note.enabled', value: 'true' }
+    - { key: 'public.note.url', value: 'https://{{ inventory_hostname }}/pad' }
+    - { key: 'public.genericContent.multipleNotes.enabled', value: '{{ bigbluebutton_notes_multiple_enabled }}' }
+  when: not reg_settings_json.stat.exists

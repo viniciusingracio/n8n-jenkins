@@ -4,6 +4,17 @@
   with_items:
     - { rule: 'allow', port: 3478, proto: 'udp' }
     - { rule: 'allow', port: 3478, proto: 'tcp' }
+  notify:
+    - restart ufw
+
+- name: Configure ufw rules for SSL
+  become: true
+  ufw:
+    rule: '{{ item.rule }}'
+    port: '{{ item.port }}'
+    proto: '{{ item.proto }}'
+    delete: '{{ not coturn_ssl_enabled }}'
+  with_items:
     - { rule: 'allow', port: 5349, proto: 'tcp' }
   notify:
     - restart ufw

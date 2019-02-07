@@ -1,0 +1,9 @@
+/usr/bin/ansible-playbook -v -i envs/prod/redclara/hosts provision.yml -T 180
+
+mconf-live1.redclara.net: 149 OK, 26 changed, 0 unreachable, 0 failed
+mconf-live2.redclara.net: 153 OK, 35 changed, 0 unreachable, 0 failed
+mconf-recordings.redclara.net: 0 OK, 0 changed, 0 unreachable, 1 failed
+vce-live1.conare.ac.cr: 149 OK, 26 changed, 0 unreachable, 0 failed
+vce-live2.cedia.org.ec: 154 OK, 29 changed, 0 unreachable, 0 failed
+vce-rec2.cedia.org.ec: 1 OK, 0 changed, 0 unreachable, 0 failed
+vce-recordings.conare.ac.cr: 1 OK, 0 changed, 0 unreachable, 0 failed

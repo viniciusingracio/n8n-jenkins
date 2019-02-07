@@ -1,3 +1,6 @@
+- include: etherpad-dummy.yml
+  when: bigbluebutton_docker_etherpad
+
 - include_role:
     name: bigbluebutton
   tags: always

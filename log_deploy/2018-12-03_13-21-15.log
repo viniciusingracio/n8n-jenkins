@@ -1,0 +1,4 @@
+/usr/bin/ansible-playbook -v -i envs/prod/tjrr/hosts -l coturn provision.yml -T 180
+
+stun01.vc.tjrr.jus.br: 12 OK, 3 changed, 0 unreachable, 0 failed
+stun02.vc.tjrr.jus.br: 12 OK, 3 changed, 0 unreachable, 0 failed

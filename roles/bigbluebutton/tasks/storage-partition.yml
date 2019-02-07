@@ -44,7 +44,6 @@
   become: yes
   file:
     path: '{{ bigbluebutton_storage_dir }}'
-    recurse: yes
     state: directory
 
 - name: Mount new partition
@@ -63,22 +62,33 @@
     - /var/bigbluebutton
     - /var/freeswitch
     - /var/kurento
+    - /var/lib/docker
   register: reg_dir
 
-- name: Create parent directories to move 
+- name: Stop docker daemon
+  become: yes
+  service: name=docker state=stopped
+  with_items: '{{ reg_dir.results }}'
+  when: item.item == '/var/lib/docker' and item.stat.exists and not item.stat.islnk
+
+- name: Create parent directories to move
   become: yes
   file:
     path: '{{ bigbluebutton_storage_dir }}{{ item.item | dirname }}'
-    recurse: yes
     state: directory
   with_items: '{{ reg_dir.results }}'
 
-- name: Move directories to storage
+- name: Copy directories to storage
   become: yes
-  command: mv {{ item.item }} {{ bigbluebutton_storage_dir }}{{ item.item }}
+  command: rsync -aqxP {{ item.item }} {{ bigbluebutton_storage_dir }}{{ item.item | dirname }}
   with_items: '{{ reg_dir.results }}'
   when: item.stat.exists and not item.stat.islnk
-  notify: restart bigbluebutton
+
+- name: Remove directories from local disk
+  become: yes
+  command: rm -r {{ item.item }}
+  with_items: '{{ reg_dir.results }}'
+  when: item.stat.exists and not item.stat.islnk
 
 - name: Create links to storage
   become: yes
@@ -89,3 +99,9 @@
   with_items: '{{ reg_dir.results }}'
   when: item.stat.exists and not item.stat.islnk
   notify: restart bigbluebutton
+
+- name: Start docker daemon
+  become: yes
+  service: name=docker state=started
+  with_items: '{{ reg_dir.results }}'
+  when: item.item == '/var/lib/docker' and item.stat.exists and not item.stat.islnk

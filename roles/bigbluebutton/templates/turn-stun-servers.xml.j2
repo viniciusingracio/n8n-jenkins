@@ -8,7 +8,6 @@
         <constructor-arg index="0" value="{{ item }}"/>
     </bean>
 {% endfor %}
-
 {% for item in bigbluebutton_turn_server %}
     <bean id="turn{{ loop.index }}" class="org.bigbluebutton.web.services.turn.TurnServer">
         <constructor-arg index="0" value="{{ item.secret }}"/>
@@ -16,6 +15,12 @@
         <constructor-arg index="2" value="{{ item.ttl }}"/>
     </bean>
 {% endfor %}
+{% for item in bigbluebutton_artificial_ice_candidates %}
+    <bean id="iceCandidate{{ loop.index }}" class="org.bigbluebutton.web.services.turn.RemoteIceCandidate">
+      <constructor-arg index="0" value="{{ item }}"/>
+    </bean>
+{% endfor %}
+
     <bean id="stunTurnService" class="org.bigbluebutton.web.services.turn.StunTurnService">
         <property name="stunServers">
             <set>
@@ -32,7 +37,11 @@
             </set>
         </property>
         <property name="remoteIceCandidates">
-            <set/>
+            <set>
+{% for item in bigbluebutton_artificial_ice_candidates %}
+                <ref bean="iceCandidate{{ loop.index }}" />
+{% endfor %}
+            </set>
         </property>
     </bean>
 </beans>

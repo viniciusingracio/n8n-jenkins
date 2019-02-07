@@ -1,0 +1,21 @@
+- include: json-deps.yml
+
+- set_fact:
+    bigbluebutton_html5_config: "{{ bigbluebutton_html5_config + [ item ] }}"
+  with_items:
+    - { path: '/public/clientLog/external/enabled', value: '{{ bigbluebutton_html5_external_log_enabled }}' }
+    - { path: '/public/clientLog/external/level', value: '{{ bigbluebutton_html5_external_log_level }}' }
+    - { path: '/public/clientLog/external/url', value: '{{ bigbluebutton_html5_external_log_url }}' }
+    - { path: '/public/clientLog/external/method', value: '{{ bigbluebutton_html5_external_log_method }}' }
+
+- name: Update json values
+  become: true
+  json:
+    path: /usr/share/meteor/bundle/programs/server/assets/app/config/settings-production.json
+    replace:
+      json_path: '{{ item.path }}'
+      with_value: '{{ item.value }}'
+    indent: 4
+    insert_if_missing: true
+  with_items: '{{ bigbluebutton_html5_config }}'
+  notify: restart bbb-html5

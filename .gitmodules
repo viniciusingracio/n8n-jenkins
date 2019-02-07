@@ -1,7 +1,3 @@
-[submodule "envs/prod"]
-	path = envs/prod
-	url = git@github.com:mconftec/mconf-ansihub-private-envs.git
-
 [submodule "envs/rnp"]
 	path = envs/rnp
 	url = ssh://git@git.rnp.br:2022/GTI/mconf-ansihub-envs.git

@@ -1,7 +1,7 @@
 - name: Start sfu-phone container
   docker_container:
     name: sfu-phone
-    image: mconf/sfu-phone:mconf-2.x
+    image: mconf/sfu-phone:v2.0.4
     pull: yes
     restart_policy: unless-stopped
     ports:
@@ -11,3 +11,4 @@
       MCS_PORT: 3009
       MCS_HOST: '{{ docker_ip }}'
       SIP_API_ADDRESS: wss://{{ inventory_hostname }}/mcs-sip
+  notify: restart docker components

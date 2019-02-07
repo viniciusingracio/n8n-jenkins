@@ -1,7 +1,7 @@
 - name: Determine wss_binding value
   set_fact:
     wss_binding_value: '{% if ansible_default_ipv4.address == external_ip %}:7443{% else %}{{ external_ip }}:7443{% endif %}'
-    ws_binding_value: '{% if ansible_default_ipv4.address == external_ip %}:5066{% else %}{{ external_ip }}:5066{% endif %}'
+    ws_binding_value: :5066
 
 - name: Define FreeSWITCH external SIP port
   set_fact:
@@ -20,7 +20,7 @@
 
 - name: Restart FreeSWITCH
   become: yes
-  service:
+  systemd:
     name: freeswitch
     state: restarted
   when: modify_sip_port is changed
@@ -51,6 +51,7 @@
       - { name: "rtp-autofix-timing", value: "false" }
       - { name: "ws-binding", value: "{{ ws_binding_value }}" }
       - { name: "wss-binding", value: "{{ wss_binding_value }}" }
+      - { name: "apply-candidate-acl", value: "0.0.0.0/0" }
 
 - name: Read external_props
   xml:
@@ -133,6 +134,33 @@
   with_items: '{{ hits.results }}'
   become: yes
   when: item is failed
+  notify: restart bigbluebutton
+
+- name: Check if IPv6 is supported
+  shell: ip addr | grep inet6
+  ignore_errors: yes
+  register: reg_ipv6
+
+- name: Change listen-ip on the socket layer since it can't handle IPv6
+  become: yes
+  xml:
+    path: /opt/freeswitch/etc/freeswitch/autoload_configs/event_socket.conf.xml
+    xpath: //param[@name="listen-ip"]
+    attribute: value
+    value: '127.0.0.1'
+  when: reg_ipv6 is failed
+  notify: restart bigbluebutton
+
+- name: Remove IPv6 configuration from FreeSWITCH profiles
+  become: yes
+  command: mv {{ item }} {{ item }}_
+  args:
+    creates: '{{ item }}_'
+    removes: '{{ item }}'
+  with_items:
+    - /opt/freeswitch/etc/freeswitch/sip_profiles/internal-ipv6.xml
+    - /opt/freeswitch/etc/freeswitch/sip_profiles/external-ipv6.xml
+  when: reg_ipv6 is failed
   notify: restart bigbluebutton
 
 - include: sounds.yml

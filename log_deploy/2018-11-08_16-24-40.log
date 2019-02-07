@@ -1,0 +1,3 @@
+/usr/bin/ansible-playbook -i envs/rnp/prod -l mconf-lb provision.yml
+
+lb03-p.mconf.rnp.br: 10 OK, 7 changed, 0 unreachable, 0 failed

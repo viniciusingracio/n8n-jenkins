@@ -1,3 +1,7 @@
+- hosts: nrpe
+  roles:
+  - { role: nrpe, tags: [ nrpe ] }
+
 - hosts: zabbix-agent
   roles:
   - { role: dj-wasabi.zabbix-agent, tags: [ zabbix-agent ] }
@@ -52,6 +56,7 @@
 
 # Mconf-Live
 - hosts:
+  - mconf-live
   - mconf-live110
   - mconf-live200
   roles:
@@ -171,6 +176,15 @@
 - hosts: jekyll
   roles:
   - jekyll
+
+- hosts: certbot
+  roles:
+  - certbot
+
+- hosts: bbb-prometheus
+  roles:
+  - bigbluebutton-prometheus
+  - node-exporter
 
 - hosts: all
   roles:

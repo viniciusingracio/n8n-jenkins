@@ -3,12 +3,12 @@
     private: false
   vars:
     rec_proxy_api_secret: '{{ bbb_secret }}'
-    rec_proxy_jwt_secret: '{{ bbb_secret | to_uuid }}'
+    rec_proxy_jwt_secret: '{{ mconf_live_rec_proxy_jwt_secret | default(bbb_secret | to_uuid, true) }}'
     rec_proxy_build_from_source: false
     rec_proxy_image: 'mconf/mconf-rec'
-    rec_proxy_image_version: 'local-nossl-0.0.12'
+    rec_proxy_image_version: '{{ mconf_live_rec_proxy_image_version }}'
     rec_proxy_local_playback: true
     rec_proxy_http_port: '{{ mconf_live_rec_proxy_http_port }}'
-  when: mconf_live_rec_proxy_enabled
+  when: mconf_live_rec_proxy_enabled or mconf_live_rec_proxy_api_enabled
 
 - include: nginx.yml

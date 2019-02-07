@@ -11,25 +11,23 @@
 
 - name: Configure ufw rules for SIP
   become: true
-  ufw: rule={{ item[0].rule }} port={{ item[0].port }} proto={{ item[0].proto }} from_ip={{ item[1] }}
+  ufw: rule={{ item[0].rule }} port={{ item[0].port }} proto={{ item[0].proto }} from_ip={{ item[1] }} delete={{ item[0].delete }}
   with_nested:
     -
-      - { rule: 'allow', port: 5060, proto: 'tcp' }
-      - { rule: 'allow', port: 5060, proto: 'udp' }
+      - { rule: 'allow', port: 5060, proto: 'tcp', delete: '{{ not bigbluebutton_sip }}' }
+      - { rule: 'allow', port: 5060, proto: 'udp', delete: '{{ not bigbluebutton_sip }}' }
     - '{{ bigbluebutton_sip_sources }}'
   notify:
     - restart ufw
-  when: bigbluebutton_sip
 
 # TODO configure zabbix source
 - name: Configure ufw rules for Zabbix
   become: true
-  ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
+  ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }} delete={{ item.delete }}
   with_items:
-    - { rule: 'allow', port: 10050, proto: 'tcp' }
+    - { rule: 'allow', port: 10050, proto: 'tcp', delete: '{{ not zabbix_agent_enabled }}' }
   notify:
     - restart ufw
-  when: zabbix_agent_enabled
 
 - name: Remove ufw rule specific for redis from docker
   become: true

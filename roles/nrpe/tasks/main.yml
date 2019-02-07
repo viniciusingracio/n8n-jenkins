@@ -1,0 +1,70 @@
+---
+
+- name: Update apt (if older than 5m)
+  become: true
+  apt: update_cache=yes cache_valid_time=300
+
+- name: Install nrpe and nagios-plugins
+  become: true
+  apt:
+    name:
+      - nagios-nrpe-server
+      - nagios-plugins
+    state: latest
+
+- name: Allowed hosts
+  become: yes
+  lineinfile:
+    dest: /etc/nagios/nrpe.cfg
+    state: present
+    regexp: ^allowed_hosts=
+    line: 'allowed_hosts={{ nrpe_sources|join(", ") }}'
+  notify: restart nrpe
+
+- name: Add check_mconf.pl to nrpe config
+  become: yes
+  blockinfile:
+    dest: /etc/nagios/nrpe.cfg
+    block: |
+      command[check_mconf]=sudo /usr/lib/nagios/plugins/check_mconf.pl
+    marker: '# {mark} ANSIBLE MANAGED BLOCK'
+  notify: restart nrpe
+
+- name: Copy check_mconf.pl
+  become: yes
+  copy:
+    src: files/check_mconf.pl
+    dest: /usr/lib/nagios/plugins/check_mconf.pl
+    mode: 0755
+  notify: restart nrpe
+
+- name: Remove check_mconf.sudoers
+  become: yes
+  file:
+    path: /etc/sudoers.d/check_mconf
+    state: absent
+
+- name: Add nagios alias to sudoers
+  become: yes
+  lineinfile:
+    dest: /etc/sudoers
+    regex: '^Cmnd_Alias NAGIOS\s'
+    line: 'Cmnd_Alias NAGIOS = /usr/lib/nagios/plugins/check_mconf.pl'
+    backup: yes
+    state: present
+    validate: visudo -cf %s
+
+- name: Add nagios permissions to sudoers
+  become: yes
+  lineinfile:
+    dest: /etc/sudoers
+    regex: '^nagios\s'
+    line: 'nagios ALL=(ALL) NOPASSWD: NAGIOS'
+    insertafter: '^Cmnd_Alias NAGIOS\s'
+    backup: yes
+    state: present
+    validate: visudo -cf %s
+
+- include: ufw.yml
+  when: common_ufw_enabled
+  tags: [ufw,firewall]

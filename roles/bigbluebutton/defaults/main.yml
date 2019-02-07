@@ -7,6 +7,7 @@ bigbluebutton_apt_source: "deb http://ubuntu.bigbluebutton.org/xenial-200-dev/ b
 # Install BigBlueButton 1.1
 # bigbluebutton_apt_source: "deb http://ubuntu.bigbluebutton.org/xenial-110/ bigbluebutton-xenial main"
 bigbluebutton_apt_package: bigbluebutton
+bigbluebutton_apt_clean_installation: false
 
 # Install HTML5 client
 bigbluebutton_html5: false
@@ -104,10 +105,18 @@ bigbluebutton_html5_config:
   - { path: '/public/kurento/enableScreensharing', value: true }
   - { path: '/public/kurento/enableVideo', value: true }
 
+bigbluebutton_html5_config_yml:
+  - { key: 'public.kurento.wsUrl', value: 'wss://{{ inventory_hostname }}/bbb-webrtc-sfu' }
+  - { key: 'public.kurento.chromeExtensionKey', value: '{{ bigbluebutton_screenshare_extension_key }}' }
+  - { key: 'public.kurento.chromeExtensionLink', value: '{{ bigbluebutton_screenshare_extension_url }}' }
+  - { key: 'public.kurento.enableScreensharing', value: true }
+  - { key: 'public.kurento.enableVideo', value: true }
+
 bigbluebutton_stun_server:
   - stun:stun.l.google.com:19302
 
 bigbluebutton_turn_server: []
+bigbluebutton_artificial_ice_candidates: []
 
 bigbluebutton_sounds_frequency:
   - 48000
@@ -154,3 +163,5 @@ bigbluebutton_html5_external_log_url: 'https://{{ inventory_hostname }}/html5Log
 bigbluebutton_html5_external_log_method: POST
 
 bigbluebutton_docker_webrtc_sfu: false
+
+external_ip:

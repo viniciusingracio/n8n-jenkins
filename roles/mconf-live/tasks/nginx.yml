@@ -55,14 +55,14 @@
     src: templates/rec_auth_token.nginx.j2
     dest: '/etc/bigbluebutton/nginx/rec_auth_token.nginx'
   become: yes
-  when: mconf_live_rec_proxy_enabled
+  when: mconf_live_rec_proxy_enabled or mconf_live_rec_proxy_api_enabled
   notify: reload nginx
 
 - file:
     path: '/etc/bigbluebutton/nginx/rec_auth_token.nginx'
     state: absent
   become: yes
-  when: not mconf_live_rec_proxy_enabled
+  when: not ( mconf_live_rec_proxy_enabled or mconf_live_rec_proxy_api_enabled )
   notify: reload nginx
 
 - name: Add recording server fallback
@@ -75,10 +75,10 @@
 
     insertafter: '{{ item.after }}'
     marker: '                # {mark} ANSIBLE MANAGED BLOCK server fallback'
+    state: '{% if mconf_live_rec_proxy_enabled or mconf_live_rec_fallback is none %}absent{% else %}present{% endif %}'
   with_items:
     - { dest: "/etc/bigbluebutton/nginx/presentation.nginx", check: "/var/bigbluebutton/published/presentation/$arg_meetingId/shapes.svg", after: ".*location \\/playback\\/presentation {$" }
-    - { dest: "/etc/bigbluebutton/nginx/presentation_video.nginx", check: "/var/bigbluebutton/published$uri", after: ".*location ~\\* \\/presentation_video\\/.*" }
+    - { dest: "/etc/bigbluebutton/nginx/presentation_video.nginx", check: "/var/bigbluebutton/published$uri", after: ".*location.* \\/presentation_video.*{$" }
   become: yes
-  when: not mconf_live_rec_fallback is none
   ignore_errors: yes
   notify: reload nginx
