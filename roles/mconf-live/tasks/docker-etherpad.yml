@@ -10,7 +10,7 @@
       SETTINGS_MODIFIER: '.dbSettings.host = "{{ docker_ip }}"'
 
 - name: Remove old images
-  shell: docker images {{ bigbluebutton_docker_etherpad_image.split(":")[0] }} --filter 'before={{ bigbluebutton_docker_etherpad_image }}' -q | xargs -r docker rmi
+  shell: docker images {{ bigbluebutton_docker_etherpad_image.split(":")[0] }} --filter 'before={{ bigbluebutton_docker_etherpad_image }}' -q | xargs -r docker rmi --force
   notify: clean docker
 
 - name: Add notes to nginx

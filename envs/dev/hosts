@@ -32,6 +32,7 @@ felipe-docker.mconf.com
 test-live1.dev.mconf.com
 test-live2.dev.mconf.com
 kamailio.dev.mconf.com
+elastic.dev.mconf.com
 
 [mconf-live200]
 paulo.dev.mconf.com certbot_enabled=true zabbix_agent_enabled=true
@@ -68,5 +69,5 @@ felipe2.dev.mconf.com
 [certbot]
 kamailio.dev.mconf.com
 
-[mconf-live]
+[mconf-live220]
 test-live220.dev.mconf.com certbot_enabled=true

@@ -165,3 +165,5 @@ bigbluebutton_html5_external_log_method: POST
 bigbluebutton_docker_webrtc_sfu_enabled: false
 
 external_ip:
+
+bigbluebutton_zabbix_copy_scripts: false

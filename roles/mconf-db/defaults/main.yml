@@ -12,9 +12,7 @@ mconf_db_mysql_pkgs:
   - mysql-server-{{ mconf_db_mysql_ver }}
   - mysql-client-{{ mconf_db_mysql_ver }}
   - libmysqlclient-dev # for the python libs
-mconf_db_mysql_python_pkgs: # needed to run utility commands
-  - mysqlclient    # for python3
-  # - MySQL-python # for python2
+  - python3-pymysql # needed to run utility commands
 mconf_db_mysql_service: mysql
 mconf_db_mysql_root_db_pass: ''
 mconf_db_mysql_conf_dir: "/etc/mysql/"

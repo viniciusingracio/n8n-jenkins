@@ -2,9 +2,7 @@
 
 - name: Install the Redis packages
   become: true
-  apt: name={{ item }} state=present update_cache=yes
-  with_items: 
-    - "{{ mconf_db_redis_pkgs }}"
+  apt: name={{ mconf_db_redis_pkgs }} state=present update_cache=yes
 
 - name: Copy the redis configuration file
   become: true

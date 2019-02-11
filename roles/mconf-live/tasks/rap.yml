@@ -1,7 +1,5 @@
-- name: Check if presentation_recorder is installed
-  stat:
-    path: /usr/local/bigbluebutton/core/scripts/mconf-presentation-recorder.yml
-  register: reg_recorder
+- set_fact:
+    presentation_video_enabled: '"presentation_video" in mconf_live_enabled_recording_formats'
 
 - name: Adjust mconf-presentation-recorder.yml
   yedit:
@@ -13,7 +11,7 @@
       - { key: 'simultaneous_meetings', value: '{{ mconf_live_num_presentation_recorders }}' }
     state: present
   become: yes
-  when: reg_recorder.stat.exists
+  when: presentation_video_enabled
 
 - name: Configure video formats
   become: yes
@@ -27,11 +25,6 @@
     - /usr/local/bigbluebutton/core/scripts/presentation_video.yml
   ignore_errors: yes
 
-- name: Check if presentation_video is installed
-  stat:
-    path: /usr/local/bigbluebutton/core/scripts/presentation_video.yml
-  register: reg_video
-
 - name: Adjust presentation_video.yml
   yedit:
     src: /usr/local/bigbluebutton/core/scripts/presentation_video.yml
@@ -39,7 +32,7 @@
     - { key: 'audio_offset', value: '2300' }
     state: present
   become: yes
-  when: reg_video.stat.exists
+  when: presentation_video_enabled
 
 - name: List rap scripts enabled
   find:
@@ -68,12 +61,12 @@
 - name: Pull mconf-presentation-recorder
   docker_image:
     name: '{{ mconf_live_presentation_recorder_image }}:{{ mconf_live_presentation_recorder_version }}'
-  when: reg_recorder.stat.exists
+  when: presentation_video_enabled
 
 # tag is needed because the rap script always use latest
 - name: Tag presentation recorder image to latest
   command: docker tag {{ mconf_live_presentation_recorder_image }}:{{ mconf_live_presentation_recorder_version }} {{ mconf_live_presentation_recorder_image }}:latest
-  when: reg_recorder.stat.exists
+  when: presentation_video_enabled
 
 - name: Add tomcat7 to docker group
   become: true
@@ -81,5 +74,13 @@
     name: 'tomcat7'
     groups: docker
     append: yes
-  when: reg_recorder.stat.exists
+  when: presentation_video_enabled
   notify: restart mconf-presentation-recorder
+
+- name: Stop the recorder if presentation_video isn't enabled
+  become: yes
+  systemd:
+    name: mconf-presentation-recorder
+    state: stopped
+    enable: no
+  when: presentation_video_enabled

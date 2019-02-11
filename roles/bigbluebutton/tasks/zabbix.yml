@@ -1,13 +1,13 @@
 - name: Copy scripts
   synchronize:
     src: files/zabbix/
-    dest: /etc/zabbix/scripts/
+    dest: /etc/zabbix/scripts_mconf/
     delete: yes
   become: yes
 
 - name: Set owner of zabbix scripts dir
   file:
-    path: /etc/zabbix/scripts/
+    path: /etc/zabbix/scripts_mconf/
     recurse: yes
     state: directory
     owner: '{{ ansible_user }}'
@@ -15,7 +15,7 @@
   become: yes
 
 - find:
-    paths: /etc/zabbix/scripts/
+    paths: /etc/zabbix/scripts_mconf/
     patterns: setup.sh
     recurse: yes
   register: find_result
@@ -25,7 +25,7 @@
   with_items: '{{ find_result.files }}'
 
 - name: Userparams
-  shell: find /etc/zabbix/scripts/ -name userparams.conf -exec cat {} \; | tee /etc/zabbix/zabbix_agentd.d/userparams_mconf.conf
+  shell: find /etc/zabbix/scripts_mconf/ -name userparams.conf -exec cat {} \; | tee /etc/zabbix/zabbix_agentd.conf.d/userparams_mconf.conf
   become: yes
   notify: restart zabbix-agent
 
@@ -38,4 +38,5 @@
     mode: 0440
     validate: /usr/sbin/visudo -cf %s
   become: yes
-  notify: restart zabbix-agent 
+  when: zabbix_agent_enabled
+  notify: restart zabbix-agent

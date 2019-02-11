@@ -59,6 +59,7 @@
   - mconf-live
   - mconf-live110
   - mconf-live200
+  - mconf-live220
   roles:
   - { role: certbot, when: certbot_enabled }
   - mconf-live

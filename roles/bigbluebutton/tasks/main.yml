@@ -495,7 +495,7 @@
   tags: [ufw,firewall]
 
 - include: zabbix.yml
-  when: zabbix_agent_enabled
+  when: bigbluebutton_zabbix_copy_scripts or zabbix_agent_enabled
   tags: [zabbix]
 
 # - include: rap-resque.yml

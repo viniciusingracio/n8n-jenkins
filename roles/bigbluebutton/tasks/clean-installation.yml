@@ -25,6 +25,7 @@
   apt:
     name: '{{ list_of_packages.stdout_lines }}'
     purge: yes
+    force: yes
     state: absent
   when: list_of_packages.stdout_lines | length > 0
 

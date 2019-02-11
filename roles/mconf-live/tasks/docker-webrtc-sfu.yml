@@ -58,7 +58,7 @@
   notify: restart docker components
 
 - name: Remove old images
-  shell: docker images {{ bigbluebutton_docker_kurento_image.split(":")[0] }} --filter 'before={{ bigbluebutton_docker_kurento_image }}' -q | xargs -r docker rmi
+  shell: docker images {{ bigbluebutton_docker_kurento_image.split(":")[0] }} --filter 'before={{ bigbluebutton_docker_kurento_image }}' -q | xargs -r docker rmi --force
   notify: clean docker
 
 - name: Copy dummy package for bbb-webrtc-sfu to /tmp
@@ -147,7 +147,7 @@
   notify: restart docker components
 
 - name: Remove old images
-  shell: docker images {{ bigbluebutton_docker_webrtc_sfu_image.split(":")[0] }} --filter 'before={{ bigbluebutton_docker_webrtc_sfu_image }}' -q | xargs -r docker rmi
+  shell: docker images {{ bigbluebutton_docker_webrtc_sfu_image.split(":")[0] }} --filter 'before={{ bigbluebutton_docker_webrtc_sfu_image }}' -q | xargs -r docker rmi --force
   notify: clean docker
 
 - name: Add webrtc-sfu to nginx
@@ -156,4 +156,3 @@
     src: templates/webrtc-sfu.nginx.j2
     dest: /etc/bigbluebutton/nginx/webrtc-sfu.nginx
   notify: reload nginx
-

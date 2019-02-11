@@ -31,6 +31,7 @@ doc.xpath("/result/row").each do |row|
     output = stdout.readlines
   end
   response = JSON.load(output.join())
+  exit 1 if response["status"] != "success"
 
   quality = response["response"]["audio"]["in_quality_percentage"]
 
@@ -43,11 +44,9 @@ doc.xpath("/result/row").each do |row|
   }
 end
 
-avg = 1.0
-webrtc = 1.0
 if ! data.empty?
   avg = ( data.inject(0){ |sum, el| sum + el[:quality] }.to_f / data.size ) / 100
-  webrtc = ( data.select{ |el| el[:webrtc] }.size.to_f / data.size )
+  puts "count: #{data.size}, quality: #{avg.round(2)}"
+else
+  puts "count: 0"
 end
-
-puts "quality: #{avg.round(2)}, webrtc: #{webrtc.round(2)}, count: #{data.size}"

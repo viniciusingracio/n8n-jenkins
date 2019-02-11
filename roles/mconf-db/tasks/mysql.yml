@@ -25,12 +25,6 @@
   notify:
     - restart mysql
 
-- name: Install the Python modules
-  become: true
-  pip: name={{ item }} state=present
-  with_items:
-    - "{{ mconf_db_mysql_python_pkgs }}"
-
 - name: Start the mysql services
   become: true
   service: name={{ mconf_db_mysql_service }} state=started enabled=yes
