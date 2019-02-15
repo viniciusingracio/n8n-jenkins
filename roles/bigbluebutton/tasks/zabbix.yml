@@ -25,7 +25,7 @@
   with_items: '{{ find_result.files }}'
 
 - name: Userparams
-  shell: find /etc/zabbix/scripts_mconf/ -name userparams.conf -exec cat {} \; | tee /etc/zabbix/zabbix_agentd.conf.d/userparams_mconf.conf
+  shell: find /etc/zabbix/scripts_mconf/ -name userparams.conf -exec cat {} \; | tee {{ bigbluebutton_zabbix_conf_dir }}/userparams_mconf.conf
   become: yes
   notify: restart zabbix-agent
 

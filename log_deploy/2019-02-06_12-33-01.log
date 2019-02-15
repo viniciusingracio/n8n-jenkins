@@ -1,0 +1,5 @@
+/usr/bin/ansible-playbook -v -i envs/prod/tjrr-staging/hosts provision.yml -T 180 --force-handlers
+
+hdb-vc.tjrr.jus.br: 19 OK, 7 changed, 0 unreachable, 0 failed
+hlive01-vc.tjrr.jus.br: 1 OK, 0 changed, 0 unreachable, 1 failed
+hlive02-vc.tjrr.jus.br: 1 OK, 0 changed, 0 unreachable, 1 failed

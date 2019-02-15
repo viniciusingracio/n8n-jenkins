@@ -82,5 +82,5 @@
   systemd:
     name: mconf-presentation-recorder
     state: stopped
-    enable: no
+    enabled: no
   when: presentation_video_enabled

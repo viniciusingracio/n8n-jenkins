@@ -14,5 +14,5 @@
   notify: restart docker components
 
 - name: Remove old images
-  shell: docker images {{ bigbluebutton_docker_sfu_phone_image.split(":")[0] }} --filter 'before={{ bigbluebutton_docker_sfu_phone_image }}' -q | xargs -r docke rmir --force
+  shell: docker images {{ bigbluebutton_docker_sfu_phone_image.split(":")[0] }} --filter 'before={{ bigbluebutton_docker_sfu_phone_image }}' -q | xargs -r docker rmi --force
   notify: clean docker

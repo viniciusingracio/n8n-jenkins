@@ -1,0 +1,13 @@
+/usr/bin/ansible-playbook -v -i envs/prod/tjrr-staging/hosts setup.yml --ask-pass --ask-sudo-pass --extra-vars ansible_user=tjadmin -T 180 --force-handlers
+
+hdb-vc.tjrr.jus.br: 23 OK, 14 changed, 0 unreachable, 0 failed
+hlb-vc.tjrr.jus.br: 23 OK, 14 changed, 0 unreachable, 0 failed
+hlive01-vc.tjrr.jus.br: 23 OK, 14 changed, 0 unreachable, 0 failed
+hlive02-vc.tjrr.jus.br: 23 OK, 14 changed, 0 unreachable, 0 failed
+hmonit-vc.tjrr.jus.br: 23 OK, 14 changed, 0 unreachable, 0 failed
+hrec-vc.tjrr.jus.br: 23 OK, 14 changed, 0 unreachable, 0 failed
+hrecw01-vc.tjrr.jus.br: 23 OK, 14 changed, 0 unreachable, 0 failed
+hrecw02-vc.tjrr.jus.br: 23 OK, 14 changed, 0 unreachable, 0 failed
+hsip-vc.tjrr.jus.br: 23 OK, 14 changed, 0 unreachable, 0 failed
+hstun01-vc.tjrr.jus.br: 23 OK, 14 changed, 0 unreachable, 0 failed
+hstun02-vc.tjrr.jus.br: 23 OK, 14 changed, 0 unreachable, 0 failed

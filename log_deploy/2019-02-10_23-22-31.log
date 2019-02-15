@@ -1,0 +1,3 @@
+/usr/bin/ansible-playbook -v -i envs/dev/hosts -l elastic.dev.mconf.com setup.yml --extra-vars ansible_user=root -T 180 --force-handlers
+
+elastic.dev.mconf.com: 30 OK, 21 changed, 0 unreachable, 0 failed

@@ -33,6 +33,7 @@ test-live1.dev.mconf.com
 test-live2.dev.mconf.com
 kamailio.dev.mconf.com
 elastic.dev.mconf.com
+greenlight.dev.mconf.com
 
 [mconf-live200]
 paulo.dev.mconf.com certbot_enabled=true zabbix_agent_enabled=true

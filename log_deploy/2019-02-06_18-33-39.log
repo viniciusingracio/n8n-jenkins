@@ -1,0 +1,13 @@
+/usr/bin/ansible-playbook -v -i envs/prod/tjrr-staging/hosts provision.yml -T 180 --force-handlers
+
+hdb-vc.tjrr.jus.br: 18 OK, 0 changed, 0 unreachable, 0 failed
+hlb-vc.tjrr.jus.br: 3 OK, 1 changed, 0 unreachable, 0 failed
+hlive01-vc.tjrr.jus.br: 260 OK, 176 changed, 0 unreachable, 1 failed
+hlive02-vc.tjrr.jus.br: 260 OK, 176 changed, 0 unreachable, 1 failed
+hmonit-vc.tjrr.jus.br: 1 OK, 0 changed, 0 unreachable, 0 failed
+hrec-vc.tjrr.jus.br: 252 OK, 158 changed, 0 unreachable, 1 failed
+hrecw01-vc.tjrr.jus.br: 206 OK, 124 changed, 0 unreachable, 1 failed
+hrecw02-vc.tjrr.jus.br: 206 OK, 124 changed, 0 unreachable, 1 failed
+hsip-vc.tjrr.jus.br: 13 OK, 8 changed, 0 unreachable, 0 failed
+hstun01-vc.tjrr.jus.br: 18 OK, 14 changed, 0 unreachable, 0 failed
+hstun02-vc.tjrr.jus.br: 18 OK, 14 changed, 0 unreachable, 0 failed

@@ -1,0 +1,19 @@
+/usr/bin/ansible-playbook -v -i envs/prod/tjrr/hosts -l coturn,mconf-live200 provision.yml -T 180 --force-handlers
+
+aer-vc.tjrr.jus.br: 227 OK, 53 changed, 0 unreachable, 0 failed
+bfi-vc.tjrr.jus.br: 227 OK, 54 changed, 0 unreachable, 0 failed
+ckr-vc.tjrr.jus.br: 227 OK, 54 changed, 0 unreachable, 0 failed
+fcr-vc.tjrr.jus.br: 227 OK, 52 changed, 0 unreachable, 0 failed
+fcv-vc.tjrr.jus.br: 227 OK, 52 changed, 0 unreachable, 0 failed
+live01-vc.tjrr.jus.br: 228 OK, 47 changed, 0 unreachable, 0 failed
+live02-vc.tjrr.jus.br: 228 OK, 47 changed, 0 unreachable, 0 failed
+live03-vc.tjrr.jus.br: 228 OK, 47 changed, 0 unreachable, 0 failed
+live04-vc.tjrr.jus.br: 228 OK, 47 changed, 0 unreachable, 0 failed
+mji-vc.tjrr.jus.br: 227 OK, 52 changed, 0 unreachable, 0 failed
+pac-vc.tjrr.jus.br: 227 OK, 54 changed, 0 unreachable, 0 failed
+pjs-vc.tjrr.jus.br: 227 OK, 52 changed, 0 unreachable, 0 failed
+rli-vc.tjrr.jus.br: 227 OK, 54 changed, 0 unreachable, 0 failed
+slz-vc.tjrr.jus.br: 227 OK, 54 changed, 0 unreachable, 0 failed
+stun01-vc.tjrr.jus.br: 17 OK, 8 changed, 0 unreachable, 0 failed
+stun02-vc.tjrr.jus.br: 17 OK, 8 changed, 0 unreachable, 0 failed
+vij-vc.tjrr.jus.br: 227 OK, 52 changed, 0 unreachable, 0 failed

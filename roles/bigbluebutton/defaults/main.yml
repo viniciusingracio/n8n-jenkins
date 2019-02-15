@@ -167,3 +167,4 @@ bigbluebutton_docker_webrtc_sfu_enabled: false
 external_ip:
 
 bigbluebutton_zabbix_copy_scripts: false
+bigbluebutton_zabbix_conf_dir: /etc/zabbix/zabbix_agentd.conf.d
