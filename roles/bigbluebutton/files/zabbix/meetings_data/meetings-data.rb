@@ -14,24 +14,34 @@ def format_date_time(d)
   local_date.strftime("%d/%m/%Y %H:%M:%S")
 end
 
-def get_size(record_id)
+def get_dirs(record_id)
+  output = Dir.glob("/var/bigbluebutton/published/*/#{record_id}/**/*")
+  return output if ! output.empty?
+
+  output = Dir.glob("/var/bigbluebutton/recording/raw/#{record_id}/**/*")
+  return output if ! output.empty?
+
   output = []
-  if FileTest.directory? "/var/bigbluebutton/published/presentation/#{record_id}"
-    output += Dir.glob("/var/bigbluebutton/published/presentation/#{record_id}/**/*")
-  elsif FileTest.directory? "/var/bigbluebutton/recording/raw/#{record_id}"
-    output += Dir.glob("/var/bigbluebutton/recording/raw/#{record_id}/**/*")
-  else
-    # presentations
-    output += Dir.glob("/var/bigbluebutton/#{record_id}/**/*")
-    # webcam streams in red5
-    output += Dir.glob("/usr/share/red5/webapps/video/streams/#{record_id}/**/*")
-    # desktop sharing streams in red5
-    output += Dir.glob("/var/bigbluebutton/deskshare/#{record_id}-*.flv")
-    # FreeSWITCH wav recordings
-    output += Dir.glob("/var/freeswitch/meetings/#{record_id}-*.wav")
-  end
+  # presentations
+  output += Dir.glob("/var/bigbluebutton/#{record_id}/**/*")
+  # webcam streams in red5
+  output += Dir.glob("/usr/share/red5/webapps/video/streams/#{record_id}/**/*")
+  # screenshare streams in red5
+  output += Dir.glob("/usr/share/red5/webapps/screenshare/streams/#{record_id}/**/*")
+  # desktop sharing streams in red5
+  output += Dir.glob("/var/bigbluebutton/deskshare/#{record_id}-*.flv")
+  # FreeSWITCH wav recordings
+  output += Dir.glob("/var/freeswitch/meetings/#{record_id}-*.wav")
+  # webcam streams in kurento
+  output += Dir.glob("/var/kurento/recordings/#{record_id}/**/*")
+  # screenshare streams in kurento
+  output += Dir.glob("/var/kurento/screenshare/#{record_id}/**/*")
+  output
+end
+
+def get_size(record_id)
   size = 0
-  output.each { |f| size += File.size(f) if File.file?(f) }
+  get_dirs(record_id).each { |f| size += File.size(f) if File.file?(f) }
   size
 end
 
@@ -83,18 +93,19 @@ end
 
 recordings = {}
 
-date_format = "%Y-%m-%d %H:%M:%S,%L%:z"
+date_format = "%Y-%m-%dT%H:%M:%S.%L%:z"
 `ls -tr1 /var/log/bigbluebutton/bbb-web.log* | xargs -I{} zgrep 'Meeting started\\|Removing expired meeting\\|Meeting ended\\|Removing un-joined meeting\\|Meeting destroyed\\|Starting Meeting Service' {}`.split("\n").each do |line|
-  next if assign_next(line, recordings, "start_meeting", /(?<date>\d+-\d+-\d+ \d+:\d+:\d+,\d+[^ ]*).*Meeting started: data=(?<data>.*)/i, date_format)
-  next if assign_next(line, recordings, "end_meeting", /(?<date>\d+-\d+-\d+ \d+:\d+:\d+,\d+[^ ]*).*(Meeting ended|Removing expired meeting|Removing un-joined meeting|Meeting destroyed): data=(?<data>.*)/i, date_format)
-  next if assign_next(line, recordings, "restart_server", /(?<date>\d+-\d+-\d+ \d+:\d+:\d+,\d+[^ ]*).*Starting Meeting Service.$/i, date_format)
+  next if assign_next(line, recordings, "start_meeting", /(?<date>\d+-\d+-\d+.\d+:\d+:\d+\.\d+[^ ]*).*Meeting started: data=(?<data>.*)/i, date_format)
+  next if assign_next(line, recordings, "end_meeting", /(?<date>\d+-\d+-\d+.\d+:\d+:\d+\.\d+[^ ]*).*(Meeting ended|Removing expired meeting|Removing un-joined meeting|Meeting destroyed): data=(?<data>.*)/i, date_format)
+  next if assign_next(line, recordings, "restart_server", /(?<date>\d+-\d+-\d+.\d+:\d+:\d+\.\d+[^ ]*).*Starting Meeting Service.$/i, date_format)
 end
 
 date_format = "%Y-%m-%dT%H:%M:%S.%L"
-if File.exists?("/var/log/bigbluebutton/bbb-rap-worker.log")
-  `ls -tr1 /var/log/bigbluebutton/bbb-rap-worker.log* | xargs -I{} zgrep 'Successfully sanity checked\\|Successfully archived' {}`.split("\n").each do |line|
+if ! Dir.glob("/var/log/bigbluebutton/bbb-rap-worker.log*").empty?
+  `ls -tr1 /var/log/bigbluebutton/bbb-rap-worker.log* | xargs -I{} zgrep 'Successfully sanity checked\\|Successfully archived\\|Publish format.*succeeded' {}`.split("\n").each do |line|
     next if assign_next(line, recordings, "end_sanity", /\[(?<date>\d+-\d+-\d+.\d+:\d+:\d+\.\d+).*Successfully sanity checked (?<record_id>\w+-\d+)/i, date_format)
     next if assign_next(line, recordings, "end_archive", /\[(?<date>\d+-\d+-\d+.\d+:\d+:\d+\.\d+).*Successfully archived (?<record_id>\w+-\d+)/i, date_format)
+    next if assign_next(line, recordings, "end_publish", /\[(?<date>\d+-\d+-\d+.\d+:\d+:\d+\.\d+).*Publish format (?<format>[^ ]*) succeeded for (?<record_id>\w+-\d+)/i, date_format)
   end
 end
 
@@ -105,6 +116,8 @@ recordings.each do |record_id, info|
     info["status"] = "not recorded"
   elsif info["end_meeting_event"] == "server_restart"
     info["status"] = "server restarted"
+  elsif ! info["end_publish"].nil?
+    info["status"] = "processed"
   elsif File.exists?("/var/bigbluebutton/recording/status/published/#{record_id}-presentation.done")
     info["end_publish"] = DateTime.parse(File.mtime("/var/bigbluebutton/recording/status/published/#{record_id}-presentation.done").to_s)
     info["status"] = "processed"
@@ -160,4 +173,5 @@ recordings.map! do |info|
   }
 end
 
-puts recordings.to_json
+puts recordings.to_json.gsub("},", "},\n ")
+
