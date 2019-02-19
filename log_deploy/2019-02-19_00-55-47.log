@@ -1,0 +1,7 @@
+/usr/bin/ansible-playbook -v -i envs/prod/com/hosts -l coturn,mconf-live200,mconf-live220 provision.yml -T 180 --force-handlers
+
+live02.mconf.com: 258 OK, 98 changed, 0 unreachable, 0 failed
+live03.mconf.com: 253 OK, 66 changed, 0 unreachable, 0 failed
+live04.mconf.com: 255 OK, 82 changed, 0 unreachable, 0 failed
+stun1.mconf.com: 30 OK, 11 changed, 0 unreachable, 0 failed
+stun2.mconf.com: 30 OK, 11 changed, 0 unreachable, 0 failed
