@@ -44,6 +44,8 @@
     pull: yes
     restart_policy: unless-stopped
     network_mode: host
+    # limit memory to avoid complete colapse
+    memory: 1G
     volumes:
       - /var/kurento:/var/kurento
       - /var/log/kurento-media-server:/var/log/kurento-media-server

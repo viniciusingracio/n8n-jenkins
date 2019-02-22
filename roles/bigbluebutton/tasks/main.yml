@@ -208,6 +208,9 @@
            # resolver $DNS-IP-1 $DNS-IP-2 valid=300s;
            # resolver_timeout 5s;
            add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload";
+           
+           # define an upload limit for the whole site
+           client_max_body_size 30m;
     insertafter: '.*server_name .*'
     marker: '     # {mark} ANSIBLE MANAGED BLOCK'
   become: yes
@@ -465,6 +468,7 @@
   - { regexp: '^history=', line: 'history={{ bigbluebutton_retention_runtime }}' }
   - { regexp: '^unrecorded_days=', line: 'unrecorded_days={{ bigbluebutton_retention_unrecorded }}' }
   - { regexp: '^published_days=', line: 'published_days={{ bigbluebutton_retention_published_raw }}' }
+  - { regexp: '^log_history=', line: 'log_history={{ bigbluebutton_log_retention }}' }
   - { regexp: '^[#]?remove_raw_of_recordings_without_marks$', line: 'remove_raw_of_recordings_without_marks', when: '{{ not bigbluebutton_retention_unrecorded is none }}' }
   - { regexp: '^[#]?remove_raw_of_recordings_without_marks$', line: '#remove_raw_of_recordings_without_marks', when: '{{ bigbluebutton_retention_unrecorded is none }}' }
   - { regexp: '^[#]?remove_raw_of_published_recordings$', line: 'remove_raw_of_published_recordings', when: '{{ not bigbluebutton_retention_published_raw is none }}' }
