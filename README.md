@@ -79,6 +79,10 @@ ansible all -v -i envs/prod/tjrr/hosts -l mconf-live200,mconf-rec,mconf-recw --e
 # get systemd status
 ansible all -v -i envs/prod/tjrr/hosts -l mconf-live200 --extra-vars "ansible_user=mconf" --become -m raw -a 'systemctl --no-pager status zabbix-agent.service'
 
+# umount and mount nfs directories on mconf-recw
+ansible all -v -i envs/prod/tjrr/hosts -l mconf-recw --extra-vars "ansible_user=mconf" --become -m raw -a 'umount -a -t nfs4'
+ansible all -v -i envs/prod/tjrr/hosts -l mconf-recw --extra-vars "ansible_user=mconf" --become -m raw -a 'mount -a'
+
 ```
 
 ### Other playbooks

@@ -1,0 +1,3 @@
+/usr/bin/ansible-playbook -v -i envs/prod/tjrr/hosts -l aer-vc.tjrr.jus.br provision.yml -T 180 --force-handlers
+
+aer-vc.tjrr.jus.br: 227 OK, 57 changed, 0 unreachable, 0 failed
