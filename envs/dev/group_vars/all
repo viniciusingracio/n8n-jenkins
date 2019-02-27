@@ -10,8 +10,6 @@ bigbluebutton_branding_layout: envs/{{ env }}/files/layout.xml
 bigbluebutton_screenshare_extension_url: https://chrome.google.com/webstore/detail/mconf-screenshare/mbfngdphjegmlbfobcblikeefpidfncb
 bigbluebutton_screenshare_extension_key: mbfngdphjegmlbfobcblikeefpidfncb
 
-bigbluebutton_default_presentation: envs/{{ env }}/files/default.pdf
-
 certbot_domain: '{{ inventory_hostname }}'
 certbot_webroot_cmd: '{{ certbot_base_cmd }} --webroot -w /var/www/bigbluebutton-default/'
 bigbluebutton_ssl_certificate: '{% if certbot_enabled %}{{ certbot_cert_path }}/fullchain.pem{% else %}/etc/nginx/ssl/{{ inventory_hostname }}.crt{% endif %}'

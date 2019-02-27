@@ -46,13 +46,15 @@
     env:
       EXTERNAL_IP: '{{ contact_ip }}'
       BIND_IP: 0.0.0.0
-      MCS_PORT: 3009
+      MCS_PORT: "3009"
       MCS_HOST: '{{ docker_ip }}'
-      SIP_API_PORT: 3012
+      SIP_API_PORT: "3012"
       SIP_API_PATH: /mcs-sip
-      ENABLE_EXTERNAL_API: true
+      ENABLE_EXTERNAL_API: "true"
       REGISTRAR: '{{ registrar_config | to_json }}'
       SIP_DEFAULT_GATEWAY: '{{ bigbluebutton_sip_default_gateway | default(bigbluebutton_sip_registrar_address, true) }}'
+      ENABLE_MCS_BFCP: "true"
+      MCS_BFCP_ADDRESS: 'ws://{{ ansible_default_ipv4.address }}:8000'
   notify: restart docker components
 
 - name: Remove old images
