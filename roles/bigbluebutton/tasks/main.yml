@@ -148,6 +148,17 @@
   when: bigbluebutton_apt_state == 'latest'
   notify: restart bigbluebutton
 
+- name: Check if bbb-web is running on a standalone app
+  stat:
+    path: /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
+  register: reg_standalone
+- set_fact:
+    bigbluebutton_servlet_dir: /usr/share/bbb-web
+  when: reg_standalone.stat.exists
+- set_fact:
+    bigbluebutton_servlet_dir: /var/lib/tomcat7/webapps/bigbluebutton
+  when: not reg_standalone.stat.exists
+
 - name: Determine if reset encoding needed on bigbluebutton.properties
   set_fact:
     properties_charset: 'iso-8859-1'
@@ -264,11 +275,11 @@
   when: not bigbluebutton_demos
 
 - name: Get BigBlueButton secret
-  shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
+  shell: cat {{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
   register: reg_bbb_secret
 
 - name: Get BigBlueButton URL
-  shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^bigbluebutton.web.serverURL=' | cut -d'=' -f2 | awk '{print $1"/bigbluebutton/"}'
+  shell: cat {{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties | grep '^bigbluebutton.web.serverURL=' | cut -d'=' -f2 | awk '{print $1"/bigbluebutton/"}'
   register: reg_bbb_url
 
 - name: Determine if setip is needed
@@ -283,12 +294,12 @@
   when: setip_needed
 
 - name: Get BigBlueButton secret again
-  shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
+  shell: cat {{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
   register: reg_bbb_secret
   when: setip_needed
 
 - name: Get BigBlueButton URL again
-  shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^bigbluebutton.web.serverURL=' | cut -d'=' -f2 | awk '{print $1"/bigbluebutton/"}'
+  shell: cat {{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties | grep '^bigbluebutton.web.serverURL=' | cut -d'=' -f2 | awk '{print $1"/bigbluebutton/"}'
   register: reg_bbb_url
   when: setip_needed
 
@@ -336,7 +347,7 @@
     encoding: '{{ properties_charset }}'
   with_nested:
     -
-      - /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties
+      - '{{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties'
       - /var/lib/tomcat7/webapps/demo/bbb_api_conf.jsp
       - /usr/share/red5/webapps/screenshare/WEB-INF/screenshare.properties
     -

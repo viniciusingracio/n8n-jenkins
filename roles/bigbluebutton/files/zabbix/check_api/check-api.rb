@@ -11,8 +11,8 @@ require 'benchmark'
 # externally set (for instance, from command line).
 class BBBProperties
   def self.load_properties_from_file()
-      @@properties = Hash[File.read("/var/lib/tomcat7/webapps/bigbluebutton/"\
-        "WEB-INF/classes/bigbluebutton.properties", :encoding => "ISO-8859-1:UTF-8").scan(/(.+?)=(.+)/)]
+      servlet_dir = File.exists?("/usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties") ? "/usr/share/bbb-web" : "/var/lib/tomcat7/webapps/bigbluebutton"
+      @@properties = Hash[File.read("#{servlet_dir}/WEB-INF/classes/bigbluebutton.properties", :encoding => "ISO-8859-1:UTF-8").scan(/(.+?)=(.+)/)]
   end
 
   def self.load_properties_from_cli(server_url, salt)

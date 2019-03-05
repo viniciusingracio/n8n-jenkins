@@ -74,7 +74,7 @@ ansible all -v -i envs/rnp/prod/hosts -l mconf-live200 --extra-vars "ansible_use
 ansible all -v -i envs/prod/tjrr/hosts -l mconf-live200,mconf-rec --extra-vars "ansible_user=mconf" --become -m raw -a 'systemctl daemon-reload; systemctl restart performance_report'
 
 # get /metrics password for node-exporter
-ansible all -v -i envs/prod/tjrr/hosts -l mconf-live200,mconf-rec,mconf-recw --extra-vars "ansible_user=mconf" --become -m raw -a "cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2 | tr -d '\n' | sha256sum"
+ansible all -v -i envs/prod/tjrr/hosts -l mconf-live200,mconf-rec,mconf-recw --extra-vars "ansible_user=mconf" --become -m raw -a "cat /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2 | tr -d '\n' | sha256sum"
 
 # get systemd status
 ansible all -v -i envs/prod/tjrr/hosts -l mconf-live200 --extra-vars "ansible_user=mconf" --become -m raw -a 'systemctl --no-pager status zabbix-agent.service'

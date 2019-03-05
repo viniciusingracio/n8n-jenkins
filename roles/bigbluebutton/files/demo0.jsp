@@ -74,7 +74,7 @@ Error: createMeeting() failed
 		}
 	}
 
-	window.location.href = processJoinUrl("<%=joinURL%>");
+	window.location.href = "<%=joinURL%>";
 </script>
 
 <%
