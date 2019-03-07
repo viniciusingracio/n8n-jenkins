@@ -1,0 +1,3 @@
+/usr/bin/ansible-playbook -i envs/prod/tjrr-staging/hosts -l hvc.tjrr.jus.br --extra-vars=ansible_user=tjadmin --ask-pass --ask-become-pass setup.yml
+
+hvc.tjrr.jus.br: 23 OK, 15 changed, 0 unreachable, 0 failed

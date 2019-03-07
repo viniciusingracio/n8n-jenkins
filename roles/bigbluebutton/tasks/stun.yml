@@ -19,9 +19,16 @@
   notify: restart kms
   when: not bigbluebutton_docker_webrtc_sfu_enabled
 
+- set_fact:
+    turn_stun_config: /usr/share/bbb-web/WEB-INF/classes/spring/turn-stun-servers.xml
+  when: bigbluebutton_servlet_dir == '/usr/share/bbb-web'
+- set_fact:
+    turn_stun_config: /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/spring/turn-stun-servers.xml
+  when: bigbluebutton_servlet_dir != '/usr/share/bbb-web'
+
 - name: Update tomcat7 stun/turn file
   become: yes
   template:
     src: templates/turn-stun-servers.xml.j2
-    dest: /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/spring/turn-stun-servers.xml
+    dest: '{{ turn_stun_config }}'
   notify: restart bigbluebutton

@@ -7,12 +7,23 @@
     external_ip: '{{ ansible_default_ipv4.address }}'
   when: external_ip is none or external_ip | trim == ""
 
+- name: Check if bbb-web is running on a standalone app
+  stat:
+    path: /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
+  register: reg_standalone
+- set_fact:
+    bigbluebutton_servlet_dir: /usr/share/bbb-web
+  when: reg_standalone.stat.exists
+- set_fact:
+    bigbluebutton_servlet_dir: /var/lib/tomcat7/webapps/bigbluebutton
+  when: not reg_standalone.stat.exists
+
 - name: Get BigBlueButton secret
-  shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
+  shell: cat {{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
   register: bbb_secret_raw
 
 - name: Get BigBlueButton URL
-  shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^bigbluebutton.web.serverURL=' | cut -d'=' -f2 | awk '{print $1"/bigbluebutton/api"}'
+  shell: cat {{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties | grep '^bigbluebutton.web.serverURL=' | cut -d'=' -f2 | awk '{print $1"/bigbluebutton/api"}'
   register: bbb_api_entry_point_raw
 
 - set_fact:
