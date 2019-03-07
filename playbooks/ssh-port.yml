@@ -1,0 +1,5 @@
+- hosts: all
+  user: mconf
+  gather_facts: no
+  roles:
+    - ssh-port

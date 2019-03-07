@@ -32,7 +32,6 @@ bigbluebutton_docker_mcs_sip_image: mconf/mcs-sip:v2.1.0-dev # default is v2.0.6
 bigbluebutton_docker_sfu_phone_image: mconf/sfu-phone:v2.1.0-dev # default is v2.0.4-release
 bigbluebutton_docker_webrtc_sfu_enabled: true
 bigbluebutton_docker_webrtc_sfu_image: mconf/bbb-webrtc-sfu:v2.3.0-dev # default is v2.2.4-dev
-bigbluebutton_docker_kurento_image: mconf/kurento:bbb220-dev-timelapse
 bigbluebutton_docker_mcs_bfcp_enabled: true
 
 bigbluebutton_kms_udp_range_begin: 7000
@@ -55,8 +54,10 @@ bigbluebutton_html5_config_yml:
   - { key: 'public.kurento.chromeExtensionLink', value: '{{ bigbluebutton_screenshare_extension_url }}' }
   - { key: 'public.kurento.enableScreensharing', value: true }
   - { key: 'public.kurento.enableVideo', value: true }
-  - { key: 'public.kurento.enableVideoStats', value: true }
+  - { key: 'public.kurento.enableVideoStats', value: false }
   - { key: 'public.kurento.enableListenOnly', value: true }
+  - { key: 'public.kurento.cameraConstraints.width.max', value: 320 }
+  - { key: 'public.kurento.cameraConstraints.height.max', value: 240 }
   - { key: 'public.app.appName', value: '{{ bigbluebutton_branding_name }}' }
   - { key: 'public.app.clientTitle', value: '{{ bigbluebutton_branding_name }}' }
   - { key: 'public.app.copyright', value: '{{ bigbluebutton_branding_copyright_html5 }}' }

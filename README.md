@@ -131,6 +131,14 @@ password=929dk92k29d29i
 user=mconf
 ```
 
+#### ssh-port
+
+Change port used by sshd, and update ufw. Example:
+
+```
+ansible-playbook -i envs/dev/hosts -l 134.209.118.45 playbooks/ssh-port.yml
+```
+
 ### Utils
 
 * Start at a given point: `ansible-playbook -i envs/dev -l rec-proxy --start-at-task="rec-proxy : Download rec-proxy source code" provision.yml`

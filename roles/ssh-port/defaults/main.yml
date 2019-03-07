@@ -1,0 +1,5 @@
+---
+
+common_ufw_ssh_sources:
+  - any
+common_ufw_enabled: false

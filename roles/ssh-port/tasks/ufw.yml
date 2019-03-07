@@ -1,0 +1,8 @@
+---
+
+- name: Configure ssh rule
+  become: yes
+  ufw: rule=limit port={{ configured_port }} proto=tcp from_ip={{ item }}
+  with_items: '{{ common_ufw_ssh_sources }}'
+  notify:
+    - restart ufw
