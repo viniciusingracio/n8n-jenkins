@@ -4,6 +4,8 @@ bigbluebutton_apt_package: bigbluebutton
 bigbluebutton_apt_key: https://jenkins-live.mconf.com/apt/public.asc
 bigbluebutton_apt_source: deb https://jenkins-live.mconf.com/apt/development/mconf-220/xenial-2.2.0 mconf-xenial main
 
+bbb_beats_logstash_url: "elastic.dev.mconf.com:5044"
+
 bigbluebutton_default_presentation: envs/{{ env }}/files/default.pdf
 
 bigbluebutton_sip: true

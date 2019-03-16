@@ -1,0 +1,39 @@
+---
+# tasks file for bbb-beats
+
+- name: Start filebeat container
+  docker_container:
+    name: '{{ inventory_hostname }}-filebeat'
+    image: elastic/filebeat:6.5.4
+    pull: yes
+    restart_policy: unless-stopped
+    user: root
+    command: "-e --strict.perms=false -E output.logstash.hosts=[\"{{ bbb_beats_logstash_url }}\"]"
+    memory: 100m
+    volumes:
+      - "/var/log/:/hostfs/var/log:ro"
+      - "/var/bigbluebutton:/hostfs/var/bigbluebutton:ro"
+      - "/var/lib/docker/containers:/var/lib/docker/containers:ro"
+      - "./files/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
+      - "./certs:/etc/certs:ro"
+    labels:
+      co.elastic.logs/disable: "true"
+
+- name: Start packetbeat container
+  docker_container:
+    name: '{{ inventory_hostname }}-packetbeat'
+    image: elastic/packetbeat:6.6.0
+    pull: yes
+    restart_policy: unless-stopped
+    user: packetbeat
+    command: "-e --strict.perms=false -E output.logstash.hosts=[\"{{ bbb_beats_logstash_url }}\"]"
+    memory: 100m
+    volumes:
+      - "./files/packetbeat.yml:/usr/share/filebeat/packetbeat.yml:ro"
+      - "./certs:/etc/certs:ro"
+    capabilities:
+      - "NET_RAW"
+      - "NET_ADMIN"
+    network_mode: host
+    labels:
+      co.elastic.logs/disable: "true"

@@ -1,0 +1,45 @@
+filebeat.config:
+  modules:
+    path: ${path.config}/modules.d/*.yml
+    reload.enabled: false
+
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+
+#logging.level: debug
+
+filebeat.inputs:
+  - type: log
+    paths:
+      - /hostfs/var/log/syslog
+    fields_under_root: true
+    fields:
+      syslog: true
+
+  - type: log
+    paths:
+     - "/hostfs/var/bigbluebutton/*/*/*/textfiles/*.txt"
+    fields_under_root: true
+    fields:
+     slides: true
+    multiline.pattern: '.*'
+    multiline.match: after
+
+  - type: log
+    paths:
+      - "/hostfs/var/log/nginx/html5-client.log"
+    fields_under_root: true
+    fields:
+      client: true
+    json:
+      keys_under_root: true
+      add_error_key: true
+
+output.logstash:
+  hosts: '${LOGSTASH_HOSTS:}'
+  ssl:
+    certificate_authorities: ["/etc/certs/ca.crt"]
+    certificate: "/etc/certs/beat.crt"
+    key: "/etc/certs/beat.key"

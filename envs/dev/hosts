@@ -70,5 +70,8 @@ felipe2.dev.mconf.com
 [certbot]
 kamailio.dev.mconf.com
 
-[mconf-live220]
-test-live220.dev.mconf.com certbot_enabled=true
+[mconf-live200]
+test-live220.dev.mconf.com
+
+[bbb-beats]
+test-live220.dev.mconf.com

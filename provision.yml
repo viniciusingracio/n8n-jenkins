@@ -73,7 +73,7 @@
   roles:
   - performance-report
   - nsca
-  
+
 # Kurento
 - hosts: kurento
   roles:
@@ -186,6 +186,11 @@
   roles:
   - bigbluebutton-prometheus
   - node-exporter
+
+# Bigbluebutton beats
+- hosts: bbb-beats
+  roles:
+  - bbb-beats
 
 - hosts: all
   roles:
