@@ -1,20 +1,9 @@
 - name: Read BigBlueButton source file
   slurp:
-    src: /etc/apt/sources.list.d/mconf-live.list
-  register: slurpfile
-  ignore_errors: yes
-  when: bigbluebutton_apt_clean_installation
-
-- set_fact:
-    current_apt_source: '{{ slurpfile["content"] | b64decode | regex_replace("\n") }}'
-  when: bigbluebutton_apt_clean_installation and slurpfile is succeeded and not slurpfile is skipped
-
-- name: Read BigBlueButton source file
-  slurp:
     src: /etc/apt/sources.list.d/bigbluebutton.list
   register: slurpfile
   ignore_errors: yes
-  when: bigbluebutton_apt_clean_installation and slurpfile is failed
+  when: bigbluebutton_apt_clean_installation
 
 - set_fact:
     current_apt_source: '{{ slurpfile["content"] | b64decode | regex_replace("\n") }}'

@@ -1,6 +1,22 @@
 - include: etherpad-dummy.yml
   when: bigbluebutton_docker_etherpad_enabled
 
+- stat:
+    path: /etc/apt/sources.list.d/mconf-live.list
+  register: mconf_repo_file
+
+- stat:
+    path: /etc/apt/sources.list.d/bigbluebutton.list
+  register: bigbluebutton_repo_file
+
+- fail:
+    msg: Don't know what to do when mconf-live.list and bigbluebutton.list exist
+  when: mconf_repo_file.stat.exists and bigbluebutton_repo_file.stat.exists
+
+- command: mv /etc/apt/sources.list.d/mconf-live.list /etc/apt/sources.list.d/bigbluebutton.list
+  become: yes
+  when: mconf_repo_file.stat.exists
+
 - include_role:
     name: bigbluebutton
   tags: always

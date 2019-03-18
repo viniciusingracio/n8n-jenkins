@@ -31,9 +31,8 @@
 
 - name: Remove apt repository
   become: true
-  apt_repository:
-    repo: '{{ current_apt_source }}'
-    filename: '{{ bigbluebutton_apt_package }}'
+  file:
+    path: /etc/apt/sources.list.d/bigbluebutton.list
     state: absent
 
 - name: Cleanup tmp directory
