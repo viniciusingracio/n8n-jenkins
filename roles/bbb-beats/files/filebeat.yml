@@ -8,7 +8,7 @@ filebeat.autodiscover:
     - type: docker
       hints.enabled: true
 
-#logging.level: debug
+logging.level: warning
 
 filebeat.inputs:
   - type: log
@@ -20,7 +20,7 @@ filebeat.inputs:
 
   - type: log
     paths:
-     - "/hostfs/var/bigbluebutton/*/*/*/textfiles/*.txt"
+     - /hostfs/var/bigbluebutton/*/*/*/textfiles/*.txt
     fields_under_root: true
     fields:
      slides: true
@@ -29,7 +29,7 @@ filebeat.inputs:
 
   - type: log
     paths:
-      - "/hostfs/var/log/nginx/html5-client.log"
+      - /hostfs/var/log/nginx/html5-client.log
     fields_under_root: true
     fields:
       client: true

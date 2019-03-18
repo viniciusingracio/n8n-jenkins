@@ -1,0 +1,5 @@
+---
+  
+bbb_beats_logstash_url:
+bbb_beats_certs_dir: /usr/share/filebeat/certs
+bbb_beats_conf_dir: /usr/share/filebeat/conf
