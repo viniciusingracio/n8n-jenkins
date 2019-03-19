@@ -233,8 +233,10 @@
   register: reg_demo
 
 - name: Restart tomcat7
-  command: service tomcat7 restart
   become: true
+  service:
+    name: tomcat7
+    state: restarted
   when: reg_demo.changed
 
 - name: Wait until demo is deployed before continuing
