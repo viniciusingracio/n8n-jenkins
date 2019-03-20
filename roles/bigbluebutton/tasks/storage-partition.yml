@@ -7,7 +7,8 @@
     - /var/bigbluebutton
     - /var/freeswitch
     - /var/kurento
-    - /var/lib/docker
+    # TODO check if storage is not zfs, otherwise docker won't start
+    # - /var/lib/docker
   register: reg_dir
 
 - name: Stop docker daemon
