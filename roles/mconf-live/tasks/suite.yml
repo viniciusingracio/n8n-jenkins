@@ -8,7 +8,7 @@
 - name: Start suite container
   docker_container:
     name: suite
-    image: mconf/suite:suite-0.0.1-test
+    image: mconf/suite:suite-bbb-webrtc-sfu-2.4.0dev
     pull: yes
     restart_policy: unless-stopped
     ports:
@@ -19,22 +19,4 @@
       MONGO_URL: mongodb://mongo/suite
       METEOR_SETTINGS_MODIFIER: ".public.server.mcs_address = \"wss://{{ inventory_hostname }}/mcs\""
 
-- name: Stop webrtc-sfu container
-  docker_container:
-    name: webrtc-sfu
-    state: stopped
 
-- name: Start mcs container
-  docker_container:
-    name: mcs
-    image: mconf/suite:mcs-0.0.1-test
-    pull: yes
-    restart_policy: unless-stopped
-    ports:
-      - 3009:8443
-    env:
-      KURENTO_URI: ws://{{ docker_ip }}:3100/kurento
-      KURENTO_IP: "{{ external_ip }}"
-      FREESWITCH_IP: "{{ external_ip }}"
-      FREESWITCH_PORT: 5066
-      ESL_IP: "{{ docker_ip }}"

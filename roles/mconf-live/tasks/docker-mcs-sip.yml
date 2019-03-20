@@ -33,7 +33,7 @@
 - name: Start mcs-sip container
   docker_container:
     name: mcs-sip
-    image: mconf/mcs-sip:registrar-support
+    image: mconf/mcs-sip:v2.1.0-dev
     pull: yes
     restart_policy: unless-stopped
     ports:
