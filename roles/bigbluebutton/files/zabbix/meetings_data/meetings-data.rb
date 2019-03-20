@@ -89,11 +89,7 @@ def add_info(m, recordings, symbol, date, has_data)
     recordings[record_id][symbol] = date
   else
     record_id = m["record_id"]
-    if ! recordings.has_key?(record_id)
-      return if ! ["queued"].include?(symbol)
-
-      recordings[record_id] = new_record if ! recordings.has_key?(record_id)
-    end
+    recordings[record_id] = new_record if ! recordings.has_key?(record_id)
     recordings[record_id]["record_id"] = record_id
     recordings[record_id][symbol] = date
   end
@@ -192,7 +188,7 @@ end
 
 $tz = opts[:tz]
 $disable_size = opts[:disable_size]
-time_limit = opts[:time_limit]
+time_limit = opts[:time_limit].to_i
 recordings = recordings.values
 
 # puts recordings.to_json.gsub("},", "},\n ")
