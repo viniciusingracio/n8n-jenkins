@@ -39,6 +39,7 @@
     image: '{{ bigbluebutton_docker_mcs_sip_image }}'
     pull: yes
     restart_policy: unless-stopped
+    hostname: '{{ inventory_hostname }}'
     ports:
       - 5060:5060
       - 5060:5060/udp

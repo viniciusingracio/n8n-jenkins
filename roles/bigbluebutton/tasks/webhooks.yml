@@ -17,6 +17,7 @@
     image: mconf/bbb-webhooks:latest
     pull: yes
     restart_policy: unless-stopped
+    hostname: '{{ inventory_hostname }}'
     ports:
       - "3005:3005"
     env:

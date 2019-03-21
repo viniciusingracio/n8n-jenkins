@@ -27,6 +27,7 @@
     image: '{{ aws_publisher_image }}:{{ aws_publisher_image_version }}'
     pull: yes
     restart_policy: on-failure
+    hostname: '{{ inventory_hostname }}'
     volumes:
       - /var/bigbluebutton:/var/bigbluebutton
       - /var/log/bigbluebutton:/var/log/bigbluebutton

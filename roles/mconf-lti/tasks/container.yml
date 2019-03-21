@@ -8,6 +8,7 @@
     image: '{{ item.lti_image | default(default_image) }}'
     pull: yes
     restart_policy: unless-stopped
+    hostname: '{{ inventory_hostname }}'
     published_ports:
       - '{{ 3001 + loop_index }}:8080'
     volumes:

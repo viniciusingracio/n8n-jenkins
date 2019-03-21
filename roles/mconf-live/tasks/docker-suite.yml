@@ -12,6 +12,7 @@
     name: mongo
     image: mongo:latest
     restart_policy: unless-stopped
+    hostname: '{{ inventory_hostname }}'
 
 - name: Start suite container
   docker_container:
@@ -19,6 +20,7 @@
     image: '{{ bigbluebutton_docker_suite_image }}'
     pull: yes
     restart_policy: unless-stopped
+    hostname: '{{ inventory_hostname }}'
     ports:
       - 3013:3000
     links:

@@ -7,6 +7,7 @@
     command: --path.rootfs /host --collector.textfile.directory /host/usr/local/share/prometheus
     pull: yes
     restart_policy: unless-stopped
+    hostname: '{{ inventory_hostname }}'
     network_mode: host
     pid_mode: host
     volumes:

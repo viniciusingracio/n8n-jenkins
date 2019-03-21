@@ -38,6 +38,7 @@
     name: rec-worker
     image: mconf/bbb-rap:latest
     restart_policy: unless-stopped
+    hostname: '{{ inventory_hostname }}'
     # command: ["sleep", "infinity"]
     volumes:
       - /var/bigbluebutton:/var/bigbluebutton

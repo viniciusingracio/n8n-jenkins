@@ -4,6 +4,7 @@
     image: '{{ bigbluebutton_docker_sfu_phone_image }}'
     pull: yes
     restart_policy: unless-stopped
+    hostname: '{{ inventory_hostname }}'
     ports:
       - 3011:3011
     env:
@@ -12,6 +13,7 @@
       MCS_HOST: '{{ docker_ip }}'
       SIP_API_ADDRESS: wss://{{ inventory_hostname }}/mcs-sip
       ENABLE_REGISTER: '{{ bigbluebutton_sip_registrar_enabled | string }}'
+      ENABLE_FLOOR_N: 'true'
   notify: restart docker components
 
 - name: Remove old images

@@ -4,6 +4,7 @@
     image: '{{ bigbluebutton_docker_etherpad_image }}'
     pull: yes
     restart_policy: unless-stopped
+    hostname: '{{ inventory_hostname }}'
     ports:
       - "3006:9001"
     env:

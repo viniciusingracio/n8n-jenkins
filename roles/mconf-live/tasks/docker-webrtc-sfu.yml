@@ -43,6 +43,7 @@
     image: '{{ bigbluebutton_docker_kurento_image }}'
     pull: yes
     restart_policy: unless-stopped
+    hostname: '{{ inventory_hostname }}'
     network_mode: host
     # limit memory to avoid complete colapse
     memory: 1G
@@ -125,6 +126,7 @@
     image: '{{ bigbluebutton_docker_webrtc_sfu_image }}'
     pull: yes
     restart_policy: unless-stopped
+    hostname: '{{ inventory_hostname }}'
     ports:
       - 3008:3008
       - 3009:3009
