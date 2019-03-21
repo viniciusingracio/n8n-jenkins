@@ -4,6 +4,7 @@ mconf_live_extra_recording_packages: []
 
 mconf_live_enabled_recording_formats:
   - presentation
+  - presentation_video
 
 mconf_live_video_formats:
   - webm
@@ -36,6 +37,9 @@ bigbluebutton_docker_sfu_phone_image: mconf/sfu-phone:v2.0.4-release
 bigbluebutton_docker_mcs_bfcp_enabled: false
 bigbluebutton_docker_mcs_bfcp_image: mconf/mcs-bfcp:development
 bigbluebutton_docker_mcs_bfcp_num_ports: 40
+bigbluebutton_docker_suite_enabled: false
+bigbluebutton_docker_suite_image: mconf/suite:suite-bbb-webrtc-sfu-2.4.0dev
+bigbluebutton_docker_suite_password: suite
 
 bigbluebutton_docker_kurento_enabled: true
 bigbluebutton_docker_kurento_instances:

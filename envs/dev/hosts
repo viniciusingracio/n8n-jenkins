@@ -72,6 +72,8 @@ kamailio.dev.mconf.com
 
 [mconf-live220]
 test-live220.dev.mconf.com certbot_enabled=true
+suite.mconf.com certbot_enabled=true
+suite.dev.mconf.com certbot_enabled=true
 
-[bbb-beats]
-test-live220.dev.mconf.com
+[bbb-beats:children]
+mconf-live220

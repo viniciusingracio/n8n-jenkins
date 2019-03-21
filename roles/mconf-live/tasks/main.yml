@@ -46,6 +46,11 @@
 - include: docker-sfu-phone.yml
   when: bigbluebutton_docker_mcs_sip_enabled
 
+- include: docker-suite.yml
+  when: bigbluebutton_docker_suite_enabled
+  tags:
+    - suite
+
 - include: docker-webrtc-sfu.yml
   when: bigbluebutton_docker_webrtc_sfu_enabled
   tags:

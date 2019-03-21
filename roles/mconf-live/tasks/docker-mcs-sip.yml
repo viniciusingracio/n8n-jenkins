@@ -60,3 +60,4 @@
 - name: Remove old images
   shell: docker images {{ bigbluebutton_docker_mcs_sip_image.split(":")[0] }} --filter 'before={{ bigbluebutton_docker_mcs_sip_image }}' -q | xargs -r docker rmi --force
   notify: clean docker
+

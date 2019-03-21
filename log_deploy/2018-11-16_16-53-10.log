@@ -1,0 +1,4 @@
+/usr/bin/ansible-playbook -v -i envs/dev/hosts -l suite.dev.mconf.com,suite.mconf.com provision.yml -T 180
+
+suite.dev.mconf.com: 65 OK, 19 changed, 0 unreachable, 0 failed
+suite.mconf.com: 64 OK, 17 changed, 0 unreachable, 0 failed
