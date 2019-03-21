@@ -33,6 +33,8 @@ filebeat.inputs:
     fields_under_root: true
     fields:
       syslog: true
+    multiline.pattern: '^%{SYSLOGTIMESTAMP} %{SYSLOGHOST} %{GREEDYDATA}[%{NUMBER}]: [[:space]]'
+    multiline.match: after
 
   - type: log
     paths:
