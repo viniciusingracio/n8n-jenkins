@@ -57,6 +57,7 @@
       KURENTO_LOGS_PATH: /var/log/kurento-media-server
       STUN_IP: '{{ stun_server_ip }}'
       STUN_PORT: '{{ stun_server_port }}'
+      # GST_DEBUG: 'Kurento*:5,kms*:5'
   with_items: '{{ kurento_ports }}'
   notify: restart docker components
 

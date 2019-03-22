@@ -28,3 +28,4 @@
     env:
       MONGO_URL: mongodb://mongo/suite
       METEOR_SETTINGS_MODIFIER: ".public.server.mcs_address = \"wss://{{ inventory_hostname }}/mcs\" | .public.basename_path = \"suite\""
+      ROOT_URL: http://127.0.0.1:3000/suite
