@@ -7,7 +7,6 @@
     - { path: '/public/clientLog/external/level', value: '{{ bigbluebutton_html5_external_log_level }}' }
     - { path: '/public/clientLog/external/url', value: '{{ bigbluebutton_html5_external_log_url }}' }
     - { path: '/public/clientLog/external/method', value: '{{ bigbluebutton_html5_external_log_method }}' }
-    - { path: '/public/clientLog/external/throttleInterval', value: '{{ bigbluebutton_html5_external_log_throttle }}' }
 
 - name: Update json values
   become: true
