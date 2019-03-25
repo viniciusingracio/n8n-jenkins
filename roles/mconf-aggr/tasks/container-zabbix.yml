@@ -19,6 +19,5 @@
     name: mconf-aggr
     image: '{{ mconf_aggr_image }}:{{ mconf_aggr_image_version }}'
     restart_policy: unless-stopped
-    hostname: '{{ inventory_hostname }}'
     volumes:
       - '/root/mconf-aggr-config.json:/usr/src/mconf-aggr/config/config.json'

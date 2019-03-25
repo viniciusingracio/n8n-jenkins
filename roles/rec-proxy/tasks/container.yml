@@ -49,7 +49,6 @@
     restart_policy: unless-stopped
     volumes: '{{ container_volumes }}'
     published_ports: '{{ rec_proxy_ports }}'
-    hostname: '{{ inventory_hostname }}'
     env:
       APP_HOST: '{{ rec_proxy_app_host }}'
       CERTS_PATH: '{{ rec_proxy_certs_path }}'

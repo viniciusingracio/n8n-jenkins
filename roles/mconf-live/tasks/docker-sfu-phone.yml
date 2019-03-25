@@ -4,7 +4,6 @@
     image: '{{ bigbluebutton_docker_sfu_phone_image }}'
     pull: yes
     restart_policy: unless-stopped
-    hostname: '{{ inventory_hostname }}'
     ports:
       - 3011:3011
     env:
