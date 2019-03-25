@@ -12,6 +12,12 @@ filebeat.autodiscover:
         - condition.or:
           - contains.docker.container.name: "sfu-phone"
           - contains.docker.container.name: "webrtc-sfu"
+          - contains.docker.container.name: "kurento"
+          - contains.docker.container.name: "mcs"
+          - contains.docker.container.name: "etherpad"
+          - contains.docker.container.name: "webhooks"
+          - contains.docker.container.name: "suite"
+          - contains.docker.container.name: "mongo"
 
           config:
             - type: docker
@@ -33,6 +39,8 @@ filebeat.inputs:
     fields_under_root: true
     fields:
       syslog: true
+    multiline.pattern: '^%{SYSLOGTIMESTAMP} %{SYSLOGHOST} %{GREEDYDATA}[%{NUMBER}]: [[:space]]'
+    multiline.match: after
 
   - type: log
     paths:
