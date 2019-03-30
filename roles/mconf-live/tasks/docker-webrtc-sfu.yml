@@ -57,6 +57,8 @@
       STUN_IP: '{{ stun_server_ip }}'
       STUN_PORT: '{{ stun_server_port }}'
       # GST_DEBUG: 'Kurento*:5,kms*:5'
+    labels:
+      hostname: '{{ inventory_hostname }}'
   with_items: '{{ kurento_ports }}'
   notify: restart docker components
 
@@ -143,10 +145,13 @@
       STREAM_IMAGE_NAME: mconf/mconf-presentation-recorder:latest
       STREAM_BIGBLUEBUTTON_URL: '{{ bbb_api_entry_point | regex_replace("/api") }}'
       STREAM_BIGBLUEBUTTON_SECRET: '{{ bbb_secret }}'
+      STREAM_BOT_NAME: 'Streaming'
       SFU_PROCESSES: '{{ sfu_processes | to_json }}'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /usr/local/bigbluebutton/bbb-webrtc-sfu/config/client_secret.json:/app/client_secret.json
+    labels:
+      hostname: '{{ inventory_hostname }}'
   notify: restart docker components
 
 - name: Remove old images

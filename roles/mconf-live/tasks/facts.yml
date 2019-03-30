@@ -13,9 +13,11 @@
   register: reg_standalone
 - set_fact:
     bigbluebutton_servlet_dir: /usr/share/bbb-web
+    bigbluebutton_user: bigbluebutton
   when: reg_standalone.stat.exists
 - set_fact:
     bigbluebutton_servlet_dir: /var/lib/tomcat7/webapps/bigbluebutton
+    bigbluebutton_user: tomcat7
   when: not reg_standalone.stat.exists
 
 - name: Get BigBlueButton secret

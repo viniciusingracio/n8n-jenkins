@@ -1,10 +1,34 @@
 #!/usr/bin/ruby
 
+# depends on apt package moreutils
+# run with:
+# ruby gen-all-recordings.rb | ifne sponge /var/bigbluebutton/all_recordings.xml
+
 require 'rubygems'
 require 'nokogiri'
 
+pid_file = "/var/bigbluebutton/all_recordings.pid"
+begin
+    pid = File.read(pid_file).to_i
+    Process.getpgid(pid)
+    # file exists and pid is running, so exit
+    exit 0
+rescue
+    # just keep going
+end
+File.open(pid_file, "w") do |file|
+    file.write(Process.pid)
+end
+
+last_modified_file = "/var/bigbluebutton/all_recordings.out"
+last_modified = `find /var/bigbluebutton/published/ /var/bigbluebutton/unpublished/ /var/bigbluebutton/deleted/ -printf '%T@ %p\n' | sort -n | tail -1`.split("\n").first
+if File.exists? last_modified_file
+    last_modified_recorded = File.read(last_modified_file)
+    exit 0 if last_modified_recorded == last_modified
+end
+
 recordings = {}
-files = `find /var/bigbluebutton/published /var/bigbluebutton/unpublished -name metadata.xml`.split("\n")
+files = `find /var/bigbluebutton/published/ /var/bigbluebutton/unpublished/ -name metadata.xml`.split("\n")
 files.each do |filename|
     metadata = Nokogiri::XML(File.open(filename)) { |x| x.noblanks }
     playback = metadata.at("/recording/playback").remove
@@ -24,14 +48,11 @@ files.each do |filename|
         metadata.at("/recording/end_time").name = "endTime"
         metadata.at("/recording/meta").name = "metadata"
         metadata.at("/recording/raw_size").name = "rawSize"
-        if metadata.at("/recording/published").text == "true"
-            metadata.at("/recording/state").content = "published"
-        else
-            metadata.at("/recording/state").content = "unpublished"
-        end
+        metadata.at("/recording/published").content = (metadata.at("/recording/state").text == "published").to_s
 
         metadata.at("/recording") << "<playback/>"
-        metadata.at("/recording/playback") << "<format><type>#{playback.at('format').text}</type><url>#{playback.at('link').text}</url><processingTime>#{if playback.at('processing_time').nil? ? 0 : playback.at('processing_time').text}</processingTime><size>#{playback.at('size').text}</size><length>#{(playback.at('duration').text.to_f / 60000).to_i}</length></format>"
+        processing_time = playback.at('processing_time').nil? ? 0 : playback.at('processing_time').text
+        metadata.at("/recording/playback") << "<format><type>#{playback.at('format').text}</type><url>#{playback.at('link').text.strip}</url><processingTime>#{processing_time}</processingTime><size>#{playback.at('size').text}</size><length>#{(playback.at('duration').text.to_f / 60000).to_i}</length></format>"
 
         order = [ "recordID", "meetingID", "internalMeetingID", "name", "isBreakout", "published", "state", "startTime", "endTime", "size", "rawSize", "metadata", "playback", "download" ]
         root = metadata.at("/recording")
@@ -41,14 +62,19 @@ files.each do |filename|
         recordings[record_id] = metadata.at("recording")
     else
         recording_node = recordings[record_id]
-        recording_node.at("playback") << "<format><type>#{playback.at('format').text}</type><url>#{playback.at('link').text}</url><processingTime>#{playback.at('processing_time').text}</processingTime><size>#{playback.at('size').text}</size><length>#{(playback.at('duration').text.to_f / 60000).to_i}</length></format>"
+        processing_time = playback.at('processing_time').nil? ? 0 : playback.at('processing_time').text
+        recording_node.at("playback") << "<format><type>#{playback.at('format').text}</type><url>#{playback.at('link').text.strip}</url><processingTime>#{processing_time}</processingTime><size>#{playback.at('size').text}</size><length>#{(playback.at('duration').text.to_f / 60000).to_i}</length></format>"
     end
 end
 
 doc = Nokogiri::XML("<response><returncode>SUCCESS</returncode><recordings/></response>", nil, "UTF-8")
 recordings_node = doc.at("/response/recordings")
 recordings.values.each do |elem|
-  recordings_node.add_child(elem)
+    recordings_node.add_child(elem)
 end
 
 puts doc.to_xml(:indent => 0, :encoding => "UTF-8")
+
+File.open(last_modified_file, "w") do |file|
+    file.write(last_modified)
+end

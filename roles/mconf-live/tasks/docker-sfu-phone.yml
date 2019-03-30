@@ -13,6 +13,8 @@
       SIP_API_ADDRESS: wss://{{ inventory_hostname }}/mcs-sip
       ENABLE_REGISTER: '{{ bigbluebutton_sip_registrar_enabled | string }}'
       ENABLE_FLOOR_N: 'true'
+    labels:
+      hostname: '{{ inventory_hostname }}'
   notify: restart docker components
 
 - name: Remove old images

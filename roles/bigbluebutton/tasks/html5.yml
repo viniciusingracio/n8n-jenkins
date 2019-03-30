@@ -89,5 +89,5 @@
     encoding: '{{ properties_charset }}'
   with_items:
     - { regexp: '^defaultGuestPolicy=.*', replace: 'defaultGuestPolicy=ALWAYS_ACCEPT' }
-    - { regexp: '^svgImagesRequired=.*', replace: 'svgImagesRequired=True' }
+    - { regexp: '^svgImagesRequired=.*', replace: 'svgImagesRequired=true' }
   notify: restart bigbluebutton

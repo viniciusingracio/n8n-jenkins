@@ -138,6 +138,7 @@
       - "{{ bbb_beats_certs_dir }}:/etc/certs:ro"
     labels:
       co.elastic.logs/disable: "true"
+      hostname: '{{ inventory_hostname }}'
 
 - name: Start packetbeat container
   docker_container:
@@ -158,3 +159,4 @@
     network_mode: host
     labels:
       co.elastic.logs/disable: "true"
+      hostname: '{{ inventory_hostname }}'

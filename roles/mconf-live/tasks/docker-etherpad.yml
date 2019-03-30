@@ -8,6 +8,8 @@
       - "3006:9001"
     env:
       SETTINGS_MODIFIER: '.dbSettings.host = "{{ docker_ip }}"'
+    labels:
+      hostname: '{{ inventory_hostname }}'
 
 - name: Remove old images
   shell: docker images {{ bigbluebutton_docker_etherpad_image.split(":")[0] }} --filter 'before={{ bigbluebutton_docker_etherpad_image }}' -q | xargs -r docker rmi --force

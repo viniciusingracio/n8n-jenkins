@@ -68,10 +68,10 @@
   command: docker tag {{ mconf_live_presentation_recorder_image }}:{{ mconf_live_presentation_recorder_version }} {{ mconf_live_presentation_recorder_image }}:latest
   when: presentation_video_enabled
 
-- name: Add tomcat7 to docker group
+- name: Add bigbluebutton user to docker group
   become: true
   user:
-    name: 'tomcat7'
+    name: '{{ bigbluebutton_user }}'
     groups: docker
     append: yes
   when: presentation_video_enabled

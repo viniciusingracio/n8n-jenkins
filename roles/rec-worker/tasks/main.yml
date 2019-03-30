@@ -51,3 +51,5 @@
       HOST_ADDRESS: '{{ ansible_default_ipv4.address }}'
       HOST_USER: '{{ deploy_user }}'
       QUEUE: '{{ rec_worker_queues }}'
+    labels:
+      hostname: '{{ inventory_hostname }}'

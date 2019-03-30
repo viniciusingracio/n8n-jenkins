@@ -39,6 +39,8 @@
       - 80:80
     # auto_remove: true # on ansible 2.4
     detach: false
+    labels:
+      hostname: '{{ inventory_hostname }}'
   when: port_80.rc == 1 # port not used
 
 
@@ -58,6 +60,8 @@
       - /var/log/letsencrypt:/var/log/letsencrypt
     # auto_remove: true # on ansible 2.4
     detach: false
+    labels:
+      hostname: '{{ inventory_hostname }}'
   when: port_80.rc == 0
 
 

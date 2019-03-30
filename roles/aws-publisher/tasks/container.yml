@@ -42,6 +42,8 @@
       BBB_AWS_KEEP_LOCAL: '{{ aws_publisher_keep_local }}'
       BBB_AWS_REDIS_HOST: '{{ docker_ip.stdout }}'
       BBB_AWS_FAST_RESYNC: '{{ aws_publisher_fast_resync }}'
+    labels:
+      hostname: '{{ inventory_hostname }}'
 
 
 # sudo tc qdisc add dev `ifconfig | grep veth | tail -1 | awk '{print $1; exit}'` root tbf rate 100kbit latency 50ms burst 800000

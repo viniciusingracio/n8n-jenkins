@@ -55,6 +55,8 @@
       SIP_DEFAULT_GATEWAY: '{{ bigbluebutton_sip_default_gateway | default(bigbluebutton_sip_registrar_address, true) }}'
       ENABLE_MCS_BFCP: "true"
       MCS_BFCP_ADDRESS: 'ws://{{ ansible_default_ipv4.address }}:8000'
+    labels:
+      hostname: '{{ inventory_hostname }}'
   notify: restart docker components
 
 - name: Remove old images
