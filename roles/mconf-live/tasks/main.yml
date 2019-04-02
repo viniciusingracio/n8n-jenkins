@@ -58,3 +58,11 @@
 
 - include: docker-mcs-bfcp.yml
   when: bigbluebutton_docker_mcs_bfcp_enabled
+
+- name: Install basic stats
+  become: true
+  apt:
+    name: mconf-basic-stats
+    state: 'latest'
+  # this package is only available on 2.2
+  ignore_errors: yes
