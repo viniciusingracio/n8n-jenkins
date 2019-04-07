@@ -31,7 +31,10 @@ recordings = {}
 files = `find /var/bigbluebutton/published/ /var/bigbluebutton/unpublished/ -name metadata.xml`.split("\n")
 files.each do |filename|
     metadata = Nokogiri::XML(File.open(filename)) { |x| x.noblanks }
-    playback = metadata.at("/recording/playback").remove
+    playback_node = metadata.at("/recording/playback")
+    playback = playback_node.remove if ! playback_node.nil?
+    download_node = metadata.at("/recording/download")
+    download = download_node.remove if ! download_node.nil?
 
     record_id = metadata.at('/recording/id').text
     if ! recordings.has_key?(record_id)
@@ -51,8 +54,7 @@ files.each do |filename|
         metadata.at("/recording/published").content = (metadata.at("/recording/state").text == "published").to_s
 
         metadata.at("/recording") << "<playback/>"
-        processing_time = playback.at('processing_time').nil? ? 0 : playback.at('processing_time').text
-        metadata.at("/recording/playback") << "<format><type>#{playback.at('format').text}</type><url>#{playback.at('link').text.strip}</url><processingTime>#{processing_time}</processingTime><size>#{playback.at('size').text}</size><length>#{(playback.at('duration').text.to_f / 60000).to_i}</length></format>"
+        metadata.at("/recording") << "<download/>"
 
         order = [ "recordID", "meetingID", "internalMeetingID", "name", "isBreakout", "published", "state", "startTime", "endTime", "size", "rawSize", "metadata", "playback", "download" ]
         root = metadata.at("/recording")
@@ -60,21 +62,27 @@ files.each do |filename|
         sorted.each{ |e| root << e }
 
         recordings[record_id] = metadata.at("recording")
-    else
-        recording_node = recordings[record_id]
-        processing_time = playback.at('processing_time').nil? ? 0 : playback.at('processing_time').text
-        recording_node.at("playback") << "<format><type>#{playback.at('format').text}</type><url>#{playback.at('link').text.strip}</url><processingTime>#{processing_time}</processingTime><size>#{playback.at('size').text}</size><length>#{(playback.at('duration').text.to_f / 60000).to_i}</length></format>"
+    end
+
+    recording_node = recordings[record_id]
+    if ! playback.nil?
+      processing_time = playback.at('processing_time').nil? ? 0 : playback.at('processing_time').text
+      recording_node.at("playback") << "<format><type>#{playback.at('format').text}</type><url>#{playback.at('link').text.strip}</url><processingTime>#{processing_time}</processingTime><size>#{playback.at('size').text}</size><length>#{(playback.at('duration').text.to_f / 60000).to_i}</length></format>"
+    end
+    if ! download.nil?
+      recording_node.at("download") << "<format><type>#{download.at('format').text}</type><url>#{download.at('link').text.strip}</url><processingTime>#{processing_time}</processingTime><size>#{download.at('size').text}</size><md5>#{download.at('md5').text}</md5><key>#{download.at('key').text}</key></format>"
     end
 end
 
 doc = Nokogiri::XML("<response><returncode>SUCCESS</returncode><recordings/></response>", nil, "UTF-8")
 recordings_node = doc.at("/response/recordings")
 recordings.values.each do |elem|
-    recordings_node.add_child(elem)
+  recordings_node.add_child(elem)
 end
 
 puts doc.to_xml(:indent => 0, :encoding => "UTF-8")
 
 File.open(last_modified_file, "w") do |file|
-    file.write(last_modified)
+  file.write(last_modified)
 end
+

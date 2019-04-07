@@ -15,8 +15,8 @@
   file:
     path: /var/bigbluebutton/recording/status/sanity_{{ hostvars[item].nfs_name }}
     state: directory
-    owner: tomcat7
-    group: tomcat7
+    owner: '{{ bigbluebutton_user }}'
+    group: '{{ bigbluebutton_user }}'
   with_items: "{{ groups['mconf-recw'] }}"
 
 - name: Remove sanity dir
