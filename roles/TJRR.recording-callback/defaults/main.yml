@@ -1,0 +1,8 @@
+---
+
+recording_callback_enabled: false
+recording_callback_db_host:
+recording_callback_db_username:
+recording_callback_db_password:
+recording_callback_db_database:
+recording_callback_uri:

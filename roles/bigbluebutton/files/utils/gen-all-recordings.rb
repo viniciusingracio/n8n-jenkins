@@ -43,8 +43,8 @@ files.each do |filename|
         metadata.at("/recording") << "<internalMeetingID>#{metadata.at('/recording/recordID').text}</internalMeetingID>"
         metadata.at("/recording") << "<name>#{metadata.at('/recording/meta/meetingName').text}</name>"
         metadata.at("/recording") << "<isBreakout>#{metadata.at('/recording/meeting').attr('breakout')}</isBreakout>"
-        [ "metadataXml", "meetingId", "meetingName", "breakout", "meeting", "participants", "download" ].each do |node|
-          metadata.at("/recording/#{node}").remove if not metadata.at("/recording/#{node}").nil?
+        [ "metadataXml", "meetingId", "meetingName", "breakout", "meeting" ].each do |node|
+            metadata.at("/recording/#{node}").remove if not metadata.at("/recording/#{node}").nil?
         end
 
         metadata.at("/recording/start_time").name = "startTime"
@@ -55,8 +55,9 @@ files.each do |filename|
 
         metadata.at("/recording") << "<playback/>"
         metadata.at("/recording") << "<download/>"
+        metadata.at("/recording") << "<size>0</size>"
 
-        order = [ "recordID", "meetingID", "internalMeetingID", "name", "isBreakout", "published", "state", "startTime", "endTime", "size", "rawSize", "metadata", "playback", "download" ]
+        order = [ "recordID", "meetingID", "internalMeetingID", "name", "isBreakout", "published", "state", "startTime", "endTime", "participants", "rawSize", "metadata", "size", "playback", "download" ]
         root = metadata.at("/recording")
         sorted = root.children.sort_by{ |e| order.index(e.name) || order.length }
         sorted.each{ |e| root << e }
@@ -66,23 +67,38 @@ files.each do |filename|
 
     recording_node = recordings[record_id]
     if ! playback.nil?
-      processing_time = playback.at('processing_time').nil? ? 0 : playback.at('processing_time').text
-      recording_node.at("playback") << "<format><type>#{playback.at('format').text}</type><url>#{playback.at('link').text.strip}</url><processingTime>#{processing_time}</processingTime><size>#{playback.at('size').text}</size><length>#{(playback.at('duration').text.to_f / 60000).to_i}</length></format>"
+        playback.name = "format"
+        playback.at("format").name = "type"
+        playback.at("link").name = "url"
+        playback.at("processing_time").name = "processingTime" if ! playback.at("processing_time").nil?
+        playback.at("duration").content = (playback.at('duration').text.to_f / 60000).to_i
+        playback.at("duration").name = "length"
+        if ! playback.at("extensions").nil?
+            playback.at("extensions").children.each { |child| child.parent = playback }
+            playback.at("extensions").remove
+        end
+        playback.at("extension").remove if ! playback.at("extension").nil?
+        recording_node.at("size").content = recording_node.at("size").text.to_i + playback.at("size").text.to_i
+        recording_node.at("playback") << playback
     end
-    if ! download.nil?
-      recording_node.at("download") << "<format><type>#{download.at('format').text}</type><url>#{download.at('link').text.strip}</url><processingTime>#{processing_time}</processingTime><size>#{download.at('size').text}</size><md5>#{download.at('md5').text}</md5><key>#{download.at('key').text}</key></format>"
+    if ! download.nil? && download.children.length > 0
+        download.name = "format"
+        download.at("format").name = "type"
+        download.at("link").name = "url"
+        download.at("processing_time").name = "processingTime" if ! playback.at("processing_time").nil?
+        recording_node.at("size").content = recording_node.at("size").text.to_i + download.at("size").text.to_i
+        recording_node.at("download") << download
     end
 end
 
 doc = Nokogiri::XML("<response><returncode>SUCCESS</returncode><recordings/></response>", nil, "UTF-8")
 recordings_node = doc.at("/response/recordings")
 recordings.values.each do |elem|
-  recordings_node.add_child(elem)
+    recordings_node.add_child(elem)
 end
 
 puts doc.to_xml(:indent => 0, :encoding => "UTF-8")
 
 File.open(last_modified_file, "w") do |file|
-  file.write(last_modified)
+    file.write(last_modified)
 end
-
