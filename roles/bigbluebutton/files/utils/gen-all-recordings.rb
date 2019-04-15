@@ -85,7 +85,7 @@ files.each do |filename|
         download.name = "format"
         download.at("format").name = "type"
         download.at("link").name = "url"
-        download.at("processing_time").name = "processingTime" if ! playback.at("processing_time").nil?
+        download.at("processing_time").name = "processingTime" if ! download.at("processing_time").nil?
         recording_node.at("size").content = recording_node.at("size").text.to_i + download.at("size").text.to_i
         recording_node.at("download") << download
     end

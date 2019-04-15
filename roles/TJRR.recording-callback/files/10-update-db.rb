@@ -18,12 +18,12 @@ BigBlueButton.logger = logger
 opts = Trollop::options do
   opt :meeting_id, "Meeting id to archive", :type => String
 end
-meeting_id = opts[:meeting_id]
+record_id = opts[:meeting_id]
 
-metadata_xml = "/var/bigbluebutton/published/presentation/#{meeting_id}/metadata.xml"
+metadata_xml = "/var/bigbluebutton/published/presentation/#{record_id}/metadata.xml"
 exit 0 if ! File.exists? metadata_xml
 
-props = YAML::load(File.open(File.expand_path('10-update-db.yml', __FILE__)))
+props = YAML::load(File.open(File.expand_path('../10-update-db.yml', __FILE__)))
 db_username = props['db_username']
 db_password = props['db_password']
 db_database = props['db_database']
@@ -65,14 +65,15 @@ else
 end
 
 now = DateTime.now.strftime('%Y-%m-%d %H:%M:%S')
+meeting_id = doc["recording"]["meta"]["meetingId"]
 
 data = {
-  "recordId" => meeting_id,
+  "recordId" => record_id,
   "createdAt" => now,
   "updatedAt" => now,
   "serverId" => server_id,
   "serverType" => server_type,
-  "meetingId" => doc["recording"]["meta"]["meetingId"],
+  "meetingId" => meeting_id,
   "name" => doc["recording"]["meta"]["meetingName"],
   "published" => doc["recording"]["published"] ? 1 : 0,
   "startTime" => doc["recording"]["start_time"],
@@ -112,10 +113,10 @@ end
 end
 
 begin
-  results = client.query("SELECT id FROM Recordings WHERE recordId = \"#{meeting_id}\";")
+  results = client.query("SELECT id FROM Recordings WHERE recordId = \"#{record_id}\";")
   if results.count > 0
     update_fields = data.select{ |k, v| [ "updateAt", "serverId", "serverType", "playback", "size", "metadata" ].include?(k) }.map{ |k, v| "#{k} = \"#{client.escape(v.to_s)}\""}.join(", ")
-    query = "UPDATE Recordings SET #{update_fields} WHERE recordId = \"#{meeting_id}\";"
+    query = "UPDATE Recordings SET #{update_fields} WHERE recordId = \"#{record_id}\";"
     BigBlueButton.logger.info "Running #{query}"
     results = client.query(query)
   else
@@ -137,3 +138,4 @@ rescue => e
   BigBlueButton.logger.info("Rescued")
   BigBlueButton.logger.info(e.to_s)
 end
+

@@ -1,7 +1,7 @@
 ---
 
 - name:
-  become: true
+  become: yes
   apt:
     name: libmysqlclient-dev
     state: latest
@@ -10,18 +10,19 @@
     name: mysql2
     version: 0.5.2
     state: present
-  become: true
+    user_install: no
+  become: yes
 
 - copy:
     src: files/10-update-db.rb
     dest: /usr/local/bigbluebutton/core/scripts/post_publish/10-update-db.rb
-  become: true
+  become: yes
   when: recording_callback_enabled
 
 - template:
     src: templates/10-update-db.yml.j2
     dest: /usr/local/bigbluebutton/core/scripts/post_publish/10-update-db.yml
-  become: true
+  become: yes
   when: recording_callback_enabled
 
 - file:
@@ -30,5 +31,5 @@
   with_items:
     - /usr/local/bigbluebutton/core/scripts/post_publish/10-update-db.rb
     - /usr/local/bigbluebutton/core/scripts/post_publish/10-update-db.yml
-  become: true
+  become: yes
   when: not recording_callback_enabled

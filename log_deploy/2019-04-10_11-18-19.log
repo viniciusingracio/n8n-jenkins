@@ -1,0 +1,4 @@
+/usr/bin/ansible-playbook -i envs/prod/redclara/hosts -l reuna provision.yml -T 180 --force-handlers
+
+mconf-live01.reuna.cl: 216 OK, 47 changed, 0 unreachable, 0 failed
+mconf-rec01.reuna.cl: 22 OK, 2 changed, 0 unreachable, 1 failed

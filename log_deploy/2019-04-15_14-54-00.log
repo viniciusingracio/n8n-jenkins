@@ -1,0 +1,4 @@
+/usr/bin/ansible-playbook -v -i envs/prod/tjrr-staging/hosts -l mconf-live200 provision.yml -T 180 --force-handlers
+
+hlive01-vc.tjrr.jus.br: 116 OK, 24 changed, 0 unreachable, 0 failed
+hlive02-vc.tjrr.jus.br: 116 OK, 24 changed, 0 unreachable, 0 failed
