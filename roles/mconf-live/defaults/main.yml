@@ -41,8 +41,9 @@ bigbluebutton_docker_suite_enabled: false
 bigbluebutton_docker_suite_image: mconf/suite:suite-bbb-webrtc-sfu-2.4.0dev
 bigbluebutton_docker_suite_password: suite
 
-bigbluebutton_docker_kurento_enabled: true
+bigbluebutton_docker_kurento_enabled: false
 bigbluebutton_docker_kurento_instances:
+bigbluebutton_docker_kurento_first_port: 3100
 bigbluebutton_docker_kurento_image: mconf/kurento:bbb220-dev
 
 bigbluebutton_sip_default_gateway:

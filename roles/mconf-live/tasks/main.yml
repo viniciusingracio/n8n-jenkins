@@ -51,6 +51,9 @@
   tags:
     - suite
 
+- include: docker-kurento.yml
+  when: bigbluebutton_docker_kurento_enabled
+
 - include: docker-webrtc-sfu.yml
   when: bigbluebutton_docker_webrtc_sfu_enabled
   tags:
