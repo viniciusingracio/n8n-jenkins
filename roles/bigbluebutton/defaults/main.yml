@@ -164,7 +164,7 @@ bigbluebutton_html5_external_log_method: POST
 bigbluebutton_html5_external_log_throttle: 5000
 
 bigbluebutton_docker_webrtc_sfu_enabled: false
-bigbluebutton_docker_webhooks_image: mconf/bbb-webhooks:latest
+bigbluebutton_docker_webhooks_image: mconf/bbb-webhooks:dev-13fffcc
 bigbluebutton_docker_webhooks_permanent_hooks: []
 
 external_ip:

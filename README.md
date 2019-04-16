@@ -83,6 +83,8 @@ ansible all -v -i envs/prod/tjrr/hosts -l mconf-live200 --extra-vars "ansible_us
 ansible all -v -i envs/prod/tjrr/hosts -l mconf-recw --extra-vars "ansible_user=mconf" --become -m raw -a 'umount -a -t nfs4'
 ansible all -v -i envs/prod/tjrr/hosts -l mconf-recw --extra-vars "ansible_user=mconf" --become -m raw -a 'mount -a'
 
+# print api-mate URL
+ansible all -v -i envs/prod/tjrr/hosts -l mconf-live200,mconf-rec --extra-vars "ansible_user=mconf" --become -m raw -a 'export LC_ALL=C; bbb-conf --salt' | grep 'api-mate'
 ```
 
 ### Other playbooks

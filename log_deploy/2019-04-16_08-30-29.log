@@ -1,0 +1,14 @@
+/usr/bin/ansible-playbook -v -i envs/prod/tjrr/hosts -l mconf-live200,mconf-rec,mconf-recw provision.yml -T 180 --force-handlers
+
+fcr-vc.tjrr.jus.br: 249 OK, 73 changed, 0 unreachable, 0 failed
+fcv-vc.tjrr.jus.br: 249 OK, 73 changed, 0 unreachable, 0 failed
+live01-vc.tjrr.jus.br: 250 OK, 76 changed, 0 unreachable, 0 failed
+live02-vc.tjrr.jus.br: 250 OK, 76 changed, 0 unreachable, 0 failed
+live03-vc.tjrr.jus.br: 250 OK, 76 changed, 0 unreachable, 0 failed
+live04-vc.tjrr.jus.br: 250 OK, 76 changed, 0 unreachable, 0 failed
+pac-vc.tjrr.jus.br: 249 OK, 76 changed, 0 unreachable, 0 failed
+pjs-vc.tjrr.jus.br: 249 OK, 76 changed, 0 unreachable, 0 failed
+rec-vc.tjrr.jus.br: 239 OK, 55 changed, 0 unreachable, 0 failed
+recw01-vc.tjrr.jus.br: 207 OK, 56 changed, 0 unreachable, 0 failed
+recw02-vc.tjrr.jus.br: 207 OK, 56 changed, 0 unreachable, 0 failed
+vij-vc.tjrr.jus.br: 249 OK, 76 changed, 0 unreachable, 0 failed
