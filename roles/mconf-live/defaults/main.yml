@@ -20,7 +20,7 @@ mconf_live_rec_proxy_jwt_secret:
 mconf_live_sounds_hold_music:
 
 mconf_live_presentation_recorder_image: mconf/mconf-presentation-recorder
-mconf_live_presentation_recorder_version: 0.0.6-662a346
+mconf_live_presentation_recorder_version: 0.0.7-88edbff
 
 # these attributes are optional and will be set to default values if empty
 mconf_live_recording_auth_entry_point:
@@ -44,7 +44,7 @@ bigbluebutton_docker_suite_password: suite
 bigbluebutton_docker_kurento_enabled: false
 bigbluebutton_docker_kurento_instances:
 bigbluebutton_docker_kurento_first_port: 3100
-bigbluebutton_docker_kurento_image: mconf/kurento:bbb220-dev
+bigbluebutton_docker_kurento_image: mconf/kurento:6.10.0-bbb220-dev
 
 bigbluebutton_sip_default_gateway:
 bigbluebutton_sip_registrar_enabled: false
