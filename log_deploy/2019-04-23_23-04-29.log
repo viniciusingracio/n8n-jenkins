@@ -1,0 +1,5 @@
+/usr/bin/ansible-playbook -v -i envs/prod/redclara/hosts -l mconf-live1.redclara.net,vce-live2.cedia.org.ec,vce-live1.conare.ac.cr provision.yml -T 180 --force-handlers
+
+mconf-live1.redclara.net: 231 OK, 108 changed, 0 unreachable, 0 failed
+vce-live1.conare.ac.cr: 181 OK, 56 changed, 0 unreachable, 0 failed
+vce-live2.cedia.org.ec: 186 OK, 60 changed, 0 unreachable, 0 failed

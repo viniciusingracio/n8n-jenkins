@@ -71,8 +71,8 @@ files.each do |filename|
         playback.at("format").name = "type"
         playback.at("link").name = "url"
         playback.at("processing_time").name = "processingTime" if ! playback.at("processing_time").nil?
-        playback.at("duration").content = (playback.at('duration').text.to_f / 60000).to_i
-        playback.at("duration").name = "length"
+        playback.at("duration").content = (playback.at('duration').text.to_f / 60000).to_i if ! playback.at('duration').nil?
+        playback.at("duration").name = "length" if ! playback.at('duration').nil?
         if ! playback.at("extensions").nil?
             playback.at("extensions").children.each { |child| child.parent = playback }
             playback.at("extensions").remove

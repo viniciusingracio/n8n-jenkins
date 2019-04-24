@@ -1,0 +1,4 @@
+/usr/bin/ansible-playbook -v -i envs/prod/redclara/hosts -l redclara-live,redclara-rec provision.yml -T 180 --force-handlers
+
+mconf-live2.redclara.net: 231 OK, 113 changed, 0 unreachable, 0 failed
+mconf-recordings.redclara.net: 70 OK, 23 changed, 0 unreachable, 1 failed

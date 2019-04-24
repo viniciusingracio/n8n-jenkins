@@ -33,6 +33,7 @@ bigbluebutton_docker_etherpad_enabled: true
 bigbluebutton_docker_mcs_sip_enabled: true
 bigbluebutton_docker_mcs_sip_image: mconf/mcs-sip:v2.3.2-invite-with-sdp
 bigbluebutton_docker_mcs_bfcp_enabled: true
+bigbluebutton_webhooks: true
 bigbluebutton_docker_webhooks_permanent_hooks:
   - url: https://webhook.d.mconf.rnp.br
     getRaw: false
@@ -66,6 +67,7 @@ bigbluebutton_html5_config_yml:
   - { key: 'public.app.copyright', value: '{{ bigbluebutton_branding_copyright_html5 }}' }
   - { key: 'public.app.defaultSettings.application.chatPushAlerts', value: true }
   - { key: 'public.app.showHelpButton', value: false }
+  - { key: 'public.clientLog.console.level', value: 'info' }
   - { key: 'public.acl.enabled', value: false }
   - { key: 'public.app.enableSIP', value: '{{ bigbluebutton_sip }}' }
   - { key: 'public.app.enableExternalVideo', value: 'true' }
@@ -85,7 +87,7 @@ bigbluebutton_sounds_profile:
 bigbluebutton_notes_multiple_enabled: true
 
 bigbluebutton_streaming_enabled: true
-bigbluebutton_streaming_secret: {"web":{"client_id":"815163372732-b18hbpmhj33atj201b2nuj91cc3k25iq.apps.googleusercontent.com","project_id":"mconf-streaming-oauth","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"7evKbFJE9F2Zl4KMLTTJi6sy","redirect_uris":["https://test-live220.dev.mconf.com/oauth2_redirect"],"javascript_origins":["https://test-live220.dev.mconf.com"]}}
+bigbluebutton_streaming_secret: {"web":{"client_id":"815163372732-b18hbpmhj33atj201b2nuj91cc3k25iq.apps.googleusercontent.com","project_id":"mconf-streaming-oauth","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"7evKbFJE9F2Zl4KMLTTJi6sy","redirect_uris":["https://{{ inventory_hostname }}/oauth2_redirect"],"javascript_origins":["https://{{ inventory_hostname }}"]}}
 
 bigbluebutton_sip_default_gateway: sip.mconf.com
 bigbluebutton_sip_registrar_enabled: true

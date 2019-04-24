@@ -13,6 +13,7 @@ mconf_live_num_presentation_recorders: 1
 
 mconf_live_rec_proxy_http_port: 8091
 mconf_live_rec_proxy_enabled: false
+mconf_live_rec_fallback:
 mconf_live_rec_proxy_api_enabled: false
 mconf_live_rec_proxy_image_version: latest
 mconf_live_rec_proxy_jwt_secret:
