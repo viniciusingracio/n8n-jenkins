@@ -51,6 +51,11 @@ filebeat.inputs:
     multiline.pattern: '.*'
     multiline.match: after
 
+    ignore_older: 119m
+    clean_inactive: 120m
+    close_timeout: 5m
+    scan_frequency: 20s
+
   - type: log
     paths:
       - /hostfs/var/log/nginx/html5-client.log

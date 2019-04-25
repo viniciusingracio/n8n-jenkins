@@ -128,7 +128,8 @@
     user: root
     hostname: '{{ inventory_hostname }}'
     command: "-e --strict.perms=false -E output.logstash.hosts=[\"{{ bbb_beats_logstash_url }}\"]"
-    memory: 100m
+    memory: 200m
+    cpu_shares: 100
     volumes:
       - "/var/log/:/hostfs/var/log:ro"
       - "/var/bigbluebutton:/hostfs/var/bigbluebutton:ro"
@@ -149,7 +150,8 @@
     user: packetbeat
     hostname: '{{ inventory_hostname }}'
     command: "-e --strict.perms=false -c /usr/share/filebeat/packetbeat.yml -E output.logstash.hosts=[\"{{ bbb_beats_logstash_url }}\"]"
-    memory: 100m
+    memory: 200m
+    cpu_shares: 100
     volumes:
       - "{{ bbb_beats_conf_dir }}/packetbeat.yml:/usr/share/filebeat/packetbeat.yml:ro"
       - "{{ bbb_beats_certs_dir }}:/etc/certs:ro"
