@@ -79,6 +79,8 @@
       STREAM_BIGBLUEBUTTON_SECRET: '{{ bbb_secret }}'
       STREAM_BOT_NAME: 'Streaming'
       SFU_PROCESSES: '{{ sfu_processes | to_json }}'
+      CODEC_VIDEO_MAIN: '{{ bigbluebutton_docker_webrtc_sfu_codec_main }}'
+      CODEC_VIDEO_CONTENT: '{{ bigbluebutton_docker_webrtc_sfu_codec_content }}'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /usr/local/bigbluebutton/bbb-webrtc-sfu/config/client_secret.json:/app/client_secret.json
