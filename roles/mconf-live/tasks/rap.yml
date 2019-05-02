@@ -1,20 +1,13 @@
 - set_fact:
     presentation_video_enabled: '"presentation_video" in mconf_live_enabled_recording_formats'
 
-- set_fact:
-    recorder_address: '{{ docker_ip }}'
-  when: mconf_live_recording_auth_same_machine
-- set_fact:
-    recorder_address: '{{ mconf_live_recording_auth_local_address | default(ansible_default_ipv4.address, true) }}'
-  when: not mconf_live_recording_auth_same_machine
-
 - name: Adjust mconf-presentation-recorder.yml
   yedit:
     src: /usr/local/bigbluebutton/core/scripts/mconf-presentation-recorder.yml
     edits:
       - { key: 'api_entry_point', value: '{{ mconf_live_recording_auth_entry_point | default(bbb_api_entry_point, true) }}' }
       - { key: 'api_shared_secret', value: '{{ mconf_live_recording_auth_secret | default(bbb_secret, true) }}' }
-      - { key: 'local_address', value: '{{ recorder_address }}' }
+      - { key: 'local_address', value: '{{ mconf_live_recording_auth_local_address | default(ansible_default_ipv4.address, true) }}' }
       - { key: 'simultaneous_meetings', value: '{{ mconf_live_num_presentation_recorders }}' }
     state: present
   become: yes

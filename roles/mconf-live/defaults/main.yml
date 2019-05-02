@@ -27,8 +27,6 @@ mconf_live_presentation_recorder_version: 0.0.6-662a346
 mconf_live_recording_auth_entry_point:
 mconf_live_recording_auth_secret:
 mconf_live_recording_auth_local_address:
-# set to true if rec-proxy and presentation-recorder will run on the same machine
-mconf_live_recording_auth_same_machine: false
 
 bigbluebutton_docker_webrtc_sfu_enabled: false
 bigbluebutton_docker_webrtc_sfu_image: mconf/bbb-webrtc-sfu:v2.3.6
