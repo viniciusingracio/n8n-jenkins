@@ -118,23 +118,6 @@
     state: link
   become: yes
 
-- name: Customize bigbluebutton.properties
-  replace:
-    path: '{{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties'
-    regexp: '{{ item.regexp }}'
-    replace: '{{ item.replace }}'
-    encoding: '{{ properties_charset }}'
-  with_items:
-    - { regexp: '^(defaultWelcomeMessage)=.*', replace: '\1={{ bigbluebutton_branding_welcome }}' }
-    - { regexp: '^(defaultWelcomeMessageFooter)=.*', replace: '\1={{ bigbluebutton_branding_welcome_footer }}' }
-    - { regexp: '^(defaultClientUrl)=.*', replace: '\1=${bigbluebutton.web.serverURL}/client/Mconf-Live.html' }
-    - { regexp: '^(attendeesJoinViaHTML5Client)=.*', replace: '\1={{ bigbluebutton_html5_only }}' }
-    - { regexp: '^(moderatorsJoinViaHTML5Client)=.*', replace: '\1={{ bigbluebutton_html5_only }}' }
-    - { regexp: '^(keepEvents)=.*', replace: '\1=true' }
-  when: not item.replace is none
-  become: yes
-  notify: restart bigbluebutton
-
 - name: Customize blinker
   replace:
     path: /var/www/bigbluebutton/client/lib/bbb_blinker.js

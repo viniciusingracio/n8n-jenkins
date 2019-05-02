@@ -129,12 +129,16 @@
     state: '{{ bigbluebutton_apt_state }}'
   when: not bigbluebutton_docker_webrtc_sfu_enabled
 
+- name: Auto-remove to avoid no space left on /boot
+  become: true
+  apt:
+    autoremove: true
+    autoclean: true
+
 - name: Upgrade packages to make sure BigBlueButton packages are updated
   become: true
   apt:
     upgrade: safe
-    autoremove: true
-    autoclean: true
   when: bigbluebutton_apt_state == 'latest'
   notify: restart bigbluebutton
 
@@ -347,6 +351,17 @@
       - { regexp: 'http[s]?:\/\/{{ ansible_default_ipv4.address }}', replace: 'https://{{ inventory_hostname }}' }
       - { regexp: 'rtmp:\/\/{{ ansible_default_ipv4.address }}', replace: 'rtmp://{{ inventory_hostname }}' }
   ignore_errors: yes
+  become: yes
+  notify: restart bigbluebutton
+
+- name: Customize bigbluebutton.properties
+  replace:
+    path: '{{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties'
+    regexp: '^({{ item.key }})=.*'
+    replace: '\1={{ item.value }}'
+    encoding: '{{ properties_charset }}'
+  with_items: '{{ bigbluebutton_properties_config }}'
+  when: not item.value is none
   become: yes
   notify: restart bigbluebutton
 
