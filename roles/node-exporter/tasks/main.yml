@@ -11,5 +11,7 @@
     pid_mode: host
     volumes:
       - /:/host:ro,rslave
+    labels:
+      hostname: '{{ inventory_hostname }}'
   notify:
     - clean docker

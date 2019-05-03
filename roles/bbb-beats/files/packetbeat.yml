@@ -1,0 +1,9 @@
+packetbeat.protocols.redis:
+  ports: [6379]
+
+output.logstash:
+  hosts: '${LOGSTASH_HOSTS:}'
+  ssl:
+    certificate_authorities: ["/etc/certs/ca.crt"]
+    certificate: "/etc/certs/beat.crt"
+    key: "/etc/certs/beat.key"

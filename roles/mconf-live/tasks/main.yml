@@ -1,6 +1,22 @@
 - include: etherpad-dummy.yml
   when: bigbluebutton_docker_etherpad_enabled
 
+- stat:
+    path: /etc/apt/sources.list.d/mconf-live.list
+  register: mconf_repo_file
+
+- stat:
+    path: /etc/apt/sources.list.d/bigbluebutton.list
+  register: bigbluebutton_repo_file
+
+- fail:
+    msg: Don't know what to do when mconf-live.list and bigbluebutton.list exist
+  when: mconf_repo_file.stat.exists and bigbluebutton_repo_file.stat.exists
+
+- command: mv /etc/apt/sources.list.d/mconf-live.list /etc/apt/sources.list.d/bigbluebutton.list
+  become: yes
+  when: mconf_repo_file.stat.exists
+
 - include_role:
     name: bigbluebutton
   tags: always
@@ -30,6 +46,14 @@
 - include: docker-sfu-phone.yml
   when: bigbluebutton_docker_mcs_sip_enabled
 
+- include: docker-suite.yml
+  when: bigbluebutton_docker_suite_enabled
+  tags:
+    - suite
+
+- include: docker-kurento.yml
+  when: bigbluebutton_docker_kurento_enabled
+
 - include: docker-webrtc-sfu.yml
   when: bigbluebutton_docker_webrtc_sfu_enabled
   tags:
@@ -37,3 +61,11 @@
 
 - include: docker-mcs-bfcp.yml
   when: bigbluebutton_docker_mcs_bfcp_enabled
+
+- name: Install basic stats
+  become: true
+  apt:
+    name: mconf-basic-stats
+    state: 'latest'
+  # this package is only available on 2.2
+  ignore_errors: yes

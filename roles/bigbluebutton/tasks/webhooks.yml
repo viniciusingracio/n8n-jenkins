@@ -14,7 +14,7 @@
 - name: Start bbb-webhooks container
   docker_container:
     name: webhooks
-    image: mconf/bbb-webhooks:latest
+    image: '{{ bigbluebutton_docker_webhooks_image }}'
     pull: yes
     restart_policy: unless-stopped
     ports:
@@ -22,8 +22,11 @@
     env:
       REDIS_HOST: '{{ docker_ip }}'
       SHARED_SECRET: '{{ bbb_secret }}'
-      BEARER_AUTH: 1
+      BEARER_AUTH: '1'
       SERVER_DOMAIN: '{{ inventory_hostname }}'
+      PERMANENT_HOOKS: '{{ bigbluebutton_docker_webhooks_permanent_hooks | to_json }}'
+    labels:
+      hostname: '{{ inventory_hostname }}'
     state: '{% if bigbluebutton_webhooks %}started{% else %}absent{% endif %}'
 
 - name: Add webhooks to nginx

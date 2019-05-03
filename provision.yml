@@ -187,6 +187,15 @@
   - bigbluebutton-prometheus
   - node-exporter
 
+# Bigbluebutton beats
+- hosts: bbb-beats
+  roles:
+  - bbb-beats
+
+- hosts: recw-callback
+  roles:
+  - TJRR.recording-callback
+
 - hosts: all
   roles:
   - { role: reboot, tags: always }

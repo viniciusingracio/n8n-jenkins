@@ -19,3 +19,6 @@ aws_publisher_remote_playback: 0
 aws_publisher_remote_playback_url:
 aws_publisher_available_formats: presentation,presentation_video
 aws_publisher_keep_local: 1
+aws_publisher_fast_resync: 0
+
+aws_publisher_run_resync: false

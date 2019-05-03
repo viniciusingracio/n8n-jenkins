@@ -21,3 +21,5 @@
     restart_policy: unless-stopped
     volumes:
       - '/root/mconf-aggr-config.json:/usr/src/mconf-aggr/config/config.json'
+    labels:
+      hostname: '{{ inventory_hostname }}'

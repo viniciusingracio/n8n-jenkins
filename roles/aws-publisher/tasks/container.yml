@@ -42,6 +42,33 @@
       BBB_AWS_KEEP_LOCAL: '{{ aws_publisher_keep_local }}'
       BBB_AWS_REDIS_HOST: '{{ docker_ip.stdout }}'
       BBB_AWS_FAST_RESYNC: '{{ aws_publisher_fast_resync }}'
+    labels:
+      hostname: '{{ inventory_hostname }}'
+
+- name: Resync recordings
+  docker_container:
+    command: bundle exec ruby s3.rb --resync
+    name: mconf-aws-publisher-resync
+    image: '{{ aws_publisher_image }}:{{ aws_publisher_image_version }}'
+    pull: yes
+    volumes:
+      - /var/bigbluebutton:/var/bigbluebutton
+      - /var/log/bigbluebutton:/var/log/bigbluebutton
+    env:
+      BBB_AWS_REGION: '{{ aws_publisher_region }}'
+      BBB_AWS_KEY: '{{ aws_publisher_key }}'
+      BBB_AWS_SECRET: '{{ aws_publisher_secret }}'
+      BBB_AWS_BUCKET: '{{ aws_publisher_bucket }}'
+      BBB_AWS_DEBUG: '{{ aws_publisher_debug }}'
+      BBB_AWS_REMOTE_PLAYBACK: '{{ aws_publisher_remote_playback }}'
+      BBB_AWS_REMOTE_PLAYBACK_URL: '{{ aws_publisher_remote_playback_url }}'
+      BBB_AWS_AVAILABLE_FORMATS: '{{ aws_publisher_available_formats }}'
+      BBB_AWS_KEEP_LOCAL: '{{ aws_publisher_keep_local }}'
+      BBB_AWS_REDIS_HOST: '{{ docker_ip.stdout }}'
+      BBB_AWS_FAST_RESYNC: '{{ aws_publisher_fast_resync }}'
+    labels:
+      hostname: '{{ inventory_hostname }}'
+  when: aws_publisher_run_resync
 
 
 # sudo tc qdisc add dev `ifconfig | grep veth | tail -1 | awk '{print $1; exit}'` root tbf rate 100kbit latency 50ms burst 800000

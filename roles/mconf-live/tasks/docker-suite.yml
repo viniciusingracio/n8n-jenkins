@@ -1,0 +1,33 @@
+- name: Install package for htpasswd
+  become: yes
+  apt:
+    name: apache2-utils
+
+- name: Create password file
+  become: yes
+  shell: echo {{ bigbluebutton_docker_suite_password }} | htpasswd -i -c /etc/apache2/.htpasswd suite
+
+- name: Start mongo container
+  docker_container:
+    name: mongo
+    image: mongo:latest
+    restart_policy: unless-stopped
+    labels:
+      hostname: '{{ inventory_hostname }}'
+
+- name: Start suite container
+  docker_container:
+    name: suite
+    image: '{{ bigbluebutton_docker_suite_image }}'
+    pull: yes
+    restart_policy: unless-stopped
+    ports:
+      - 3013:3000
+    links:
+      - mongo
+    env:
+      MONGO_URL: mongodb://mongo/suite
+      METEOR_SETTINGS_MODIFIER: ".public.server.mcs_address = \"wss://{{ inventory_hostname }}/mcs\" | .public.basename_path = \"suite\""
+      ROOT_URL: http://127.0.0.1:3000/suite
+    labels:
+      hostname: '{{ inventory_hostname }}'

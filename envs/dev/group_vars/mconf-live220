@@ -4,6 +4,8 @@ bigbluebutton_apt_package: bigbluebutton
 bigbluebutton_apt_key: https://jenkins-live.mconf.com/apt/public.asc
 bigbluebutton_apt_source: deb https://jenkins-live.mconf.com/apt/development/mconf-220/xenial-2.2.0 mconf-xenial main
 
+bigbluebutton_default_presentation: envs/{{ env }}/files/default.pdf
+
 bigbluebutton_sip: true
 bigbluebutton_sip_sources:
   - 68.183.164.136
@@ -24,10 +26,17 @@ bigbluebutton_webhooks: true
 
 ffmpeg_version: '4.1'
 
+bigbluebutton_docker_kurento_enabled: true
+bigbluebutton_docker_webrtc_sfu_enabled: true
+bigbluebutton_docker_webrtc_sfu_image: mconf/bbb-webrtc-sfu:v2.3.5-no-desc-negotiation
 bigbluebutton_docker_etherpad_enabled: true
 bigbluebutton_docker_mcs_sip_enabled: true
-bigbluebutton_docker_webrtc_sfu_enabled: true
+bigbluebutton_docker_mcs_sip_image: mconf/mcs-sip:v2.3.2-invite-with-sdp
 bigbluebutton_docker_mcs_bfcp_enabled: true
+bigbluebutton_webhooks: true
+bigbluebutton_docker_webhooks_permanent_hooks:
+  - url: https://webhook.d.mconf.rnp.br
+    getRaw: false
 
 bigbluebutton_kms_udp_range_begin: 7000
 bigbluebutton_kms_udp_range_end: 8999
@@ -49,13 +58,16 @@ bigbluebutton_html5_config_yml:
   - { key: 'public.kurento.chromeExtensionLink', value: '{{ bigbluebutton_screenshare_extension_url }}' }
   - { key: 'public.kurento.enableScreensharing', value: true }
   - { key: 'public.kurento.enableVideo', value: true }
-  - { key: 'public.kurento.enableVideoStats', value: true }
+  - { key: 'public.kurento.enableVideoStats', value: false }
   - { key: 'public.kurento.enableListenOnly', value: true }
+  - { key: 'public.kurento.cameraConstraints.width.max', value: 320 }
+  - { key: 'public.kurento.cameraConstraints.height.max', value: 240 }
   - { key: 'public.app.appName', value: '{{ bigbluebutton_branding_name }}' }
   - { key: 'public.app.clientTitle', value: '{{ bigbluebutton_branding_name }}' }
   - { key: 'public.app.copyright', value: '{{ bigbluebutton_branding_copyright_html5 }}' }
   - { key: 'public.app.defaultSettings.application.chatPushAlerts', value: true }
   - { key: 'public.app.showHelpButton', value: false }
+  - { key: 'public.clientLog.console.level', value: 'info' }
   - { key: 'public.acl.enabled', value: false }
   - { key: 'public.app.enableSIP', value: '{{ bigbluebutton_sip }}' }
   - { key: 'public.app.enableExternalVideo', value: 'true' }
@@ -75,7 +87,7 @@ bigbluebutton_sounds_profile:
 bigbluebutton_notes_multiple_enabled: true
 
 bigbluebutton_streaming_enabled: true
-bigbluebutton_streaming_secret: {"web":{"client_id":"815163372732-b18hbpmhj33atj201b2nuj91cc3k25iq.apps.googleusercontent.com","project_id":"mconf-streaming-oauth","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"7evKbFJE9F2Zl4KMLTTJi6sy","redirect_uris":["https://test-live220.dev.mconf.com/oauth2_redirect"],"javascript_origins":["https://test-live220.dev.mconf.com"]}}
+bigbluebutton_streaming_secret: {"web":{"client_id":"815163372732-b18hbpmhj33atj201b2nuj91cc3k25iq.apps.googleusercontent.com","project_id":"mconf-streaming-oauth","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"7evKbFJE9F2Zl4KMLTTJi6sy","redirect_uris":["https://{{ inventory_hostname }}/oauth2_redirect"],"javascript_origins":["https://{{ inventory_hostname }}"]}}
 
 bigbluebutton_sip_default_gateway: sip.mconf.com
 bigbluebutton_sip_registrar_enabled: true

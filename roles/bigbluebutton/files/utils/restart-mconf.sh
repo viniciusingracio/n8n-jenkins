@@ -1,6 +1,12 @@
 #!/bin/bash
 
-API_ENTRYPOINT=$(cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^bigbluebutton.web.serverURL=' | cut -d'=' -f2 | awk '{print $1"/bigbluebutton/api"}')
+SERVLET_DIR=
+if [ -f "/usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties" ]; then
+  SERVLET_DIR="/usr/share/bbb-web"
+else
+  SERVLET_DIR="/var/lib/tomcat7/webapps/bigbluebutton"
+fi
+API_ENTRYPOINT=$(cat ${SERVLET_DIR}/WEB-INF/classes/bigbluebutton.properties | grep '^bigbluebutton.web.serverURL=' | cut -d'=' -f2 | awk '{print $1"/bigbluebutton/api"}')
 
 for i in `seq 1 20`; do
   echo "$(date) Restarting (attempt $i)..."

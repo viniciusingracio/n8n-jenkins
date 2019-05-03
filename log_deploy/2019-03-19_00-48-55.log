@@ -1,0 +1,6 @@
+/usr/bin/ansible-playbook -i envs/rnp/prod/hosts -l rec-moodle provision.yml --force-handlers
+
+rec-ifg01.mconf.rnp.br: 217 OK, 34 changed, 0 unreachable, 0 failed
+rec-ifsp01.mconf.rnp.br: 216 OK, 37 changed, 0 unreachable, 0 failed
+rec-uepg01.mconf.rnp.br: 239 OK, 100 changed, 0 unreachable, 0 failed
+rec-ufsc01.mconf.rnp.br: 170 OK, 31 changed, 0 unreachable, 1 failed

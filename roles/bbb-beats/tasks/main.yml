@@ -1,0 +1,164 @@
+---
+# tasks file for bbb-beats
+
+# TODO create ca if key and crt don't exist
+# - name: Check if ca files exist
+#   local_action: stat path=envs/{{ env }}/files/beats/ca.crt
+#   register: stat_ca
+# 
+# - name: Create ca key if needed
+#   local_action: command openssl genrsa -out ca.key 2048
+#   args:
+#     chdir: envs/{{ env }}/files/beats
+#   when: not stat_ca.stat.exists
+# 
+# - name: Create ca cert if needed
+#   local_action: command openssl req -x509 -new -nodes -key ca.key -sha256 -days 3650 -out ca.crt
+#   args:
+#     chdir: envs/{{ env }}/files/beats
+#   when: not stat_ca.stat.exists
+
+- stat:
+    path: '{{ bbb_beats_certs_dir }}/beat.key'
+  register: stat_beat_key
+
+- stat:
+    path: '{{ bbb_beats_certs_dir }}/beat.crt'
+  register: stat_beat_crt
+
+- set_fact:
+    build_certs: '{{ not ( stat_beat_key.stat.exists and stat_beat_crt.stat.exists ) }}'
+
+- name: Create temporary file for key
+  local_action: tempfile
+  args:
+    state: file
+    suffix: .key
+  register: tmp_key_file
+  when: build_certs
+
+- name: Create key
+  local_action: command openssl genrsa -out {{ tmp_key_file.path }} 2048
+  when: build_certs
+
+- name: Create temporary file for csr
+  local_action: tempfile
+  args:
+    state: file
+    suffix: .csr
+  register: tmp_csr_file
+  when: build_certs
+
+- name: Create csr
+  local_action: command openssl req -sha512 -new -key {{ tmp_key_file.path }} -out {{ tmp_csr_file.path }} -config {{ role_path }}/files/beat.conf
+  when: build_certs
+
+- name: Extract serial from ca cert
+  local_action: shell openssl x509 -in envs/{{ env }}/files/beat/ca.crt -text -noout -serial | grep serial | cut -f"2" -d"=" > envs/{{ env }}/files/beat/serial
+  when: build_certs
+
+- name: Create temporary file for crt
+  local_action: tempfile
+  args:
+    state: file
+    suffix: .crt
+  register: tmp_crt_file
+  when: build_certs
+
+- name: Create crt
+  local_action: command openssl x509 -days 3650 -req -sha512 -in '{{ tmp_csr_file.path }}' -CAserial envs/{{ env }}/files/beat/serial -CA envs/{{ env }}/files/beat/ca.crt -CAkey envs/{{ env }}/files/beat/ca.key -out {{ tmp_crt_file.path }} -extensions v3_req -extensions usr_cert -extfile {{ role_path }}/files/beat.conf
+  when: build_certs
+
+- name: Create remote dirs
+  become: yes
+  file:
+    path: '{{ item }}'
+    recurse: yes
+    state: directory
+  with_items:
+    - '{{ bbb_beats_certs_dir }}'
+    - '{{ bbb_beats_conf_dir }}'
+  when: build_certs
+
+- name: Copy files to server
+  become: yes
+  copy:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+  with_items:
+    - { src: 'envs/{{ env }}/files/beat/ca.crt', dest: '{{ bbb_beats_certs_dir }}/ca.crt' }
+    - { src: '{{ tmp_key_file.path }}', dest: '{{ bbb_beats_certs_dir }}/beat.key' }
+    - { src: '{{ tmp_crt_file.path }}', dest: '{{ bbb_beats_certs_dir }}/beat.crt' }
+  when: build_certs
+  notify:
+    - restart filebeat
+    - restart packetbeat
+
+- name: Delete local files
+  local_action: file
+  args:
+    path: '{{ item }}'
+    state: absent
+  with_items:
+    - tmp_key_file.path
+    - tmp_csr_file.path
+    - tmp_crt_file.path
+  when: build_certs
+
+- name: Copy packetbeat config
+  become: yes
+  copy:
+    src: files/packetbeat.yml
+    dest: '{{ bbb_beats_conf_dir }}/'
+  notify: restart packetbeat
+
+- name: Copy filebeat config
+  become: yes
+  copy:
+    src: files/filebeat.yml
+    dest: '{{ bbb_beats_conf_dir }}/'
+  notify: restart filebeat
+
+- name: Start filebeat container
+  docker_container:
+    name: filebeat
+    image: elastic/filebeat:7.0.0
+    pull: yes
+    restart_policy: unless-stopped
+    user: root
+    hostname: '{{ inventory_hostname }}'
+    command: "-e --strict.perms=false -E output.logstash.hosts=[\"{{ bbb_beats_logstash_url }}\"]"
+    memory: 200m
+    cpu_shares: 100
+    volumes:
+      - "/var/log/:/hostfs/var/log:ro"
+      - "/var/bigbluebutton:/hostfs/var/bigbluebutton:ro"
+      - "/var/lib/docker/containers:/var/lib/docker/containers:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "{{ bbb_beats_conf_dir }}/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
+      - "{{ bbb_beats_certs_dir }}:/etc/certs:ro"
+    labels:
+      co.elastic.logs/disable: "true"
+      hostname: '{{ inventory_hostname }}'
+
+- name: Start packetbeat container
+  docker_container:
+    name: packetbeat
+    image: elastic/packetbeat:7.0.0
+    pull: yes
+    restart_policy: unless-stopped
+    user: packetbeat
+    hostname: '{{ inventory_hostname }}'
+    command: "-e --strict.perms=false -c /usr/share/filebeat/packetbeat.yml -E output.logstash.hosts=[\"{{ bbb_beats_logstash_url }}\"]"
+    memory: 200m
+    cpu_shares: 100
+    volumes:
+      - "{{ bbb_beats_conf_dir }}/packetbeat.yml:/usr/share/filebeat/packetbeat.yml:ro"
+      - "{{ bbb_beats_certs_dir }}:/etc/certs:ro"
+    capabilities:
+      - "NET_RAW"
+      - "NET_ADMIN"
+    network_mode: host
+    labels:
+      co.elastic.logs/disable: "true"
+      hostname: '{{ inventory_hostname }}'

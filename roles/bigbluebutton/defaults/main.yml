@@ -112,6 +112,17 @@ bigbluebutton_html5_config_yml:
   - { key: 'public.kurento.enableScreensharing', value: true }
   - { key: 'public.kurento.enableVideo', value: true }
 
+bigbluebutton_properties_config:
+  - { key: 'defaultWelcomeMessage', value: '{{ bigbluebutton_branding_welcome }}' }
+  - { key: 'defaultWelcomeMessageFooter', value: '{{ bigbluebutton_branding_welcome_footer }}' }
+  - { key: 'defaultClientUrl', value: '${bigbluebutton.web.serverURL}/client/Mconf-Live.html' }
+  - { key: 'attendeesJoinViaHTML5Client', value: '{{ bigbluebutton_html5_only }}' }
+  - { key: 'moderatorsJoinViaHTML5Client', value: '{{ bigbluebutton_html5_only }}' }
+  - { key: 'keepEvents', value: 'true' }
+  - { key: 'maxInactivityTimeoutMinutes', value: '0' }
+  - { key: 'userInactivityInspectTimerInMinutes', value: '0' }
+  - { key: 'maxNumPages', value: '300' }
+
 bigbluebutton_stun_server:
   - stun:stun.l.google.com:19302
 
@@ -161,8 +172,11 @@ bigbluebutton_html5_external_log_enabled: false
 bigbluebutton_html5_external_log_level: info
 bigbluebutton_html5_external_log_url: 'https://{{ inventory_hostname }}/html5Log'
 bigbluebutton_html5_external_log_method: POST
+bigbluebutton_html5_external_log_throttle: 5000
 
 bigbluebutton_docker_webrtc_sfu_enabled: false
+bigbluebutton_docker_webhooks_image: mconf/bbb-webhooks:dev-13fffcc
+bigbluebutton_docker_webhooks_permanent_hooks: []
 
 external_ip:
 

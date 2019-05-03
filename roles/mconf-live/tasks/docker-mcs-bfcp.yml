@@ -6,8 +6,11 @@
     restart_policy: unless-stopped
     network_mode: host
     env:
-      LIBRE_BFCP_BIND_PORT_MIN: '{{ bigbluebutton_kms_udp_range_end - 39 }}'
-      LIBRE_BFCP_BIND_PORT_MAX: '{{ bigbluebutton_kms_udp_range_end }}'
+      MCS_BFCP_API_ADDRESS: 0.0.0.0
+      LIBRE_BFCP_BIND_PORT_MIN: '{{ ( bigbluebutton_kms_udp_range_end - bigbluebutton_docker_mcs_bfcp_num_ports + 1 ) | string }}'
+      LIBRE_BFCP_BIND_PORT_MAX: '{{ bigbluebutton_kms_udp_range_end | string }}'
+    labels:
+      hostname: '{{ inventory_hostname }}'
   notify: restart docker components
 
 - name: Remove old images

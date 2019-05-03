@@ -1,0 +1,9 @@
+/usr/bin/ansible-playbook -v -i envs/prod/tjrr-staging/hosts -l coturn,mconf-live200,mconf-rec,mconf-recw provision.yml -T 180 --force-handlers
+
+hlive01-vc.tjrr.jus.br: 231 OK, 52 changed, 0 unreachable, 0 failed
+hlive02-vc.tjrr.jus.br: 232 OK, 56 changed, 0 unreachable, 0 failed
+hrec-vc.tjrr.jus.br: 221 OK, 42 changed, 0 unreachable, 0 failed
+hrecw01-vc.tjrr.jus.br: 184 OK, 38 changed, 0 unreachable, 0 failed
+hrecw02-vc.tjrr.jus.br: 185 OK, 40 changed, 0 unreachable, 0 failed
+hstun01-vc.tjrr.jus.br: 16 OK, 2 changed, 0 unreachable, 0 failed
+hstun02-vc.tjrr.jus.br: 16 OK, 2 changed, 0 unreachable, 0 failed

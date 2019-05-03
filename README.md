@@ -74,11 +74,17 @@ ansible all -v -i envs/rnp/prod/hosts -l mconf-live200 --extra-vars "ansible_use
 ansible all -v -i envs/prod/tjrr/hosts -l mconf-live200,mconf-rec --extra-vars "ansible_user=mconf" --become -m raw -a 'systemctl daemon-reload; systemctl restart performance_report'
 
 # get /metrics password for node-exporter
-ansible all -v -i envs/prod/tjrr/hosts -l mconf-live200,mconf-rec,mconf-recw --extra-vars "ansible_user=mconf" --become -m raw -a "cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2 | tr -d '\n' | sha256sum"
+ansible all -v -i envs/prod/tjrr/hosts -l mconf-live200,mconf-rec,mconf-recw --extra-vars "ansible_user=mconf" --become -m raw -a "cat /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2 | tr -d '\n' | sha256sum"
 
 # get systemd status
 ansible all -v -i envs/prod/tjrr/hosts -l mconf-live200 --extra-vars "ansible_user=mconf" --become -m raw -a 'systemctl --no-pager status zabbix-agent.service'
 
+# umount and mount nfs directories on mconf-recw
+ansible all -v -i envs/prod/tjrr/hosts -l mconf-recw --extra-vars "ansible_user=mconf" --become -m raw -a 'umount -a -t nfs4'
+ansible all -v -i envs/prod/tjrr/hosts -l mconf-recw --extra-vars "ansible_user=mconf" --become -m raw -a 'mount -a'
+
+# print api-mate URL
+ansible all -v -i envs/prod/tjrr/hosts -l mconf-live200,mconf-rec --extra-vars "ansible_user=mconf" --become -m raw -a 'export LC_ALL=C; bbb-conf --salt' | grep 'api-mate'
 ```
 
 ### Other playbooks
@@ -129,6 +135,14 @@ The credentials to access the server should be set a the `~/.my.cnf` in the serv
 port=3306
 password=929dk92k29d29i
 user=mconf
+```
+
+#### ssh-port
+
+Change port used by sshd, and update ufw. Example:
+
+```
+ansible-playbook -i envs/dev/hosts -l 134.209.118.45 playbooks/ssh-port.yml
 ```
 
 ### Utils

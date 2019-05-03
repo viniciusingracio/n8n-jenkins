@@ -82,3 +82,25 @@
   become: yes
   ignore_errors: yes
   notify: reload nginx
+
+- set_fact:
+    get_all_recordings_checksum: '{{ ("getRecordings" + bbb_secret) | hash("sha1") }}'
+
+- name:
+  become: true
+  apt:
+    name: moreutils
+    state: latest
+
+- name: Install cron job to generate the list of recordings
+  cron:
+    name: generate list of recordings
+    job: /usr/bin/ruby /usr/local/bigbluebutton/core/scripts/utils/gen-all-recordings.rb | ifne sponge /var/www/bigbluebutton-default/all_recordings.xml
+    user: root
+  become: yes
+
+- template:
+    src: templates/get_recordings_from_file.nginx.j2
+    dest: /etc/bigbluebutton/nginx/get_recordings_from_file.nginx
+  become: yes
+  notify: reload nginx

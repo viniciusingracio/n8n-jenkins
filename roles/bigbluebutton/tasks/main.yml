@@ -1,20 +1,9 @@
 - name: Read BigBlueButton source file
   slurp:
-    src: /etc/apt/sources.list.d/mconf-live.list
-  register: slurpfile
-  ignore_errors: yes
-  when: bigbluebutton_apt_clean_installation
-
-- set_fact:
-    current_apt_source: '{{ slurpfile["content"] | b64decode | regex_replace("\n") }}'
-  when: bigbluebutton_apt_clean_installation and slurpfile is succeeded and not slurpfile is skipped
-
-- name: Read BigBlueButton source file
-  slurp:
     src: /etc/apt/sources.list.d/bigbluebutton.list
   register: slurpfile
   ignore_errors: yes
-  when: bigbluebutton_apt_clean_installation and slurpfile is failed
+  when: bigbluebutton_apt_clean_installation
 
 - set_fact:
     current_apt_source: '{{ slurpfile["content"] | b64decode | regex_replace("\n") }}'
@@ -101,6 +90,7 @@
     - { repo: '{{ bigbluebutton_apt_source }}', filename: '{{ bigbluebutton_apt_package }}' }
     - { repo: 'deb http://deb.nodesource.com/node_8.x {{ ansible_lsb.codename }} main', filename: 'node' }
     - { repo: 'ppa:rmescandon/yq', filename: 'yq' }
+    - { repo: 'ppa:nginx/stable', filename: 'nginx' }
 
 - name: Update apt if keys changed
   become: true
@@ -139,14 +129,29 @@
     state: '{{ bigbluebutton_apt_state }}'
   when: not bigbluebutton_docker_webrtc_sfu_enabled
 
+- name: Auto-remove to avoid no space left on /boot
+  become: true
+  apt:
+    autoremove: true
+    autoclean: true
+
 - name: Upgrade packages to make sure BigBlueButton packages are updated
   become: true
   apt:
     upgrade: safe
-    autoremove: true
-    autoclean: true
   when: bigbluebutton_apt_state == 'latest'
   notify: restart bigbluebutton
+
+- name: Check if bbb-web is running on a standalone app
+  stat:
+    path: /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
+  register: reg_standalone
+- set_fact:
+    bigbluebutton_servlet_dir: /usr/share/bbb-web
+  when: reg_standalone.stat.exists
+- set_fact:
+    bigbluebutton_servlet_dir: /var/lib/tomcat7/webapps/bigbluebutton
+  when: not reg_standalone.stat.exists
 
 - name: Determine if reset encoding needed on bigbluebutton.properties
   set_fact:
@@ -208,6 +213,9 @@
            # resolver $DNS-IP-1 $DNS-IP-2 valid=300s;
            # resolver_timeout 5s;
            add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload";
+           
+           # define an upload limit for the whole site
+           client_max_body_size 30m;
     insertafter: '.*server_name .*'
     marker: '     # {mark} ANSIBLE MANAGED BLOCK'
   become: yes
@@ -230,8 +238,10 @@
   register: reg_demo
 
 - name: Restart tomcat7
-  command: service tomcat7 restart
   become: true
+  service:
+    name: tomcat7
+    state: restarted
   when: reg_demo.changed
 
 - name: Wait until demo is deployed before continuing
@@ -261,11 +271,11 @@
   when: not bigbluebutton_demos
 
 - name: Get BigBlueButton secret
-  shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
+  shell: cat {{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
   register: reg_bbb_secret
 
 - name: Get BigBlueButton URL
-  shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^bigbluebutton.web.serverURL=' | cut -d'=' -f2 | awk '{print $1"/bigbluebutton/"}'
+  shell: cat {{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties | grep '^bigbluebutton.web.serverURL=' | cut -d'=' -f2 | awk '{print $1"/bigbluebutton/"}'
   register: reg_bbb_url
 
 - name: Determine if setip is needed
@@ -280,12 +290,12 @@
   when: setip_needed
 
 - name: Get BigBlueButton secret again
-  shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
+  shell: cat {{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
   register: reg_bbb_secret
   when: setip_needed
 
 - name: Get BigBlueButton URL again
-  shell: cat /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties | grep '^bigbluebutton.web.serverURL=' | cut -d'=' -f2 | awk '{print $1"/bigbluebutton/"}'
+  shell: cat {{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties | grep '^bigbluebutton.web.serverURL=' | cut -d'=' -f2 | awk '{print $1"/bigbluebutton/"}'
   register: reg_bbb_url
   when: setip_needed
 
@@ -333,7 +343,7 @@
     encoding: '{{ properties_charset }}'
   with_nested:
     -
-      - /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties
+      - '{{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties'
       - /var/lib/tomcat7/webapps/demo/bbb_api_conf.jsp
       - /usr/share/red5/webapps/screenshare/WEB-INF/screenshare.properties
     -
@@ -341,6 +351,17 @@
       - { regexp: 'http[s]?:\/\/{{ ansible_default_ipv4.address }}', replace: 'https://{{ inventory_hostname }}' }
       - { regexp: 'rtmp:\/\/{{ ansible_default_ipv4.address }}', replace: 'rtmp://{{ inventory_hostname }}' }
   ignore_errors: yes
+  become: yes
+  notify: restart bigbluebutton
+
+- name: Customize bigbluebutton.properties
+  replace:
+    path: '{{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties'
+    regexp: '^({{ item.key }})=.*'
+    replace: '\1={{ item.value }}'
+    encoding: '{{ properties_charset }}'
+  with_items: '{{ bigbluebutton_properties_config }}'
+  when: not item.value is none
   become: yes
   notify: restart bigbluebutton
 
@@ -465,6 +486,7 @@
   - { regexp: '^history=', line: 'history={{ bigbluebutton_retention_runtime }}' }
   - { regexp: '^unrecorded_days=', line: 'unrecorded_days={{ bigbluebutton_retention_unrecorded }}' }
   - { regexp: '^published_days=', line: 'published_days={{ bigbluebutton_retention_published_raw }}' }
+  - { regexp: '^log_history=', line: 'log_history={{ bigbluebutton_log_retention }}' }
   - { regexp: '^[#]?remove_raw_of_recordings_without_marks$', line: 'remove_raw_of_recordings_without_marks', when: '{{ not bigbluebutton_retention_unrecorded is none }}' }
   - { regexp: '^[#]?remove_raw_of_recordings_without_marks$', line: '#remove_raw_of_recordings_without_marks', when: '{{ bigbluebutton_retention_unrecorded is none }}' }
   - { regexp: '^[#]?remove_raw_of_published_recordings$', line: 'remove_raw_of_published_recordings', when: '{{ not bigbluebutton_retention_published_raw is none }}' }

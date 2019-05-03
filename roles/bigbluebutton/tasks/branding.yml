@@ -5,15 +5,11 @@
   become: yes
   ignore_errors: yes
 
-- name: Figure out which demo to use
-  set_fact:
-    demo_jsp: '{% if bigbluebutton_html5 %}demoHTML5{% else %}demo0{% endif %}'
-
 - name: Set demo to use the HTML5 client
   replace:
     path: '/var/www/bigbluebutton-default/index.html'
     regexp: '(?P<before><form [^>]*)\/demo\/.*.jsp(?P<after>[^>]*>)'
-    replace: '\g<before>/demo/{{ demo_jsp }}.jsp\g<after>'
+    replace: '\g<before>/demo/demo0.jsp\g<after>'
   become: yes
   when: bigbluebutton_demos
 
@@ -121,23 +117,6 @@
     dest: /var/www/bigbluebutton/client/Mconf-Live.html
     state: link
   become: yes
-
-- name: Customize bigbluebutton.properties
-  replace:
-    path: /var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties
-    regexp: '{{ item.regexp }}'
-    replace: '{{ item.replace }}'
-    encoding: '{{ properties_charset }}'
-  with_items:
-    - { regexp: '^(defaultWelcomeMessage)=.*', replace: '\1={{ bigbluebutton_branding_welcome }}' }
-    - { regexp: '^(defaultWelcomeMessageFooter)=.*', replace: '\1={{ bigbluebutton_branding_welcome_footer }}' }
-    - { regexp: '^(defaultClientUrl)=.*', replace: '\1=${bigbluebutton.web.serverURL}/client/Mconf-Live.html' }
-    - { regexp: '^(attendeesJoinViaHTML5Client)=.*', replace: '\1={{ bigbluebutton_html5_only }}' }
-    - { regexp: '^(moderatorsJoinViaHTML5Client)=.*', replace: '\1={{ bigbluebutton_html5_only }}' }
-    - { regexp: '^(keepEvents)=.*', replace: '\1=true' }
-  when: not item.replace is none
-  become: yes
-  notify: restart bigbluebutton
 
 - name: Customize blinker
   replace:

@@ -1,0 +1,8 @@
+/usr/bin/ansible-playbook -v -i envs/rnp/h/hosts -l live-compute04.h.mconf.rnp.br,coturn,mconf-rec,mconf-recw provision.yml -T 180 --force-handlers
+
+live-compute04.h.mconf.rnp.br: 225 OK, 85 changed, 0 unreachable, 0 failed
+rec-compute01.h.mconf.rnp.br: 216 OK, 86 changed, 0 unreachable, 0 failed
+rec-ufg01.h.mconf.rnp.br: 215 OK, 88 changed, 0 unreachable, 0 failed
+recw-compute01.h.mconf.rnp.br: 12 OK, 2 changed, 0 unreachable, 1 failed
+recw-compute02.h.mconf.rnp.br: 187 OK, 83 changed, 0 unreachable, 0 failed
+stun-compute01.h.mconf.rnp.br: 0 OK, 0 changed, 1 unreachable, 0 failed

@@ -1,0 +1,8 @@
+/usr/bin/ansible-playbook -v -i envs/rnp/prod/hosts -l mconf-live220 provision.yml -T 180 --force-handlers
+
+live-cdcrec12.mconf.rnp.br: 255 OK, 47 changed, 0 unreachable, 0 failed
+live-cdcrec13.mconf.rnp.br: 255 OK, 47 changed, 0 unreachable, 0 failed
+live-cdcrec14.mconf.rnp.br: 255 OK, 47 changed, 0 unreachable, 0 failed
+live-cdcrec16.mconf.rnp.br: 255 OK, 47 changed, 0 unreachable, 0 failed
+live-cdcrec17.mconf.rnp.br: 255 OK, 47 changed, 0 unreachable, 0 failed
+live-cdcrec18.mconf.rnp.br: 255 OK, 47 changed, 0 unreachable, 0 failed

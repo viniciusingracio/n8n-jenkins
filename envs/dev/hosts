@@ -72,3 +72,8 @@ kamailio.dev.mconf.com
 
 [mconf-live220]
 test-live220.dev.mconf.com certbot_enabled=true
+suite.mconf.com     certbot_enabled=true bigbluebutton_docker_webrtc_sfu_image=mconf/bbb-webrtc-sfu:v2.4.0-dev
+suite.dev.mconf.com certbot_enabled=true bigbluebutton_docker_webrtc_sfu_image=mconf/bbb-webrtc-sfu:v2.4.0-dev
+
+[bbb-beats:children]
+mconf-live220

@@ -8,9 +8,13 @@
       - 3011:3011
     env:
       REDIS_HOST: '{{ docker_ip }}'
-      MCS_PORT: 3009
+      MCS_PORT: "3009"
       MCS_HOST: '{{ docker_ip }}'
       SIP_API_ADDRESS: wss://{{ inventory_hostname }}/mcs-sip
+      ENABLE_REGISTER: '{{ bigbluebutton_sip_registrar_enabled | string }}'
+      ENABLE_FLOOR_N: 'true'
+    labels:
+      hostname: '{{ inventory_hostname }}'
   notify: restart docker components
 
 - name: Remove old images

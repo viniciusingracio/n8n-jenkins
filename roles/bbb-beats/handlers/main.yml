@@ -1,0 +1,5 @@
+- name: restart filebeat
+  command: docker restart filebeat
+
+- name: restart packetbeat
+  command: docker restart packetbeat

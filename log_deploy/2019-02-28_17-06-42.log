@@ -1,0 +1,13 @@
+/usr/bin/ansible-playbook -i envs/prod/tjrr-staging/hosts playbooks/ssh-port.yml
+
+hdb-vc.tjrr.jus.br: 10 OK, 4 changed, 0 unreachable, 0 failed
+hlb-vc.tjrr.jus.br: 10 OK, 4 changed, 0 unreachable, 0 failed
+hlive01-vc.tjrr.jus.br: 8 OK, 0 changed, 0 unreachable, 0 failed
+hlive02-vc.tjrr.jus.br: 8 OK, 0 changed, 0 unreachable, 0 failed
+hmonit-vc.tjrr.jus.br: 10 OK, 4 changed, 0 unreachable, 0 failed
+hrec-vc.tjrr.jus.br: 8 OK, 0 changed, 0 unreachable, 0 failed
+hrecw01-vc.tjrr.jus.br: 10 OK, 4 changed, 0 unreachable, 0 failed
+hrecw02-vc.tjrr.jus.br: 10 OK, 4 changed, 0 unreachable, 0 failed
+hsip-vc.tjrr.jus.br: 10 OK, 4 changed, 0 unreachable, 0 failed
+hstun01-vc.tjrr.jus.br: 8 OK, 0 changed, 0 unreachable, 0 failed
+hstun02-vc.tjrr.jus.br: 8 OK, 0 changed, 0 unreachable, 0 failed

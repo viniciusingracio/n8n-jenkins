@@ -1,0 +1,74 @@
+filebeat.config:
+  modules:
+    path: ${path.config}/modules.d/*.yml
+    reload.enabled: false
+
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+
+      templates:
+        - condition.or:
+          - contains.docker.container.name: "sfu-phone"
+          - contains.docker.container.name: "webrtc-sfu"
+          - contains.docker.container.name: "kurento"
+          - contains.docker.container.name: "mcs"
+          - contains.docker.container.name: "etherpad"
+          - contains.docker.container.name: "webhooks"
+          - contains.docker.container.name: "suite"
+          - contains.docker.container.name: "mongo"
+
+          config:
+            - type: docker
+              containers.ids:
+                - "${data.docker.container.id}"
+              multiline.pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2}"
+              multiline.match: after
+              multiline.negate: true
+
+              processors:
+                - add_docker_metadata: ~
+
+logging.level: warning
+
+filebeat.inputs:
+  - type: log
+    paths:
+      - /hostfs/var/log/syslog
+    fields_under_root: true
+    fields:
+      syslog: true
+    multiline.pattern: '^%{SYSLOGTIMESTAMP} %{SYSLOGHOST} %{GREEDYDATA}[%{NUMBER}]: [[:space]]'
+    multiline.match: after
+
+  - type: log
+    paths:
+     - /hostfs/var/bigbluebutton/*/*/*/textfiles/*.txt
+    fields_under_root: true
+    fields:
+     slides: true
+    multiline.pattern: '.*'
+    multiline.match: after
+
+    ignore_older: 119m
+    clean_inactive: 120m
+    close_timeout: 5m
+    scan_frequency: 20s
+
+  - type: log
+    paths:
+      - /hostfs/var/log/nginx/html5-client.log
+    fields_under_root: true
+    fields:
+      client: true
+    json:
+      keys_under_root: true
+      add_error_key: true
+
+output.logstash:
+  hosts: '${LOGSTASH_HOSTS:}'
+  ssl:
+    certificate_authorities: ["/etc/certs/ca.crt"]
+    certificate: "/etc/certs/beat.crt"
+    key: "/etc/certs/beat.key"
