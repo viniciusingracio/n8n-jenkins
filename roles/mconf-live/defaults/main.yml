@@ -66,4 +66,8 @@ bigbluebutton_sfu_auth_enabled: false
 bigbluebutton_streaming_enabled: false
 bigbluebutton_streaming_secret: {}
 
+bigbluebutton_video_rnp_client_id:
+bigbluebutton_video_rnp_client_secret:
+
 external_ip:
+
