@@ -39,7 +39,7 @@ bigbluebutton_docker_mcs_sip_enabled: false
 bigbluebutton_docker_mcs_sip_image: mconf/mcs-sip:v2.1.0-dev
 bigbluebutton_docker_sfu_phone_image: mconf/sfu-phone:v2.1.0-dev
 bigbluebutton_docker_mcs_bfcp_enabled: false
-bigbluebutton_docker_mcs_bfcp_image: mconf/mcs-bfcp:development
+bigbluebutton_docker_mcs_bfcp_image: mconf/mcs-bfcp:v0.0.2-dev-allocate-resources
 bigbluebutton_docker_mcs_bfcp_num_ports: 40
 bigbluebutton_docker_suite_enabled: false
 bigbluebutton_docker_suite_image: mconf/suite:suite-bbb-webrtc-sfu-2.4.0dev
@@ -66,8 +66,8 @@ bigbluebutton_sfu_auth_enabled: false
 bigbluebutton_streaming_enabled: false
 bigbluebutton_streaming_secret: {}
 
+bigbluebutton_video_rnp_endpoint_hostname: video--approval.rnp.br
 bigbluebutton_video_rnp_client_id:
 bigbluebutton_video_rnp_client_secret:
 
 external_ip:
-
