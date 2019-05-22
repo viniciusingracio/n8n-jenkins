@@ -131,9 +131,7 @@
 
 - name: Auto-remove to avoid no space left on /boot
   become: true
-  apt:
-    autoremove: true
-    autoclean: true
+  command: apt-get -y autoremove
 
 - name: Upgrade packages to make sure BigBlueButton packages are updated
   become: true
@@ -213,7 +211,7 @@
            # resolver $DNS-IP-1 $DNS-IP-2 valid=300s;
            # resolver_timeout 5s;
            add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload";
-           
+
            # define an upload limit for the whole site
            client_max_body_size 30m;
     insertafter: '.*server_name .*'
@@ -402,7 +400,7 @@
   command: 'ip addr add {{ external_ip }}/32 dev lo'
   become: yes
   when: reg_external_ip_assigned is failed or reg_external_ip_access is failed
-  
+
 - name: Add dummy NIC to network interfaces
   blockinfile:
     dest: /etc/network/interfaces
@@ -580,6 +578,16 @@
     user: root
   become: yes
 
+- name: Install cron job to generate audio-stats
+  cron:
+    name: enable audio-stats, sleep {{ item }})
+    job: sleep {{ item }}; /usr/bin/ruby /usr/local/bigbluebutton/core/scripts/utils/audio-stats.rb
+    user: root
+  become: yes
+  with_items:
+    - 30
+    - 60
+
 - include: tune-so.yml
 
 - include: storage-partition.yml
@@ -592,7 +600,7 @@
 #   stat:
 #     path: /var/run/reboot-required
 #   register: reg_reboot
-# 
+#
 # - name: Notify when reboot is required
 #   command: 'true'
 #   notify: reboot

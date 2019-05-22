@@ -1,6 +1,5 @@
 - include_role:
     name: oefenweb.fail2ban
-  become: true
   vars:
     fail2ban_bantime: 86400
     fail2ban_services:

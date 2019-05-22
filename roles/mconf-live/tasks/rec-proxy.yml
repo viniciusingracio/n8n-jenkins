@@ -1,6 +1,5 @@
 - include_role:
     name: rec-proxy
-    private: false
   vars:
     rec_proxy_api_secret: '{{ bbb_secret }}'
     rec_proxy_jwt_secret: '{{ mconf_live_rec_proxy_jwt_secret | default(bbb_secret | to_uuid, true) }}'

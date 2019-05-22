@@ -258,7 +258,10 @@ if output[:response][:returncode] == "SUCCESS" and ! output[:response][:meetings
 end
 
 logger = Logger.new("/var/log/bigbluebutton/audio-stats.log")
-logger.datetime_format = "%Y-%m-%dT%H:%M:%S.%L%z "
+formatter = Logger::Formatter.new
+logger.formatter = proc { |severity, datetime, progname, msg|
+  formatter.call(severity, datetime.utc, progname, msg)
+}
 
 participants.each do | participant|
   logger.info participant.to_json

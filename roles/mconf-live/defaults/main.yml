@@ -29,24 +29,23 @@ mconf_live_recording_auth_secret:
 mconf_live_recording_auth_local_address:
 
 bigbluebutton_docker_webrtc_sfu_enabled: false
-bigbluebutton_docker_webrtc_sfu_image: mconf/bbb-webrtc-sfu:v2.3.6
+bigbluebutton_docker_webrtc_sfu_image: mconf/bbb-webrtc-sfu:v2.3.7
 # it can be VP8 or H264
-bigbluebutton_docker_webrtc_sfu_codec_main: VP8
-bigbluebutton_docker_webrtc_sfu_codec_content: VP8
+bigbluebutton_docker_webrtc_sfu_codec: VP8
 bigbluebutton_docker_etherpad_enabled: false
 bigbluebutton_docker_etherpad_image: mconf/etherpad-lite:mconf
 bigbluebutton_docker_mcs_sip_enabled: false
 bigbluebutton_docker_mcs_sip_image: mconf/mcs-sip:v2.1.0-dev
 bigbluebutton_docker_sfu_phone_image: mconf/sfu-phone:v2.1.0-dev
 bigbluebutton_docker_mcs_bfcp_enabled: false
-bigbluebutton_docker_mcs_bfcp_image: mconf/mcs-bfcp:v0.0.2-dev-allocate-resources
+bigbluebutton_docker_mcs_bfcp_image: mconf/mcs-bfcp:v0.0.2-dev-allocate-port
 bigbluebutton_docker_mcs_bfcp_num_ports: 40
 bigbluebutton_docker_suite_enabled: false
 bigbluebutton_docker_suite_image: mconf/suite:suite-bbb-webrtc-sfu-2.4.0dev
 bigbluebutton_docker_suite_password: suite
 
 bigbluebutton_docker_kurento_enabled: false
-bigbluebutton_docker_kurento_instances:
+bigbluebutton_docker_kurento_instances: 1
 bigbluebutton_docker_kurento_first_port: 3100
 bigbluebutton_docker_kurento_image: mconf/kurento:6.10.0-bbb220-dev
 

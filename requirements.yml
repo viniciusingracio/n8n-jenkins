@@ -11,3 +11,5 @@
 - src: oefenweb.fail2ban
   version: v3.2.13
 
+- src: nickhammond.logrotate
+  version: v0.0.5

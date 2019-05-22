@@ -1,3 +1,5 @@
+# TODO stop container if bigbluebutton_docker_etherpad_enabled = false
+
 - name: Start etherpad container
   docker_container:
     name: etherpad
