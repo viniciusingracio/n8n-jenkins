@@ -72,8 +72,13 @@ kamailio.dev.mconf.com
 
 [mconf-live220]
 test-live220.dev.mconf.com certbot_enabled=true
-suite.mconf.com     certbot_enabled=true bigbluebutton_docker_webrtc_sfu_image=mconf/bbb-webrtc-sfu:v2.4.0-dev
-suite.dev.mconf.com certbot_enabled=true bigbluebutton_docker_webrtc_sfu_image=mconf/bbb-webrtc-sfu:v2.4.0-dev
+dev.bigbluebutton.local common_ufw_enabled=false
+suite.mconf.com certbot_enabled=true bigbluebutton_docker_suite_enabled=true bigbluebutton_docker_webrtc_sfu_image=mconf/bbb-webrtc-sfu:v2.4.0-dev bigbluebutton_docker_suite_image=mconf/suite:suite-new-interface
+suite.dev.mconf.com certbot_enabled=true bigbluebutton_docker_suite_enabled=true bigbluebutton_docker_webrtc_sfu_image=mconf/bbb-webrtc-sfu:v2.4.0-dev bigbluebutton_docker_suite_image=mconf/suite:suite-new-interface
+
+[suite]
+suite.mconf.com
+suite.dev.mconf.com
 
 [bbb-beats:children]
 mconf-live220

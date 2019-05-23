@@ -122,6 +122,7 @@ bigbluebutton_properties_config:
   - { key: 'maxInactivityTimeoutMinutes', value: '0' }
   - { key: 'userInactivityInspectTimerInMinutes', value: '0' }
   - { key: 'maxNumPages', value: '300' }
+  - { key: 'allowModsToUnmuteUsers', value: 'true' }
 
 bigbluebutton_stun_server:
   - stun:stun.l.google.com:19302

@@ -81,6 +81,11 @@
       SFU_PROCESSES: '{{ sfu_processes | to_json }}'
       CODEC_VIDEO_MAIN: '{{ bigbluebutton_docker_webrtc_sfu_codec_main }}'
       CODEC_VIDEO_CONTENT: '{{ bigbluebutton_docker_webrtc_sfu_codec_content }}'
+      VIDEO_RNP_BASE_URL: '{{ bigbluebutton_video_rnp_endpoint_hostname }}'
+      VIDEO_RNP_CLIENT_ID: '{{ bigbluebutton_video_rnp_client_id }}'
+      VIDEO_RNP_CLIENT_SECRET: '{{ bigbluebutton_video_rnp_client_secret }}'
+      VIDEO_RNP_REDIRECT_URI: 'https://{{ inventory_hostname }}/oauth2_redirect'
+      VIDEO_RNP_HOST_IP: '{{ external_ip }}'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /usr/local/bigbluebutton/bbb-webrtc-sfu/config/client_secret.json:/app/client_secret.json
