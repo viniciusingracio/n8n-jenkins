@@ -1,6 +1,21 @@
 - include: etherpad-dummy.yml
   when: bigbluebutton_docker_etherpad_enabled
 
+# TODO move this to etherpad-dummy.yml
+- apt:
+    name: bbb-etherpad=1.0
+    state: absent
+    force: yes
+  become: yes
+  when: not bigbluebutton_docker_etherpad_enabled
+
+# TODO move this to docker-etherpad.yml
+- name: stop etherpad container
+  docker_container:
+    name: etherpad
+    state: stopped
+  when: not bigbluebutton_docker_etherpad_enabled
+
 - stat:
     path: /etc/apt/sources.list.d/mconf-live.list
   register: mconf_repo_file
