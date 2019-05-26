@@ -22,16 +22,14 @@ mconf_live_extra_recording_packages:
 bigbluebutton_redis_bind:
   - 0.0.0.0
 
-bigbluebutton_webhooks: true
+certbot_webroot_cmd: '{{ certbot_base_cmd }} --webroot -w /var/www/bigbluebutton-default/'
 
 ffmpeg_version: '4.1'
 
 bigbluebutton_docker_kurento_enabled: true
 bigbluebutton_docker_webrtc_sfu_enabled: true
-bigbluebutton_docker_webrtc_sfu_image: mconf/bbb-webrtc-sfu:v2.3.5-no-desc-negotiation
-bigbluebutton_docker_etherpad_enabled: true
+bigbluebutton_docker_etherpad_enabled: false
 bigbluebutton_docker_mcs_sip_enabled: true
-bigbluebutton_docker_mcs_sip_image: mconf/mcs-sip:v2.3.2-invite-with-sdp
 bigbluebutton_docker_mcs_bfcp_enabled: true
 bigbluebutton_webhooks: true
 
