@@ -533,6 +533,7 @@
     special_time: hourly
     job: /usr/bin/ruby /usr/local/bigbluebutton/core/scripts/utils/remove-norecord.rb
     user: root
+    state: '{% if bigbluebutton_retention_unrecorded == 0 %}present{% else %}absent{% endif %}'
   become: yes
 
 - name: Install cron job to remove media files already archived
