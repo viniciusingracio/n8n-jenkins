@@ -3,7 +3,7 @@
     src: files/mconf-mcs-sip_1.0_all.deb
     dest: /tmp/mconf-mcs-sip_1.0_all.deb
 
-- name: Install dummy package 
+- name: Install dummy package
   apt:
     deb: /tmp/mconf-mcs-sip_1.0_all.deb
     force: yes
@@ -53,7 +53,7 @@
       ENABLE_EXTERNAL_API: "true"
       REGISTRAR: '{{ registrar_config | to_json }}'
       SIP_DEFAULT_GATEWAY: '{{ bigbluebutton_sip_default_gateway | default(bigbluebutton_sip_registrar_address, true) }}'
-      ENABLE_MCS_BFCP: "true"
+      ENABLE_MCS_BFCP: '{{ bigbluebutton_docker_mcs_bfcp_enabled }}'
       MCS_BFCP_ADDRESS: 'ws://{{ ansible_default_ipv4.address }}:8000'
     labels:
       hostname: '{{ inventory_hostname }}'
@@ -62,4 +62,3 @@
 - name: Remove old images
   shell: docker images {{ bigbluebutton_docker_mcs_sip_image.split(":")[0] }} --filter 'before={{ bigbluebutton_docker_mcs_sip_image }}' -q | xargs -r docker rmi --force
   notify: clean docker
-
