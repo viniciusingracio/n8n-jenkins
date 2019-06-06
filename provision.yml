@@ -73,7 +73,7 @@
   roles:
   - performance-report
   - nsca
-  
+
 # Kurento
 - hosts: kurento
   roles:
@@ -195,6 +195,10 @@
 - hosts: recw-callback
   roles:
   - TJRR.recording-callback
+
+- hosts: recw-transcode
+  roles:
+  - TJRR.video-transcode
 
 - hosts: all
   roles:
