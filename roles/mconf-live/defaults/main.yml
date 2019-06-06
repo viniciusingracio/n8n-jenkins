@@ -29,7 +29,7 @@ mconf_live_recording_auth_secret:
 mconf_live_recording_auth_local_address:
 
 bigbluebutton_docker_webrtc_sfu_enabled: false
-bigbluebutton_docker_webrtc_sfu_image: mconf/bbb-webrtc-sfu:v2.3.7
+bigbluebutton_docker_webrtc_sfu_image: mconf/bbb-webrtc-sfu:v2.3.9
 # it can be VP8 or H264
 bigbluebutton_docker_webrtc_sfu_codec: VP8
 bigbluebutton_docker_etherpad_enabled: false
