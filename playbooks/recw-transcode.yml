@@ -1,0 +1,5 @@
+---
+
+- hosts: recw-transcode
+  roles:
+  - TJRR.video-transcode

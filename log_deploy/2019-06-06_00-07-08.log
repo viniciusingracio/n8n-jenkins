@@ -1,0 +1,4 @@
+/usr/bin/ansible-playbook -v -i envs/prod/tjrr-staging/hosts -l mconf-recw playbooks/recw-transcode.yml -T 180 --force-handlers
+
+hrecw01-vc.tjrr.jus.br: 3 OK, 2 changed, 0 unreachable, 0 failed
+hrecw02-vc.tjrr.jus.br: 3 OK, 2 changed, 0 unreachable, 0 failed

@@ -9,8 +9,8 @@ require 'benchmark'
 # externally set (for instance, from command line).
 class BBBProperties
   def self.load_properties_from_file()
-      @@properties = Hash[File.read("/var/lib/tomcat7/webapps/bigbluebutton/"\
-        "WEB-INF/classes/bigbluebutton.properties", :encoding => "ISO-8859-1:UTF-8").scan(/(.+?)=(.+)/)]
+    servlet_dir = File.exists?("/usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties") ? "/usr/share/bbb-web" : "/var/lib/tomcat7/webapps/bigbluebutton"
+    @@properties = Hash[File.read("#{servlet_dir}/WEB-INF/classes/bigbluebutton.properties", :encoding => "ISO-8859-1:UTF-8").scan(/(.+?)=(.+)/)]
   end
 
   def self.load_properties_from_cli(server_url, salt)
@@ -57,8 +57,8 @@ class URIBuilder
     @@client_uri ||= build_uri "client/conf/config.xml"
   end
 
-  def self.api_method_uri(method)
-    @@method_uri ||= get_security method do |params, checksum|
+  def self.api_method_uri(method, params=nil)
+    get_security(method, params) do |params, checksum|
       "bigbluebutton/api/#{method}?#{params}&checksum=#{checksum}"
     end
   end
@@ -72,8 +72,8 @@ class URIBuilder
     end
   end
 
-  def self.get_security(method)
-    params = "random=#{rand(99999)}"
+  def self.get_security(method, params=nil)
+    params ||= "random=#{rand(99999)}"
     checksum = Digest::SHA1.hexdigest "#{method}#{params}#{BBBProperties.security_salt}"
     build_uri yield(params, checksum)
   end
@@ -135,7 +135,7 @@ class Hash
     end
 
     def xml_node_to_hash(node)
-      # If we are at the root of the document, start the hash 
+      # If we are at the root of the document, start the hash
       if node.element?
         result_hash = {}
         if node.attributes != {}
@@ -179,4 +179,3 @@ class Hash
     end
   end
 end
-
