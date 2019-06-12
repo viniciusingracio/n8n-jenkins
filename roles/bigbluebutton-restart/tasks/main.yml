@@ -1,0 +1,34 @@
+---
+
+- name: Copy scripts for recordings
+  synchronize:
+    src: files/
+    dest: /usr/local/bigbluebutton/core/scripts/utils/
+  become: yes
+
+- set_fact:
+    restart_mconf_command: /usr/local/bigbluebutton/core/scripts/utils/restart-mconf.sh >> /var/log/restart-mconf.log 2>&1
+- set_fact:
+    restart_mconf_command: /usr/bin/ruby /usr/local/bigbluebutton/core/scripts/utils/abort-if-meetings-running.rb && {{ restart_mconf_command }}
+  when: bigbluebutton_skip_restart_if_meetings_running | bool
+- set_fact:
+    restart_mconf_command: '{{ restart_mconf_command }}; systemctl stop red5 bbb-transcode-akka; systemctl disable red5 bbb-transcode-akka'
+  when: bigbluebutton_html5_only | bool
+
+- name: Install cron job to restart KMS daily
+  cron:
+    name: restart kms
+    minute: '0'
+    hour: '4'
+    user: root
+    state: absent
+  become: yes
+
+- name: Install cron job to restart Mconf daily
+  cron:
+    name: restart mconf
+    minute: '0'
+    hour: '4'
+    job: '{{ restart_mconf_command }}'
+    user: root
+  become: yes

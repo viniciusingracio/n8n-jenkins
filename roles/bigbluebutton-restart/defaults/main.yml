@@ -1,0 +1,4 @@
+---
+
+bigbluebutton_skip_restart_if_meetings_running: false
+bigbluebutton_html5_only: false
