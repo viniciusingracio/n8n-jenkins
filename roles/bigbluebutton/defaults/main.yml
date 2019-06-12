@@ -184,9 +184,4 @@ external_ip:
 bigbluebutton_zabbix_copy_scripts: false
 bigbluebutton_zabbix_conf_dir: /etc/zabbix/zabbix_agentd.conf.d
 
-logrotate_scripts:
-  - name: audio stats
-    path: /var/log/bigbluebutton/audio-stats.log
-    options:
-      - daily
-      - rotate 14
+bigbluebutton_skip_restart_if_meetings_running: false

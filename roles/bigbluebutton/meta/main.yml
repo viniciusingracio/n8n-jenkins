@@ -3,7 +3,6 @@
 dependencies:
   - jpnewman.json
   - kwoodson.yedit
-  - nickhammond.logrotate
   - ffmpeg
   - docker-host
   - role: handlers

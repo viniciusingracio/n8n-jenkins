@@ -1,0 +1,6 @@
+---
+
+- hosts: logrotate
+  become: yes
+  roles:
+  - nickhammond.logrotate

@@ -1,0 +1,39 @@
+---
+
+- gem:
+    name: '{{ item.name }}'
+    version: '{{ item.version }}'
+    state: present
+    user_install: no
+  with_items:
+    - { name: 'google-cloud-storage', version: '1.18.2' }
+    - { name: 'google-cloud-speech', version: '0.34.1' }
+  become: yes
+
+- copy:
+    src: files/06-transcribe.rb
+    dest: /usr/local/bigbluebutton/core/scripts/post_publish/06-transcribe.rb
+  become: yes
+  when: asr_enabled | bool
+
+- copy:
+    src: '{{ asr_gcloud_credentials_src }}'
+    dest: '{{ asr_gcloud_credentials_path }}'
+  become: yes
+  when: asr_enabled | bool
+
+- template:
+    src: templates/06-transcribe.yml.j2
+    dest: /usr/local/bigbluebutton/core/scripts/post_publish/06-transcribe.yml
+  become: yes
+  when: asr_enabled | bool
+
+- file:
+    path: '{{ item }}'
+    state: absent
+  with_items:
+    - /usr/local/bigbluebutton/core/scripts/post_publish/06-transcribe.rb
+    - /usr/local/bigbluebutton/core/scripts/post_publish/06-transcribe.yml
+    - '{{ asr_gcloud_credentials_path }}'
+  become: yes
+  when: not asr_enabled | bool

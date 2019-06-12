@@ -200,6 +200,14 @@
   roles:
   - TJRR.video-transcode
 
+- hosts: recw-transcribe
+  roles:
+  - TJRR.recording-transcription
+
+- hosts: logrotate
+  roles:
+  - nickhammond.logrotate
+
 - hosts: all
   roles:
   - { role: reboot, tags: always }

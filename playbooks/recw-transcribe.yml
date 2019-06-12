@@ -1,0 +1,5 @@
+---
+
+- hosts: recw-transcribe
+  roles:
+  - TJRR.recording-transcription
