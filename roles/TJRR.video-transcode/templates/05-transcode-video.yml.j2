@@ -1,0 +1,6 @@
+{% if recording_transcode_matcher | length > 0 %}
+matcher:
+{{ recording_transcode_matcher | to_nice_yaml }}
+{% else %}
+matcher: []
+{% endif %}

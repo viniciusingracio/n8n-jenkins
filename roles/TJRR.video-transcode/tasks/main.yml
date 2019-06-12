@@ -1,0 +1,22 @@
+---
+
+- copy:
+    src: files/05-transcode-video.rb
+    dest: /usr/local/bigbluebutton/core/scripts/post_publish/05-transcode-video.rb
+  become: yes
+  when: recording_transcode_enabled
+
+- template:
+    src: templates/05-transcode-video.yml.j2
+    dest: /usr/local/bigbluebutton/core/scripts/post_publish/05-transcode-video.yml
+  become: yes
+  when: recording_transcode_enabled
+
+- file:
+    path: '{{ item }}'
+    state: absent
+  with_items:
+    - /usr/local/bigbluebutton/core/scripts/post_publish/05-transcode-video.rb
+    - /usr/local/bigbluebutton/core/scripts/post_publish/05-transcode-video.yml
+  become: yes
+  when: not recording_transcode_enabled
