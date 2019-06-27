@@ -183,7 +183,7 @@
 
 - name: Determine if use self signed certificate
   set_fact:
-    use_self_signed_certificate: '{{ bigbluebutton_local_ssl_certificate is none and not certbot_enabled }}'
+    use_self_signed_certificate: '{{ bigbluebutton_local_ssl_certificate is none and not certbot_enabled | bool }}'
 
 - include: self-signed-certs.yml
   when: use_self_signed_certificate

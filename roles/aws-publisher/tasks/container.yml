@@ -31,17 +31,17 @@
       - /var/bigbluebutton:/var/bigbluebutton
       - /var/log/bigbluebutton:/var/log/bigbluebutton
     env:
-      BBB_AWS_REGION: '{{ aws_publisher_region }}'
-      BBB_AWS_KEY: '{{ aws_publisher_key }}'
-      BBB_AWS_SECRET: '{{ aws_publisher_secret }}'
-      BBB_AWS_BUCKET: '{{ aws_publisher_bucket }}'
-      BBB_AWS_DEBUG: '{{ aws_publisher_debug }}'
-      BBB_AWS_REMOTE_PLAYBACK: '{{ aws_publisher_remote_playback }}'
-      BBB_AWS_REMOTE_PLAYBACK_URL: '{{ aws_publisher_remote_playback_url }}'
-      BBB_AWS_AVAILABLE_FORMATS: '{{ aws_publisher_available_formats }}'
-      BBB_AWS_KEEP_LOCAL: '{{ aws_publisher_keep_local }}'
-      BBB_AWS_REDIS_HOST: '{{ docker_ip.stdout }}'
-      BBB_AWS_FAST_RESYNC: '{{ aws_publisher_fast_resync }}'
+      BBB_AWS_REGION: '{{ aws_publisher_region | string }}'
+      BBB_AWS_KEY: '{{ aws_publisher_key | string }}'
+      BBB_AWS_SECRET: '{{ aws_publisher_secret | string }}'
+      BBB_AWS_BUCKET: '{{ aws_publisher_bucket | string }}'
+      BBB_AWS_DEBUG: '{{ aws_publisher_debug | string }}'
+      BBB_AWS_REMOTE_PLAYBACK: '{{ aws_publisher_remote_playback | string }}'
+      BBB_AWS_REMOTE_PLAYBACK_URL: '{{ aws_publisher_remote_playback_url | string }}'
+      BBB_AWS_AVAILABLE_FORMATS: '{{ aws_publisher_available_formats | string }}'
+      BBB_AWS_KEEP_LOCAL: '{{ aws_publisher_keep_local | string }}'
+      BBB_AWS_REDIS_HOST: '{{ docker_ip.stdout | string }}'
+      BBB_AWS_FAST_RESYNC: '{{ aws_publisher_fast_resync | string }}'
     labels:
       hostname: '{{ inventory_hostname }}'
 
@@ -55,17 +55,17 @@
       - /var/bigbluebutton:/var/bigbluebutton
       - /var/log/bigbluebutton:/var/log/bigbluebutton
     env:
-      BBB_AWS_REGION: '{{ aws_publisher_region }}'
-      BBB_AWS_KEY: '{{ aws_publisher_key }}'
-      BBB_AWS_SECRET: '{{ aws_publisher_secret }}'
-      BBB_AWS_BUCKET: '{{ aws_publisher_bucket }}'
-      BBB_AWS_DEBUG: '{{ aws_publisher_debug }}'
-      BBB_AWS_REMOTE_PLAYBACK: '{{ aws_publisher_remote_playback }}'
-      BBB_AWS_REMOTE_PLAYBACK_URL: '{{ aws_publisher_remote_playback_url }}'
-      BBB_AWS_AVAILABLE_FORMATS: '{{ aws_publisher_available_formats }}'
-      BBB_AWS_KEEP_LOCAL: '{{ aws_publisher_keep_local }}'
-      BBB_AWS_REDIS_HOST: '{{ docker_ip.stdout }}'
-      BBB_AWS_FAST_RESYNC: '{{ aws_publisher_fast_resync }}'
+      BBB_AWS_REGION: '{{ aws_publisher_region | string }}'
+      BBB_AWS_KEY: '{{ aws_publisher_key | string }}'
+      BBB_AWS_SECRET: '{{ aws_publisher_secret | string }}'
+      BBB_AWS_BUCKET: '{{ aws_publisher_bucket | string }}'
+      BBB_AWS_DEBUG: '{{ aws_publisher_debug | string }}'
+      BBB_AWS_REMOTE_PLAYBACK: '{{ aws_publisher_remote_playback | string }}'
+      BBB_AWS_REMOTE_PLAYBACK_URL: '{{ aws_publisher_remote_playback_url | string }}'
+      BBB_AWS_AVAILABLE_FORMATS: '{{ aws_publisher_available_formats | string }}'
+      BBB_AWS_KEEP_LOCAL: '{{ aws_publisher_keep_local | string }}'
+      BBB_AWS_REDIS_HOST: '{{ docker_ip.stdout | string }}'
+      BBB_AWS_FAST_RESYNC: '{{ aws_publisher_fast_resync | string }}'
     labels:
       hostname: '{{ inventory_hostname }}'
   when: aws_publisher_run_resync

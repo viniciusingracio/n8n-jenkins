@@ -7,6 +7,7 @@
   become: yes
   ufw: rule=allow port=nfs src={{ hostvars[item].nfs_ip }}
   with_items: "{{ groups['mconf-recw'] }}"
+  when: hostvars[item].nfs_ip is defined
   notify:
     - restart ufw
 
