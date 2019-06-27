@@ -15,7 +15,7 @@
     name: '{{ rec_proxy_image }}'
     tag: '{{ rec_proxy_image_version }}'
     force: true
-  when: rec_proxy_build_from_source and rec_proxy_code.changed
+  when: rec_proxy_build_from_source | bool and rec_proxy_code.changed
 
 - name: Create directory for nginx cache
   file:
@@ -29,12 +29,12 @@
     container_volumes:
       - /var/www:/usr/local/openresty/nginx/html # for certbot --webroot and static pages
       - '{{ rec_proxy_certs_path_root }}:{{ rec_proxy_certs_path_root }}'
-      - /var/cache/nginx:/var/cache/nginx
+      - '{{ rec_proxy_cache_path }}:/var/cache/nginx'
 
 - name: Include playback volume
   set_fact:
-    container_volumes: '{{ container_volumes + [ "/var/bigbluebutton:/var/bigbluebutton" ] }}'
-  when: rec_proxy_local_playback
+    container_volumes: '{{ container_volumes + [ "/var/bigbluebutton/published:/var/bigbluebutton/published" ] }}'
+  when: rec_proxy_local_playback | bool
 
 - name: Determine ports
   set_fact:
