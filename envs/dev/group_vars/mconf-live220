@@ -28,7 +28,8 @@ ffmpeg_version: '4.1'
 
 bigbluebutton_docker_kurento_enabled: true
 bigbluebutton_docker_webrtc_sfu_enabled: true
-bigbluebutton_docker_etherpad_enabled: false
+bigbluebutton_docker_webrtc_sfu_codec: H264
+bigbluebutton_docker_etherpad_enabled: true
 bigbluebutton_docker_mcs_sip_enabled: true
 bigbluebutton_docker_mcs_bfcp_enabled: true
 bigbluebutton_webhooks: true

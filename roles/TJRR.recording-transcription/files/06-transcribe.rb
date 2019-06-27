@@ -26,6 +26,7 @@ require "trollop"
 require "yaml"
 require "fileutils"
 require "json"
+require "pp"
 require File.expand_path("../../../lib/recordandplayback", __FILE__)
 
 opts = Trollop::options do
@@ -59,9 +60,25 @@ storage_file_name = "#{meeting_id}.flac"
 storage_path = "gs://#{bucket_name}/#{storage_file_name}"
 
 BigBlueButton.logger.info("Generating #{language_code} transcription for #{meeting_id}")
-if !File.exist?(vtt_file)
+if ! File.exist?(vtt_file)
   FileUtils.mkdir_p speech_dir
-  BigBlueButton::AudioProcessor.process("/var/bigbluebutton/recording/raw/#{meeting_id}", "#{speech_dir}/audio") if !File.exist?(audio_file)
+  if ! File.exist?(audio_file)
+    raw_dir = "/var/bigbluebutton/recording/raw/#{meeting_id}"
+    if Dir.exist?(raw_dir)
+      BigBlueButton::AudioProcessor.process(raw_dir, "#{speech_dir}/audio")
+    elsif Dir.exist?(published_files)
+      command = ""
+      if File.exist?("#{published_files}/video/webcams.webm")
+        command = "ffmpeg -i #{published_files}/video/webcams.webm -vn -af aformat=s16:48000 #{audio_file}"
+      elsif File.exist?("#{published_files}/video/webcams.mp4")
+        command = "ffmpeg -i #{published_files}/video/webcams.mp4 -vn -af aformat=s16:48000 #{audio_file}"
+      else
+        raise "Can't find any file to extract the audio file"
+      end
+      BigBlueButton.execute(command)
+    end
+  end
+
   if File.exist?(audio_file)
     BigBlueButton.logger.info("Storing audio file as #{storage_file_name} at #{bucket_name}")
     storage = Google::Cloud::Storage.new project_id: project_id, credentials: credentials
@@ -73,7 +90,7 @@ if !File.exist?(vtt_file)
     config = { encoding: :FLAC,
                sample_rate_hertz: 48_000,
                audio_channel_count: 2,
-               enable_separate_recognition_per_channel: true,
+               enable_separate_recognition_per_channel: false,
                enable_word_time_offsets: true,
                enable_automatic_punctuation: true,
                language_code: language_code }
@@ -82,8 +99,9 @@ if !File.exist?(vtt_file)
     operation.wait_until_done!
     raise operation.results.message if operation.error?
     results = operation.response.results
+    File.open("#{speech_dir}/gcloud.out", 'w') { |file| PP.pp(results, file) }
 
-    if !results.empty?
+    if ! results.empty?
       BigBlueButton.logger.info("Generating #{language_code} VTT file for #{meeting_id}")
       vtt = File.new(vtt_file, "w")
       vtt.write("WEBVTT\n")
