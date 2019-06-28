@@ -55,7 +55,7 @@
       SIP_DEFAULT_GATEWAY: '{{ bigbluebutton_sip_default_gateway | default(bigbluebutton_sip_registrar_address, true) }}'
       ENABLE_MCS_BFCP: '{{ bigbluebutton_docker_mcs_bfcp_enabled | string }}'
       MCS_BFCP_ADDRESS: 'ws://{{ ansible_default_ipv4.address }}:8000'
-      INFO_INTRAFRAME_INTERVAL: '0'
+      INFO_INTRAFRAME_INTERVAL: '{{ bigbluebutton_docker_mcs_sip_intraframe_interval | string }}'
     labels:
       hostname: '{{ inventory_hostname }}'
   notify: restart docker components

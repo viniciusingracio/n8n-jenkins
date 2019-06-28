@@ -1,0 +1,20 @@
+/usr/bin/ansible-playbook -v -i envs/prod/tjrr/hosts -l mconf-live200,mconf-rec,mconf-recw provision.yml -T 180 --force-handlers
+
+aer-vc.tjrr.jus.br: 250 OK, 54 changed, 0 unreachable, 0 failed
+bfi-vc.tjrr.jus.br: 250 OK, 56 changed, 0 unreachable, 0 failed
+ckr-vc.tjrr.jus.br: 250 OK, 55 changed, 0 unreachable, 0 failed
+fcr-vc.tjrr.jus.br: 250 OK, 56 changed, 0 unreachable, 0 failed
+fcv-vc.tjrr.jus.br: 250 OK, 55 changed, 0 unreachable, 0 failed
+live01-vc.tjrr.jus.br: 250 OK, 51 changed, 0 unreachable, 0 failed
+live02-vc.tjrr.jus.br: 250 OK, 51 changed, 0 unreachable, 0 failed
+live03-vc.tjrr.jus.br: 250 OK, 51 changed, 0 unreachable, 0 failed
+live04-vc.tjrr.jus.br: 250 OK, 51 changed, 0 unreachable, 0 failed
+mji-vc.tjrr.jus.br: 250 OK, 55 changed, 0 unreachable, 0 failed
+pac-vc.tjrr.jus.br: 0 OK, 0 changed, 1 unreachable, 0 failed
+pjs-vc.tjrr.jus.br: 250 OK, 55 changed, 0 unreachable, 0 failed
+rec-vc.tjrr.jus.br: 203 OK, 38 changed, 0 unreachable, 1 failed
+recw01-vc.tjrr.jus.br: 210 OK, 50 changed, 0 unreachable, 0 failed
+recw02-vc.tjrr.jus.br: 210 OK, 50 changed, 0 unreachable, 0 failed
+rli-vc.tjrr.jus.br: 250 OK, 56 changed, 0 unreachable, 0 failed
+slz-vc.tjrr.jus.br: 250 OK, 56 changed, 0 unreachable, 0 failed
+vij-vc.tjrr.jus.br: 250 OK, 56 changed, 0 unreachable, 0 failed

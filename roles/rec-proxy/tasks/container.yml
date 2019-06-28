@@ -33,7 +33,7 @@
 
 - name: Include playback volume
   set_fact:
-    container_volumes: '{{ container_volumes + [ "/var/bigbluebutton/published:/var/bigbluebutton/published" ] }}'
+    container_volumes: '{{ container_volumes + [ "/var/bigbluebutton:/var/bigbluebutton" ] }}'
   when: rec_proxy_local_playback | bool
 
 - name: Determine ports
