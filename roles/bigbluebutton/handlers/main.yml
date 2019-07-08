@@ -1,6 +1,6 @@
 - name: restart bigbluebutton
   become: true
-  command: bbb-conf --restart
+  command: /usr/local/bigbluebutton/core/scripts/utils/restart-mconf.sh
   ignore_errors: yes
 
 - name: restart redis

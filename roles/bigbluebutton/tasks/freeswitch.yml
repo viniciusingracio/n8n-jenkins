@@ -36,12 +36,13 @@
     - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "external_sip_ip=")]', attribute: 'data', value: 'external_sip_ip={{ external_ip }}' }
     - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "sound_prefix=")]', attribute: 'data', value: 'sound_prefix={{ bigbluebutton_sounds_prefix }}' }
     - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "local_ip_v4=")]', attribute: 'data', value: 'local_ip_v4={{ ansible_default_ipv4.address }}' }
+    - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "rtp_liberal_dtmf=")]', attribute: 'data', value: 'rtp_liberal_dtmf=true' }
   become: yes
   notify: restart bigbluebutton
 
 - name: Determine properties to modify external.xml
   set_fact:
-    external_props: 
+    external_props:
       - { name: "ext-rtp-ip", value: '$${external_rtp_ip}' }
       - { name: "ext-sip-ip", value: '$${external_sip_ip}' }
       - { name: "enable-3pcc", value: "proxy" }
@@ -50,6 +51,9 @@
       - { name: "ws-binding", value: "{{ ws_binding_value }}" }
       - { name: "wss-binding", value: "{{ wss_binding_value }}" }
       - { name: "apply-candidate-acl", value: "0.0.0.0/0" }
+      - { name: "liberal-dtmf", value: "true" }
+      - { name: "dtmf_type" }
+      - { name: "dtmf-type" }
 
 - name: Read external_props
   xml:
@@ -72,7 +76,7 @@
           value: '{{ item.item.value }}'
     pretty_print: yes
   with_items: '{{ external_props_read.results }}'
-  when: item is failed
+  when: item is failed and item.item.value is defined
   become: yes
   notify: restart bigbluebutton
 
@@ -83,7 +87,17 @@
     attribute: value
     value: '{{ item.item.value }}'
   with_items: '{{ external_props_read.results }}'
-  when: item is succeeded
+  when: item is succeeded and item.item.value is defined
+  become: yes
+  notify: restart bigbluebutton
+
+- name: Remove external_prop if it shouldn't exist
+  xml:
+    path: /opt/freeswitch/conf/sip_profiles/external.xml
+    xpath: '/profile/settings/param[@name="{{ item.item.name }}"]'
+    state: absent
+  with_items: '{{ external_props_read.results }}'
+  when: item is succeeded and item.item.value is undefined
   become: yes
   notify: restart bigbluebutton
 
@@ -153,7 +167,7 @@
 
 - name: Determine properties to modify event_socket.conf.xml
   set_fact:
-    esl_props: 
+    esl_props:
       - { name: "listen-ip", value: "0.0.0.0" }
       - { name: "apply-inbound-acl", value: "0.0.0.0/0" }
 

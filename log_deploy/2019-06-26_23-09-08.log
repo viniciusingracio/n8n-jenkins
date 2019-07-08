@@ -1,0 +1,7 @@
+/usr/bin/ansible-playbook -v -i envs/prod/redclara/hosts -l mconf-live110,mconf-live220 playbooks/bigbluebutton-restart.yml -T 180 --force-handlers
+
+mconf-live01.reuna.cl: 6 OK, 0 changed, 0 unreachable, 0 failed
+mconf-live1.redclara.net: 6 OK, 0 changed, 0 unreachable, 0 failed
+mconf-live2.redclara.net: 6 OK, 0 changed, 0 unreachable, 0 failed
+vce-live1.conare.ac.cr: 5 OK, 1 changed, 0 unreachable, 0 failed
+vce-live2.cedia.org.ec: 5 OK, 1 changed, 0 unreachable, 0 failed

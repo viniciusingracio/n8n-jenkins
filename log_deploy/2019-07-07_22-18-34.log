@@ -1,0 +1,5 @@
+/usr/bin/ansible-playbook -v -i envs/prod/com/hosts -l live01*,live02*,live04* provision.yml -T 180 --force-handlers
+
+live01.mconf.com: 229 OK, 48 changed, 0 unreachable, 0 failed
+live02.mconf.com: 17 OK, 6 changed, 0 unreachable, 1 failed
+live04.mconf.com: 278 OK, 73 changed, 0 unreachable, 0 failed
