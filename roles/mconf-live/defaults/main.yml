@@ -28,6 +28,9 @@ mconf_live_recording_auth_entry_point:
 mconf_live_recording_auth_secret:
 mconf_live_recording_auth_local_address:
 
+bigbluebutton_stun_server:
+  - stun:stun.l.google.com:19302
+
 bigbluebutton_docker_webrtc_sfu_enabled: false
 bigbluebutton_docker_webrtc_sfu_image: mconf/bbb-webrtc-sfu:v2.4.0
 # it can be VP8 or H264

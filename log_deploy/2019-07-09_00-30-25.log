@@ -1,0 +1,3 @@
+/usr/bin/ansible-playbook -v -i envs/prod/207technologies/hosts -l mconf-rec provision.yml -T 180 --force-handlers
+
+rec.distancelearning.cloud: 181 OK, 50 changed, 0 unreachable, 0 failed
