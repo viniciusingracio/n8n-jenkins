@@ -66,7 +66,7 @@ files.each do |filename|
     end
 
     recording_node = recordings[record_id]
-    if ! playback.nil?
+    if ! playback.nil? && playback.children.length > 0
         playback.name = "format"
         playback.at("format").name = "type"
         playback.at("link").name = "url"

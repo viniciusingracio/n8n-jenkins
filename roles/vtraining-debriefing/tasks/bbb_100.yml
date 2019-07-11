@@ -152,7 +152,7 @@
           </profile>
     insertbefore: '</profiles>'
     marker: '<!-- {mark} ANSIBLE MANAGED BLOCK -->'
-    create: yes 
+    create: yes
   become: yes
 
 - name: Set IP on vars.xml
@@ -220,7 +220,7 @@
   apt:
     name: bbb-demo
     state: present
-  when: bigbluebutton_demos
+  when: bigbluebutton_demos|bool
   notify: restart bigbluebutton
 
 - name: Remove demos
@@ -228,7 +228,7 @@
   apt:
     name: bbb-demo
     state: absent
-  when: bigbluebutton_demos == False
+  when: not bigbluebutton_demos|bool
   notify: restart bigbluebutton
 
 - name: Open/close redis

@@ -21,20 +21,20 @@
     remote_src: True
     creates: /usr/local/src/openh264-{{ openh264_version }}
   become: yes
-  when: build_openh264
+  when: build_openh264|bool
 
 - name: Build openh264
   make:
     chdir: /usr/local/src/openh264-{{ openh264_version }}
   become: yes
-  when: build_openh264
+  when: build_openh264|bool
 
 - name: Install openh264
   make:
     chdir: /usr/local/src/openh264-{{ openh264_version }}
     target: install
   become: yes
-  when: build_openh264
+  when: build_openh264|bool
 
 - name: Create link to openh264 library
   file:
@@ -42,4 +42,4 @@
     dest: /usr/lib/x86_64-linux-gnu/libopenh264.so.0
     state: link
   become: yes
-  when: build_openh264
+  when: build_openh264|bool

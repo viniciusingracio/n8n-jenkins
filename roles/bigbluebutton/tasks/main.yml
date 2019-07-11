@@ -3,14 +3,14 @@
     src: /etc/apt/sources.list.d/bigbluebutton.list
   register: slurpfile
   ignore_errors: yes
-  when: bigbluebutton_apt_clean_installation
+  when: bigbluebutton_apt_clean_installation|bool
 
 - set_fact:
     current_apt_source: '{{ slurpfile["content"] | b64decode | regex_replace("\n") }}'
-  when: bigbluebutton_apt_clean_installation and slurpfile is succeeded and not slurpfile is skipped
+  when: bigbluebutton_apt_clean_installation|bool and slurpfile is succeeded and not slurpfile is skipped
 
 - include: clean-installation.yml
-  when: bigbluebutton_apt_clean_installation and slurpfile is succeeded and current_apt_source != bigbluebutton_apt_source
+  when: bigbluebutton_apt_clean_installation|bool and slurpfile is succeeded and current_apt_source != bigbluebutton_apt_source
 
 - name: Update apt (if older than 60m)
   become: true
@@ -186,7 +186,7 @@
     use_self_signed_certificate: '{{ bigbluebutton_local_ssl_certificate is none and not certbot_enabled | bool }}'
 
 - include: self-signed-certs.yml
-  when: use_self_signed_certificate
+  when: use_self_signed_certificate|bool
 
 - name: Add ssl configuration on nginx
   blockinfile:
@@ -232,7 +232,7 @@
   apt:
     name: bbb-demo
     state: '{{ bigbluebutton_apt_state }}'
-  when: bigbluebutton_demos
+  when: bigbluebutton_demos|bool
   register: reg_demo
 
 - name: Restart tomcat7
@@ -245,28 +245,28 @@
 - name: Wait until demo is deployed before continuing
   wait_for:
     path: /var/lib/tomcat7/webapps/demo/bbb_api_conf.jsp
-  when: bigbluebutton_demos
+  when: bigbluebutton_demos|bool
 
 - name: Copy demo0
   become: true
   copy:
     src: files/demo0.jsp
     dest: /var/lib/tomcat7/webapps/demo/demo0.jsp
-  when: bigbluebutton_demos
+  when: bigbluebutton_demos|bool
 
 - name: Remove demos
   become: true
   apt:
     name: bbb-demo
     state: absent
-  when: not bigbluebutton_demos
+  when: not bigbluebutton_demos|bool
 
 - name: Make sure demo is removed
   file:
     path: /var/lib/tomcat7/demo
     state: absent
   become: yes
-  when: not bigbluebutton_demos
+  when: not bigbluebutton_demos|bool
 
 - name: Get BigBlueButton secret
   shell: cat {{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
@@ -285,23 +285,23 @@
 - name: bbb-conf --setip
   become: true
   command: bbb-conf --setip '{{ inventory_hostname }}'
-  when: setip_needed
+  when: setip_needed|bool
 
 - name: Get BigBlueButton secret again
   shell: cat {{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
   register: reg_bbb_secret
-  when: setip_needed
+  when: setip_needed|bool
 
 - name: Get BigBlueButton URL again
   shell: cat {{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties | grep '^bigbluebutton.web.serverURL=' | cut -d'=' -f2 | awk '{print $1"/bigbluebutton/"}'
   register: reg_bbb_url
-  when: setip_needed
+  when: setip_needed|bool
 
 - name: Determine URL and secret again
   set_fact:
     bbb_url: '{{ reg_bbb_url.stdout }}'
     bbb_secret: '{{ reg_bbb_secret.stdout }}'
-  when: setip_needed
+  when: setip_needed|bool
 
 - name: Configure akka apps
   become: yes

@@ -11,7 +11,7 @@
     regexp: '(?P<before><form [^>]*)\/demo\/.*.jsp(?P<after>[^>]*>)'
     replace: '\g<before>/demo/demo0.jsp\g<after>'
   become: yes
-  when: bigbluebutton_demos
+  when: bigbluebutton_demos|bool
 
 - name: Copy layout.xml
   copy:
