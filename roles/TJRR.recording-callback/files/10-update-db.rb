@@ -92,8 +92,10 @@ if ! data["playback"].empty?
   data["playback"]["url"] = data["playback"].delete("link")
   data["playback"]["processingTime"] = data["playback"].delete("processing_time")
   data["playback"]["length"] = (data["playback"].delete("duration").to_f / 60000).to_i
-  data["playback"].delete("extensions").each do |k, v|
-    data["playback"][k] = v
+  if data["playback"].key?("extensions")
+    data["playback"].delete("extensions").each do |k, v|
+      data["playback"][k] = v
+    end
   end
   playback = data.delete("playback")
   data["playback"] = { "format" => playback }
@@ -138,4 +140,3 @@ rescue => e
   BigBlueButton.logger.info("Rescued")
   BigBlueButton.logger.info(e.to_s)
 end
-

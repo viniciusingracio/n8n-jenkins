@@ -1,0 +1,3 @@
+/usr/bin/ansible-playbook -v -i envs/prod/com/hosts -l rec-proxy provision.yml -T 180
+
+rec.mconf.com: 22 OK, 7 changed, 0 unreachable, 0 failed

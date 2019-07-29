@@ -1,0 +1,6 @@
+/usr/bin/ansible-playbook -v -i envs/dev/hosts -l test-live* provision.yml -T 180 --force-handlers
+
+test-live1.dev.mconf.com: 0 OK, 0 changed, 1 unreachable, 0 failed
+test-live110.mconf.com: 0 OK, 0 changed, 1 unreachable, 0 failed
+test-live2.dev.mconf.com: 0 OK, 0 changed, 1 unreachable, 0 failed
+test-live220.dev.mconf.com: 227 OK, 55 changed, 0 unreachable, 0 failed

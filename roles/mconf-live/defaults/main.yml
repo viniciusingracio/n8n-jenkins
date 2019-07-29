@@ -51,7 +51,7 @@ bigbluebutton_docker_suite_password: suite
 bigbluebutton_docker_kurento_enabled: false
 bigbluebutton_docker_kurento_instances: 1
 bigbluebutton_docker_kurento_first_port: 3100
-bigbluebutton_docker_kurento_image: mconf/kurento:6.10.0-bbb220-dev
+bigbluebutton_docker_kurento_image: mconf/kurento:6.11.0-mconf-dev
 
 bigbluebutton_sip_default_gateway:
 bigbluebutton_sip_registrar_enabled: false
