@@ -4,5 +4,10 @@
 - include: mysql.yml
   when: mconf_db_install_db == 'mysql'
 
+- include: mysql-replication.yml
+  when:
+    - mconf_db_install_db == 'mysql'
+    - mconf_db_replication_enabled
+
 - include: redis.yml
   when: mconf_db_install_redis

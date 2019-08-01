@@ -1,33 +1,43 @@
 ---
 
-- name: Install the mysql packages
+- name: Generate server-id
+  shell: hostname -I | sed -e 's/ \+\([a-z0-9]\+\:\)\+[a-z0-9]\+//' | sed -e 's/ /\n/' | grep -v '^$' | tail -1 | awk -F. '{print $3 * 256 + $4}'
+  register: mconf_db_server_id_generated
+  when: mconf_db_server_id == None
+
+- name: Install mysql packages
   become: true
   apt:
     name: "{{ mconf_db_mysql_pkgs }}"
     state: present
     update_cache: yes
 
-- name: Copy the my.cnf file
+- name: Create the configuration directory
   become: true
-  template: src=my.cnf.j2 dest={{ mconf_db_mysql_conf_dir }}/my.cnf
-  notify:
-   - restart mysql
+  file: path="{{ mconf_db_mysql_conf_dir }}" state=directory
 
-- name: Create the directory /etc/mysql/conf.d
+- name: Detect original config
+  stat: path="{{ mconf_db_mysql_conf_dir }}/{{ mconf_db_mysql_conf_name }}"
+  register: mysqldcnf
+- name: Backup original config
   become: true
-  file: path=/etc/mysql/conf.d state=directory
-  notify:
-   - restart mysql
+  command: "mv {{ mconf_db_mysql_conf_dir }}/{{ mconf_db_mysql_conf_name }} {{ mconf_db_mysql_conf_dir }}/{{ mconf_db_mysql_conf_name }}.bk"
+  when: mysqldcnf.stat.exists == True
 
-- name: Deploy mysql config to conf.d
+- name: Deploy mysql config
   become: true
-  template: src=mysql.cnf.j2 dest=/etc/mysql/conf.d/mysql.cnf
-  notify:
-    - restart mysql
+  template: src=mysql.cnf.j2 dest="{{ mconf_db_mysql_conf_dir }}/{{ mconf_db_mysql_conf_name }}"
+  register: conf
 
-- name: Start the mysql services
+- name: Start the mysql service
   become: true
   service: name={{ mconf_db_mysql_service }} state=started enabled=yes
+  when: not conf.changed
+
+- name: Restart the mysql service
+  become: true
+  service: name={{ mconf_db_mysql_service }} state=restarted enabled=yes
+  when: conf.changed
 
 - name: Abort if root password not set
   fail:
@@ -53,12 +63,21 @@
   when: mycnf.stat.exists == False
 
 - name: Update mysql root password for all root accounts
-  mysql_user: name=root host={{ item }} password={{ mconf_db_mysql_root_db_pass | mandatory }} check_implicit_admin=yes
+  mysql_user:
+    name: root
+    host: "{{ item }}"
+    password: "{{ mconf_db_mysql_root_db_pass | mandatory }}"
+    check_implicit_admin: yes
   with_items:
-   - "{{ ansible_hostname }}"
    - 127.0.0.1
    - ::1
    - localhost
+
+- name: Disallow root login remotely
+  command: 'mysql -NBe "{{ item }}"'
+  with_items:
+    - DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1')
+  changed_when: false
 
 - name: Install .my.cnf file with root password credentials
   template: src=.my.cnf.j2 dest="/home/{{ deploy_user }}/.my.cnf" mode=0600
@@ -72,15 +91,37 @@
 - name: Remove the test database
   mysql_db: name=test state=absent
 
+# the user ubuntu uses when updating mysql packages
+# GRANT ALL PRIVILEGES on *.* TO `debian-sys-maint`@`localhost` IDENTIFIED BY 'your password' WITH GRANT OPTION;
+- name: Capture the password for debian-sys-maint
+  shell: cat /etc/mysql/debian.cnf | grep -e password | tail -1 | awk '{print $3}'
+  become: true
+  register: debianpw
+- name: Create the debian-sys-maint user
+  mysql_user:
+    name: debian-sys-maint
+    password: "{{ debianpw.stdout }}"
+    priv: '*.*:ALL'
+    state: present
+    host: localhost
+
 - name: Create the databases
   mysql_db: name={{ item.name }} state=present
   with_items:
     - "{{ mconf_db_databases }}"
-  when: mconf_db_databases is defined and mconf_db_databases != None
+  when:
+    - mconf_db_databases is defined and mconf_db_databases != None
+    - mconf_db_role == 'master'
 
 - name: Create the database users
-  mysql_user: name={{ item.name }} password={{ item.pass|default("foobar") }}
-              priv={{ item.priv|default("*.*:ALL") }} state=present host={{ item.host | default("localhost") }}
+  mysql_user:
+    name: "{{ item.name }}"
+    password: "{{ item.pass | default('foobar') }}"
+    priv: "{{ item.priv | default('*.*:ALL') }}"
+    state: present
+    host: "{{ item.host | default('localhost') }}"
   with_items:
     - "{{ mconf_db_users }}"
-  when: mconf_db_users is defined and mconf_db_users != None
+  when:
+    - mconf_db_users is defined and mconf_db_users != None
+    - mconf_db_role == 'master'

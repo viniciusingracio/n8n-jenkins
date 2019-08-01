@@ -1,0 +1,54 @@
+# Adapted from https://github.com/geerlingguy/ansible-role-mysql/blob/master/tasks/replication.yml
+
+- name: Ensure replication user exists on master
+  mysql_user:
+    name: "{{ mconf_db_replication_user.name }}"
+    host: "{{ mconf_db_replication_user.host | default('%') }}"
+    password: "{{ mconf_db_replication_user.pass }}"
+    priv: "{{ mconf_db_replication_user.priv | default('*.*:REPLICATION SLAVE,REPLICATION CLIENT') }}"
+    state: present
+  when:
+    - mconf_db_role == 'master'
+    - mconf_db_replication_user is defined and mconf_db_replication_user != None
+
+- name: Check slave replication status
+  mysql_replication:
+    mode: getslave
+  register: slave
+  when:
+    - mconf_db_role == 'slave'
+
+- name: Check master replication status
+  mysql_replication:
+    mode: getmaster
+  delegate_to: "{{ mconf_db_replication_master }}"
+  register: master
+  when:
+    - mconf_db_role == 'slave'
+
+- name: Configure replication on the slave
+  mysql_replication:
+    mode: changemaster
+    master_host: "{{ mconf_db_replication_master }}"
+    master_user: "{{ mconf_db_replication_user.name }}"
+    master_password: "{{ mconf_db_replication_user.pass }}"
+    master_log_file: "{{ master.File }}"
+    master_log_pos: "{{ master.Position }}"
+  ignore_errors: true
+  when:
+    - mconf_db_role == 'slave'
+    - mconf_db_replication_user is defined and mconf_db_replication_user != None
+
+- name: Create the databases on the slave
+  mysql_db: name={{ item.name }} state=present
+  with_items:
+    - "{{ mconf_db_databases }}"
+  when:
+    - item.replicate
+    - mconf_db_databases is defined and mconf_db_databases != None
+    - mconf_db_role == 'slave'
+
+- name: Start replication
+  mysql_replication: mode=startslave
+  when:
+    - mconf_db_role == 'slave'

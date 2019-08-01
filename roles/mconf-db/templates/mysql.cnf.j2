@@ -1,2 +1,75 @@
+#
+# The MySQL database server configuration file.
+#
+[client]
+port		  = {{ mconf_db_mysql_port }}
+socket		= /var/run/mysqld/mysqld.sock
+
+# This was formally known as [safe_mysqld]. Both versions are currently parsed.
+[mysqld_safe]
+socket		= /var/run/mysqld/mysqld.sock
+nice		  = 0
+
 [mysqld]
-sql_mode={{ mconf_db_mysql_sql_mode }}
+sql_mode  = {{ mconf_db_mysql_sql_mode }}
+user		  = mysql
+pid-file	= /var/run/mysqld/mysqld.pid
+socket		= /var/run/mysqld/mysqld.sock
+port		  = {{ mconf_db_mysql_port }}
+basedir		= /usr
+datadir		= /var/lib/mysql
+tmpdir		= /tmp
+lc-messages-dir	= /usr/share/mysql
+skip-external-locking
+
+bind-address		= {{ mconf_db_mysql_bind_address }}
+
+#key_buffer        = 16M
+max_allowed_packet = 16M
+thread_stack       = 192K
+thread_cache_size  = 8
+
+query_cache_limit	= 1M
+query_cache_size  = 16M
+
+log_error = /var/log/mysql/error.log
+{# log_bin   = /var/log/mysql/mysql-bin.log #}
+
+{% if mconf_db_slow_query_log_enabled %}
+# Slow query log configuration.
+slow_query_log = 1
+slow_query_log_file = {{ mconf_db_slow_query_log_file }}
+long_query_time = {{ mconf_db_slow_query_time }}
+{% endif %}
+
+{% if mconf_db_replication_enabled %}
+# Replication
+{% if mconf_db_server_id != None %}
+server-id = {{ mconf_db_server_id }}
+{% else %}
+server-id = {{ mconf_db_server_id_generated.stdout }}
+{% endif %}
+
+{% if mconf_db_role == 'master' %}
+log_bin = mysql-bin
+log-bin-index = mysql-bin.index
+expire_logs_days = {{ mconf_db_mysql_expire_logs_days }}
+max_binlog_size = {{ mconf_db_mysql_max_binlog_size }}
+binlog_format = {{ mconf_db_mysql_binlog_format }}
+
+{% for db in mconf_db_databases %}
+{% if db.replicate | default(1) %}
+binlog_do_db = {{ db.name }}
+{% else %}
+binlog_ignore_db = {{ db.name }}
+{% endif %}
+{% endfor %}
+{% endif %}
+
+{% if mconf_db_role == 'slave' %}
+read_only
+relay-log = relay-bin
+relay-log-index = relay-bin.index
+{% endif %}
+
+{% endif %}

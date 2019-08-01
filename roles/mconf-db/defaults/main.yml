@@ -6,6 +6,10 @@ mconf_db_install_db: 'mysql'
 # Leave it empty or set to false so redis is not installed. Set to true to install.
 mconf_db_install_redis: true
 
+# 'master' or 'slave'
+mconf_db_role: 'master'
+mconf_db_server_id:
+
 # MySQL
 mconf_db_mysql_ver: 5.7
 mconf_db_mysql_pkgs:
@@ -20,14 +24,39 @@ mconf_db_mysql_sql_mode: STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_
 mconf_db_mysql_port: 3306
 mconf_db_mysql_bind_address: "0.0.0.0"
 
+mconf_db_mysql_conf_dir: /etc/mysql/mysql.conf.d
+mconf_db_mysql_conf_name: mysqld.cnf
+
+
+# Log slow queries
+mconf_db_slow_query_log_enabled: false
+mconf_db_slow_query_time: "2"
+mconf_db_slow_query_log_file: /var/log/mysql/slow.log # auto rotated with other mysql logs
+
 mconf_db_databases:
 #  - name: foo
+#    replicate: true
 #  - name: bar
+#    replicate: false
 
 mysql_db_users:
 #  - name: mconf
-#    pass: "change-me-now"
-#    priv: "*.*:ALL"
+#    pass: change-me-now
+#    priv: *.*:ALL
+#    host: %
+
+# Replication settings
+mconf_db_replication_enabled: false
+# domain/ip of the master
+mconf_db_replication_master:
+mconf_db_replication_user:
+#  name: mconf
+#  host: %
+#  pass: change-me-now
+#  priv: *.*:ALL
+mconf_db_mysql_max_binlog_size: "200M"
+mconf_db_mysql_binlog_format: "ROW"
+mconf_db_mysql_expire_logs_days: "14"
 
 # Redis
 mconf_db_redis_pkgs:
