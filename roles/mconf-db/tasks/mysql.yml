@@ -19,10 +19,15 @@
 - name: Detect original config
   stat: path="{{ mconf_db_mysql_conf_dir }}/{{ mconf_db_mysql_conf_name }}"
   register: mysqldcnf
+- name: Detect backup
+  stat: path="{{ mconf_db_mysql_conf_dir }}/{{ mconf_db_mysql_conf_name }}.bk"
+  register: mysqldcnfbk
 - name: Backup original config
   become: true
   command: "mv {{ mconf_db_mysql_conf_dir }}/{{ mconf_db_mysql_conf_name }} {{ mconf_db_mysql_conf_dir }}/{{ mconf_db_mysql_conf_name }}.bk"
-  when: mysqldcnf.stat.exists == True
+  when:
+    - mysqldcnf.stat.exists == True
+    - mysqldcnfbk.stat.exists == False
 
 - name: Deploy mysql config
   become: true
