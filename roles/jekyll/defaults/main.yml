@@ -1,9 +1,21 @@
 ---
 
-jekyll_usr: '{{ deploy_user }}'
-jekyll_grp: www-data
-jekyll_output_dir: /var/www/jekyll/
+# where the repo is cloned from and to
 jekyll_repo_url: "edit-me"
 jekyll_repo_ref: master
-jekyll_dir_to_copy: _site
 jekyll_tmp_path: /tmp/jekyll/repo
+
+# build configurations
+jekyll_build_dir: _site
+jekyll_build_cmd: build
+jekyll_config_file: "envs/{{ env }}/files/jekyll/_config.yml"
+
+# docker image to run jekyll from
+jekyll_docker_image_name: jekyll
+jekyll_dockerfile: Dockerfile.jekyll
+jekyll_docker_workdir: /usr/src/app
+
+# final output will be put at
+jekyll_output_path: /var/www/jekyll/
+jekyll_usr: '{{ deploy_user }}'
+jekyll_grp: www-data

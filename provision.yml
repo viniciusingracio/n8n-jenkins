@@ -176,7 +176,7 @@
 
 - hosts: jekyll
   roles:
-  - jekyll
+  - { role: jekyll, tags: [ jekyll ] }
 
 - hosts: certbot
   roles:

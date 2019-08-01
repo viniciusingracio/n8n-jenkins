@@ -7,7 +7,7 @@
     group: '{{ jekyll_grp }}'
     mode: 0755
   with_items:
-    - '{{ jekyll_output_dir }}'
+    - '{{ jekyll_output_path }}'
 
 - name: Clean tmp directory
   file:
@@ -23,16 +23,67 @@
     accept_hostkey: true
     force: true
 
+- name: Build the jekyll docker image
+  docker_image:
+    source: build
+    build:
+      pull: yes
+      path: '{{ jekyll_tmp_path }}'
+      dockerfile: '{{ jekyll_dockerfile }}'
+    name: '{{ jekyll_docker_image_name }}'
+    force_source: true
+
+- name: Create a temporary folder
+  tempfile:
+    state: directory
+    suffix: temp
+  register: temp_config
+
+- name: Copy _config.yml to build the application
+  become: true
+  copy:
+    src: '{{ jekyll_config_file }}'
+    dest: '{{ temp_config.path }}/_config.yml'
+    owner: 'root'
+    group: 'root'
+    mode: 0600
+
+- name: Build the application using jekyll
+  docker_container:
+    name: 'jekyll-build'
+    image: '{{ jekyll_docker_image_name }}'
+    command: '{{ jekyll_build_cmd }}'
+    env:
+      JEKYLL_ENV: production
+    volumes:
+      - '{{ temp_config.path }}/_config.yml:{{ jekyll_docker_workdir }}/_config.yml'
+      - '{{ jekyll_tmp_path }}/{{ jekyll_build_dir }}:{{ jekyll_docker_workdir }}/{{ jekyll_build_dir }}'
+    cleanup: true
+    detach: false
+
+- name: Remove the config file
+  file:
+    path: '{{ temp_config.path }}'
+    state: absent
+
+- name: Set the owner of the built files
+  become: true
+  file:
+    path: '{{ jekyll_tmp_path }}/{{ jekyll_build_dir }}'
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_user }}'
+    recurse: true
+
 - name: Ansible copy files remote to remote
   synchronize:
-    src: '{{ jekyll_tmp_path }}/{{ jekyll_dir_to_copy }}'
-    dest: '{{ jekyll_output_dir }}'
+    src: '{{ jekyll_tmp_path }}/{{ jekyll_build_dir }}/'
+    dest: '{{ jekyll_output_path }}'
   delegate_to: '{{ inventory_hostname }}'
 
 - name: Set permissions
   become: true
   file:
-    path: '{{ jekyll_output_dir }}'
+    path: '{{ jekyll_output_path }}'
     owner: '{{ jekyll_usr }}'
     group: '{{ jekyll_grp }}'
     recurse: true
