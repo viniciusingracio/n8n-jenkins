@@ -89,12 +89,12 @@ ansible all -v -i envs/prod/tjrr/hosts -l mconf-live200,mconf-rec --extra-vars "
 
 ### Other playbooks
 
-#### upgrade-so
+#### upgrade-packages
 
 Upgrades the packages in the server and cleans unused packages (basically "apt-get dist-upgrade" + "autoremove"):
 
 ```
-ansible-playbook -i envs/prod/com-staging -l rec-proxy playbooks/upgrade-so.yml
+ansible-playbook -i envs/prod/com-staging -l rec-proxy playbooks/upgrade-packages.yml
 ```
 
 #### ufw
