@@ -2,4 +2,5 @@
 *.retry
 .docker-auth
 *.pyc
+tmp/*
 
