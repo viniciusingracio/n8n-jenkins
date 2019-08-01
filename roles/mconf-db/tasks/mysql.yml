@@ -97,7 +97,6 @@
   mysql_db: name=test state=absent
 
 # the user ubuntu uses when updating mysql packages
-# GRANT ALL PRIVILEGES on *.* TO `debian-sys-maint`@`localhost` IDENTIFIED BY 'your password' WITH GRANT OPTION;
 - name: Capture the password for debian-sys-maint
   shell: cat /etc/mysql/debian.cnf | grep -e password | tail -1 | awk '{print $3}'
   become: true

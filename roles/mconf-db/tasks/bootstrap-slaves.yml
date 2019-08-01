@@ -1,0 +1,120 @@
+##
+## ON MASTER
+##
+
+- name: Lock all tables
+  command: 'mysql -NBe "{{ item }}"'
+  with_items:
+    - FLUSH TABLES WITH READ LOCK;
+  changed_when: false
+  when:
+    - mconf_db_role == 'master'
+    - inventory_hostname == mconf_db_replication_master
+  run_once: true
+
+- name: Dump database
+  mysql_db:
+    name: all
+    state: dump
+    target: "/tmp/{{ mconf_db_replication_master }}.sql.gz"
+  run_once: true
+  when:
+    - mconf_db_role == 'master'
+    - inventory_hostname == mconf_db_replication_master
+
+- name: Download the dump
+  fetch:
+    src: "/tmp/{{ mconf_db_replication_master }}.sql.gz"
+    dest: /tmp/
+    flat: true
+  run_once: true
+  when:
+    - mconf_db_role == 'master'
+    - inventory_hostname == mconf_db_replication_master
+
+##
+## ON SLAVES
+##
+
+- name: Stop slave
+  mysql_replication: mode=stopslave
+  when:
+    - mconf_db_role == 'slave'
+    - inventory_hostname != mconf_db_replication_master
+
+- name: Upload the dump file
+  copy:
+    src: "/tmp/{{ mconf_db_replication_master }}.sql.gz"
+    dest: "/tmp/{{ mconf_db_replication_master }}.sql.gz"
+    # owner: root
+    # group: root
+    mode: '0644'
+  when:
+    - mconf_db_role == 'slave'
+    - inventory_hostname != mconf_db_replication_master
+
+- name: Remove the databases on the slave
+  mysql_db: name={{ item.name }} state=absent
+  with_items:
+    - "{{ mconf_db_databases }}"
+  when:
+    - item.replicate
+    - mconf_db_role == 'slave'
+    - inventory_hostname != mconf_db_replication_master
+
+- name: Import the dump file
+  mysql_db:
+    name: all
+    state: import
+    target: "/tmp/{{ mconf_db_replication_master }}.sql.gz"
+  when:
+    - mconf_db_role == 'slave'
+    - inventory_hostname != mconf_db_replication_master
+
+- name: Check master replication status
+  mysql_replication:
+    mode: getmaster
+  delegate_to: "{{ mconf_db_replication_master }}"
+  register: master
+  when:
+    - mconf_db_role == 'slave'
+    - inventory_hostname != mconf_db_replication_master
+
+- name: Configure replication on the slave
+  mysql_replication:
+    mode: changemaster
+    master_host: "{{ mconf_db_replication_master }}"
+    master_user: "{{ mconf_db_replication_user.name }}"
+    master_password: "{{ mconf_db_replication_user.pass }}"
+    master_log_file: "{{ master.File }}"
+    master_log_pos: "{{ master.Position }}"
+  ignore_errors: true
+  when:
+    - mconf_db_role == 'slave'
+    - inventory_hostname != mconf_db_replication_master
+
+- name: Start slave
+  mysql_replication: mode=startslave
+  when:
+    - mconf_db_role == 'slave'
+    - inventory_hostname != mconf_db_replication_master
+
+
+##
+## ON MASTER
+##
+
+- name: Unlock all tables
+  command: 'mysql -NBe "{{ item }}"'
+  with_items:
+    - UNLOCK TABLES;
+  changed_when: false
+  run_once: true
+  when:
+    - mconf_db_role == 'master'
+    - inventory_hostname == mconf_db_replication_master
+
+
+
+
+

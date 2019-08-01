@@ -1,0 +1,7 @@
+- name: Bootstrap MySQL slaves
+  hosts: all
+  tasks:
+    - name: Run mconf-db/bootstrap-slaves
+      import_role:
+        name: mconf-db
+        tasks_from: bootstrap-slaves
