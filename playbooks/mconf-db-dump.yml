@@ -1,22 +1,7 @@
 - name: MySQL dump
   hosts: all
   tasks:
-    - name: Generate output file name
-      shell: date +'%Y-%m-%d-%H%M%S'
-      register: dumpfile
-      run_once: true
-      when: mconf_db_role == 'master'
-    - name: Dump database
-      mysql_db:
-        name: all
-        state: dump
-        target: "/tmp/{{ inventory_hostname }}-{{ dumpfile.stdout }}.sql.gz"
-      run_once: true
-      when: mconf_db_role == 'master'
-    - name: Download the dump
-      fetch:
-        src: "/tmp/{{ inventory_hostname }}-{{ dumpfile.stdout }}.sql.gz"
-        dest: ../tmp/
-        flat: true
-      run_once: true
-      when: mconf_db_role == 'master'
+    - name: Run mconf-db/dump
+      import_role:
+        name: mconf-db
+        tasks_from: dump
