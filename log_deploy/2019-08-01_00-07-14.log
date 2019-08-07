@@ -1,0 +1,4 @@
+/usr/bin/ansible-playbook -v -i envs/prod/ufrgs/hosts -l mconf-live220 provision.yml -T 180 --force-handlers
+
+mconf1.ufrgs.br: 240 OK, 54 changed, 0 unreachable, 0 failed
+mconf2.ufrgs.br: 240 OK, 54 changed, 0 unreachable, 0 failed

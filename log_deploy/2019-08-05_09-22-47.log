@@ -1,0 +1,3 @@
+/usr/bin/ansible-playbook -v -i envs/rnp/h/hosts -l live-compute03* provision.yml -T 180 --force-handlers
+
+live-compute03.h.mconf.rnp.br: 258 OK, 75 changed, 0 unreachable, 0 failed

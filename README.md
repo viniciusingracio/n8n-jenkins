@@ -11,7 +11,7 @@ sudo apt-get install ansible
 * Install/upgrade python libraries
 ```bash
 sudo apt-get install python-pip
-sudo pip install --upgrade pip pyopenssl docker zabbix-api
+sudo pip install --upgrade pip pyopenssl docker zabbix-api mitogen
 ```
 * Install ansible dependency roles
 ```bash
@@ -85,6 +85,12 @@ ansible all -v -i envs/prod/tjrr/hosts -l mconf-recw --extra-vars "ansible_user=
 
 # print api-mate URL
 ansible all -v -i envs/prod/tjrr/hosts -l mconf-live200,mconf-rec --extra-vars "ansible_user=mconf" --become -m raw -a 'export LC_ALL=C; bbb-conf --salt' | grep 'api-mate'
+
+# list rooms with a SIP participant
+ansible all -v -i envs/rnp/prod/hosts -l mconf-live220 --extra-vars "ansible_user=mconf" -m raw -a "grep -l 'medium-v_' /var/bigbluebutton/events/ -R | xargs grep meetingName" | sed 's|.*meetingName=\"\([^\"]*\)\".*|. \1|g' | sort | uniq | grep "^\. "
+
+# count sessions
+ansible all -v -i envs/rnp/prod/hosts -l mconf-live220 --extra-vars "ansible_user=mconf" -m raw -a "ls -1 /var/bigbluebutton/events/" | wc -l
 ```
 
 ### Other playbooks

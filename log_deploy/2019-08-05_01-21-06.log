@@ -1,0 +1,3 @@
+/usr/bin/ansible-playbook -v -i envs/prod/ufrgs/hosts -l mconf-gravacao.ufrgs.br provision.yml -T 180 --force-handlers
+
+mconf-gravacao.ufrgs.br: 232 OK, 103 changed, 0 unreachable, 0 failed
