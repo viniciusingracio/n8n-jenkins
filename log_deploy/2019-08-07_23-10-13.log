@@ -1,0 +1,4 @@
+/usr/local/bin/ansible-playbook -i envs/rnp/prod -l mconf-db provision.yml --start-at=mconf-db : Ensure replication user exists on master
+
+200.130.75.108: 12 OK, 3 changed, 0 unreachable, 0 failed
+db-p.mconf.rnp.br: 11 OK, 0 changed, 0 unreachable, 0 failed

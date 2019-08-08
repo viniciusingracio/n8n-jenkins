@@ -26,6 +26,11 @@
   when:
     - mconf_db_role == 'slave'
 
+# - debug:
+#     var: slave
+# - debug:
+#     var: master
+
 - name: Configure replication on the slave
   mysql_replication:
     mode: changemaster
@@ -36,6 +41,7 @@
     master_log_pos: "{{ master.Position }}"
   ignore_errors: true
   when:
+    - (slave.Is_Slave is defined and not slave.Is_Slave) or (slave.Is_Slave is not defined and slave is failed)
     - mconf_db_role == 'slave'
     - mconf_db_replication_user is defined and mconf_db_replication_user != None
 
