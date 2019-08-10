@@ -7,7 +7,7 @@
     name: mconf-lti_{{ item.id }}
     image: '{{ item.lti_image | default(default_image) }}'
     pull: yes
-    restart_policy: unless-stopped
+    restart_policy: always
     published_ports:
       - '{{ 3001 + loop_index }}:8080'
     volumes:

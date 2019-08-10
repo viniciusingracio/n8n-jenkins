@@ -42,7 +42,7 @@
     name: kurento_{{ item }}
     image: '{{ bigbluebutton_docker_kurento_image }}'
     pull: yes
-    restart_policy: unless-stopped
+    restart_policy: always
     network_mode: host
     # limit memory to avoid complete colapse
     memory: 2G

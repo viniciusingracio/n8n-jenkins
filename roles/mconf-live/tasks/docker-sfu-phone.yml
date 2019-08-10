@@ -3,7 +3,7 @@
     name: sfu-phone
     image: '{{ bigbluebutton_docker_sfu_phone_image }}'
     pull: yes
-    restart_policy: unless-stopped
+    restart_policy: always
     ports:
       - 3011:3011
     env:

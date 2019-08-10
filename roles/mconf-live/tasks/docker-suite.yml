@@ -11,7 +11,7 @@
   docker_container:
     name: mongo
     image: mongo:latest
-    restart_policy: unless-stopped
+    restart_policy: always
     labels:
       hostname: '{{ inventory_hostname }}'
 
@@ -20,7 +20,7 @@
     name: suite
     image: '{{ bigbluebutton_docker_suite_image }}'
     pull: yes
-    restart_policy: unless-stopped
+    restart_policy: always
     ports:
       - 3013:3000
     links:

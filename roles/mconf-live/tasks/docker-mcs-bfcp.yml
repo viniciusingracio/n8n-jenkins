@@ -3,7 +3,7 @@
     name: mcs-bfcp
     image: '{{ bigbluebutton_docker_mcs_bfcp_image }}'
     pull: yes
-    restart_policy: unless-stopped
+    restart_policy: always
     network_mode: host
     env:
       MCS_BFCP_API_ADDRESS: 0.0.0.0

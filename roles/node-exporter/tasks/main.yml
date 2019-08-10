@@ -6,7 +6,7 @@
     image: quay.io/prometheus/node-exporter:v0.18.1
     command: --path.rootfs /host --collector.textfile.directory /host/usr/local/share/prometheus
     pull: yes
-    restart_policy: unless-stopped
+    restart_policy: always
     network_mode: host
     pid_mode: host
     volumes:

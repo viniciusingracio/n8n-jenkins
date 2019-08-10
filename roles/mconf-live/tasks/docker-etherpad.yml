@@ -5,7 +5,7 @@
     name: etherpad
     image: '{{ bigbluebutton_docker_etherpad_image }}'
     pull: yes
-    restart_policy: unless-stopped
+    restart_policy: always
     ports:
       - "3006:9001"
     env:

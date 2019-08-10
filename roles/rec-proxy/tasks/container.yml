@@ -46,7 +46,7 @@
     image: '{{ rec_proxy_image }}:{{ rec_proxy_image_version }}'
     # TODO do it only when not rec_proxy_build_from_source
     pull: yes
-    restart_policy: unless-stopped
+    restart_policy: always
     volumes: '{{ container_volumes }}'
     published_ports: '{{ rec_proxy_ports }}'
     env:

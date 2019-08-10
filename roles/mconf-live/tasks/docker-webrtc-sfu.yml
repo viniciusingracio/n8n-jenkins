@@ -74,7 +74,7 @@
     name: webrtc-sfu
     image: '{{ bigbluebutton_docker_webrtc_sfu_image }}'
     pull: yes
-    restart_policy: unless-stopped
+    restart_policy: always
     ports:
       - 3008:3008
       - 3009:3009

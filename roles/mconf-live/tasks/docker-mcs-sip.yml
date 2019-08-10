@@ -38,7 +38,7 @@
     name: mcs-sip
     image: '{{ bigbluebutton_docker_mcs_sip_image }}'
     pull: yes
-    restart_policy: unless-stopped
+    restart_policy: always
     ports:
       - 5060:5060
       - 5060:5060/udp
