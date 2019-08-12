@@ -65,20 +65,39 @@
   when: not ( mconf_live_rec_proxy_enabled or mconf_live_rec_proxy_api_enabled )
   notify: reload nginx
 
-- name: Add recording server fallback
+- name: Add recording server fallback for presentation
   blockinfile:
-    dest: '{{ item.dest }}'
+    dest: /etc/bigbluebutton/nginx/presentation.nginx
     block: |2
-                      if (!-f {{ item.check }}) {
-                              return 302 {{ mconf_live_rec_fallback }}$request_uri;
+                      set $test "";
+                      if ($arg_meetingId) {
+                              set $test "Exists";
+                      }
+                      if (!-f /var/bigbluebutton/published/presentation/$arg_meetingId/shapes.svg) {
+                              set $test "${test}ButMissing";
+                      }
+                      if ($test = ExistsButMissing) {
+                              return 301 {{ mconf_live_rec_fallback }}$request_uri;
                       }
 
-    insertafter: '{{ item.after }}'
+    insertafter: .*location \\/playback\\/presentation {$"
     marker: '                # {mark} ANSIBLE MANAGED BLOCK server fallback'
     state: '{% if mconf_live_rec_proxy_enabled or mconf_live_rec_fallback is none %}absent{% else %}present{% endif %}'
-  with_items:
-    - { dest: "/etc/bigbluebutton/nginx/presentation.nginx", check: "/var/bigbluebutton/published/presentation/$arg_meetingId/shapes.svg", after: ".*location \\/playback\\/presentation {$" }
-    - { dest: "/etc/bigbluebutton/nginx/presentation_video.nginx", check: "/var/bigbluebutton/published$uri", after: ".*location.* \\/presentation_video.*{$" }
+  become: yes
+  ignore_errors: yes
+  notify: reload nginx
+
+- name: Add recording server fallback for presentation_video
+  blockinfile:
+    dest: /etc/bigbluebutton/nginx/presentation_video.nginx
+    block: |2
+                      if (!-f /var/bigbluebutton/published$uri) {
+                              return 301 {{ mconf_live_rec_fallback }}$request_uri;
+                      }
+
+    insertafter: .*location.* \\/presentation_video.*{$"
+    marker: '                # {mark} ANSIBLE MANAGED BLOCK server fallback'
+    state: '{% if mconf_live_rec_proxy_enabled or mconf_live_rec_fallback is none %}absent{% else %}present{% endif %}'
   become: yes
   ignore_errors: yes
   notify: reload nginx
