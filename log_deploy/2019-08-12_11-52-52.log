@@ -1,0 +1,4 @@
+/usr/local/bin/ansible-playbook -i envs/rnp/h -l mconf-db provision.yml
+
+200.133.38.57: 22 OK, 2 changed, 0 unreachable, 0 failed
+db-compute01.h.mconf.rnp.br: 23 OK, 3 changed, 0 unreachable, 0 failed

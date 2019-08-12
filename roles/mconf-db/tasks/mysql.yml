@@ -129,3 +129,5 @@
   when:
     - mconf_db_users is defined and mconf_db_users != None
     - mconf_db_role == 'master'
+  tags:
+  - users

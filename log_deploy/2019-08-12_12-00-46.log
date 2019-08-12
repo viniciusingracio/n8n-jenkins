@@ -1,0 +1,4 @@
+/usr/local/bin/ansible-playbook -i envs/rnp/h -l mconf-db provision.yml --tags users
+
+200.133.38.57: 2 OK, 0 changed, 0 unreachable, 0 failed
+db-compute01.h.mconf.rnp.br: 3 OK, 1 changed, 0 unreachable, 0 failed
