@@ -37,6 +37,8 @@
     - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "sound_prefix=")]', attribute: 'data', value: 'sound_prefix={{ bigbluebutton_sounds_prefix }}' }
     - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "local_ip_v4=")]', attribute: 'data', value: 'local_ip_v4={{ ansible_default_ipv4.address }}' }
     - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "rtp_liberal_dtmf=")]', attribute: 'data', value: 'rtp_liberal_dtmf=true' }
+    - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "global_codec_prefs=")]', attribute: 'data', value: 'global_codec_prefs=OPUS,speex@16000h@20i,speex@8000h@20i,G722,PCMU,PCMA' }
+    - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "outbound_codec_prefs=")]', attribute: 'data', value: 'outbound_codec_prefs=OPUS,speex@16000h@20i,speex@8000h@20i,G722,PCMU,PCMA' }
   become: yes
   notify: restart bigbluebutton
 
