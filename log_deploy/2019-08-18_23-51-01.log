@@ -1,0 +1,6 @@
+/usr/bin/ansible-playbook -i envs/prod/com/hosts -l mconf-live220 playbooks/kurento-health-monitor.yml
+
+live02.mconf.com: 8 OK, 3 changed, 0 unreachable, 0 failed
+live03.mconf.com: 8 OK, 3 changed, 0 unreachable, 0 failed
+live04.mconf.com: 8 OK, 3 changed, 0 unreachable, 0 failed
+live05.mconf.com: 8 OK, 3 changed, 0 unreachable, 0 failed

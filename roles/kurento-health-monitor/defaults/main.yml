@@ -1,0 +1,4 @@
+---
+
+external_ip:
+bigbluebutton_kurento_use_internal_ip: false

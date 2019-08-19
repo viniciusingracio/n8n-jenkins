@@ -1,0 +1,44 @@
+---
+
+- name: Determine external IP
+  set_fact:
+    external_ip: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | grep \"[0-9]*\\.[0-9]*\\.[0-9]*\\.[0-9]*\" | head -n 1') }}"
+  when: external_ip is none
+- name: Set external IP as internal IP if nothing returns from dig
+  set_fact:
+    external_ip: '{{ ansible_default_ipv4.address }}'
+  when: external_ip is none or external_ip | trim == ""
+
+- name: Register Docker host IP
+  shell: "ifconfig docker0 | grep 'inet addr:' | cut -d: -f2 | awk '{print $1}'"
+  register: docker_ip_raw
+
+- set_fact:
+    docker_ip: '{{ docker_ip_raw.stdout }}'
+
+- name: Determine kurento running instances
+  shell: docker ps | grep 'kurento_[0-9]*' | sed 's:.*kurento_\([0-9]*\)$:\1:g' | sort
+  register: running_kurento_raw
+
+- set_fact:
+    kurento_ip: "{% if bigbluebutton_kurento_use_internal_ip %}{{ ansible_default_ipv4.address }}{% else %}{{ external_ip }}{% endif %}"
+    kurento_ports: '{{ running_kurento_raw.stdout_lines }}'
+
+- name: Determine kurento URLs to configure kurento health monitor
+  set_fact:
+    kurento_config: "{{ kurento_config|default([]) + [ { 'ip': kurento_ip, 'url': 'ws://' + docker_ip + ':' + item + '/kurento' } ] }}"
+  with_items: '{{ kurento_ports }}'
+
+- name: Start kurento health monitor
+  docker_container:
+    name: kurento-health-monitor
+    image: mconf/kurento-health-monitor:master
+    pull: yes
+    restart_policy: always
+    memory: 128M
+    env:
+      KURENTO: '{{ kurento_config | to_json }}'
+      WEBHOOK_URL: 'https://mconf.rocket.chat/hooks/9AsDWnbg6LetB4gau/iaMTtbe6XHzhYhejo5a4C75RpBwaKubK3Rat8gPiW6PToweP'
+      HOST_ADDRESS: '{{ inventory_hostname }}'
+    labels:
+      hostname: '{{ inventory_hostname }}'
