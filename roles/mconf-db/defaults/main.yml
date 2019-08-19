@@ -27,6 +27,8 @@ mconf_db_mysql_bind_address: "0.0.0.0"
 mconf_db_mysql_conf_dir: /etc/mysql/mysql.conf.d
 mconf_db_mysql_conf_name: mysqld.cnf
 
+# Extra entries to add to mysql.cnf
+mconf_db_mysql_conf_entries: []
 
 # Log slow queries
 mconf_db_slow_query_log_enabled: false
