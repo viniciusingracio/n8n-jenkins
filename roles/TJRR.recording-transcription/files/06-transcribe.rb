@@ -45,8 +45,7 @@ credentials = props["gcloud_credentials_path"]
 language_code = props["language_code"]
 language_name = props["language_name"]
 caption_duration = props["caption_duration"]
- # Line will break after the limit is reached
-caption_line_size = props["caption_line_size"]
+caption_paragraph_min_size = props["caption_paragraph_min_size"]
 
 captions_code = language_code.gsub("-", "_")
 
@@ -106,9 +105,12 @@ if ! File.exist?(vtt_file)
       vtt = File.new(vtt_file, "w")
       vtt.write("WEBVTT\n")
       sequence_number = 0
+      header = ""
       start = 0.0
       content = []
-      line_size = 0
+      paragraph_break = false
+      new_paragraph = "\nNOTE MCONF_CUE_META {\"paragraph\":\"true\"}\n"
+      paragraph_size = 0
 
       results.each do |result|
         alternative = result.alternatives.first
@@ -116,6 +118,11 @@ if ! File.exist?(vtt_file)
           stop = word.end_time.seconds + word.end_time.nanos / 1_000_000_000.0
           if content.empty?
             sequence_number = sequence_number + 1
+            if paragraph_break
+              header = "#{new_paragraph}\n#{sequence_number}"
+            else
+              header = "#{sequence_number}"
+            end
             if index == 0
               # Avoid the first word to be assigned at 0.0 seconds
               start = stop
@@ -125,18 +132,21 @@ if ! File.exist?(vtt_file)
           end
 
           content << word.word
-          line_size = line_size + word.word.length + 1
-          punct = word.word =~ /[?!.]/
-          if line_size > caption_line_size && punct.nil?
-            content << "\n"
-            line_size = 0
+          paragraph_size = paragraph_size + word.word.length + 1
+          punct = word.word =~ /[.]/
+
+          duration_break = stop - start > caption_duration
+          end_break = index == alternative.words.length - 1
+          paragraph_break = !punct.nil? && paragraph_size > caption_paragraph_min_size
+
+          if (paragraph_break)
+            paragraph_size = 0
           end
 
-          if stop - start > caption_duration || index == alternative.words.length - 1 || !punct.nil?
+          if duration_break || end_break || paragraph_break
             time = "#{Time.at(start).utc.strftime("%T.%L")} --> #{Time.at(stop).utc.strftime("%T.%L")}"
-            vtt.write("\n#{sequence_number}\n#{time}\n#{content.join(" ")}\n")
+            vtt.write("\n#{header}\n#{time}\n#{content.join(" ")}\n")
             content = []
-            line_size = 0
           end
         end
       end
