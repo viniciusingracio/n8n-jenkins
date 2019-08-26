@@ -209,6 +209,12 @@
   roles:
   - nickhammond.logrotate
 
+- hosts:
+  - mconf-live200
+  - mconf-live220
+  roles:
+  - kurento-health-monitor
+
 - hosts: all
   roles:
   - { role: reboot, tags: always }
