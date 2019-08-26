@@ -73,3 +73,7 @@ relay-log-index = relay-bin.index
 {% endif %}
 
 {% endif %}
+
+{% for config in mconf_db_mysql_conf_entries %}
+{{ config }}
+{% endfor %}
