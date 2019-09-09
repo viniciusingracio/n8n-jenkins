@@ -1,0 +1,31 @@
+/usr/local/bin/ansible-playbook -v -i envs/rnp/prod -l mconf-live110 playbooks/dynatrace-agent.yml
+
+live-cdcrec01.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-cdcrec02.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-cdcrec03.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-cdcrec04.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-cdcrec05.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-cdcrec06.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-cdcrec07.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-cdcrec08.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-cdcrec09.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-cdcrec10.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-cdcrec11.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-ce01.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-ms01.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-pa01.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-pb01.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-pe01.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-pi01.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-rj01.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-rn01.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-rs01.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-sc01.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-usp01.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-usp02.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-usp03.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-usp04.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-usp05.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-usp06.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-usp09.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-usp10.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed

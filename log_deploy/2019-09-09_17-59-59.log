@@ -1,0 +1,17 @@
+/usr/local/bin/ansible-playbook -v -i envs/rnp/prod -l mconf-live220 playbooks/dynatrace-agent.yml
+
+live-ac01.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-al01.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-cdcrec12.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-cdcrec13.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-cdcrec14.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-cdcrec15.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-cdcrec16.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-cdcrec17.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-cdcrec18.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-es01.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-ma01.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-mt01.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-to01.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-usp07.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+live-usp08.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed

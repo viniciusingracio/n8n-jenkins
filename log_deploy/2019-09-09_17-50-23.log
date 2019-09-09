@@ -1,0 +1,4 @@
+/usr/local/bin/ansible-playbook -v -i envs/rnp/prod -l mconf-web playbooks/dynatrace-agent.yml
+
+portal01-p.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed
+portal02-p.mconf.rnp.br: 5 OK, 4 changed, 0 unreachable, 0 failed

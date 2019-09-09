@@ -1,0 +1,28 @@
+# Installs dynatrace's agent.
+# Requires a server restart to start monitoring all metrics.
+
+- name: Install dynatrace's agent
+  hosts: all
+  tasks:
+
+  - name: Download the installation script
+    get_url:
+      url: https://mxj49412.live.dynatrace.com/api/v1/deployment/installer/agent/unix/default/latest?Api-Token=fOhPf24BQW6pEAgjs2yd5&arch=x86&flavor=default
+      dest: /tmp/Dynatrace-OneAgent-Linux-1.175.217.sh
+      mode: '0744'
+
+  - name: Download dt-root
+    get_url:
+      url: https://ca.dynatrace.com/dt-root.cert.pem
+      dest: /tmp/dt-root.pem
+      mode: '0644'
+
+  - name: Configure certs
+    shell: >
+      ( echo 'Content-Type: multipart/signed; protocol="application/x-pkcs7-signature"; micalg="sha-256"; boundary="--SIGNED-INSTALLER"'; echo ; echo ; echo '----SIGNED-INSTALLER' ; cat /tmp/Dynatrace-OneAgent-Linux-1.175.217.sh )
+      | openssl cms -verify -CAfile /tmp/dt-root.pem
+      > /dev/null
+
+  - name: Run the script
+    become: true
+    shell: "/tmp/Dynatrace-OneAgent-Linux-1.175.217.sh APP_LOG_CONTENT_ACCESS=1 INFRA_ONLY=0"

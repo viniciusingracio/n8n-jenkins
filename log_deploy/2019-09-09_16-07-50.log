@@ -1,0 +1,4 @@
+/usr/local/bin/ansible-playbook -v -i envs/rnp/prod -l mconf-db playbooks/dynatrace-agent.yml
+
+200.130.75.108: 5 OK, 2 changed, 0 unreachable, 0 failed
+db-p.mconf.rnp.br: 5 OK, 2 changed, 0 unreachable, 0 failed
