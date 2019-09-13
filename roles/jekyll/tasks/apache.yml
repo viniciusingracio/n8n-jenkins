@@ -1,0 +1,14 @@
+- name: Save Apache's config
+  become: true
+  template: src=site.conf.j2 dest="{{ jekyll_apache_config_dir }}/{{ jekyll_apache_domain }}.conf"
+  register: conf
+
+- name: Enable the new website
+  become: true
+  command: "a2ensite {{ jekyll_apache_domain }}.conf"
+  when: conf.changed
+
+- name: Reload Apache
+  become: true
+  service: name=apache2 state=reloaded enabled=yes
+  when: conf.changed

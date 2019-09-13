@@ -1,0 +1,60 @@
+<VirtualHost *:80>
+  ServerName {{ jekyll_apache_domain }}
+  ServerSignature Off
+
+  {% if jekyll_apache_ssl %}
+
+  Redirect "/" "https://{{ jekyll_apache_domain }}/"
+
+  {% else %}
+
+  DocumentRoot {{ jekyll_output_path }}
+  <Directory {{ jekyll_output_path }}>
+    DirectoryIndex index.html
+    AllowOverride all
+    Options +MultiViews
+    Require all granted
+  </Directory>
+
+  {% endif %}
+
+  LogLevel info
+  ErrorLog /var/log/apache2/{{ jekyll_apache_domain }}.log
+  CustomLog /var/log/apache2/{{ jekyll_apache_domain }}.log combined
+
+</VirtualHost>
+
+{% if jekyll_apache_ssl %}
+<VirtualHost *:443>
+  ServerName {{ jekyll_apache_domain }}
+  ServerSignature Off
+
+  SSLEngine               on
+  SSLCertificateFile      {{ jekyll_apache_cert_file }}
+  SSLCertificateKeyFile   {{ jekyll_apache_cert_key }}
+  SSLCACertificateFile    {{ jekyll_apache_cert_chain }}
+
+  DocumentRoot {{ jekyll_output_path }}
+  <Directory {{ jekyll_output_path }}>
+    DirectoryIndex index.html
+    AllowOverride all
+    Options +MultiViews
+    Require all granted
+  </Directory>
+
+  # SSL security
+  # Includes prevention to POODLE and BEAST
+  # See:
+  # * https://sslcheck.globalsign.com/en_US/help/acbb2dc6
+  # * https://www.linode.com/docs/security/security-patches/disabling-sslv3-for-poodle
+  SSLProtocol ALL -SSLv2 -SSLv3
+  SSLCipherSuite HIGH:!aNULL:!MD5
+  SSLHonorCipherOrder On
+  SSLInsecureRenegotiation off
+
+  LogLevel info
+  ErrorLog /var/log/apache2/{{ jekyll_apache_domain }}.log
+  CustomLog /var/log/apache2/{{ jekyll_apache_domain }}.log combined
+
+</VirtualHost>
+{% endif %}

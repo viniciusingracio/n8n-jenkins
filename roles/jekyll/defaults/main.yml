@@ -19,3 +19,12 @@ jekyll_docker_workdir: /usr/src/app
 jekyll_output_path: /var/www/jekyll/
 jekyll_usr: '{{ deploy_user }}'
 jekyll_grp: www-data
+
+# enable to save a config on apache to serve this website
+jekyll_apache_config: false
+jekyll_apache_domain: default.mconf.com
+jekyll_apache_ssl: false
+jekyll_apache_cert_file: "/etc/letsencrypt/live/{{ jekyll_apache_domain }}/cert.pem"
+jekyll_apache_cert_chain: "/etc/letsencrypt/live/{{ jekyll_apache_domain }}/chain.pem"
+jekyll_apache_cert_key: "/etc/letsencrypt/live/{{ jekyll_apache_domain }}/privkey.pem"
+jekyll_apache_config_dir: /etc/apache2/sites-available/
