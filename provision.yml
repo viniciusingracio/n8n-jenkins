@@ -166,6 +166,7 @@
 
 - hosts: mconf-web
   roles:
+  - { role: certbot, when: certbot_enabled }
   - mconf-web
   - { role: mconf-web-reports, when: mconf_web_reports_enabled, tags: [ mconf-web-reports ] }
   - { role: test-webrtc, when: test_webrtc_enabled }
@@ -176,6 +177,7 @@
 
 - hosts: jekyll
   roles:
+  - { role: certbot, when: certbot_enabled }
   - { role: jekyll, tags: [ jekyll ] }
 
 - hosts: certbot
