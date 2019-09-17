@@ -25,7 +25,7 @@ for i in `seq 1 20`; do
   bbb-conf --restart
 
   echo "Wait a moment for bbb-web to boot"
-  sleep 30
+  sleep 60
 
   if curl -S "${API_ENTRYPOINT}/create" | grep checksumError > /dev/null 2>&1; then
     echo "Successfully restarted!"
@@ -46,7 +46,7 @@ if [ $? -eq 0 ]; then
     RUNNING_KURENTO_HEALTH_MONITOR=true
     docker stop kurento-health-monitor
   fi
-  for NAME in `docker ps -f "name=kurento_*" --format '{{.Names}}'`; do
+  for NAME in `docker ps -a --format '{{.Names}}' | grep '^kurento_'`; do
     echo "Restart $NAME"
     docker restart $NAME
     echo "Wait $NAME to be healthy"

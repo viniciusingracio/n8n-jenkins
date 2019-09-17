@@ -1,0 +1,8 @@
+---
+
+- hosts:
+  - mconf-rec
+  - mconf-rec200
+  - mconf-rec220
+  roles:
+  - mconf-editor

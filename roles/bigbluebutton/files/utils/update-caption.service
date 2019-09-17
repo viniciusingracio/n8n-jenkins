@@ -1,0 +1,13 @@
+# move this to /etc/systemd/system/update-caption.service
+[Unit]
+Description=Update caption tracks for BigBlueButton
+
+[Service]
+Type=simple
+User=bigbluebutton
+WorkingDirectory=/usr/local/bigbluebutton/core/scripts
+ExecStart=/usr/local/bin/filewatcher "/var/bigbluebutton/captions/inbox/*.txt" 'ruby /usr/local/bigbluebutton/core/scripts/utils/update-caption.rb -f $FILENAME'
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

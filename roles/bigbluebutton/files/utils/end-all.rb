@@ -19,5 +19,6 @@ doc.xpath("//meetings/meeting").each do |meeting|
     puts "Successfully ended #{meetingId}"
   else
     puts "Failed to end #{meetingId}"
+    puts doc.to_xml(:indent => 2)
   end
 end

@@ -132,6 +132,8 @@
 
 - hosts:
   - mconf-rec
+  - mconf-rec110
+  - mconf-rec220
   - mconf-recw
   roles:
   - { role: certbot, when: certbot_enabled, tags: [ certbot ] }

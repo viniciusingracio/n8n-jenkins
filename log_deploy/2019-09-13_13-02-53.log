@@ -1,0 +1,5 @@
+/usr/bin/ansible-playbook -v -i envs/prod/tjrr-staging/hosts -l mconf-rec,mconf-recw provision.yml -T 180 --force-handlers
+
+hrec-vc.tjrr.jus.br: 251 OK, 43 changed, 0 unreachable, 0 failed
+hrecw01-vc.tjrr.jus.br: 217 OK, 44 changed, 0 unreachable, 0 failed
+hrecw02-vc.tjrr.jus.br: 217 OK, 44 changed, 0 unreachable, 0 failed

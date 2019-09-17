@@ -1,0 +1,5 @@
+/usr/bin/ansible-playbook -v -i envs/prod/tjrr-staging/hosts -l mconf-rec,mconf-recw playbooks/recw-transcribe.yml --extra-vars asr_gcloud_credentials_src=../envs/prod/tjrr-staging/files/asr-credentials.json -T 180
+
+hrec-vc.tjrr.jus.br: 6 OK, 1 changed, 0 unreachable, 0 failed
+hrecw01-vc.tjrr.jus.br: 6 OK, 1 changed, 0 unreachable, 0 failed
+hrecw02-vc.tjrr.jus.br: 6 OK, 1 changed, 0 unreachable, 0 failed

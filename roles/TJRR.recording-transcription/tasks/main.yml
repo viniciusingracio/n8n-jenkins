@@ -6,13 +6,35 @@
     state: present
     user_install: no
   with_items:
-    - { name: 'google-cloud-storage', version: '1.18.2' }
-    - { name: 'google-cloud-speech', version: '0.34.1' }
+    - { name: 'google-cloud-storage', version: '1.21.0' }
+    - { name: 'google-cloud-speech', version: '0.37.0' }
   become: yes
 
+# - file:
+#     path: '{{ item }}'
+#     state: absent
+#   with_items:
+#     - /usr/local/bigbluebutton/core/scripts/post_publish/06-transcribe.yml
+#     - /usr/local/bigbluebutton/core/scripts/asr-credentials.json
+#     - /usr/local/bigbluebutton/core/scripts/transcribe.rb
+#     - /usr/local/bigbluebutton/core/scripts/transcribe.yml
+#   become: yes
+
+- name:
+  file:
+    path: /usr/local/bigbluebutton/core/scripts/transcribe
+    mode: 0755
+    recurse: yes
+    state: directory
+  become: yes
+  when: asr_enabled | bool
+
 - copy:
-    src: files/06-transcribe.rb
-    dest: /usr/local/bigbluebutton/core/scripts/post_publish/06-transcribe.rb
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+  with_items:
+    - { src: 'files/transcribe.rb', dest: '/usr/local/bigbluebutton/core/scripts/transcribe/transcribe.rb' }
+    - { src: 'files/06-transcribe.rb', dest: '/usr/local/bigbluebutton/core/scripts/post_publish/06-transcribe.rb' }
   become: yes
   when: asr_enabled | bool
 
@@ -23,8 +45,8 @@
   when: asr_enabled | bool
 
 - template:
-    src: templates/06-transcribe.yml.j2
-    dest: /usr/local/bigbluebutton/core/scripts/post_publish/06-transcribe.yml
+    src: templates/transcribe.yml.j2
+    dest: /usr/local/bigbluebutton/core/scripts/transcribe/transcribe.yml
   become: yes
   when: asr_enabled | bool
 
@@ -33,7 +55,7 @@
     state: absent
   with_items:
     - /usr/local/bigbluebutton/core/scripts/post_publish/06-transcribe.rb
-    - /usr/local/bigbluebutton/core/scripts/post_publish/06-transcribe.yml
+    - /usr/local/bigbluebutton/core/scripts/transcribe
     - '{{ asr_gcloud_credentials_path }}'
   become: yes
   when: not asr_enabled | bool
