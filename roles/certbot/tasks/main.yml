@@ -17,6 +17,10 @@
     firewall_running: '{{ ufw_status is succeeded and not ufw_status.stdout is match("Status: inactive") }}'
     firewall_blocking_80: '{{ ufw_status is succeeded and not ufw_status.stdout is search("80/tcp.*ALLOW IN") }}'
 
+- name: concatenate cmd for all domains
+  set_fact:
+    certbot_all_domains_cmd: "{{ certbot_all_domains | join(' --domain ') }}"
+
 #
 # If nothing binding to port 80, use certbot standalone
 #
@@ -31,7 +35,8 @@
   docker_container:
     name: certbot
     image: certbot/certbot
-    command: '{{ certbot_standalone_cmd }}'
+    pull: yes
+    command: 'certonly --non-interactive --register-unsafely-without-email --agree-tos --expand --domain {{ certbot_all_domains_cmd }} --standalone --preferred-challenges http'
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt
       - /var/log/letsencrypt:/var/log/letsencrypt
@@ -40,7 +45,7 @@
     # auto_remove: true # on ansible 2.4
     detach: false
     labels:
-      hostname: '{{ inventory_hostname }}'
+      hostname: '{{ certbot_domain }}'
   when: port_80.rc == 1 # port not used
 
 
@@ -53,7 +58,7 @@
     name: certbot
     image: certbot/certbot
     pull: yes
-    command: '{{ certbot_webroot_cmd }}'
+    command: "certonly --non-interactive --register-unsafely-without-email --agree-tos --expand --domain {{ certbot_all_domains_cmd }} --webroot -w {{ certbot_webroot_path }}"
     volumes:
       - "{{ certbot_webroot_path }}:{{ certbot_webroot_path }}" # webroot
       - /etc/letsencrypt:/etc/letsencrypt
@@ -61,7 +66,7 @@
     # auto_remove: true # on ansible 2.4
     detach: false
     labels:
-      hostname: '{{ inventory_hostname }}'
+      hostname: '{{ certbot_domain }}'
   when: port_80.rc == 0
 
 
@@ -70,7 +75,6 @@
   ufw: rule=allow port=80 proto=tcp delete=true
   notify: restart ufw
   when: firewall_blocking_80 # port was not open before
-
 
 - include: cron.yml
   tags: [cron]

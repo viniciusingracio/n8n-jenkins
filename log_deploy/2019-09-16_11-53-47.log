@@ -1,0 +1,3 @@
+/usr/local/bin/ansible-playbook -v -i envs/prod/com-staging/ -l d.scriba.mconf.com provision.yml
+
+d.scriba.mconf.com: 28 OK, 15 changed, 0 unreachable, 0 failed

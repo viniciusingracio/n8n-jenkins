@@ -2,19 +2,19 @@
 
 certbot_enabled: false
 
-# Domain get a certificate to
+# Main domain to get a certificate to
 certbot_domain: '{{ inventory_hostname }}'
+# A list of all domains the certificate will be valid for
+certbot_all_domains:
+  - '{{ certbot_domain }}'
 
 # Path to use to serve the files for the webroot verification
 certbot_webroot_path: '/var/www'
 
-# Certbot commands
-certbot_base_cmd: 'certonly --non-interactive --register-unsafely-without-email --agree-tos --expand --domain {{ certbot_domain }}'
-certbot_webroot_cmd: '{{ certbot_base_cmd }} --webroot -w {{ certbot_webroot_path }}'
-certbot_standalone_cmd: '{{ certbot_base_cmd }} --standalone --preferred-challenges http'
 certbot_renew_cmd: renew
 
 # So other roles can pick up on this to point to certificates
+# all pointing to the main certbot domain
 certbot_cert_path_root: '/etc/letsencrypt'
 certbot_cert_path: '{{ certbot_cert_path_root }}/live/{{ certbot_domain }}'
 

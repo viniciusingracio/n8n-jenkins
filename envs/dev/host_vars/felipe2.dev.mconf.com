@@ -5,7 +5,7 @@ bigbluebutton_html5_only: true
 
 certbot_enabled: true
 certbot_domain: '{{ inventory_hostname }}'
-certbot_webroot_cmd: '{{ certbot_base_cmd }} --webroot -w /var/www/bigbluebutton-default/'
+certbot_webroot_path: '/var/www/bigbluebutton-default/'
 bigbluebutton_ssl_certificate: '{{ certbot_cert_path }}/fullchain.pem'
 bigbluebutton_ssl_certificate_key: '{{ certbot_cert_path }}/privkey.pem'
 

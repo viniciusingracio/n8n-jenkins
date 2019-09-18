@@ -14,7 +14,7 @@
 # Recording proxies
 - hosts: rec-proxy
   roles:
-  - { role: certbot, when: certbot_enabled }
+  - { role: certbot, when: certbot_enabled, tags: [ certbot ] }
   - rec-proxy
 - hosts: rec-proxy-self-signed
   roles:
@@ -51,7 +51,7 @@
   - bigbluebutton
   - bigbluebutton220
   roles:
-  - { role: certbot, when: certbot_enabled }
+  - { role: certbot, when: certbot_enabled, tags: [ certbot ] }
   - bigbluebutton
 
 # Mconf-Live
@@ -61,7 +61,7 @@
   - mconf-live200
   - mconf-live220
   roles:
-  - { role: certbot, when: certbot_enabled }
+  - { role: certbot, when: certbot_enabled, tags: [ certbot ] }
   - mconf-live
 
 - hosts: bigbluebutton-dev
@@ -123,7 +123,7 @@
 
 - hosts: mconf-lti
   roles:
-  - { role: certbot, when: certbot_enabled }
+  - { role: certbot, when: certbot_enabled, tags: [ certbot ] }
   - mconf-lti
 
 - hosts: docker-host
@@ -134,7 +134,7 @@
   - mconf-rec
   - mconf-recw
   roles:
-  - { role: certbot, when: certbot_enabled }
+  - { role: certbot, when: certbot_enabled, tags: [ certbot ] }
   - mconf-rec
 
 - hosts: aws-publisher
@@ -143,7 +143,7 @@
 
 - hosts: coturn
   roles:
-  - { role: certbot, when: certbot_enabled }
+  - { role: certbot, when: certbot_enabled, tags: [ certbot ] }
   - coturn
 
 - hosts: sip-proxy
@@ -161,12 +161,12 @@
 
 - hosts: mconf-lb
   roles:
-  - { role: certbot, when: certbot_enabled }
+  - { role: certbot, when: certbot_enabled, tags: [ certbot ] }
   - mconf-lb
 
 - hosts: mconf-web
   roles:
-  - { role: certbot, when: certbot_enabled }
+  - { role: certbot, when: certbot_enabled, tags: [ certbot ] }
   - mconf-web
   - { role: mconf-web-reports, when: mconf_web_reports_enabled, tags: [ mconf-web-reports ] }
   - { role: test-webrtc, when: test_webrtc_enabled }
@@ -177,12 +177,13 @@
 
 - hosts: jekyll
   roles:
-  - { role: certbot, when: certbot_enabled }
+  - { role: certbot, when: certbot_enabled, tags: [ certbot ] }
   - { role: jekyll, tags: [ jekyll ] }
 
 - hosts: certbot
   roles:
   - certbot
+  tags: [ certbot ]
 
 - hosts: bbb-prometheus
   roles:

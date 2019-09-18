@@ -22,7 +22,7 @@ mconf_live_extra_recording_packages:
 bigbluebutton_redis_bind:
   - 0.0.0.0
 
-certbot_webroot_cmd: '{{ certbot_base_cmd }} --webroot -w /var/www/bigbluebutton-default/'
+certbot_webroot_path: '/var/www/bigbluebutton-default/'
 
 ffmpeg_version: '4.1'
 
