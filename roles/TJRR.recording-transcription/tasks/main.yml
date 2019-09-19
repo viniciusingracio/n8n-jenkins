@@ -10,16 +10,6 @@
     - { name: 'google-cloud-speech', version: '0.37.0' }
   become: yes
 
-# - file:
-#     path: '{{ item }}'
-#     state: absent
-#   with_items:
-#     - /usr/local/bigbluebutton/core/scripts/post_publish/06-transcribe.yml
-#     - /usr/local/bigbluebutton/core/scripts/asr-credentials.json
-#     - /usr/local/bigbluebutton/core/scripts/transcribe.rb
-#     - /usr/local/bigbluebutton/core/scripts/transcribe.yml
-#   become: yes
-
 - name:
   file:
     path: /usr/local/bigbluebutton/core/scripts/transcribe

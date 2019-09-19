@@ -220,6 +220,10 @@
   roles:
   - kurento-health-monitor
 
+- hosts: mconf-editor
+  roles:
+  - mconf-editor
+
 - hosts: all
   roles:
   - { role: reboot, tags: always }
