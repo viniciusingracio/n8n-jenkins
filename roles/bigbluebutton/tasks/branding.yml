@@ -2,6 +2,7 @@
   synchronize:
     src: envs/{{ env }}/files/landing_page/
     dest: /var/www/bigbluebutton-default
+    use_ssh_args: yes
   become: yes
   ignore_errors: yes
 

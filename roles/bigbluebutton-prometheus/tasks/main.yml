@@ -25,6 +25,7 @@
     src: files/etc/
     dest: /usr/local/etc/bigbluebutton-prometheus/
     delete: yes
+    use_ssh_args: yes
 
 - name: Install cron job monitor metrics
   become: yes
@@ -34,10 +35,7 @@
     user: root
 - cron:
     name: bbb-prometheus-exporter-rec
-    job: /usr/bin/ruby /usr/local/etc/bigbluebutton-prometheus/bbb-prometheus-exporter-rec.rb --ssl true | sponge /usr/local/share/prometheus/bbb-prometheus-exporter-rec.prom
-    user: root
-    minute: 0
-    hour: '*/6'
+    state: absent
   become: yes
 
 - name: Install package for htpasswd

@@ -525,6 +525,7 @@
   synchronize:
     src: files/utils/
     dest: /usr/local/bigbluebutton/core/scripts/utils/
+    use_ssh_args: yes
   become: yes
 
 - name: Install cron job to remove media files from non-recorded meetings

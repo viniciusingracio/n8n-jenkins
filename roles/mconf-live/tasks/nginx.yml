@@ -80,7 +80,7 @@
                               return 301 {{ mconf_live_rec_fallback }}$request_uri;
                       }
 
-    insertafter: .*location \\/playback\\/presentation {$"
+    insertafter: '.*location /playback/presentation {$'
     marker: '                # {mark} ANSIBLE MANAGED BLOCK server fallback'
     state: '{% if mconf_live_rec_proxy_enabled or mconf_live_rec_fallback is none %}absent{% else %}present{% endif %}'
   become: yes
@@ -95,7 +95,7 @@
                               return 301 {{ mconf_live_rec_fallback }}$request_uri;
                       }
 
-    insertafter: .*location.* \\/presentation_video.*{$"
+    insertafter: '.*location.* /presentation_video.* {$'
     marker: '                # {mark} ANSIBLE MANAGED BLOCK server fallback'
     state: '{% if mconf_live_rec_proxy_enabled or mconf_live_rec_fallback is none %}absent{% else %}present{% endif %}'
   become: yes

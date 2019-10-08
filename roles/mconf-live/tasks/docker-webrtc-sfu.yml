@@ -88,6 +88,7 @@
       VIDEO_RNP_CLIENT_SECRET: '{{ bigbluebutton_video_rnp_client_secret | string }}'
       VIDEO_RNP_REDIRECT_URI: 'https://{{ inventory_hostname }}/oauth2_redirect'
       VIDEO_RNP_HOST_IP: '{{ external_ip }}'
+      KURENTO_ALLOWED_CANDIDATE_IPS: '{{ bigbluebutton_docker_kurento_allowed_candidates | default("", true) | to_json }}'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /usr/local/bigbluebutton/bbb-webrtc-sfu/config/client_secret.json:/app/client_secret.json

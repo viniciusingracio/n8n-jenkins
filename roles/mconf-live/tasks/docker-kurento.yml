@@ -20,13 +20,13 @@
   with_sequence: start=0 count={{ num_proc }}
 
 - name: Determine kurento running instances
-  shell: docker ps | grep 'kurento_[0-9]*' | sed 's:.*kurento_\([0-9]*\)$:\1:g' | sort
+  shell: docker ps -a | grep 'kurento_' | sed 's:.*kurento_\(.*\)$:\1:g' | sort
   register: running_kurento_raw
 
 - name: Stop kurento instances that we don't need
   docker_container:
     name: kurento_{{ item }}
-    state: stopped
+    state: absent
   with_items: '{{ running_kurento_raw.stdout_lines | difference(kurento_ports) }}'
 
 - set_fact:
@@ -55,7 +55,7 @@
       RTP_MAX_PORT: '{{ ( bigbluebutton_kms_udp_range_end - bigbluebutton_docker_mcs_bfcp_num_ports ) | string }}'
       KURENTO_LOGS_PATH: /var/log/kurento-media-server
       STUN_IP: '{{ stun_server_ip }}'
-      STUN_PORT: '{{ stun_server_port }}'
+      STUN_PORT: '{{ stun_server_port | string }}'
       # GST_DEBUG: 'Kurento*:5,kms*:5'
     labels:
       hostname: '{{ inventory_hostname }}'

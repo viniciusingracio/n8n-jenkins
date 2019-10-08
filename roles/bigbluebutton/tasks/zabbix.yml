@@ -3,6 +3,7 @@
     src: files/zabbix/
     dest: /etc/zabbix/scripts_mconf/
     delete: yes
+    use_ssh_args: yes
   become: yes
 
 - name: Set owner of zabbix scripts dir

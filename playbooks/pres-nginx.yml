@@ -1,0 +1,29 @@
+- name:
+  hosts: all
+  tasks:
+
+    - name: Add recording server fallback for presentation
+      become: yes
+      blockinfile:
+        dest: /etc/bigbluebutton/nginx/presentation.nginx
+        marker: '                # {mark} ANSIBLE MANAGED BLOCK server fallback'
+        state: absent
+
+    - name: Add recording server fallback for presentation
+      become: yes
+      blockinfile:
+        dest: /etc/bigbluebutton/nginx/presentation.nginx
+        insertafter: '.*location /playback/presentation {$'
+        marker: '                # {mark} ANSIBLE MANAGED BLOCK server fallback'
+        state: present
+        block: |2
+                          set $test "";
+                          if ($arg_meetingId) {
+                                  set $test "Exists";
+                          }
+                          if (!-f /var/bigbluebutton/published/presentation/$arg_meetingId/shapes.svg) {
+                                  set $test "${test}ButMissing";
+                          }
+                          if ($test = ExistsButMissing) {
+                                  return 301 teste$request_uri;
+                          }

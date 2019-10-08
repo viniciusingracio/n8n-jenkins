@@ -4,6 +4,7 @@
   synchronize:
     src: files/
     dest: /usr/local/bigbluebutton/core/scripts/utils/
+    use_ssh_args: yes
   become: yes
 
 - set_fact:

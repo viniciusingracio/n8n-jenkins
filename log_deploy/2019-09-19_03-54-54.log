@@ -1,0 +1,8 @@
+/usr/bin/ansible-playbook -v -i envs/prod/tjrr/hosts -l mconf-live220 provision.yml -T 180 --force-handlers
+
+aer-vc.tjrr.jus.br: 276 OK, 121 changed, 0 unreachable, 0 failed
+bfi-vc.tjrr.jus.br: 276 OK, 121 changed, 0 unreachable, 0 failed
+ckr-vc.tjrr.jus.br: 276 OK, 121 changed, 0 unreachable, 0 failed
+mji-vc.tjrr.jus.br: 276 OK, 121 changed, 0 unreachable, 0 failed
+rli-vc.tjrr.jus.br: 276 OK, 121 changed, 0 unreachable, 0 failed
+slz-vc.tjrr.jus.br: 276 OK, 121 changed, 0 unreachable, 0 failed

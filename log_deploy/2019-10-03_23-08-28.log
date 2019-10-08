@@ -1,0 +1,3 @@
+/usr/bin/ansible-playbook -v -i envs/prod/tjrr/hosts -l live01-vc* provision.yml -T 180 --force-handlers
+
+live01-vc.tjrr.jus.br: 263 OK, 84 changed, 0 unreachable, 0 failed

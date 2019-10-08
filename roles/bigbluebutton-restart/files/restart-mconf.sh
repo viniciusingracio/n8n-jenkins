@@ -62,7 +62,7 @@ if [ $? -eq 0 ]; then
     docker start kurento-health-monitor
   fi
   echo "Restart the other Docker containers"
-  docker restart webrtc-sfu mcs-sip sfu-phone
+  docker restart webrtc-sfu mcs-bfcp mcs-sip sfu-phone
 fi
 
 echo "$(date) Restart sequence finished!"

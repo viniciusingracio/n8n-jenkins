@@ -78,6 +78,7 @@
   synchronize:
     src: '{{ jekyll_tmp_path }}/{{ jekyll_build_dir }}/'
     dest: '{{ jekyll_output_path }}'
+    use_ssh_args: yes
   delegate_to: '{{ inventory_hostname }}'
 
 - name: Set permissions
