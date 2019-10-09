@@ -42,7 +42,7 @@
   when: coturn_build_from_source
 
 - name: Copy systemd file
-  become: true
+  become: yes
   copy:
     src: files/coturn.service
     dest: /etc/systemd/system/coturn.service
@@ -58,7 +58,7 @@
     external_ip: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | grep \"[0-9]*\\.[0-9]*\\.[0-9]*\\.[0-9]*\" | head -n 1') }}"
 
 - name: Copy templates
-  become: true
+  become: yes
   template:
     src: '{{ item.src }}'
     dest: '{{ item.dest }}'
@@ -69,7 +69,7 @@
   notify: restart coturn
 
 - name: Enable coturn service
-  become: true
+  become: yes
   service:
     name: coturn
     state: started

@@ -1,5 +1,5 @@
 - name: Install mcs-sip
-  become: true
+  become: yes
   apt:
     name: 'mconf-mcs-sip'
     state: '{{ bigbluebutton_apt_state }}'
@@ -8,7 +8,7 @@
 - include: json-deps.yml
 
 - name: Update config
-  become: true
+  become: yes
   json:
     path: /usr/local/bigbluebutton/mconf-mcs-sip/config/default.json
     replace:

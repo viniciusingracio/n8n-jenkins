@@ -1,5 +1,5 @@
 - name: Configure ufw rules for the database and redis
-  become: true
+  become: yes
   ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
   with_items:
     - { rule: 'allow', port: 3306, proto: 'tcp' } # mysql

@@ -1,11 +1,11 @@
 ---
 
 - name: Update apt (if older than 5m)
-  become: true
+  become: yes
   apt: update_cache=yes cache_valid_time=300
 
 - name: Install nrpe and nagios-plugins
-  become: true
+  become: yes
   apt:
     name:
       - nagios-nrpe-server

@@ -12,7 +12,7 @@
   when: mconf_live_sounds_hold_music is none
 
 - name: Copy sound
-  become: true
+  become: yes
   copy:
     src: '{{ music_path }}'
     dest: /opt/freeswitch/share/freeswitch/sounds/{{ music_basename }}
@@ -21,7 +21,7 @@
   when: not mconf_live_sounds_hold_music is none
 
 - name: Create wav file
-  become: true
+  become: yes
   command: ffmpeg -y -i /opt/freeswitch/share/freeswitch/sounds/{{ music_basename }} /opt/freeswitch/share/freeswitch/sounds/{{ music_basename_no_ext }}.wav
   args:
     creates: /opt/freeswitch/share/freeswitch/sounds/{{ music_basename_no_ext }}.wav

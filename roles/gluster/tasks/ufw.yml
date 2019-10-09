@@ -1,5 +1,5 @@
 - name: Configure ufw
-  become: true
+  become: yes
   ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
   with_items:
     - "{{ gluster_ufw_rules }}"

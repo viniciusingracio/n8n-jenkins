@@ -1,5 +1,5 @@
 - name: restart nfs-server
-  become: true
+  become: yes
   service: name=nfs-kernel-server state=restarted
 
 - name: mount all

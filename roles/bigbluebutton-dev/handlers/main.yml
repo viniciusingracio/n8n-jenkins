@@ -1,7 +1,7 @@
 - name: restart bigbluebutton
-  become: true
+  become: yes
   command: bbb-conf --restart
 
 - name: restart nginx
-  become: true
+  become: yes
   service: name=nginx state=restarted

@@ -1,7 +1,7 @@
 ---
 
 - name: Configure ufw rules for nrpe
-  become: true
+  become: yes
   ufw: rule=allow port={{ item[0].port }} proto={{ item[0].proto }} from_ip={{ item[1] }}
   with_nested:
     - '{{ nrpe_ufw_rules }}'

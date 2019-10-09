@@ -6,14 +6,14 @@
   when: mconf_db_server_id == None
 
 - name: Install mysql packages
-  become: true
+  become: yes
   apt:
     name: "{{ mconf_db_mysql_pkgs }}"
     state: present
     update_cache: yes
 
 - name: Create the configuration directory
-  become: true
+  become: yes
   file: path="{{ mconf_db_mysql_conf_dir }}" state=directory
 
 - name: Detect original config
@@ -23,24 +23,24 @@
   stat: path="{{ mconf_db_mysql_conf_dir }}/{{ mconf_db_mysql_conf_name }}.bk"
   register: mysqldcnfbk
 - name: Backup original config
-  become: true
+  become: yes
   command: "mv {{ mconf_db_mysql_conf_dir }}/{{ mconf_db_mysql_conf_name }} {{ mconf_db_mysql_conf_dir }}/{{ mconf_db_mysql_conf_name }}.bk"
   when:
     - mysqldcnf.stat.exists == True
     - mysqldcnfbk.stat.exists == False
 
 - name: Deploy mysql config
-  become: true
+  become: yes
   template: src=mysql.cnf.j2 dest="{{ mconf_db_mysql_conf_dir }}/{{ mconf_db_mysql_conf_name }}"
   register: conf
 
 - name: Start the mysql service
-  become: true
+  become: yes
   service: name={{ mconf_db_mysql_service }} state=started enabled=yes
   when: not conf.changed
 
 - name: Restart the mysql service
-  become: true
+  become: yes
   service: name={{ mconf_db_mysql_service }} state=restarted enabled=yes
   when: conf.changed
 
@@ -55,11 +55,11 @@
   stat: path="/home/{{ deploy_user }}/.my.cnf"
   register: mycnf
 - name: Use debian.cnf as .my.cnf
-  become: true
+  become: yes
   command: cp /etc/mysql/debian.cnf "/home/{{ deploy_user }}/.my.cnf"
   when: mycnf.stat.exists == False
 - name: Set permissions for .my.cnf
-  become: true
+  become: yes
   file:
     path: "/home/{{ deploy_user }}/.my.cnf"
     owner: "{{ deploy_user }}"
@@ -99,7 +99,7 @@
 # the user ubuntu uses when updating mysql packages
 - name: Capture the password for debian-sys-maint
   shell: cat /etc/mysql/debian.cnf | grep -e password | tail -1 | awk '{print $3}'
-  become: true
+  become: yes
   register: debianpw
 - name: Create the debian-sys-maint user
   mysql_user:

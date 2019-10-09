@@ -2,14 +2,14 @@
 # for the rec-worker yet
 
 - name: Disable the local recording formats
-  become: true
+  become: yes
   command: bbb-record --disable '{{ item }}'
   with_items:
     - presentation
   when: bigbluebutton_external_rap
 
 - name: Disable process and publish
-  become: true
+  become: yes
   lineinfile:
     dest: /usr/lib/systemd/system/bbb-record-core.target
     state: present
@@ -27,19 +27,19 @@
   when: bigbluebutton_external_rap
 
 - name: Install new rap scripts
-  become: true
+  become: yes
   command: cp -r /home/{{ ansible_user }}/src/bigbluebutton/record-and-playback/core/resque-docker/ /usr/local/bigbluebutton/core/
   when: bigbluebutton_external_rap
 
 - name: Install rec-worker dependencies
-  become: true
+  become: yes
   command: bundle install
   args:
     chdir: /usr/local/bigbluebutton/core/resque-docker
   when: bigbluebutton_external_rap
 
 - name: Install the post archive script
-  become: true
+  become: yes
   command: cp -r /usr/local/bigbluebutton/core/resque-docker/post_archive_process_on_docker.rb /usr/local/bigbluebutton/core/scripts/post_archive/process_on_resque.rb
   when: bigbluebutton_external_rap
 

@@ -69,7 +69,7 @@
   when: presentation_video_enabled
 
 - name: Add bigbluebutton user to docker group
-  become: true
+  become: yes
   user:
     name: '{{ bigbluebutton_user }}'
     groups: docker

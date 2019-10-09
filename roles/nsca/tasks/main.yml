@@ -1,5 +1,5 @@
 - name: Install dependencies
-  become: true
+  become: yes
   apt:
     name:
       - zlib1g-dev

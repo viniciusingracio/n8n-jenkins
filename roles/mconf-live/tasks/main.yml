@@ -33,7 +33,7 @@
     - always
 
 - name: Install extra recording formats
-  become: true
+  become: yes
   apt:
     name: '{{ mconf_live_extra_recording_packages }}'
     state: 'latest'
@@ -72,7 +72,7 @@
   when: bigbluebutton_docker_mcs_bfcp_enabled
 
 - name: Install basic stats
-  become: true
+  become: yes
   apt:
     name: mconf-basic-stats
     state: 'latest'

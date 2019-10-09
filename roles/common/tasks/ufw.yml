@@ -4,11 +4,11 @@
 #   sudo iptables -S
 
 - name: Install ufw
-  become: true
+  become: yes
   apt: package=ufw state=present
 
 - name: Reset iptables
-  become: true
+  become: yes
   shell: |
     set -e
     iptables -P INPUT ACCEPT
@@ -25,12 +25,12 @@
     - recreate docker rules on iptables
 
 - name: Reset ufw
-  become: true
+  become: yes
   ufw:
     state: reset
 
 - name: Enable/disable IPv6 on ufw
-  become: true
+  become: yes
   lineinfile:
     dest: /etc/default/ufw
     state: present
@@ -40,20 +40,20 @@
     - restart ufw
 
 - name: Enable ufw logging
-  become: true
+  become: yes
   ufw: logging=on
   notify:
     - restart ufw
 
 - name: Configure ssh rule
-  become: true
+  become: yes
   ufw: rule=limit port={{ ansible_port | default("22") }} proto=tcp from_ip={{ item }}
   with_items: '{{ common_ufw_ssh_sources }}'
   notify:
     - restart ufw
 
 - name: Block all incoming and allow all outgoing
-  become: true
+  become: yes
   ufw: direction={{ item.direction }} policy={{ item.policy }}
   with_items:
     - { direction: 'incoming', policy: 'deny' }
@@ -62,7 +62,7 @@
     - restart ufw
 
 - name: Configure custom rules
-  become: true
+  become: yes
   ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
   with_items:
     - "{{ common_ufw_rules }}"
@@ -71,5 +71,5 @@
     - restart ufw
 
 - name: Enable ufw
-  become: true
+  become: yes
   ufw: state=enabled

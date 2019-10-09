@@ -1,5 +1,5 @@
 - name: Configure ufw rules
-  become: true
+  become: yes
   ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
   with_items:
     - { rule: 'allow', port: 80, proto: 'tcp' }
@@ -8,7 +8,7 @@
     - restart ufw
 
 - name: Configure ufw rules for Zabbix
-  become: true
+  become: yes
   ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
   with_items:
     - { rule: 'allow', port: 10050, proto: 'tcp' }

@@ -24,5 +24,5 @@
       > /dev/null
 
   - name: Run the script
-    become: true
+    become: yes
     shell: "/tmp/Dynatrace-OneAgent-Linux-1.175.217.sh APP_LOG_CONTENT_ACCESS=1 INFRA_ONLY=0"

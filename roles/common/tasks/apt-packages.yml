@@ -1,21 +1,21 @@
 - name: Update apt
-  become: true
+  become: yes
   apt: update_cache=yes
 
 - name: Add universe repo to apt
-  become: true
+  become: yes
   apt_repository:
     repo: deb http://archive.ubuntu.com/ubuntu/ {{ ansible_lsb.codename }} universe
     state: present
   register: aptrepos
 
 - name: Update apt if repo changed
-  become: true
+  become: yes
   apt: update_cache=yes
   when: aptrepos is changed
 
 - name: Install common packages
-  become: true
+  become: yes
   apt:
     name:
       - aptitude

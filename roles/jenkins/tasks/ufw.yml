@@ -1,5 +1,5 @@
 - name: Configure ufw rules for Jenkins
-  become: true
+  become: yes
   ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
   with_items:
     - { rule: 'allow', port: 80, proto: 'tcp' }

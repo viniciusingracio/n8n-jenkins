@@ -1,5 +1,5 @@
 - name: Stop kurento
-  become: true
+  become: yes
   service: name=kurento-media-server state=stopped enabled=false
 
 - name: Get number of cores

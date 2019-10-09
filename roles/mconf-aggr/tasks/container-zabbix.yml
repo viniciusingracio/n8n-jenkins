@@ -1,5 +1,5 @@
 - name: Copy env file with the variables to run the container
-  become: true
+  become: yes
   copy:
     src: '{{ mconf_aggr_config_path }}'
     dest: '/root/mconf-aggr-config.json'

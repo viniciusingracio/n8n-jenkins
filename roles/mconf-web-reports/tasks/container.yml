@@ -3,7 +3,7 @@
     name: '{{ mconf_web_reports_image }}:{{ mconf_web_reports_image_version }}'
 
 - name: Setup cron to update the current reports
-  become: true
+  become: yes
   cron:
     name: update reports
     minute: "{{ mconf_web_reports_cron_schedule_minute }}"
@@ -14,7 +14,7 @@
     cron_file: mconf-web-reports-run
 
 - name: Setup cron to update the report of the previous month
-  become: true
+  become: yes
   cron:
     name: update reports
     minute: "{{ mconf_web_reports_cron_previous_month_schedule_minute }}"

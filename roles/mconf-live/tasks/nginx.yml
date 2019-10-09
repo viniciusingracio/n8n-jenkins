@@ -106,7 +106,7 @@
     get_all_recordings_checksum: '{{ ("getRecordings" + bbb_secret) | hash("sha1") }}'
 
 - name:
-  become: true
+  become: yes
   apt:
     name: moreutils
     state: latest

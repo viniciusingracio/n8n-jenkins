@@ -6,14 +6,14 @@
     force: yes
 
 - name: Add ffmpeg 4.0 repo to apt
-  become: true
+  become: yes
   apt_repository:
     repo: ppa:jonathonf/ffmpeg-4
     state: present
   register: aptrepos
 
 - name: Update apt if keys changed
-  become: true
+  become: yes
   apt: update_cache=yes
   when: aptrepos is changed
 

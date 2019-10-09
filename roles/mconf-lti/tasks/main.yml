@@ -1,9 +1,9 @@
 - name: Update apt (if older than 5m)
-  become: true
+  become: yes
   apt: update_cache=yes cache_valid_time=300
 
 - name: Install nginx
-  become: true
+  become: yes
   apt:
     name: nginx
     state: present
@@ -16,7 +16,7 @@
   become: yes
 
 - name: Install entropy daemon
-  become: true
+  become: yes
   apt:
     name: haveged
     state: present
@@ -56,7 +56,7 @@
   notify: reload nginx
 
 - name: Copy icon
-  become: true
+  become: yes
   copy:
     src: files/icon.ico
     dest: /usr/share/nginx/html/icon.ico

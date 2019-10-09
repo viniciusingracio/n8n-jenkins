@@ -1,5 +1,5 @@
 - name: Create the rec-worker user on the server
-  become: true
+  become: yes
   user:
     name: '{{ rec_worker_authorized_user }}'
     shell: /bin/bash
@@ -7,7 +7,7 @@
     append: yes
 
 - name: Set up authorized keys
-  become: true
+  become: yes
   authorized_key:
     user: '{{ rec_worker_authorized_user }}'
     state: present

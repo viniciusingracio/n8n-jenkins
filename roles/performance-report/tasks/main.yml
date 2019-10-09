@@ -1,11 +1,11 @@
 - name: Install pip on Python 2
-  become: true
+  become: yes
   apt:
     name: python-pip
     state: present
 
 - name: Install psutil
-  become: true
+  become: yes
   pip:
     name: psutil
     version: 0.5.1
@@ -30,9 +30,9 @@
 - copy:
     src: files/performance_report.py
     dest: '{{ performance_report_dir }}/performance_report.py'
-  become: true
+  become: yes
   notify: restart performance_report
 
 - name: Enable service
-  become: true
+  become: yes
   service: name=performance_report state=started enabled=yes

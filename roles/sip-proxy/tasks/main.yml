@@ -1,18 +1,18 @@
 ---
 
 - name: Update apt (if older than 5m)
-  become: true
+  become: yes
   apt: update_cache=yes cache_valid_time=300
 
 - name: Add apt key
-  become: true
+  become: yes
   apt_key:
     url: https://jenkins-live.mconf.com/apt/public.asc
     state: present
   register: aptkey
 
 - name: Add multiverse and repos to apt
-  become: true
+  become: yes
   apt_repository:
     repo: '{{ item }}'
     state: present
@@ -23,18 +23,18 @@
     - deb https://jenkins-live.mconf.com/apt/development/v2.0.x-release/{{ ansible_lsb.codename }}-2.0.0 mconf-{{ ansible_lsb.codename }} main
 
 - name: Update apt if keys changed
-  become: true
+  become: yes
   apt: update_cache=yes
   when: aptkey is changed or aptrepos is changed
 
 - name: Install FreeSWITCH
-  become: true
+  become: yes
   apt:
     name: bbb-freeswitch-core
     state: present
 
 - name: Copy resources
-  become: true
+  become: yes
   copy:
     src: '{{ item.src }}'
     dest: '{{ item.dest }}'
@@ -55,7 +55,7 @@
   notify: restart freeswitch
 
 - name: Install lxml
-  become: true
+  become: yes
   pip:
     name: lxml
     state: present

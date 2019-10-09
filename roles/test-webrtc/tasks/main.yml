@@ -1,5 +1,5 @@
 - name: Create the output directory
-  become: true
+  become: yes
   file:
     path: "{{ test_webrtc_output_dir }}"
     state: directory
@@ -8,7 +8,7 @@
     mode: "0775"
 
 - name: Copy files to the server
-  become: true
+  become: yes
   synchronize:
     src: "{{ test_webrtc_input_dir }}/"
     dest: "{{ test_webrtc_output_dir }}/"
@@ -17,7 +17,7 @@
     use_ssh_args: yes
 
 - name: Set file attributes and permission
-  become: true
+  become: yes
   file:
     path: "{{ test_webrtc_output_dir }}"
     owner: "{{ test_webrtc_output_owner }}"

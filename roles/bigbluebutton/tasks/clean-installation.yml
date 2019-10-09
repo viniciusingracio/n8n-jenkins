@@ -1,5 +1,5 @@
 - name: Stop BigBlueButton
-  become: true
+  become: yes
   command: bbb-conf --stop
   ignore_errors: true
 
@@ -14,14 +14,14 @@
 # need to execute this just because of an issue in the debian package, 
 # which expects bbb-record to be installed when this package is being uninstalled
 - name: Remove mconf-recording-decrypter
-  become: true
+  become: yes
   apt:
     name: mconf-recording-decrypter
     purge: yes
     state: absent
 
 - name: Remove packages from specific apt repository
-  become: true
+  become: yes
   apt:
     name: '{{ list_of_packages.stdout_lines }}'
     purge: yes
@@ -30,11 +30,11 @@
   when: list_of_packages.stdout_lines | length > 0
 
 - name: Remove apt repository
-  become: true
+  become: yes
   file:
     path: /etc/apt/sources.list.d/bigbluebutton.list
     state: absent
 
 - name: Cleanup tmp directory
-  become: true
+  become: yes
   command: find /tmp -type f -delete

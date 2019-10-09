@@ -1,7 +1,7 @@
 ---
 
 - name: Set up authorized keys
-  become: true
+  become: yes
   authorized_key:
     user: '{{ deploy_user }}'
     state: present

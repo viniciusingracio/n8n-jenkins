@@ -1,5 +1,5 @@
 - name: Configure ufw rules for BigBlueButton
-  become: true
+  become: yes
   ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
   with_items:
     - { rule: 'allow', port: 80, proto: 'tcp' }
@@ -10,7 +10,7 @@
     - restart ufw
 
 - name: Configure ufw rules for SIP
-  become: true
+  become: yes
   ufw: rule={{ item[0].rule }} port={{ item[0].port }} proto={{ item[0].proto }} from_ip={{ item[1] }} delete={{ item[0].delete }}
   with_nested:
     -
@@ -22,7 +22,7 @@
 
 # TODO configure zabbix source
 - name: Configure ufw rules for Zabbix
-  become: true
+  become: yes
   ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }} delete={{ item.delete }}
   with_items:
     - { rule: 'allow', port: 10050, proto: 'tcp', delete: '{{ not zabbix_agent_enabled }}' }
@@ -30,19 +30,19 @@
     - restart ufw
 
 - name: Remove ufw rule specific for redis from docker
-  become: true
+  become: yes
   ufw: rule=allow port=6379 proto=tcp direction=in interface=docker0 delete=yes
   notify:
     - restart ufw
 
 - name: Allow all traffic from the docker interface
-  become: true
+  become: yes
   ufw: rule=allow direction=in interface=docker0
   notify:
     - restart ufw
 
 - name: Modify sysctl
-  become: true
+  become: yes
   replace:
     path: '{{ item[0] }}'
     regexp: '^[#]?({{ item[1].name }})=.*'

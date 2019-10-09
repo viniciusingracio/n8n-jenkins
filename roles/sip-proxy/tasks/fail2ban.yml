@@ -11,7 +11,7 @@
         findtime: 300
 
 - name: Copy filter
-  become: true
+  become: yes
   copy:
     src: files/fail2ban/filter.d/freeswitch.conf
     dest: /etc/fail2ban/filter.d/freeswitch.conf

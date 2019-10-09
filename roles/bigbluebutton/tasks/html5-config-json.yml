@@ -9,7 +9,7 @@
     - { path: '/public/clientLog/external/method', value: '{{ bigbluebutton_html5_external_log_method }}' }
 
 - name: Update json values
-  become: true
+  become: yes
   json:
     path: /usr/share/meteor/bundle/programs/server/assets/app/config/settings-production.json
     replace:

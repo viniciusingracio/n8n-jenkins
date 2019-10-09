@@ -13,18 +13,18 @@
   when: bigbluebutton_apt_clean_installation|bool and slurpfile is succeeded and current_apt_source != bigbluebutton_apt_source
 
 - name: Update apt (if older than 60m)
-  become: true
+  become: yes
   apt: update_cache=yes cache_valid_time=3600
 
 - name: Install language pack
-  become: true
+  become: yes
   apt:
     name: language-pack-en
     state: '{{ bigbluebutton_apt_state }}'
     autoremove: yes
 
 - name: Install entropy daemon
-  become: true
+  become: yes
   apt:
     name: haveged
     state: '{{ bigbluebutton_apt_state }}'
@@ -37,23 +37,23 @@
   become: yes
 
 - name: Accept mscorefonts EULA
-  become: true
+  become: yes
   shell: echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections
 
 - name: Generate locales
-  become: true
+  become: yes
   command: locale-gen en_US.UTF-8
 
 - name: Reconfigure locales
-  become: true
+  become: yes
   command: dpkg-reconfigure --frontend=noninteractive locales
 
 - name: Set default locale
-  become: true
+  become: yes
   command: update-locale LANG=en_US.UTF-8
 
 - name: Add BigBlueButton apt key
-  become: true
+  become: yes
   apt_key:
     url: '{{ item }}'
     state: present
@@ -63,21 +63,21 @@
     - https://deb.nodesource.com/gpgkey/nodesource.gpg.key
 
 - name: Find repos to remove
-  become: true
+  become: yes
   find:
     paths: /etc/apt/sources.list.d
     pattern: 'jenkins_live_mconf_com*'
   register: jenkins_repos
 
 - name: Clear repos
-  become: true
+  become: yes
   file:
     path: '{{ item }}'
     state: absent
   with_items: "{{ jenkins_repos.files | map(attribute='path') | list + [ '/etc/apt/sources.list.d/archive_ubuntu_com_ubuntu.list', '/etc/apt/sources.list.d/deb_nodesource_com_node_8_x.list' ] | list }}"
 
 - name: Add multiverse and BigBlueButton repos to apt
-  become: true
+  become: yes
   apt_repository:
     repo: '{{ item.repo }}'
     filename: '{{ item.filename }}'
@@ -93,12 +93,12 @@
     - { repo: 'ppa:nginx/stable', filename: 'nginx' }
 
 - name: Update apt if keys changed
-  become: true
+  become: yes
   apt: update_cache=yes
   when: aptkey is changed or aptrepos is changed
 
 - name: Remove kurento-media-server-6.0
-  become: true
+  become: yes
   apt:
     name: kurento-media-server-6.0
     state: absent
@@ -107,34 +107,34 @@
 - service:
     name: kurento-media-server-6.0
     state: stopped
-  become: true
+  become: yes
   ignore_errors: yes
 
 - file:
     name: /etc/init.d/kurento-media-server-6.0
     state: absent
-  become: true
+  become: yes
 
 - name: Install BigBlueButton
-  become: true
+  become: yes
   apt:
     name: '{{ bigbluebutton_apt_package }}'
     state: '{{ bigbluebutton_apt_state }}'
   notify: restart bigbluebutton
 
 - name: Install bbb-webrtc-sfu
-  become: true
+  become: yes
   apt:
     name: bbb-webrtc-sfu
     state: '{{ bigbluebutton_apt_state }}'
   when: not bigbluebutton_docker_webrtc_sfu_enabled
 
 - name: Auto-remove to avoid no space left on /boot
-  become: true
+  become: yes
   command: apt-get -y autoremove
 
 - name: Upgrade packages to make sure BigBlueButton packages are updated
-  become: true
+  become: yes
   apt:
     upgrade: safe
   when: bigbluebutton_apt_state == 'latest'
@@ -228,7 +228,7 @@
   notify: reload nginx
 
 - name: Install demos
-  become: true
+  become: yes
   apt:
     name: bbb-demo
     state: '{{ bigbluebutton_apt_state }}'
@@ -236,7 +236,7 @@
   register: reg_demo
 
 - name: Restart tomcat7
-  become: true
+  become: yes
   service:
     name: tomcat7
     state: restarted
@@ -248,14 +248,14 @@
   when: bigbluebutton_demos|bool
 
 - name: Copy demo0
-  become: true
+  become: yes
   copy:
     src: files/demo0.jsp
     dest: /var/lib/tomcat7/webapps/demo/demo0.jsp
   when: bigbluebutton_demos|bool
 
 - name: Remove demos
-  become: true
+  become: yes
   apt:
     name: bbb-demo
     state: absent
@@ -283,7 +283,7 @@
     bbb_secret: '{{ reg_bbb_secret.stdout }}'
 
 - name: bbb-conf --setip
-  become: true
+  become: yes
   command: bbb-conf --setip '{{ inventory_hostname }}'
   when: setip_needed|bool
 
@@ -318,7 +318,7 @@
 
 # TODO move this to a new role/task
 - name: Install dependency for yedit library
-  become: true
+  become: yes
   pip:
     name: ruamel.yaml
     version: 0.15.37
@@ -447,7 +447,7 @@
   notify: restart bbb-webrtc-sfu
 
 - name: Open/close redis
-  become: true
+  become: yes
   lineinfile:
     dest: /etc/redis/redis.conf
     state: present
@@ -457,7 +457,7 @@
   notify: restart redis
 
 - name: Close redis to localhost
-  become: true
+  become: yes
   lineinfile:
     dest: /etc/redis/redis.conf
     state: present
@@ -474,7 +474,7 @@
   become: yes
 
 - name: Configure retention
-  become: true
+  become: yes
   lineinfile:
     dest: /etc/cron.daily/bigbluebutton
     state: present

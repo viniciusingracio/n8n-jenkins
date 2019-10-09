@@ -3,7 +3,7 @@
 # https://github.com/ansible/ansible/issues/14413#issuecomment-257887580
 - name: Reboot server
   shell: sleep 2 && shutdown -r now "Ansible reboot"
-  become: true
+  become: yes
   async: 1
   poll: 0
   when: reboot_required

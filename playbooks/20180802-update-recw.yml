@@ -10,7 +10,7 @@
 
   tasks:
   - name: Update apt (if older than 5m)
-    become: true
+    become: yes
     apt: update_cache=yes cache_valid_time=300
 
   - name: Update firefox
@@ -20,7 +20,7 @@
       state: latest
 
   - name: Adjust config
-    become: true
+    become: yes
     replace:
       path: /usr/local/bigbluebutton/core/scripts/mconf-presentation-recorder.yml
       regexp: '{{ item.regexp }}'

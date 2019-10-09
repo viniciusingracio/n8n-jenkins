@@ -30,7 +30,7 @@
   register: reg_settings_json
 
 - name: Update json values
-  become: true
+  become: yes
   json:
     path: /usr/share/meteor/bundle/programs/server/assets/app/config/settings-production.json
     replace:

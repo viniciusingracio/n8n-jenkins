@@ -1,11 +1,11 @@
 ---
 
 - name: Update apt (if older than 5m)
-  become: true
+  become: yes
   apt: update_cache=yes cache_valid_time=300
 
 - name: Install snmpd
-  become: true
+  become: yes
   apt:
     name: snmpd
 

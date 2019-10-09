@@ -1,5 +1,5 @@
 - name: Create remote user
-  become: true
+  become: yes
   user:
     name: '{{ deploy_user }}'
     shell: /bin/bash
@@ -7,13 +7,13 @@
     append: yes
 
 - name: Fix home directories ownership
-  become: true
+  become: yes
   file:
     path: '/home/{{ deploy_user }}'
     owner: '{{ deploy_user }}'
 
 - name: Set up authorized keys
-  become: true
+  become: yes
   authorized_key:
     user: '{{ deploy_user }}'
     state: present
@@ -21,14 +21,14 @@
   with_file: '{{ public_keys }}'
 
 - name: Add to sudoers
-  become: true
+  become: yes
   template:
     src: templates/sudoers.j2
     dest: /etc/sudoers.d/{{ deploy_user }}
 
 # For some servers we want to upload an specific ssh key for the deploy user
 - name: Set up ssh key (private)
-  become: true
+  become: yes
   copy:
     src: '{{ deploy_user_ssh_key }}'
     dest: '/home/{{ deploy_user }}/.ssh/id_rsa'
@@ -37,7 +37,7 @@
     mode: 0600
   when: deploy_user_ssh_key is defined
 - name: Set up ssh key (public)
-  become: true
+  become: yes
   copy:
     src: '{{ deploy_user_ssh_key_pub }}'
     dest: '/home/{{ deploy_user }}/.ssh/id_rsa.pub'

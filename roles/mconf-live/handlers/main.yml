@@ -1,9 +1,9 @@
 - name: reload nginx
-  become: true
+  become: yes
   service: name=nginx state=reloaded
 
 - name: restart bbb-html5
-  become: true
+  become: yes
   service: name=bbb-html5 state=restarted
 
 - name: restart sfu-phone
@@ -19,5 +19,5 @@
   ignore_errors: yes
 
 - name: restart mconf-presentation-recorder
-  become: true
+  become: yes
   service: name=mconf-presentation-recorder state=restarted

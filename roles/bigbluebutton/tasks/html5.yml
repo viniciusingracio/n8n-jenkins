@@ -1,5 +1,5 @@
 - name: Add mongo apt key
-  become: true
+  become: yes
   apt_key:
     keyserver: hkp://keyserver.ubuntu.com:80
     id: 0C49F3730359A14518585931BC711F9BA15703C6
@@ -7,26 +7,26 @@
   register: aptkey
 
 - name: Add mongo repo to apt
-  become: true
+  become: yes
   apt_repository:
     repo: 'deb [ arch=amd64,arm64 ] http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.4 multiverse'
     state: present
   register: aptrepos
 
 - name: Update apt if keys changed
-  become: true
+  become: yes
   apt: update_cache=yes
   when: aptkey is changed or aptrepos is changed
 
 - name: Install mongo
-  become: true
+  become: yes
   apt:
     name: mongodb-org
     state: '{{ bigbluebutton_apt_state }}'
   notify: start mongo
 
 - name: Install hmtl5 client
-  become: true
+  become: yes
   apt:
     name: 'bbb-html5'
     state: '{{ bigbluebutton_apt_state }}'

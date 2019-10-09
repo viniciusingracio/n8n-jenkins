@@ -1,6 +1,6 @@
 # TODO: make a module with this?
 - name: check if port 80 is used
-  become: true
+  become: yes
   shell: netstat -tuln | grep ':80 '
   register: port_80
   failed_when: False # never fail
@@ -26,7 +26,7 @@
 #
 
 - name: open firewall for certbot
-  become: true
+  become: yes
   ufw: rule=allow port=80 proto=tcp
   notify: restart ufw
   when: firewall_blocking_80 # port was not open yet
@@ -71,7 +71,7 @@
 
 
 - name: close firewall after certbot standalone
-  become: true
+  become: yes
   ufw: rule=allow port=80 proto=tcp delete=true
   notify: restart ufw
   when: firewall_blocking_80 # port was not open before

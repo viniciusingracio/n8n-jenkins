@@ -1,6 +1,6 @@
 # this would not be necessary if the rap scripts created the directories they use
 - name: Create shared directories
-  become: true
+  become: yes
   file:
     path: '{{ item }}'
     state: directory

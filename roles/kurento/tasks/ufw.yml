@@ -1,5 +1,5 @@
 - name: Configure ufw rules for Kurento
-  become: true
+  become: yes
   ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
   with_items:
     - { rule: 'allow', port: 5060, proto: 'tcp' } # sip

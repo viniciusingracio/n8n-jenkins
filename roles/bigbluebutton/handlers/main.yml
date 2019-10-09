@@ -1,48 +1,48 @@
 - name: restart bigbluebutton
-  become: true
+  become: yes
   command: /usr/local/bigbluebutton/core/scripts/utils/restart-mconf.sh
   ignore_errors: yes
 
 - name: restart redis
-  become: true
+  become: yes
   service: name=redis state=restarted
 
 - name: restart bbb-html5
-  become: true
+  become: yes
   service: name=bbb-html5 state=restarted
 
 - name: reload nginx
-  become: true
+  become: yes
   service: name=nginx state=reloaded
 
 - name: restart nginx
-  become: true
+  become: yes
   service: name=nginx state=restarted
 
 - name: start mongo
-  become: true
+  become: yes
   service: name=mongod state=started
 
 - name: restart zabbix-agent
-  become: true
+  become: yes
   service: name=zabbix-agent state=restarted
 
 - name: restart kms
-  become: true
+  become: yes
   service: name=kurento-media-server state=restarted
 
 - name: restart bbb-webrtc-sfu
-  become: true
+  become: yes
   service: name=bbb-webrtc-sfu state=restarted
 
 - name: restart mconf-mcs-sip
-  become: true
+  become: yes
   service: name=mconf-mcs-sip state=restarted
 
 - name: reboot
-  become: true
+  become: yes
   command: shutdown -r 1
 
 - name: restart webhooks
-  become: true
+  become: yes
   service: name=bbb-webhooks state=restarted

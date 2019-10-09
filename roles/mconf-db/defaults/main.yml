@@ -19,7 +19,6 @@ mconf_db_mysql_pkgs:
   - python3-pymysql # needed to run utility commands
 mconf_db_mysql_service: mysql
 mconf_db_mysql_root_db_pass: ''
-mconf_db_mysql_conf_dir: "/etc/mysql/"
 mconf_db_mysql_sql_mode: STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
 mconf_db_mysql_port: 3306
 mconf_db_mysql_bind_address: "0.0.0.0"

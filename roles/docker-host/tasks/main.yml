@@ -1,30 +1,30 @@
 - name: Add docker gpg key
-  become: true
+  become: yes
   apt_key:
     url: "https://download.docker.com/linux/ubuntu/gpg"
     state: present
 
 - name: Add docker apt repository
-  become: true
+  become: yes
   apt_repository:
     repo: 'deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable'
     state: present
   register: aptrepos
 
 - name: Update apt (if older than 60m)
-  become: true
+  become: yes
   apt: update_cache=yes cache_valid_time=3600
   when: aptrepos is changed
 
 - name: Install docker package
-  become: true
+  become: yes
   apt:
     name: docker-ce
     state: present
 
 # https://github.com/ansible/ansible/issues/42162
 - name: Remove docker-py
-  become: true
+  become: yes
   pip:
     name: docker-py
     state: absent
@@ -32,13 +32,13 @@
 # Need pip and docker to manage this docker instance with ansible
 # pip is now installed on setup.yml
 - name: Install docker
-  become: true
+  become: yes
   pip:
     name: docker
     state: present
 
 - name: Add user to docker group
-  become: true
+  become: yes
   user:
     name: '{{ ansible_ssh_user }}'
     groups: docker

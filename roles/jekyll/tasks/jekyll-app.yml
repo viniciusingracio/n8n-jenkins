@@ -1,5 +1,5 @@
 - name: Create the output directory
-  become: true
+  become: yes
   file:
     path: '{{ item }}'
     state: directory
@@ -40,7 +40,7 @@
   register: temp_config
 
 - name: Copy _config.yml to build the application
-  become: true
+  become: yes
   copy:
     src: '{{ jekyll_config_file }}'
     dest: '{{ temp_config.path }}/_config.yml'
@@ -67,7 +67,7 @@
     state: absent
 
 - name: Set the owner of the built files
-  become: true
+  become: yes
   file:
     path: '{{ jekyll_tmp_path }}/{{ jekyll_build_dir }}'
     owner: '{{ deploy_user }}'
@@ -82,7 +82,7 @@
   delegate_to: '{{ inventory_hostname }}'
 
 - name: Set permissions
-  become: true
+  become: yes
   file:
     path: '{{ jekyll_output_path }}'
     owner: '{{ jekyll_usr }}'
