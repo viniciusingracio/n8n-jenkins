@@ -39,6 +39,7 @@ if [ $? -eq 0 ]; then
   echo "bbb-webrtc-sfu is running within Docker"
   echo "Stop bbb-webrtc-sfu and kurento from packages"
   systemctl stop bbb-webrtc-sfu kurento
+  systemctl disable bbb-webrtc-sfu kurento
 
   RUNNING_KURENTO_HEALTH_MONITOR=false
   docker inspect --format='{{.State.Running}}' kurento-health-monitor
@@ -65,4 +66,6 @@ if [ $? -eq 0 ]; then
   docker restart webrtc-sfu mcs-bfcp mcs-sip sfu-phone
 fi
 
+systemctl stop red5 bbb-transcode-akka
+systemctl disable red5 bbb-transcode-akka
 echo "$(date) Restart sequence finished!"

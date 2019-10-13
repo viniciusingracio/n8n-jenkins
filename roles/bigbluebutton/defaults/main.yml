@@ -47,9 +47,6 @@ bigbluebutton_apt_state: latest
 # Install/remove demos
 bigbluebutton_demos: false
 
-# Install/remove webhooks
-bigbluebutton_webhooks: true
-
 # Open redis to external access. Set to false remove external access.
 bigbluebutton_redis_bind: false
 # To open use:
@@ -176,8 +173,6 @@ bigbluebutton_html5_external_log_method: POST
 bigbluebutton_html5_external_log_throttle: 5000
 
 bigbluebutton_docker_webrtc_sfu_enabled: false
-bigbluebutton_docker_webhooks_image: mconf/bbb-webhooks:dev-c52d15d
-bigbluebutton_docker_webhooks_permanent_hooks: []
 
 external_ip:
 

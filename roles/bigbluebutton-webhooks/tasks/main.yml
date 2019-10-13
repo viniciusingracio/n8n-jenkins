@@ -1,8 +1,37 @@
+---
+
 - name: Remove webhooks package
   become: yes
   apt:
     name: bbb-webhooks
     state: absent
+
+- name: Check if bbb-web is running on a standalone app
+  stat:
+    path: /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
+  register: reg_standalone
+- set_fact:
+    bigbluebutton_servlet_dir: /usr/share/bbb-web
+    bigbluebutton_user: bigbluebutton
+    bbb_web_port: 8090
+  when: reg_standalone.stat.exists
+- set_fact:
+    bigbluebutton_servlet_dir: /var/lib/tomcat7/webapps/bigbluebutton
+    bigbluebutton_user: tomcat7
+    bbb_web_port: 8080
+  when: not reg_standalone.stat.exists
+
+- name: Get BigBlueButton secret
+  shell: cat {{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
+  register: bbb_secret_raw
+
+- name: Get BigBlueButton URL
+  shell: cat {{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties | grep '^bigbluebutton.web.serverURL=' | cut -d'=' -f2 | awk '{print $1"/bigbluebutton/api"}'
+  register: bbb_api_entry_point_raw
+
+- set_fact:
+    bbb_secret: '{{ bbb_secret_raw.stdout }}'
+    bbb_api_entry_point: '{{ bbb_api_entry_point_raw.stdout }}'
 
 - name: Register Docker host IP
   shell: "ifconfig docker0 | grep 'inet addr:' | cut -d: -f2 | awk '{print $1}'"

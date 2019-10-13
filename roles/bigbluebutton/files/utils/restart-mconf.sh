@@ -65,4 +65,5 @@ if [ $? -eq 0 ]; then
   docker restart webrtc-sfu mcs-bfcp mcs-sip sfu-phone
 fi
 
+systemctl stop red5 bbb-transcode-akka
 echo "$(date) Restart sequence finished!"

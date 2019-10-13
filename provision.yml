@@ -129,6 +129,7 @@
 - hosts: docker-host
   roles:
   - docker-host
+  - ufw.docker
 
 - hosts:
   - mconf-rec

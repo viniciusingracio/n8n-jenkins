@@ -498,7 +498,8 @@
 - include: config-xml.yml
   when: not bigbluebutton_html5_only
 
-- include: webhooks.yml
+- include_role:
+    name: bigbluebutton-webhooks
 
 - include: html5.yml
   when: bigbluebutton_html5
