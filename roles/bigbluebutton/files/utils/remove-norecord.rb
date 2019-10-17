@@ -1,9 +1,10 @@
 #!/usr/bin/ruby
 # encoding: UTF-8
 
-Dir.glob( [ "/var/bigbluebutton/recording/status/archived/*.norecord", "/var/bigbluebutton/recording/status/ended/*.norecord" ] ).each do |norecorded|
+Dir.glob("/var/bigbluebutton/recording/status/archived/*.norecord").each do |norecorded|
   match = /^(\w+-\d+)\.norecord$/.match File.basename(norecorded)
-  next if match.nil?
+  yesterday = Time.now - (60 * 60 * 24)
+  next if match.nil? || File.mtime(norecorded) > yesterday
   record_id = match[1]
 
   puts `bbb-record --delete #{record_id}`
