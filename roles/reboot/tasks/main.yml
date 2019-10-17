@@ -17,5 +17,5 @@
     port: '{{ ansible_port | default(22) }}'
     state: started
     delay: 15
-    timeout: 180
+    timeout: 600
   when: reboot_required

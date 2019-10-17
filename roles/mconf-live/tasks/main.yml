@@ -1,12 +1,7 @@
-- include: etherpad-dummy.yml
-  when: bigbluebutton_docker_etherpad_enabled
-
-# TODO move this to etherpad-dummy.yml
-- apt:
-    name: bbb-etherpad=1.0
-    state: absent
-    force: yes
-  become: yes
+- include_role:
+    name: bigbluebutton-etherpad
+    tasks_from: etherpad-dummy
+  when: bigbluebutton_html5
 
 - stat:
     path: /etc/apt/sources.list.d/mconf-live.list
@@ -44,8 +39,10 @@
 
 - include: rap.yml
 
-- include: docker-etherpad.yml
-  when: bigbluebutton_docker_etherpad_enabled
+- include_role:
+    name: bigbluebutton-etherpad
+    tasks_from: docker-etherpad
+  when: bigbluebutton_html5
 
 - include: docker-mcs-sip.yml
   when: bigbluebutton_docker_mcs_sip_enabled

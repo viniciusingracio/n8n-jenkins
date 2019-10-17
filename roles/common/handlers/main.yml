@@ -2,4 +2,3 @@
   become: yes
   service: name=docker state=restarted
   ignore_errors: yes
-

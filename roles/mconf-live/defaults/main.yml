@@ -35,8 +35,6 @@ bigbluebutton_docker_webrtc_sfu_enabled: false
 bigbluebutton_docker_webrtc_sfu_image: mconf/bbb-webrtc-sfu:v2.4.4
 # it can be VP8, H264 or ANY
 bigbluebutton_docker_webrtc_sfu_codec: ANY
-bigbluebutton_docker_etherpad_enabled: false
-bigbluebutton_docker_etherpad_image: mconf/etherpad-lite:mconf
 bigbluebutton_docker_mcs_sip_enabled: false
 bigbluebutton_docker_mcs_sip_image: mconf/mcs-sip:v2.2.0-beta.5
 bigbluebutton_docker_mcs_sip_intraframe_interval: 0
@@ -61,9 +59,6 @@ bigbluebutton_sip_registrar_username:
 bigbluebutton_sip_registrar_password:
 
 bigbluebutton_kurento_use_internal_ip: false
-
-bigbluebutton_notes_multiple_enabled: false
-bigbluebutton_notes_auth_enabled: false
 
 bigbluebutton_sfu_auth_enabled: false
 

@@ -11,3 +11,11 @@
 
 - name: clean docker
   command: docker system prune --force
+
+- name: restart bbb-html5
+  become: yes
+  service: name=bbb-html5 state=restarted
+
+- name: reload nginx
+  become: yes
+  service: name=nginx state=reloaded

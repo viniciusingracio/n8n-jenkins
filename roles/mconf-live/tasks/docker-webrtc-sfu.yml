@@ -32,6 +32,7 @@
 - name: Pull streaming image
   docker_image:
     name: mconf/mconf-presentation-recorder:latest
+    pull: yes
 
 - name:
   become: yes
@@ -53,6 +54,11 @@
   with_items:
     - ./lib/stream/StreamProcess.js
   when: bigbluebutton_streaming_enabled
+
+- name:
+  set_fact:
+    bigbluebutton_docker_kurento_allowed_candidates: "{{ [ external_ip, ansible_default_ipv4.address ] | unique }}"
+  when: bigbluebutton_docker_kurento_allowed_candidates is none
 
 - name: Start webrtc-sfu container
   docker_container:

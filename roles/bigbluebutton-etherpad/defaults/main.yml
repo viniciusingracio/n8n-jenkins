@@ -1,0 +1,8 @@
+---
+
+bigbluebutton_docker_etherpad_enabled: false
+bigbluebutton_docker_etherpad_image: mconf/etherpad-lite:mconf
+
+bigbluebutton_notes_enabled: true
+bigbluebutton_notes_multiple_enabled: false
+bigbluebutton_notes_auth_enabled: false

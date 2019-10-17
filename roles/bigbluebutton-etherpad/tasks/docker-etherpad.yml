@@ -1,5 +1,3 @@
-# TODO stop container if bigbluebutton_docker_etherpad_enabled = false
-
 - name: Start etherpad container
   docker_container:
     name: etherpad
@@ -10,8 +8,18 @@
       - "3006:9001"
     env:
       SETTINGS_MODIFIER: '.dbSettings.host = "{{ docker_ip }}"'
+    state: '{% if bigbluebutton_docker_etherpad_enabled %}started{% else %}absent{% endif %}'
     labels:
       hostname: '{{ inventory_hostname }}'
+  register: reg_etherpad_container
+
+- name: Reinstall bbb-etherpad
+  become: yes
+  command: apt-get -y install --reinstall -o Dpkg::Options::="--force-confask,confnew,confmiss" bbb-etherpad
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  notify: reload nginx
+  when: reg_etherpad_container is changed and not bigbluebutton_docker_etherpad_enabled
 
 - name: Remove old images
   shell: docker images {{ bigbluebutton_docker_etherpad_image.split(":")[0] }} --filter 'before={{ bigbluebutton_docker_etherpad_image }}' -q | xargs -r docker rmi --force
@@ -23,25 +31,12 @@
     src: templates/notes.nginx.j2
     dest: /etc/bigbluebutton/nginx/notes.nginx
   notify: reload nginx
+  when: bigbluebutton_docker_etherpad_enabled
 
-- name: Determine if json or yml config
-  stat:
-    path: /usr/share/meteor/bundle/programs/server/assets/app/config/settings-production.json
-  register: reg_settings_json
-
-- name: Update json values
-  become: yes
-  json:
-    path: /usr/share/meteor/bundle/programs/server/assets/app/config/settings-production.json
-    replace:
-      json_path: '{{ item.path }}'
-      with_value: '{{ item.value }}'
-    indent: 4
-    insert_if_missing: true
-  with_items:
-    - { path: '/public/note/url', value: 'https://{{ inventory_hostname }}/pad' }
-  notify: restart bbb-html5
-  when: reg_settings_json.stat.exists
+- name: Read etherpad API key
+  slurp:
+    src: /usr/share/etherpad-lite/APIKEY.txt
+  register: slurpfile
 
 - name: Update yml values
   become: yes
@@ -50,4 +45,5 @@
     - { key: 'public.note.enabled', value: 'true' }
     - { key: 'public.note.url', value: 'https://{{ inventory_hostname }}/pad' }
     - { key: 'public.genericContent.multipleNotes.enabled', value: '{{ bigbluebutton_notes_multiple_enabled }}' }
-  when: not reg_settings_json.stat.exists
+    - { key: 'private.etherpad.apikey', value: '{{ slurpfile["content"] | b64decode | regex_replace("\n") }}' }
+  notify: restart bbb-html5

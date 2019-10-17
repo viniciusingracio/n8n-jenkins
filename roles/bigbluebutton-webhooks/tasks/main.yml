@@ -1,11 +1,5 @@
 ---
 
-- name: Remove webhooks package
-  become: yes
-  apt:
-    name: bbb-webhooks
-    state: absent
-
 - name: Check if bbb-web is running on a standalone app
   stat:
     path: /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
@@ -39,6 +33,12 @@
 
 - set_fact:
     docker_ip: '{{ docker_ip_raw.stdout }}'
+
+- name: Remove webhooks package
+  become: yes
+  apt:
+    name: bbb-webhooks
+    state: absent
 
 - name: Start bbb-webhooks container
   docker_container:

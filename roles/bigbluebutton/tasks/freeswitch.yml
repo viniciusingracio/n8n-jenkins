@@ -62,7 +62,6 @@
     path: /opt/freeswitch/conf/sip_profiles/external.xml
     xpath: '/profile/settings/param[@name="{{ item.name }}"]'
     content: attribute
-    attribute: value
   with_items: '{{ external_props }}'
   register: external_props_read
   ignore_errors: yes

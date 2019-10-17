@@ -1,0 +1,41 @@
+# in order to build the deb package, run (depends on equivs):
+# equivs-build bbb-etherpad
+
+- name: Copy dummy package for bbb-etherpad to /tmp
+  copy:
+    src: files/bbb-etherpad_1.0_all.deb
+    dest: /tmp/bbb-etherpad_1.0_all.deb
+  when: bigbluebutton_docker_etherpad_enabled
+
+- name: Install dummy package
+  apt:
+    deb: /tmp/bbb-etherpad_1.0_all.deb
+    force: yes
+  become: yes
+  when: bigbluebutton_docker_etherpad_enabled
+
+- set_fact:
+    hold_unhold: '{% if bigbluebutton_docker_etherpad_enabled %}hold{% else %}unhold{% endif %}'
+
+- name: Hold package
+  command: apt-mark {{ hold_unhold }} bbb-etherpad
+  become: yes
+
+- name: Hold package (with aptitude)
+  command: aptitude -y {{ hold_unhold }} bbb-etherpad
+  become: yes
+
+- name: Hold package (with dpkg)
+  dpkg_selections:
+    name: bbb-etherpad
+    selection: hold
+  become: yes
+  when: bigbluebutton_docker_etherpad_enabled
+
+# not sure if this is correct
+# - name: Hold package (with dpkg)
+#   dpkg_selections:
+#     name: bbb-etherpad
+#     selection: purge
+#   become: yes
+#   when: not bigbluebutton_docker_etherpad_enabled
