@@ -64,8 +64,9 @@ if [ $? -eq 0 ]; then
   fi
   echo "Restart the other Docker containers"
   docker restart webrtc-sfu mcs-bfcp mcs-sip sfu-phone
+
+  systemctl stop red5 bbb-transcode-akka
+  systemctl disable red5 bbb-transcode-akka
 fi
 
-systemctl stop red5 bbb-transcode-akka
-systemctl disable red5 bbb-transcode-akka
 echo "$(date) Restart sequence finished!"

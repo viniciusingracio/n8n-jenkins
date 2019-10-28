@@ -14,7 +14,7 @@
 
 - name: Decide if FFmpeg needs to be (re)built or reinstalled
   set_fact:
-    version_differ: reg_ffmpeg_version is failed or reg_ffmpeg_version.stdout != ffmpeg_version or reg_ffmpeg_configure_flags is failed or reg_ffmpeg_configure_flags.stdout != ffmpeg_configure_flags
+    version_differ: reg_ffmpeg_version is failed or not ffmpeg_version in reg_ffmpeg_version.stdout or reg_ffmpeg_configure_flags is failed or reg_ffmpeg_configure_flags.stdout != ffmpeg_configure_flags
 
 - include: source.yml
   when: version_differ and ffmpeg_build_from_source

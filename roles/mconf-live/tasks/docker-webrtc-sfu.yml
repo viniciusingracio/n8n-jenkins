@@ -31,7 +31,7 @@
 
 - name: Pull streaming image
   docker_image:
-    name: mconf/mconf-presentation-recorder:latest
+    name: '{{ mconf_live_presentation_recorder_image }}:{{ mconf_live_presentation_recorder_version }}'
     pull: yes
 
 - name:
@@ -80,7 +80,7 @@
       ESL_PORT: "8021"
       LOG_LEVEL: info
       STREAM_CONTAINER_TYPE: docker
-      STREAM_IMAGE_NAME: mconf/mconf-presentation-recorder:latest
+      STREAM_IMAGE_NAME: '{{ mconf_live_presentation_recorder_image }}:{{ mconf_live_presentation_recorder_version }}'
       STREAM_BIGBLUEBUTTON_URL: '{{ bbb_api_entry_point | regex_replace("/api") }}'
       STREAM_BIGBLUEBUTTON_SECRET: '{{ bbb_secret }}'
       STREAM_BOT_NAME: 'Streaming'

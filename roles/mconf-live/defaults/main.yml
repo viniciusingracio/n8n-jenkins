@@ -28,6 +28,8 @@ mconf_live_recording_auth_entry_point:
 mconf_live_recording_auth_secret:
 mconf_live_recording_auth_local_address:
 
+bigbluebutton_html5: false
+
 bigbluebutton_stun_server:
   - stun:stun.l.google.com:19302
 

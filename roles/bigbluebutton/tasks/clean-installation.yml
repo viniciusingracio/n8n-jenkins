@@ -5,20 +5,23 @@
 
 - name: Find path to packages installed from the specific apt repository
   set_fact:
-    apt_path: /var/lib/apt/lists/{{ current_apt_source | regex_search("http[s]?:\/\/[^ ]*") | regex_replace("http[s]?:\/\/") | replace("/", "_") }}*Packages
+    apt_path: /var/lib/apt/lists/{{ current_apt_source | regex_search("http[s]?:\/\/[^ ]*") | regex_replace("http[s]?:\/\/") | regex_replace("_", "%5f") | replace("/", "_") }}*Packages
 
 - name: Find packages installed from the specific apt repository
   shell: awk '$1 == "Package:" { if (a[$2]++ == 0) print $2; }' {{ apt_path }}
   register: list_of_packages
 
-# need to execute this just because of an issue in the debian package, 
+# need to execute this just because of an issue in the debian package,
 # which expects bbb-record to be installed when this package is being uninstalled
-- name: Remove mconf-recording-decrypter
+- name: Remove packages that depend on bbb-record-core
   become: yes
   apt:
-    name: mconf-recording-decrypter
+    name: '{{ item }}'
     purge: yes
     state: absent
+  with_items:
+    - mconf-recording-decrypter
+    - mconf-recording-encrypted
 
 - name: Remove packages from specific apt repository
   become: yes

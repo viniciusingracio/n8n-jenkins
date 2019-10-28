@@ -21,6 +21,7 @@
 #
 
 require "trollop"
+require "yaml"
 require File.expand_path("../../../lib/recordandplayback", __FILE__)
 
 opts = Trollop::options do
@@ -32,7 +33,10 @@ logger = Logger.new("/var/log/bigbluebutton/post_publish.log", "weekly")
 logger.level = Logger::INFO
 BigBlueButton.logger = logger
 
-command = "ruby transcribe/transcribe.rb -m #{meeting_id}"
+props = YAML::load(File.open(File.expand_path('../transcribe.yml', __FILE__)))
+engine = props["engine"]
+
+command = "ruby transcribe/transcribe-#{engine}.rb -m #{meeting_id}"
 pid = spawn(command)
 Process.detach pid
 

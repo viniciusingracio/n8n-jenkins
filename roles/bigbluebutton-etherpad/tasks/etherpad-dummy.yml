@@ -20,6 +20,7 @@
 - name: Hold package
   command: apt-mark {{ hold_unhold }} bbb-etherpad
   become: yes
+  ignore_errors: yes
 
 - name: Hold package (with aptitude)
   command: aptitude -y {{ hold_unhold }} bbb-etherpad

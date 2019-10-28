@@ -8,7 +8,9 @@
   with_items:
     - { name: 'google-cloud-storage', version: '1.21.0' }
     - { name: 'google-cloud-speech', version: '0.37.0' }
+    - { name: 'aws-sdk', version: '3.0.1' }
   become: yes
+  when: asr_enabled | bool
 
 - name:
   file:
@@ -23,7 +25,8 @@
     src: '{{ item.src }}'
     dest: '{{ item.dest }}'
   with_items:
-    - { src: 'files/transcribe.rb', dest: '/usr/local/bigbluebutton/core/scripts/transcribe/transcribe.rb' }
+    - { src: 'files/transcribe-aws.rb', dest: '/usr/local/bigbluebutton/core/scripts/transcribe/transcribe-aws.rb' }
+    - { src: 'files/transcribe-google.rb', dest: '/usr/local/bigbluebutton/core/scripts/transcribe/transcribe-google.rb' }
     - { src: 'files/06-transcribe.rb', dest: '/usr/local/bigbluebutton/core/scripts/post_publish/06-transcribe.rb' }
   become: yes
   when: asr_enabled | bool

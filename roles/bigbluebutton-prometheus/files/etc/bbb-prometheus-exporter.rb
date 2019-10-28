@@ -64,9 +64,11 @@ class URIBuilder
     @@client_uri ||= build_uri "client/conf/config.xml"
   end
 
-  def self.api_method_uri(method)
-    get_security method do |params, checksum|
-      "bigbluebutton/api/#{method}?#{params}&checksum=#{checksum}"
+  def self.api_method_uri(method, params = nil)
+    get_security(method, params) do |params, checksum|
+      params += "&" if ! params.empty?
+      params += "checksum=#{checksum}"
+      "bigbluebutton/api/#{method}?#{params}"
     end
   end
 
@@ -79,8 +81,8 @@ class URIBuilder
     end
   end
 
-  def self.get_security(method)
-    params = "random=#{rand(99999)}"
+  def self.get_security(method, params = nil)
+    params ||= "random=#{rand(99999)}"
     checksum = Digest::SHA1.hexdigest "#{method}#{params}#{BBBProperties.security_salt}"
     build_uri yield(params, checksum)
   end
@@ -162,10 +164,10 @@ class Meetings < MonitoredService
       meetings_hash[:bbb_meetings_total] = @@meetings.length
       @@meetings.each do |meeting|
         if meeting.at_xpath('running').text == 'true'
-          participant_count = Integer(meeting.at_xpath('participantCount').text)
-          listener_count = Integer(meeting.at_xpath('listenerCount').text)
-          voice_participant_count = Integer(meeting.at_xpath('voiceParticipantCount').text)
-          video_count = Integer(meeting.at_xpath('videoCount').text)
+          participant_count = meeting.at_xpath('participantCount').text.to_i
+          listener_count = meeting.at_xpath('listenerCount').text.to_i
+          voice_participant_count = meeting.at_xpath('voiceParticipantCount').text.to_i
+          video_count = meeting.at_xpath('videoCount').text.to_i
           meeting_name = meeting.at_xpath('meetingName').text
 
           meetings_hash[:bbb_meetings_list] << meeting_name
@@ -187,7 +189,7 @@ class Meetings < MonitoredService
     @@response_code = response.code
     doc = Nokogiri::XML(response.body)
 
-    @@meetings = doc.xpath('//meeting')
+    @@meetings = doc.xpath('/response/meetings/meeting')
   end
 
   private_class_method :update_meetings
@@ -201,12 +203,20 @@ class Recordings < MonitoredService
     {
       :bbb_recordings_response_code => @@response_code,
       :bbb_recordings_total => @@recordings.length,
-      :bbb_recordings_response_time => @@time
+      :bbb_recordings_response_time => @@time,
+      :bbb_recordings_published_presentation_count => Dir.glob("/var/bigbluebutton/published/presentation/*").count,
+      :bbb_recordings_published_presentation_video_count => Dir.glob("/var/bigbluebutton/published/presentation_video/*").count,
+      :bbb_recordings_unpublished_presentation_count => Dir.glob("/var/bigbluebutton/unpublished/presentation/*").count,
+      :bbb_recordings_unpublished_presentation_video_count => Dir.glob("/var/bigbluebutton/unpublished/presentation_video/*").count,
+      :bbb_recordings_deleted_presentation_count => Dir.glob("/var/bigbluebutton/deleted/presentation/*").count,
+      :bbb_recordings_deleted_presentation_video_count => Dir.glob("/var/bigbluebutton/deleted/presentation_video/*").count,
+      :bbb_recordings_sanity_count => Dir.glob("/var/bigbluebutton/recording/status/sanity/*").count,
+      :bbb_recordings_fail_count => Dir.glob("/var/bigbluebutton/recording/status/**/*.fail").count,
     }
   end
 
   def self.update_recordings
-    uri = URIBuilder.api_method_uri 'getRecordings'
+    uri = URIBuilder.api_method_uri('getRecordings', '')
     response = nil
     time = Benchmark.measure do
       response = @@requester.get_response(uri)
@@ -215,7 +225,7 @@ class Recordings < MonitoredService
     @@response_code = response.code
     @@time = time.to_s[/\(\s*([\d.]*)\)/, 1]
     doc = Nokogiri::XML(response.body)
-    @@recordings = doc.xpath('//recording')
+    @@recordings = doc.xpath('/response/recordings/recording')
   end
 
   private_class_method :update_recordings
@@ -253,19 +263,63 @@ def fill_template(results)
 
     # HELP bbb_meetings_sent_videos The total number of videos
     # TYPE bbb_meetings_sent_videos gauge
-    bbb_meetings_sent_videos <%= results[:bbb_meetings_sent_videos] %>
+    bbb_meetings_sent_videos <%= results[:bbb_meetings_sent_videos_total] %>
 
     # HELP bbb_meetings_received_videos The total number of videos received
     # TYPE bbb_meetings_received_videos gauge
-    bbb_meetings_received_videos <%= results[:bbb_meetings_received_videos] %>
+    bbb_meetings_received_videos <%= results[:bbb_meetings_received_videos_total] %>
 
     # HELP bbb_meetings_sent_audio The total number of audio sent
     # TYPE bbb_meetings_sent_audio gauge
-    bbb_meetings_sent_audio <%= results[:bbb_meetings_sent_audio] %>
+    bbb_meetings_sent_audio <%= results[:bbb_meetings_sent_audio_total] %>
 
     # HELP bbb_meetings_received_audio The total number of audio received
     # TYPE bbb_meetings_received_audio gauge
-    bbb_meetings_received_audio <%= results[:bbb_meetings_received_audio] %>
+    bbb_meetings_received_audio <%= results[:bbb_meetings_received_audio_total] %>
+
+    # HELP bbb_recordings_total The total number of recordings
+    # TYPE bbb_recordings_total gauge
+    bbb_recordings_total <%= results[:bbb_recordings_total] %>
+
+    # HELP bbb_recordings_response_time The response time for recordings
+    # TYPE bbb_recordings_response_time gauge
+    bbb_recordings_response_time <%= results[:bbb_recordings_response_time] %>
+
+    # HELP bbb_recordings_response_code Responde code of getRecordings call
+    # TYPE bbb_recordings_response_code gauge
+    bbb_recordings_response_code <%= results[:bbb_recordings_response_code] %>
+
+    # HELP bbb_recordings_published_presentation_count The number of published recordings for presentation
+    # TYPE bbb_recordings_published_presentation_count gauge
+    bbb_recordings_published_presentation_count <%= results[:bbb_recordings_published_presentation_count] %>
+
+    # HELP bbb_recordings_published_presentation_video_count The number of published recordings for presentation_video
+    # TYPE bbb_recordings_published_presentation_video_count gauge
+    bbb_recordings_published_presentation_video_count <%= results[:bbb_recordings_published_presentation_video_count] %>
+
+    # HELP bbb_recordings_unpublished_presentation_count The number of unpublished recordings for presentation
+    # TYPE bbb_recordings_unpublished_presentation_count gauge
+    bbb_recordings_unpublished_presentation_count <%= results[:bbb_recordings_unpublished_presentation_count] %>
+
+    # HELP bbb_recordings_unpublished_presentation_video_count The number of unpublished recordings for presentation_video
+    # TYPE bbb_recordings_unpublished_presentation_video_count gauge
+    bbb_recordings_unpublished_presentation_video_count <%= results[:bbb_recordings_unpublished_presentation_video_count] %>
+
+    # HELP bbb_recordings_deleted_presentation_count The number of deleted recordings for presentation
+    # TYPE bbb_recordings_deleted_presentation_count gauge
+    bbb_recordings_deleted_presentation_count <%= results[:bbb_recordings_deleted_presentation_count] %>
+
+    # HELP bbb_recordings_deleted_presentation_video_count The number of deleted recordings for presentation_video
+    # TYPE bbb_recordings_deleted_presentation_video_count gauge
+    bbb_recordings_deleted_presentation_video_count <%= results[:bbb_recordings_deleted_presentation_video_count] %>
+
+    # HELP bbb_recordings_sanity_count The number of pending recordings
+    # TYPE bbb_recordings_sanity_count gauge
+    bbb_recordings_sanity_count <%= results[:bbb_recordings_sanity_count] %>
+
+    # HELP bbb_recordings_fail_count The number of failed recordings
+    # TYPE bbb_recordings_fail_count gauge
+    bbb_recordings_fail_count <%= results[:bbb_recordings_fail_count] %>
 
     # HELP bbb_api_create_response_code Response code of the create endpoint of the API
     # TYPE bbb_api_create_response_code gauge
@@ -313,6 +367,7 @@ results[:bbb_api_create_response_code], results[:bbb_api_create_message_key] = r
 end
 
 results.merge!(Meetings.process_meetings)
+results.merge!(Recordings.process_recordings)
 
 filled_template = fill_template(results)
 

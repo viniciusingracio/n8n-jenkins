@@ -61,9 +61,11 @@
 - name: Pull mconf-presentation-recorder
   docker_image:
     name: '{{ mconf_live_presentation_recorder_image }}:{{ mconf_live_presentation_recorder_version }}'
+    pull: yes
   when: presentation_video_enabled
 
 # tag is needed because the rap script always use latest
+# TODO specify on presentation_video the image version
 - name: Tag presentation recorder image to latest
   command: docker tag {{ mconf_live_presentation_recorder_image }}:{{ mconf_live_presentation_recorder_version }} {{ mconf_live_presentation_recorder_image }}:latest
   when: presentation_video_enabled

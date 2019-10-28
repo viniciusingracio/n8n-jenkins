@@ -120,6 +120,7 @@ bigbluebutton_properties_config:
   - { key: 'userInactivityInspectTimerInMinutes', value: '0' }
   - { key: 'maxNumPages', value: '300' }
   - { key: 'allowModsToUnmuteUsers', value: 'true' }
+  - { key: 'swfSlidesRequired', value: '{{ not bigbluebutton_html5_only }}' }
 
 bigbluebutton_stun_server:
   - stun:stun.l.google.com:19302
@@ -171,6 +172,7 @@ bigbluebutton_html5_external_log_level: info
 bigbluebutton_html5_external_log_url: 'https://{{ inventory_hostname }}/html5Log'
 bigbluebutton_html5_external_log_method: POST
 bigbluebutton_html5_external_log_throttle: 5000
+bigbluebutton_html5_require_cookie: true
 
 bigbluebutton_docker_webrtc_sfu_enabled: false
 

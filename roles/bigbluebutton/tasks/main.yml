@@ -352,6 +352,11 @@
   become: yes
   notify: restart bigbluebutton
 
+- set_fact:
+    bigbluebutton_properties_config: "{{ bigbluebutton_properties_config + [ item ] }}"
+  with_items:
+    - { key: 'allowRequestsWithoutSession', value: '{{ not bigbluebutton_html5_require_cookie }}' }
+
 - name: Customize bigbluebutton.properties
   replace:
     path: '{{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties'
@@ -581,9 +586,17 @@
     user: root
   become: yes
 
+  - cron:
+      name: '{{ item }}'
+      state: absent
+    with_items:
+      - enable audio-stats, sleep 30)
+      - enable audio-stats, sleep 60)
+    become: yes
+
 - name: Install cron job to generate audio-stats
   cron:
-    name: enable audio-stats, sleep {{ item }})
+    name: enable audio-stats, sleep {{ item }}
     job: sleep {{ item }}; /usr/bin/ruby /usr/local/bigbluebutton/core/scripts/utils/audio-stats.rb
     user: root
   become: yes
