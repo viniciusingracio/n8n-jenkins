@@ -586,13 +586,13 @@
     user: root
   become: yes
 
-  - cron:
-      name: '{{ item }}'
-      state: absent
-    with_items:
-      - enable audio-stats, sleep 30)
-      - enable audio-stats, sleep 60)
-    become: yes
+- cron:
+    name: '{{ item }}'
+    state: absent
+  with_items:
+    - enable audio-stats, sleep 30)
+    - enable audio-stats, sleep 60)
+  become: yes
 
 - name: Install cron job to generate audio-stats
   cron:
