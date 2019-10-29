@@ -8,6 +8,8 @@ require 'net/http'
 require 'digest/sha1'
 require 'benchmark'
 require 'logger'
+require 'histogram/array'
+require 'erb'
 
 =begin
 add the following lines to root crontab:
@@ -131,11 +133,6 @@ class HTTPRequester
 end
 
 class Hash
-  # return a copy of the hash, where values are evaluated as Integer and Float
-  def evaluate_values
-    Hash[self.map{|k,v| [k, (Integer(v) rescue v)]}]
-  end
-
   class << self
     def from_xml(xml_io)
       begin
@@ -147,13 +144,13 @@ class Hash
     end
 
     def xml_node_to_hash(node)
-      # if we are at the root of the document, start the hash
+      # If we are at the root of the document, start the hash
       if node.element?
         result_hash = {}
         if node.attributes != {}
-          attributes = {}
+          result_hash[:attributes] = {}
           node.attributes.keys.each do |key|
-            attributes[node.attributes[key].name.to_sym] = node.attributes[key].value
+            result_hash[:attributes][node.attributes[key].name.to_sym] = prepare(node.attributes[key].value)
           end
         end
         if node.children.size > 0
@@ -162,33 +159,40 @@ class Hash
 
             if child.name == "text"
               unless child.next_sibling || child.previous_sibling
-                return result unless attributes
-                result_hash[child.name.to_sym] = result
+                if result_hash[:attributes]
+                  result_hash['value'] = prepare(result)
+                  return result_hash
+                else
+                  return prepare(result)
+                end
               end
             elsif result_hash[child.name.to_sym]
-
               if result_hash[child.name.to_sym].is_a?(Object::Array)
-                 result_hash[child.name.to_sym] << result
+                result_hash[child.name.to_sym] << prepare(result)
               else
-                 result_hash[child.name.to_sym] = [result_hash[child.name.to_sym]] << result
+                result_hash[child.name.to_sym] = [result_hash[child.name.to_sym]] << prepare(result)
               end
             else
-              result_hash[child.name.to_sym] = result
+              result_hash[child.name.to_sym] = prepare(result)
             end
           end
-          if attributes
-             # add code to remove non-data attributes e.g. xml schema, namespace here
-             # if there is a collision then node content supersets attributes
-             result_hash = attributes.merge(result_hash)
-          end
+
           return result_hash
         else
-          return attributes
+          return result_hash
         end
       else
-        return node.content.to_s
+        return prepare(node.content.to_s)
       end
     end
+
+    def prepare(data)
+      (data.class == String && data.to_i.to_s == data) ? data.to_i : data
+    end
+  end
+
+  def to_struct(struct_name)
+      Struct.new(struct_name,*keys).new(*values)
   end
 end
 
@@ -227,6 +231,28 @@ voice_data.each do |row|
   row[:stats] = response[:response]
   row[:timestamp] = DateTime.now
 end
+
+data = voice_data.select{ |item| item[:is_conference] }.map{ |item| item[:stats][:audio][:in_quality_percentage] }
+data_sum = 0
+data.each { |x| data_sum += x }
+(bins, freqs) = data.histogram([ 50, 60, 70, 80, 85, 90, 95, 100 ], :bin_boundary => :min)
+sum = 0
+freqs.map! { |x| sum += x }
+
+# https://prometheus.io/docs/instrumenting/exposition_formats/#text-format-example
+template =
+<<~HEREDOC
+  # HELP bbb_audio_quality A histogram of audio quality
+  # TYPE bbb_audio_quality histogram
+  <% bins.each_with_index do |bin, index| -%>
+  bbb_audio_quality_bucket{le="<%= bin.to_i %>"} <%= freqs[index].to_i %>
+  <% end -%>
+  bbb_audio_quality_bucket{le="+Inf"} <%= freqs.last.to_i %>
+  bbb_audio_quality_sum <%= data_sum %>
+  bbb_audio_quality_count <%= freqs.last.to_i %>
+HEREDOC
+
+puts ERB.new(template, nil, '-').result
 
 requester = HTTPRequester.new
 BBBProperties.load_properties_from_file

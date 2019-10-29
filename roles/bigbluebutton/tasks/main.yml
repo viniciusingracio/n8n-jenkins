@@ -594,10 +594,21 @@
     - enable audio-stats, sleep 60)
   become: yes
 
+- name: Install package for sponge
+  become: yes
+  apt:
+    name: moreutils
+
+- gem:
+    name: histogram
+    state: present
+    user_install: no
+  become: yes
+
 - name: Install cron job to generate audio-stats
   cron:
     name: enable audio-stats, sleep {{ item }}
-    job: sleep {{ item }}; /usr/bin/ruby /usr/local/bigbluebutton/core/scripts/utils/audio-stats.rb
+    job: sleep {{ item }}; /usr/bin/ruby /usr/local/bigbluebutton/core/scripts/utils/audio-stats.rb | sponge /usr/local/share/prometheus/bbb-audio-stats.prom
     user: root
   become: yes
   with_items:
