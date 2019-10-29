@@ -1,0 +1,7 @@
+/usr/bin/ansible-playbook -v -i envs/prod/com/hosts -l mconf-live220,mconf-live110 provision.yml
+
+live01.mconf.com: 246 OK, 52 changed, 0 unreachable, 0 failed
+live02.mconf.com: 300 OK, 78 changed, 0 unreachable, 0 failed
+live03.mconf.com: 301 OK, 80 changed, 0 unreachable, 0 failed
+live04.mconf.com: 300 OK, 79 changed, 0 unreachable, 0 failed
+live05.mconf.com: 300 OK, 79 changed, 0 unreachable, 0 failed
