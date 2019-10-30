@@ -235,7 +235,7 @@ end
 data = voice_data.select{ |item| item[:is_conference] }.map{ |item| item[:stats][:audio][:in_quality_percentage] }
 data_sum = 0
 data.each { |x| data_sum += x }
-(bins, freqs) = data.histogram([ 50, 60, 70, 80, 85, 90, 95, 100 ], :bin_boundary => :min)
+(bins, freqs) = data.histogram([ 0, 25, 50, 60, 70, 80, 85, 90, 95, 100 ], :bin_boundary => :min)
 sum = 0
 freqs.map! { |x| sum += x }
 
