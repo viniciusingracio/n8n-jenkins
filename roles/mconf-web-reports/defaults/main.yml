@@ -11,10 +11,6 @@
 mconf_web_reports_image: '{{ mconf_registry_org }}/web-reports'
 mconf_web_reports_image_version: 'latest'
 
-# Configuration files used when running the container
-mconf_web_reports_env_file: "envs/{{ env }}/files/mconf-web-reports/.env.local"
-mconf_web_reports_config_file: "envs/{{ env }}/files/mconf-web-reports/config.yml"
-
 # Where the reports will be saved to in the host
 mconf_web_reports_output_dir: /var/www/mconf-web/shared/private
 
@@ -24,5 +20,16 @@ mconf_web_reports_cron_schedule_minute: 5
 mconf_web_reports_cron_schedule_hour: "*"
 mconf_web_reports_cron_schedule_day: "*"
 mconf_web_reports_cron_previous_month_schedule_minute: 30
-mconf_web_reports_cron_previous_month_schedule_hour: 3 # after 3am to make sure it's after utc if server in br
+mconf_web_reports_cron_previous_month_schedule_hour: 4 # after 3am to make sure it's after utc if server in br
 mconf_web_reports_cron_previous_month_schedule_day: 1
+
+# paths to the config files, passed when running the docker container
+# TODO: this was done to accommodate the migration to a .tsv config, remove after
+# we're only using it
+mconf_web_reports_config_extension: yml
+mconf_web_reports_remote_config_path: '/root/mconf-web-reports-config.{{ mconf_web_reports_config_extension }}'
+mconf_web_reports_docker_config_path: '/usr/src/app/config.{{ mconf_web_reports_config_extension }}'
+
+# Configuration files used when running the container
+mconf_web_reports_env_file: "envs/{{ env }}/files/mconf-web-reports/.env.local"
+mconf_web_reports_config_file: "envs/{{ env }}/files/mconf-web-reports/config.{{ mconf_web_reports_config_extension }}"

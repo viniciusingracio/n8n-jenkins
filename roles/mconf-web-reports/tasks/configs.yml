@@ -11,7 +11,7 @@
   become: yes
   copy:
     src: '{{ mconf_web_reports_config_file }}'
-    dest: '/root/mconf-web-reports-config.yml'
+    dest: '{{ mconf_web_reports_remote_config_path }}'
     owner: 'root'
     group: 'root'
     mode: 0600
