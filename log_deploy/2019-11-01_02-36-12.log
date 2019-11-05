@@ -1,0 +1,24 @@
+/usr/bin/ansible-playbook -v -i envs/rnp/prod/hosts -l mconf-live220 provision.yml
+
+live-ac01.mconf.rnp.br: 304 OK, 132 changed, 0 unreachable, 0 failed
+live-al01.mconf.rnp.br: 303 OK, 131 changed, 0 unreachable, 0 failed
+live-cdcrec12.mconf.rnp.br: 289 OK, 85 changed, 0 unreachable, 0 failed
+live-cdcrec13.mconf.rnp.br: 289 OK, 85 changed, 0 unreachable, 0 failed
+live-cdcrec14.mconf.rnp.br: 288 OK, 81 changed, 0 unreachable, 0 failed
+live-cdcrec15.mconf.rnp.br: 289 OK, 85 changed, 0 unreachable, 0 failed
+live-cdcrec16.mconf.rnp.br: 289 OK, 85 changed, 0 unreachable, 0 failed
+live-cdcrec17.mconf.rnp.br: 288 OK, 81 changed, 0 unreachable, 0 failed
+live-cdcrec18.mconf.rnp.br: 289 OK, 85 changed, 0 unreachable, 0 failed
+live-es01.mconf.rnp.br: 283 OK, 64 changed, 0 unreachable, 0 failed
+live-ifsc01.mconf.rnp.br: 242 OK, 77 changed, 1 unreachable, 0 failed
+live-ifsc02.mconf.rnp.br: 292 OK, 99 changed, 0 unreachable, 0 failed
+live-ifsc03.mconf.rnp.br: 292 OK, 99 changed, 0 unreachable, 0 failed
+live-ifsc04.mconf.rnp.br: 242 OK, 77 changed, 1 unreachable, 0 failed
+live-ma01.mconf.rnp.br: 283 OK, 64 changed, 0 unreachable, 0 failed
+live-mt01.mconf.rnp.br: 303 OK, 131 changed, 0 unreachable, 0 failed
+live-rs01.mconf.rnp.br: 283 OK, 64 changed, 0 unreachable, 0 failed
+live-sc01.mconf.rnp.br: 283 OK, 64 changed, 0 unreachable, 0 failed
+live-to01.mconf.rnp.br: 303 OK, 131 changed, 0 unreachable, 0 failed
+live-usp02.mconf.rnp.br: 284 OK, 67 changed, 0 unreachable, 0 failed
+live-usp07.mconf.rnp.br: 284 OK, 67 changed, 0 unreachable, 0 failed
+live-usp08.mconf.rnp.br: 284 OK, 67 changed, 0 unreachable, 0 failed

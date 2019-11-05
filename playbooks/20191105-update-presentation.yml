@@ -1,0 +1,13 @@
+---
+
+- hosts: all
+
+  vars:
+    ansible_user: mconf
+
+  tasks:
+  - name: Copy presentation
+    copy:
+      src: files/20191105-presentation.rb
+      dest: /usr/local/bigbluebutton/core/lib/recordandplayback/generators/presentation.rb
+    become: yes

@@ -1,0 +1,8 @@
+/usr/bin/ansible-playbook -v -i envs/rnp/prod/hosts -l mconf-recw playbooks/20191105-update-presentation.yml
+
+recw01-p.mconf.rnp.br: 2 OK, 1 changed, 0 unreachable, 0 failed
+recw02-p.mconf.rnp.br: 2 OK, 1 changed, 0 unreachable, 0 failed
+recw03-p.mconf.rnp.br: 2 OK, 1 changed, 0 unreachable, 0 failed
+recw04-p.mconf.rnp.br: 2 OK, 1 changed, 0 unreachable, 0 failed
+recw05-p.mconf.rnp.br: 2 OK, 1 changed, 0 unreachable, 0 failed
+recw06-p.mconf.rnp.br: 2 OK, 1 changed, 0 unreachable, 0 failed

@@ -1,0 +1,4 @@
+/usr/bin/ansible-playbook -v -i envs/rnp/prod/hosts -l live-ifsc01.mconf.rnp.br,live-ifsc04.mconf.rnp.br provision.yml
+
+live-ifsc01.mconf.rnp.br: 285 OK, 68 changed, 0 unreachable, 0 failed
+live-ifsc04.mconf.rnp.br: 285 OK, 68 changed, 0 unreachable, 0 failed
