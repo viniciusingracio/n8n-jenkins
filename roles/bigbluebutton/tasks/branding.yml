@@ -19,14 +19,14 @@
     src: '{{ bigbluebutton_branding_layout }}'
     dest: /var/www/bigbluebutton/client/conf/layout.xml
   become: yes
-  when: not bigbluebutton_branding_layout is none
+  when: not bigbluebutton_branding_layout is none and not bigbluebutton_html5_only|bool
 
 - name: Copy client logo
   copy:
     src: '{{ bigbluebutton_branding_logo_client }}'
     dest: /var/www/bigbluebutton/client/logo.png
   become: yes
-  when: not bigbluebutton_branding_logo_client is none
+  when: not bigbluebutton_branding_logo_client is none and not bigbluebutton_html5_only|bool
 
 - name: Copy playback logo
   copy:
@@ -118,6 +118,7 @@
     dest: /var/www/bigbluebutton/client/Mconf-Live.html
     state: link
   become: yes
+  when: not bigbluebutton_html5_only|bool
 
 - name: Customize blinker
   replace:
@@ -125,6 +126,7 @@
     regexp: '"BigBlueButton - " \+ title'
     replace: 'title'
   become: yes
+  when: not bigbluebutton_html5_only|bool
 
 - name: Update locale on the HTML5 client
   become: yes

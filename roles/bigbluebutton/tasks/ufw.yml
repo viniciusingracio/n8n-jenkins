@@ -4,7 +4,7 @@
   with_items:
     - { rule: 'allow', port: 80, proto: 'tcp' }
     - { rule: 'allow', port: 443, proto: 'tcp' }
-    - { rule: 'allow', port: 1935, proto: 'tcp', delete: '{{ bigbluebutton_html5_only | bool }}' }
+    - { rule: 'allow', port: 1935, proto: 'tcp', delete: '{{ bigbluebutton_html5_only|bool }}' }
     - { rule: 'allow', port: '{{ [bigbluebutton_freeswitch_udp_range_begin, bigbluebutton_kms_udp_range_begin] | min }}:{{ [bigbluebutton_freeswitch_udp_range_end, bigbluebutton_kms_udp_range_end] | max }}', proto: 'udp' }
   notify:
     - restart ufw

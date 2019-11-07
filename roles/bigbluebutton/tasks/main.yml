@@ -137,6 +137,7 @@
   become: yes
   apt:
     upgrade: safe
+    autoremove: yes
   when: bigbluebutton_apt_state == 'latest'
   notify: restart bigbluebutton
 
@@ -343,6 +344,22 @@
     -
       - '{{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties'
       - /var/lib/tomcat7/webapps/demo/bbb_api_conf.jsp
+    -
+      - { regexp: 'http[s]?:\/\/{{ inventory_hostname }}', replace: 'https://{{ inventory_hostname }}' }
+      - { regexp: 'http[s]?:\/\/{{ ansible_default_ipv4.address }}', replace: 'https://{{ inventory_hostname }}' }
+      - { regexp: 'rtmp:\/\/{{ ansible_default_ipv4.address }}', replace: 'rtmp://{{ inventory_hostname }}' }
+  ignore_errors: yes
+  become: yes
+  notify: restart bigbluebutton
+
+- name: Set HTTPS on bigbluebutton.properties
+  replace:
+    path: '{{ item[0] }}'
+    regexp: '{{ item[1].regexp }}'
+    replace: '{{ item[1].replace }}'
+    encoding: '{{ properties_charset }}'
+  with_nested:
+    -
       - /usr/share/red5/webapps/screenshare/WEB-INF/screenshare.properties
     -
       - { regexp: 'http[s]?:\/\/{{ inventory_hostname }}', replace: 'https://{{ inventory_hostname }}' }
@@ -351,6 +368,7 @@
   ignore_errors: yes
   become: yes
   notify: restart bigbluebutton
+  when: not bigbluebutton_html5_only|bool
 
 - set_fact:
     bigbluebutton_properties_config: "{{ bigbluebutton_properties_config + [ item ] }}"

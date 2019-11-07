@@ -109,6 +109,7 @@
     regexp: ^freeswitch\.port=
     line: 'freeswitch.port={{ freeswitch_sip_port }}'
   become: yes
+  when: not bigbluebutton_html5_only|bool
   notify: restart bigbluebutton
 
 - name: Read rtp range attributes attribute
