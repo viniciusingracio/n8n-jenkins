@@ -1,0 +1,3 @@
+/usr/local/bin/ansible-playbook -v -i envs/prod/tabelionato -l mconf-db provision.yml
+
+balcaodigital.mconf.com: 40 OK, 7 changed, 0 unreachable, 0 failed

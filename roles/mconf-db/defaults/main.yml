@@ -49,8 +49,8 @@ mysql_db_users:
 # Replication settings
 mconf_db_replication_enabled: false
 # domain/ip of the master
-mconf_db_replication_master:
-mconf_db_replication_user:
+mconf_db_replication_master: ''
+mconf_db_replication_user: ''
 #  name: mconf
 #  host: %
 #  pass: change-me-now
