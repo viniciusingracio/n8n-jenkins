@@ -1,0 +1,10 @@
+- name:
+  hosts: all
+  tasks:
+
+  - name: Remove proxy
+    become: yes
+    lineinfile:
+      dest: /etc/apt/apt.conf
+      state: absent
+      regexp: '^Acquire::http::Proxy'

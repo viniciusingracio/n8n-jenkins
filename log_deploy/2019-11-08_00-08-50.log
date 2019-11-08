@@ -1,0 +1,6 @@
+/usr/bin/ansible-playbook -v -i envs/prod/dpf/hosts -l mconf-live220,mconf-rec,mconf-recw,coturn provision.yml
+
+elos-live1.pf.gov.br: 14 OK, 4 changed, 0 unreachable, 1 failed
+elos-live2.pf.gov.br: 14 OK, 4 changed, 0 unreachable, 1 failed
+elos-live3.pf.gov.br: 14 OK, 4 changed, 0 unreachable, 1 failed
+elos-live4.pf.gov.br: 14 OK, 4 changed, 0 unreachable, 1 failed

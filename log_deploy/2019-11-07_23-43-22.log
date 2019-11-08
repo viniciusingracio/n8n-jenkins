@@ -1,0 +1,12 @@
+/usr/bin/ansible-playbook -v -i envs/prod/dpf/hosts playbooks/disable-apt-proxy.yml
+
+elos-lb.pf.gov.br: 2 OK, 0 changed, 0 unreachable, 0 failed
+elos-live1.pf.gov.br: 2 OK, 1 changed, 0 unreachable, 0 failed
+elos-live2.pf.gov.br: 2 OK, 1 changed, 0 unreachable, 0 failed
+elos-live3.pf.gov.br: 2 OK, 1 changed, 0 unreachable, 0 failed
+elos-live4.pf.gov.br: 2 OK, 1 changed, 0 unreachable, 0 failed
+elos-rec1.pf.gov.br: 2 OK, 1 changed, 0 unreachable, 0 failed
+elos-rec2.pf.gov.br: 2 OK, 1 changed, 0 unreachable, 0 failed
+elos-sip.pf.gov.br: 2 OK, 1 changed, 0 unreachable, 0 failed
+elos.pf.gov.br: 2 OK, 0 changed, 0 unreachable, 0 failed
+stun.pf.gov.br: 2 OK, 1 changed, 0 unreachable, 0 failed

@@ -1,0 +1,12 @@
+/usr/bin/ansible-playbook -v -i envs/prod/dpf/hosts setup.yml
+
+elos-lb.pf.gov.br: 23 OK, 13 changed, 0 unreachable, 0 failed
+elos-live1.pf.gov.br: 23 OK, 13 changed, 0 unreachable, 0 failed
+elos-live2.pf.gov.br: 23 OK, 13 changed, 0 unreachable, 0 failed
+elos-live3.pf.gov.br: 23 OK, 13 changed, 0 unreachable, 0 failed
+elos-live4.pf.gov.br: 23 OK, 13 changed, 0 unreachable, 0 failed
+elos-rec1.pf.gov.br: 22 OK, 9 changed, 0 unreachable, 0 failed
+elos-rec2.pf.gov.br: 22 OK, 9 changed, 0 unreachable, 0 failed
+elos-sip.pf.gov.br: 23 OK, 13 changed, 0 unreachable, 0 failed
+elos.pf.gov.br: 22 OK, 9 changed, 0 unreachable, 0 failed
+stun.pf.gov.br: 23 OK, 13 changed, 0 unreachable, 0 failed
