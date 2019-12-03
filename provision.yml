@@ -54,6 +54,7 @@
   - { role: certbot, when: certbot_enabled, tags: [ certbot ] }
   - bigbluebutton
   - bigbluebutton-webhooks
+  - bigbluebutton-audio-stats
 
 # Mconf-Live
 - hosts:
@@ -65,6 +66,7 @@
   - { role: certbot, when: certbot_enabled, tags: [ certbot ] }
   - mconf-live
   - bigbluebutton-webhooks
+  - bigbluebutton-audio-stats
 
 - hosts: bigbluebutton-dev
   roles:
@@ -132,6 +134,10 @@
   roles:
   - docker-host
   - ufw.docker
+
+- hosts: kamailio
+  roles:
+  - kamailio
 
 - hosts:
   - mconf-rec

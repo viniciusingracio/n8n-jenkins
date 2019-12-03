@@ -21,7 +21,7 @@ mconf_live_rec_proxy_jwt_secret:
 mconf_live_sounds_hold_music:
 
 mconf_live_presentation_recorder_image: mconf/mconf-presentation-recorder
-mconf_live_presentation_recorder_version: 0.0.9-c421cd2
+mconf_live_presentation_recorder_version: 0.0.12-7e12998
 
 # these attributes are optional and will be set to default values if empty
 mconf_live_recording_auth_entry_point:
@@ -34,15 +34,15 @@ bigbluebutton_stun_server:
   - stun:stun.l.google.com:19302
 
 bigbluebutton_docker_webrtc_sfu_enabled: false
-bigbluebutton_docker_webrtc_sfu_image: mconf/bbb-webrtc-sfu:v2.4.4
+bigbluebutton_docker_webrtc_sfu_image: mconf/bbb-webrtc-sfu:v2.4.6-beta.5
 # it can be VP8, H264 or ANY
 bigbluebutton_docker_webrtc_sfu_codec: ANY
 bigbluebutton_docker_mcs_sip_enabled: false
-bigbluebutton_docker_mcs_sip_image: mconf/mcs-sip:v2.2.0-beta.5
+bigbluebutton_docker_mcs_sip_image: mconf/mcs-sip:v2.2.0-beta.6
 bigbluebutton_docker_mcs_sip_intraframe_interval: 0
-bigbluebutton_docker_sfu_phone_image: mconf/sfu-phone:v2.1.3
+bigbluebutton_docker_sfu_phone_image: mconf/sfu-phone:v2.1.4
 bigbluebutton_docker_mcs_bfcp_enabled: false
-bigbluebutton_docker_mcs_bfcp_image: mconf/mcs-bfcp:v0.0.3
+bigbluebutton_docker_mcs_bfcp_image: mconf/mcs-bfcp:v0.0.4-beta.2
 bigbluebutton_docker_mcs_bfcp_num_ports: 40
 bigbluebutton_docker_suite_enabled: false
 bigbluebutton_docker_suite_image: mconf/suite:suite-bbb-webrtc-sfu-2.4.0dev
@@ -56,6 +56,7 @@ bigbluebutton_docker_kurento_allowed_candidates:
 
 bigbluebutton_sip_default_gateway:
 bigbluebutton_sip_registrar_enabled: false
+bigbluebutton_sip_registrar_use_internal_ip: false
 bigbluebutton_sip_registrar_address:
 bigbluebutton_sip_registrar_username:
 bigbluebutton_sip_registrar_password:

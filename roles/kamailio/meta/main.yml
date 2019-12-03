@@ -1,0 +1,6 @@
+---
+
+dependencies:
+  - docker-host
+  - ufw.docker
+  - role: handlers

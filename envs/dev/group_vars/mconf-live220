@@ -40,7 +40,7 @@ bigbluebutton_branding_playback_error: Essa gravação não foi encontrada
 bigbluebutton_branding_playback_title: Recording Playback
 bigbluebutton_branding_playback_loading: Carregando...
 bigbluebutton_branding_playback_copyright: <p>Gravado no <a target="_blank" href="https://elos.vc/">Elos</a></p>
-bigbluebutton_branding_welcome_footer:
+bigbluebutton_branding_welcome_footer: ""
 bigbluebutton_branding_copyright: '&#169; 2019 &#183; <u><a href="https://elos.vc" target="_blank">elos.vc</a></u>'
 bigbluebutton_branding_copyright_html5: '© 2019 · elos.vc'
 bigbluebutton_branding_toolbar_color: '#2dccd3'

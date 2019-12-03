@@ -75,10 +75,14 @@
       REDIS_HOST: '{{ docker_ip }}'
       MCS_PORT: "3009"
       MCS_HOST: '{{ docker_ip }}'
+      # this can be removed when everyone is using v2.4 or above
       FREESWITCH_IP: '{{ ansible_default_ipv4.address }}'
+      FREESWITCH_SIP_IP: '{{ ansible_default_ipv4.address }}'
+      FREESWITCH_CONN_IP: '{{ kurento_ip }}'
       ESL_IP: '{{ docker_ip }}'
       ESL_PORT: "8021"
       LOG_LEVEL: info
+      LOG_FILENAME: 'null'
       STREAM_CONTAINER_TYPE: docker
       STREAM_IMAGE_NAME: '{{ mconf_live_presentation_recorder_image }}:{{ mconf_live_presentation_recorder_version }}'
       STREAM_BIGBLUEBUTTON_URL: '{{ bbb_api_entry_point | regex_replace("/api") }}'

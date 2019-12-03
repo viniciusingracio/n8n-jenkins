@@ -1,0 +1,4 @@
+/usr/bin/ansible-playbook -v -i envs/prod/dpf/hosts -l mconf-rec,mconf-recw playbooks/prometheus.yml
+
+elos-rec1.pf.gov.br: 24 OK, 12 changed, 0 unreachable, 0 failed
+elos-rec2.pf.gov.br: 24 OK, 12 changed, 0 unreachable, 0 failed

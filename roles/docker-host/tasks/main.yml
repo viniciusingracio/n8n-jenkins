@@ -34,8 +34,11 @@
 - name: Install docker
   become: yes
   pip:
-    name: docker
+    name: '{{ item }}'
     state: present
+  with_items:
+    - docker
+    - docker-compose
 
 - name: Add user to docker group
   become: yes

@@ -29,9 +29,6 @@
     state: absent
   with_items: '{{ running_kurento_raw.stdout_lines | difference(kurento_ports) }}'
 
-- set_fact:
-    kurento_ip: "{% if bigbluebutton_kurento_use_internal_ip %}{{ ansible_default_ipv4.address }}{% else %}{{ external_ip }}{% endif %}"
-
 - name: Determine kurento URLs to configure bbb-webrtc-sfu
   set_fact:
     kurento_config: "{{ kurento_config|default([]) + [ { 'ip': kurento_ip, 'url': 'ws://' + docker_ip + ':' + item + '/kurento' } ] }}"

@@ -268,15 +268,14 @@ if output[:response][:returncode] == "SUCCESS" and ! output[:response][:meetings
     next if meeting[:attendees].is_a?(String)
     meeting[:attendees] = meeting[:attendees][:attendee]
     meeting[:attendees] = [ meeting[:attendees] ] if meeting[:attendees].is_a?(Hash)
+    audio_data = voice_data.select{ |row| meeting[:voiceBridge].to_s == row[:voice_bridge] }
     meeting[:attendees].each do |attendee|
       attendee[:meeting] = Marshal.load(Marshal.dump(meeting))
-      attendee[:audio] = voice_data.select do |row|
-        if attendee[:clientType] == "DIAL-IN"
-          attendee[:fullName] == row[:cid_name]
-        else
-          attendee[:userID] == row[:user_id]
-        end
-      end.first || {}
+      if attendee[:hasJoinedVoice] == "true"
+        attendee[:audio] = audio_data.select{ |row| attendee[:fullName] == row[:cid_name] }.first || audio_data.select{ |row| attendee[:userID] == row[:user_id] }.first || audio_data.select{ |row| attendee[:fullName] == row[:user_name] }.first || {}
+      else
+        attendee[:audio] = {}
+      end
       attendee[:meeting].delete(:attendees)
       participants << attendee
     end

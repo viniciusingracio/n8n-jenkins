@@ -13,16 +13,20 @@ opts = Optimist::options do
   opt :salt, "", :type => String, :required => true
   opt :record_id, "", :type => String, :required => true
   opt :full_name, "", :type => String, :default => "Felipe Cecagno"
+  opt :ip, "", :type => String
 end
 
-uri = URI.parse("https://ipinfo.io/ip")
-req = Net::HTTP::Get.new(uri.to_s)
-res = Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') { |http| http.request(req) }
-if res.code != "200"
-    exit 1
-end
+ip = opts[:ip]
+if ip.nil?
+    uri = URI.parse("https://ipinfo.io/ip")
+    req = Net::HTTP::Get.new(uri.to_s)
+    res = Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') { |http| http.request(req) }
+    if res.code != "200"
+        exit 1
+    end
 
-ip = res.body.strip
+    ip = res.body.strip
+end
 server = opts[:server]
 record_id = opts[:record_id]
 full_name = opts[:full_name]

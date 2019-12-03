@@ -1,0 +1,37 @@
+---
+
+- name: Download source code
+  git:
+    repo: git@github.com:mconf/kamailio-docker.git
+    dest: '{{ ansible_env.HOME }}/kamailio'
+    version: dpf
+    accept_hostkey: true
+    force: yes
+
+- name: Copy certificates
+  become: yes
+  copy:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+  with_items:
+    - { src: '{{ kamailio_local_ssl_certificate }}', dest: '{{ kamailio_ssl_certificate }}' }
+    - { src: '{{ kamailio_local_ssl_certificate_key }}', dest: '{{ kamailio_ssl_certificate_key }}' }
+  when: not kamailio_local_ssl_certificate is none and not kamailio_local_ssl_certificate_key is none
+  ignore_errors: yes
+  # notify: restart kamailio
+
+- docker_compose:
+    project_src: ~/kamailio
+    build: yes
+  environment:
+    FQDN: '{{ inventory_hostname }}'
+    EXTERNAL_IP: '{{ ansible_host }}'
+    DB_ROOT_PASSWORD: 'de8e1d1b916351539aab0c9dc83f880c9371b9060d64067de8e609ac2b20a48f'
+    SSL_ENABLED: 'true'
+    SSL_CERTIFICATE: '{{ kamailio_ssl_certificate }}'
+    SSL_CERTIFICATE_KEY: '{{ kamailio_ssl_certificate_key }}'
+    GATEWAY_IP: "200.169.41.155" # SBC2: - 200.169.41.167
+
+- include: ufw.yml
+  when: common_ufw_enabled
+  tags: [ufw,firewall]
