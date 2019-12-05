@@ -29,3 +29,10 @@
     marker: '# {mark} ANSIBLE MANAGED BLOCK docker and ufw'
   notify:
     - restart ufw
+
+- name: Download ufw-docker
+  become: yes
+  get_url:
+    url: https://raw.githubusercontent.com/chaifeng/ufw-docker/3d2259125be810f9454311751bcb4b7a691bf51d/ufw-docker
+    dest: /usr/local/bin/ufw-docker
+    mode: 0755

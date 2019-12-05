@@ -262,7 +262,7 @@ doc = Nokogiri::XML(requester.get_response(uri).body)
 
 output = Hash.from_xml(doc.to_s)
 participants = []
-if output[:response][:returncode] == "SUCCESS" and ! output[:response][:meetings].nil?
+if output[:response][:returncode] == "SUCCESS" and ! output[:response][:meetings].nil? and ! output[:response][:meetings][:meeting].nil?
   output[:response][:meetings][:meeting] = [ output[:response][:meetings][:meeting] ] if output[:response][:meetings][:meeting].is_a?(Hash)
   output[:response][:meetings][:meeting].each do |meeting|
     next if meeting[:attendees].is_a?(String)
