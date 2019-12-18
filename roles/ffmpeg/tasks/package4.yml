@@ -8,7 +8,7 @@
 - name: Add ffmpeg 4.0 repo to apt
   become: yes
   apt_repository:
-    repo: ppa:jonathonf/ffmpeg-4
+    repo: ppa:bigbluebutton/support
     state: present
   register: aptrepos
 

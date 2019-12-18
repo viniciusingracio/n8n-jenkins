@@ -1,5 +1,7 @@
 # encoding: UTF-8
 
+# sudo gem install user_agent_parser -v 2.5.1
+
 require 'nokogiri'
 require 'date'
 require 'json'
@@ -68,12 +70,13 @@ end
 logger.info "Start parsing events.xml"
 
 Dir.glob("/var/bigbluebutton/events/**/events.xml").each do |events_xml|
-    session_id = File.basename(File.dirname(filename))
+    session_id = File.basename(File.dirname(events_xml))
     next if data_by_session.has_key?(session_id)
     begin
-        item = {}
         doc = Nokogiri::XML(File.open(events_xml)) { |x| x.noblanks }
 
+        next if doc.xpath("/recording/event").length == 0
+        item = {}
         item[:server] = opts[:server]
         item[:session_id] = doc.at_xpath("/recording/@meeting_id").text
         first_event_timestamp = timestamp_to_date(doc.at_xpath('/recording/event[position() = 1]/timestampUTC').text)

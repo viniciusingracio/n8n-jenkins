@@ -58,6 +58,7 @@
   with_items:
     - { direction: 'incoming', policy: 'deny' }
     - { direction: 'outgoing', policy: 'allow' }
+    - { direction: 'routed', policy: 'deny' }
   notify:
     - restart ufw
 

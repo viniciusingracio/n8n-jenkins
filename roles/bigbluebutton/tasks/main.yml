@@ -315,6 +315,8 @@
     - { regexp: 'bbbWebAPI[ ]*=', line: '  bbbWebAPI = "{{ bbb_url }}api"' }
     - { regexp: 'sharedSecret[ ]*=', line: '  sharedSecret = "{{ bbb_secret }}"' }
     - { regexp: 'deskshareip[ ]*=', line: '  deskshareip = "{{ inventory_hostname }}"' }
+    - { regexp: 'recordCodec[ ]*=', line: '  recordCodec = "wav"' }
+    - { regexp: 'inactivity[ ]*=', line: '  recordCodec = "3600"' }
   notify: restart bigbluebutton
 
 # TODO move this to a new role/task

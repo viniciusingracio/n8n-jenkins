@@ -1,0 +1,8 @@
+/usr/bin/ansible-playbook -v -i envs/rnp/prod/hosts -l mconf-live220-embrapa-df,webinar-esr.mconf.rnp.br provision.yml
+
+live-embrapa-df01.mconf.rnp.br: 279 OK, 57 changed, 0 unreachable, 0 failed
+live-embrapa-df02.mconf.rnp.br: 279 OK, 57 changed, 0 unreachable, 0 failed
+live-embrapa-df03.mconf.rnp.br: 279 OK, 57 changed, 0 unreachable, 0 failed
+live-embrapa-df04.mconf.rnp.br: 279 OK, 57 changed, 0 unreachable, 0 failed
+live-embrapa-df05.mconf.rnp.br: 279 OK, 57 changed, 0 unreachable, 0 failed
+webinar-esr.mconf.rnp.br: 279 OK, 57 changed, 0 unreachable, 0 failed

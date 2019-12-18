@@ -209,4 +209,11 @@
   become: yes
   notify: restart bigbluebutton
 
+- name: Copy opus.conf
+  become: yes
+  copy:
+    src: files/opus.conf.xml
+    dest: /opt/freeswitch/conf/autoload_configs/opus.conf.xml
+  notify: restart bigbluebutton
+
 - include: sounds.yml

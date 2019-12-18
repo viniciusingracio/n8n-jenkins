@@ -1,0 +1,7 @@
+---
+
+- name: Remove old ppa
+  become: yes
+  apt_repository:
+    repo: ppa:jonathonf/ffmpeg-4
+    state: absent

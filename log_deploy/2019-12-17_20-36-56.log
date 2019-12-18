@@ -1,0 +1,7 @@
+/usr/bin/ansible-playbook -v -i envs/rnp/h/hosts -l mconf-live220,mconf-rec,mconf-recw provision.yml
+
+live-compute03.h.mconf.rnp.br: 271 OK, 62 changed, 0 unreachable, 0 failed
+live-compute04.h.mconf.rnp.br: 271 OK, 62 changed, 0 unreachable, 0 failed
+rec-compute01.h.mconf.rnp.br: 249 OK, 47 changed, 0 unreachable, 0 failed
+recw-compute01.h.mconf.rnp.br: 221 OK, 44 changed, 0 unreachable, 0 failed
+recw-compute02.h.mconf.rnp.br: 221 OK, 45 changed, 0 unreachable, 0 failed

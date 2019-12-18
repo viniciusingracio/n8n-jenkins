@@ -1,0 +1,9 @@
+---
+
+- hosts:
+  - mconf-recw
+  tasks:
+
+  - name: Stop nfs
+    become: yes
+    command: umount -a -t nfs4

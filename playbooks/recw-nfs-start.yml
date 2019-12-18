@@ -1,0 +1,9 @@
+---
+
+- hosts:
+  - mconf-recw
+  tasks:
+
+  - name: Start nfs
+    become: yes
+    command: mount -a

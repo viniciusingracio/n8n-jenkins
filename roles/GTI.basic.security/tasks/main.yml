@@ -13,19 +13,19 @@
 
 - name: Install needed packages (apt)
   apt: name={{ item }} state=present update_cache=yes
-  with_items: "{{ debian_pkg }}" 
+  with_items: "{{ debian_pkg }}"
   when: ansible_os_family == "Debian"
 
 - name: Check for lastest security updates (Redhat/CentOS)
-  command: yum -y --security update 
+  command: yum -y --security update
   when: ansible_os_family == "RedHat"
 
-- name: Check for lastest security updates (Ubuntu)
-  command: unattended-upgrades
-  when: ansible_os_family == "Debian"
+# - name: Check for lastest security updates (Ubuntu)
+#   command: unattended-upgrades
+#   when: ansible_os_family == "Debian"
 
 - name: Changing grub.cfg permissions (Ubuntu)
-  file: 
+  file:
    path: /boot/grub/grub.cfg
    owner: root
    group: root
@@ -33,7 +33,7 @@
   when: ansible_os_family == "Debian"
 
 - name: Changing grub.cfg permissions (Redhat7/CentOS7)
-  file: 
+  file:
    path: /boot/grub2/grub.cfg
    owner: root
    group: root
@@ -41,7 +41,7 @@
   when: ansible_os_family == "RedHat" and ansible_distribution_release == "Core"
 
 - name: Changing grub.cfg permissions (Redhat6/CentOS6)
-  file: 
+  file:
    path: /boot/grub/grub.conf
    owner: root
    group: root
@@ -49,14 +49,14 @@
   when: ansible_os_family == "RedHat" and ansible_distribution_release == "Final"
 
 - name: stat compilers files
-  stat: 
+  stat:
    path: "{{ item }}"
    follow: yes
   with_items: "{{ compilers }}"
   register: p
 
-- name: Changing compilers permissions if needed 
-  file: 
+- name: Changing compilers permissions if needed
+  file:
    path: "{{ item.stat.path }}"
    mode: 0777
    follow: yes
@@ -79,20 +79,20 @@
   when: ansible_os_family == "Debian"
 
 - name: Add gtiadm to wheel group
-  user: 
+  user:
    name: gtiadm
    groups: wheel
    append: yes
   when: ansible_os_family == "RedHat" or ansible_os_family == "Debian"
 
-- name: Modify create mode permission in logrotate.conf 
+- name: Modify create mode permission in logrotate.conf
   lineinfile:
    dest: /etc/logrotate.conf
    regexp: '^create'
    line: 'create 0600'
    state: present
    backup: yes
-  when: ansible_os_family == "RedHat" or ansible_os_family == "Debian" 
+  when: ansible_os_family == "RedHat" or ansible_os_family == "Debian"
 
 - name: Add sudo command to be logged into syslog
   lineinfile:
@@ -122,7 +122,7 @@
   when: ansible_os_family == "Debian"
 
 - name: Modifying @common-password (Ubuntu)
-  replace: 
+  replace:
    dest: /etc/pam.d/common-password
    regexp: '(\s+[success=1 default=ignore].*)(sha512$)'
    replace: '\1\2 minlen=9 remember=3'
@@ -135,7 +135,7 @@
   when: ansible_os_family == "RedHat"
 
 - name: adjust system-auth/password-auth files if needed (Redhat/CentOS)
-  command: mv "{{ item.src }}"  "{{ item.dest }}"  
+  command: mv "{{ item.src }}"  "{{ item.dest }}"
   with_items: "{{ mpassauthfiles  }}"
   when: ansible_os_family == "RedHat" and stat_files.stat.islnk is defined and stat_files.stat.islnk == False
 
@@ -149,7 +149,7 @@
   with_items: "{{ spassauthfiles }}"
   when: ansible_os_family == "RedHat"
 
-- name: Modifying sysctl 
+- name: Modifying sysctl
   sysctl:
    name: "{{ item.name }}"
    value: "{{ item.value }}"
@@ -198,13 +198,13 @@
 - name: Modifying login defs
   replace:
    dest: "{{ item.file }}"
-   regexp: "{{ item.regex }}" 
-   replace: "{{ item.replace }}" 
+   regexp: "{{ item.regex }}"
+   replace: "{{ item.replace }}"
    backup: yes
   with_items: "{{ logindefs }}"
   when: ansible_os_family == "RedHat" or ansible_os_family == "Debian"
 
-- name: clean sshd variables 
+- name: clean sshd variables
   lineinfile:
    dest: "{{ item.file }}"
    state: absent
@@ -226,7 +226,7 @@
     Banner /etc/issue.net
    backup: yes
   with_items: "{{ sshd }}"
-  when: ansible_os_family == "RedHat" and ansible_distribution_release == "Final" 
+  when: ansible_os_family == "RedHat" and ansible_distribution_release == "Final"
 
 - name: Modifying sshd_config (Ubuntu/Redhat7/CentOS7)
   blockinfile:
@@ -250,8 +250,8 @@
 - name: Disable ctrl-alt-del (Redhat6/CentOS6/Ubuntu14)
   replace:
    dest: "{{ item.file }}"
-   regexp: "{{ item.regex }}" 
-   replace: "{{ item.replace }}" 
+   regexp: "{{ item.regex }}"
+   replace: "{{ item.replace }}"
    backup: yes
   with_items: "{{ crtl }}"
   when: ansible_os_family == "RedHat" and ansible_distribution_release == "Final" or ansible_os_family == "Debian" and ansible_distribution_release == "trusty"
@@ -269,7 +269,7 @@
   file: path=/etc/profile.d/tmout.sh state=absent
   when: ansible_os_family == "RedHat" or ansible_os_family == "Debian"
 
-- name: Copy motd file template 
+- name: Copy motd file template
   template: src=motd.j2 dest=/etc/motd
   when: ansible_os_family == "RedHat" or ansible_os_family == "Debian"
 
@@ -299,4 +299,4 @@
 - name: restart ssh service (Ubuntu)
   service: name={{ item }} state=restarted enabled=yes
   with_items: "{{ services }}"
-  when: ansible_os_family == "Debian" 
+  when: ansible_os_family == "Debian"

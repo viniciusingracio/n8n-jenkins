@@ -74,10 +74,12 @@ def remove(files)
 end
 
 def touch(files)
-  files = files.first if files.is_a? Array
-  if ! check(files)
-    FileUtils.touch(file) if ! $dry_run
-    $logger.info "Creating #{file}"
+  files = [ files ] if ! files.is_a? Array
+  files.each do |file|
+    if ! check(file)
+      FileUtils.touch(file) if ! $dry_run
+      $logger.info "Creating #{file}"
+    end
   end
 end
 
