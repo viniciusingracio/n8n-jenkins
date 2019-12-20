@@ -1,0 +1,34 @@
+---
+
+- hosts:
+    - mconf-rec
+  handlers:
+    - include: ../roles/handlers/handlers/main.yml
+  tasks:
+
+    - name: Configure custom ufw rules
+      become: yes
+      ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }} from_ip={{ item.from_ip }} delete={{ item.delete }}
+      with_items:
+        - { rule: 'allow', port: 111, proto: 'tcp', from_ip: '138.121.69.85', delete: yes }
+        - { rule: 'allow', port: 111, proto: 'tcp', from_ip: '138.121.69.86', delete: yes }
+        - { rule: 'allow', port: 111, proto: 'tcp', from_ip: '138.121.69.87', delete: yes }
+        - { rule: 'allow', port: 111, proto: 'tcp', from_ip: '138.121.69.88', delete: yes }
+        - { rule: 'allow', port: 111, proto: 'tcp', from_ip: '138.121.69.89', delete: yes }
+        - { rule: 'allow', port: 111, proto: 'tcp', from_ip: '138.121.69.90', delete: yes }
+        - { rule: 'allow', port: 111, proto: 'udp', from_ip: '138.121.69.85', delete: yes }
+        - { rule: 'allow', port: 111, proto: 'udp', from_ip: '138.121.69.86', delete: yes }
+        - { rule: 'allow', port: 111, proto: 'udp', from_ip: '138.121.69.87', delete: yes }
+        - { rule: 'allow', port: 111, proto: 'udp', from_ip: '138.121.69.88', delete: yes }
+        - { rule: 'allow', port: 111, proto: 'udp', from_ip: '138.121.69.89', delete: yes }
+        - { rule: 'allow', port: 111, proto: 'udp', from_ip: '138.121.69.90', delete: yes }
+        - { rule: 'allow', port: 111, proto: 'any', from_ip: '138.121.69.85', delete: no }
+        - { rule: 'allow', port: 111, proto: 'any', from_ip: '138.121.69.86', delete: no }
+        - { rule: 'allow', port: 111, proto: 'any', from_ip: '138.121.69.87', delete: no }
+        - { rule: 'allow', port: 111, proto: 'any', from_ip: '138.121.69.88', delete: no }
+        - { rule: 'allow', port: 111, proto: 'any', from_ip: '138.121.69.89', delete: no }
+        - { rule: 'allow', port: 111, proto: 'any', from_ip: '138.121.69.90', delete: no }
+        - { rule: 'allow', port: 111, proto: 'any', from_ip: '200.130.35.155/32', delete: no }
+        - { rule: 'allow', port: 2049, proto: 'any', from_ip: '200.130.35.155/32', delete: no }
+      notify:
+        - restart ufw

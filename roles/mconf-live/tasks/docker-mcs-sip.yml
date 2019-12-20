@@ -24,7 +24,7 @@
   become: yes
 
 - set_fact:
-    registrar_config: '{{ { "register": true, "registrarServer": { "server": bigbluebutton_sip_registrar_address, "authorizationUser": bigbluebutton_sip_registrar_username, "password": bigbluebutton_sip_registrar_password }, "transport": "UDP" } }}'
+    registrar_config: '{{ { "register": true, "registrarServer": { "server": bigbluebutton_sip_registrar_address, "authorizationUser": bigbluebutton_sip_registrar_username, "password": bigbluebutton_sip_registrar_password } } }}'
   when: bigbluebutton_sip_registrar_enabled
 - set_fact:
     registrar_config: '{{ { "register": false, "registrarServer": { "server": "", "authorizationUser": "", "password": "" } } }}'
@@ -56,7 +56,6 @@
       ENABLE_MCS_BFCP: '{{ bigbluebutton_docker_mcs_bfcp_enabled | string }}'
       MCS_BFCP_ADDRESS: 'ws://{{ ansible_default_ipv4.address }}:8000'
       INFO_INTRAFRAME_INTERVAL: '{{ bigbluebutton_docker_mcs_sip_intraframe_interval | string }}'
-      SIP_TRANSPORT_TYPE: UDP
     labels:
       hostname: '{{ inventory_hostname }}'
   notify: restart docker components

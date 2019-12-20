@@ -1,0 +1,64 @@
+---
+
+- hosts:
+    - all
+  vars:
+    external_ip: ""
+    bigbluebutton_docker_mcs_sip_image: mconf/mcs-sip:v2.2.5
+    bigbluebutton_sip_registrar_use_internal_ip: false
+    bigbluebutton_sip_registrar_password: ""
+  tasks:
+    - include_role:
+        name: docker-host
+
+    - name: Determine external IP
+      set_fact:
+        external_ip: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | grep \"[0-9]*\\.[0-9]*\\.[0-9]*\\.[0-9]*\" | head -n 1') }}"
+      when: external_ip is none
+    - name: Set external IP as internal IP if nothing returns from dig
+      set_fact:
+        external_ip: '{{ ansible_default_ipv4.address }}'
+      when: external_ip is none or external_ip | trim == ""
+
+    - name: Register Docker host IP
+      shell: "ifconfig docker0 | grep 'inet addr:' | cut -d: -f2 | awk '{print $1}'"
+      register: docker_ip_raw
+
+    - set_fact:
+        docker_ip: '{{ docker_ip_raw.stdout }}'
+
+    - set_fact:
+        registrar_config: '{{ { "register": true, "registrarServer": { "server": bigbluebutton_sip_registrar_address, "authorizationUser": bigbluebutton_sip_registrar_username, "password": bigbluebutton_sip_registrar_password } } }}'
+      when: bigbluebutton_sip_registrar_enabled
+    - set_fact:
+        registrar_config: '{{ { "register": false, "registrarServer": { "server": "", "authorizationUser": "", "password": "" } } }}'
+      when: not bigbluebutton_sip_registrar_enabled
+
+    - set_fact:
+        contact_ip: "{% if bigbluebutton_sip_registrar_use_internal_ip %}{{ ansible_default_ipv4.address }}{% else %}{{ external_ip }}{% endif %}"
+
+    - name: Start mcs-sip container
+      docker_container:
+        name: mcs-sip
+        image: '{{ bigbluebutton_docker_mcs_sip_image }}'
+        pull: yes
+        restart_policy: always
+        ports:
+          - 5060:5060
+          - 5060:5060/udp
+          - 3012:3012
+        env:
+          EXTERNAL_IP: '{{ contact_ip }}'
+          BIND_IP: 0.0.0.0
+          MCS_PORT: "3009"
+          MCS_HOST: '{{ docker_ip }}'
+          SIP_API_PORT: "3012"
+          SIP_API_PATH: /mcs-sip
+          ENABLE_EXTERNAL_API: "true"
+          REGISTRAR: '{{ registrar_config | to_json }}'
+          SIP_DEFAULT_GATEWAY: '{{ bigbluebutton_sip_default_gateway | default(bigbluebutton_sip_registrar_address, true) }}'
+          ENABLE_MCS_BFCP: '{{ bigbluebutton_docker_mcs_bfcp_enabled | string }}'
+          MCS_BFCP_ADDRESS: 'ws://{{ ansible_default_ipv4.address }}:8000'
+          INFO_INTRAFRAME_INTERVAL: '{{ bigbluebutton_docker_mcs_sip_intraframe_interval | string }}'
+        labels:
+          hostname: '{{ inventory_hostname }}'

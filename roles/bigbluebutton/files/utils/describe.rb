@@ -104,9 +104,10 @@ doc.xpath("/recording/event").sort_by{ |node| node.at_xpath("@timestamp").text.t
         when "ParticipantJoinedEvent"
             user_id = node.at_xpath("participant").text
             user_name = user_id_to_name[user_id]
+            message = node.at_xpath("muted").text == "true" ? "Enabled to listen" : "Enabled microphone"
             event.merge!({
                 :user => user_name,
-                :event => "Enabled microphone"
+                :event => message
             })
             events << event
         when "ParticipantLeftEvent"
@@ -114,7 +115,7 @@ doc.xpath("/recording/event").sort_by{ |node| node.at_xpath("@timestamp").text.t
             user_name = user_id_to_name[user_id]
             event.merge!({
                 :user => user_name,
-                :event => "Disabled microphone"
+                :event => "Disabled audio"
             })
             events << event
         when "ParticipantTalkingEvent"
@@ -160,6 +161,8 @@ talking.values.each do |entry|
         events << event
     end
 end
+
+exit 0 if events.length == 0
 
 events.each do |event|
     event[:date] = format_date_time(event[:date])
