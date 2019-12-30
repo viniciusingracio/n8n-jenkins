@@ -1,13 +1,13 @@
 engine: {{ asr_engine }}
 
-gcloud_project_id: {{ asr_gcloud_project_id }}
-gcloud_bucket_name: {{ asr_gcloud_bucket_name }}
-gcloud_credentials_path: {{ asr_gcloud_credentials_path }}
+gcloud_bucket_name: {{ transcribe_gcloud_bucket_name }}
+gcloud_credentials_path_asr: {{ transcribe_gcloud_credentials_path_asr }}
+gcloud_credentials_path_storage: {{ transcribe_gcloud_credentials_path_storage }}
 
-aws_key: {{ asr_aws_key }}
-aws_secret: {{ asr_aws_secret }}
-aws_region: {{ asr_aws_region }}
-aws_bucket_name: {{ asr_aws_bucket_name }}
+aws_key: {{ transcribe_aws_key }}
+aws_secret: {{ transcribe_aws_secret }}
+aws_region: {{ transcribe_aws_region }}
+aws_bucket_name: {{ transcribe_aws_bucket_name }}
 
 language_code: pt-BR
 language_name: Português (Brasil)

@@ -32,19 +32,23 @@ require File.expand_path("../../../lib/recordandplayback", __FILE__)
 opts = Trollop::options do
   opt :meeting_id, "Record ID to transcribe", :type => String
   opt :force, "Force recording to be transcribed, no matter the matchers", :type => :flag, :default => false
+  opt :stdout, "Log to stdout", :type => :flag, :default => false
 end
 meeting_id = opts[:meeting_id]
 
 log_dir = "/var/log/bigbluebutton/transcribe"
 FileUtils.mkdir_p log_dir
-logger = Logger.new("#{log_dir}/#{meeting_id}.log")
-logger.level = Logger::INFO
-BigBlueButton.logger = logger
+
+if ! opts[:stdout]
+  logger = Logger.new("#{log_dir}/#{meeting_id}.log")
+  logger.level = Logger::INFO
+  BigBlueButton.logger = logger
+end
 
 props = YAML::load(File.open(File.expand_path('../transcribe.yml', __FILE__)))
-project_id = props["gcloud_project_id"]
 bucket_name = props["gcloud_bucket_name"]
-credentials = props["gcloud_credentials_path"]
+credentials_asr = props["gcloud_credentials_path_asr"]
+credentials_storage = props["gcloud_credentials_path_storage"]
 language_code = props["language_code"]
 language_name = props["language_name"]
 caption_duration = props["caption_duration"]
@@ -77,6 +81,8 @@ props['matcher'].each do |item|
 end
 exit 0 if ! ( match or opts[:force] )
 
+operation_name = nil
+
 BigBlueButton.logger.info("Generating #{language_code} transcription for #{meeting_id}")
 
 if ! File.exist?(vtt_file)
@@ -99,24 +105,30 @@ if ! File.exist?(vtt_file)
   end
 
   if File.exist?(audio_file)
-    BigBlueButton.logger.info("Storing audio file as #{storage_file_name} at #{bucket_name}")
-    storage = Google::Cloud::Storage.new project_id: project_id, credentials: credentials
-    bucket  = storage.bucket bucket_name
+    project_id = JSON.parse(File.read(credentials_storage), symbolize_names: true)[:project_id]
+    BigBlueButton.logger.info("Storing audio file as #{storage_file_name} at #{bucket_name}, project_id #{project_id}")
+    storage = Google::Cloud::Storage.new project_id: project_id, credentials: credentials_storage
+    bucket  = storage.bucket bucket_name, skip_lookup: true
     file = bucket.create_file audio_file, storage_file_name
 
     BigBlueButton.logger.info("Transcribing #{storage_file_name} to #{language_code}")
-    speech = Google::Cloud::Speech.new credentials: credentials
+    speech = Google::Cloud::Speech.new credentials: credentials_asr
+    diarization_config = Google::Cloud::Speech::V1::SpeakerDiarizationConfig.new enable_speaker_diarization: true
     config = { encoding: :FLAC,
                sample_rate_hertz: 48_000,
                audio_channel_count: 2,
                enable_separate_recognition_per_channel: false,
                enable_word_time_offsets: true,
                enable_automatic_punctuation: true,
+               diarization_config: diarization_config,
                language_code: language_code }
     audio = { uri: storage_path }
     operation = speech.long_running_recognize config, audio
-    BigBlueButton.logger.info("Wait for it to be done")
+    operation_name = operation.name
+
+    BigBlueButton.logger.info("Wait for it to be done, name: #{operation_name}")
     begin
+      operation = speech.get_operation operation_name
       # default timeout was an hour, so it didn't work for long recordings
       # set timeout to 12 hours (last argument)
       operation.wait_until_done!(backoff_settings: Google::Gax::BackoffSettings.new(
@@ -192,6 +204,7 @@ if ! File.exist?(vtt_file)
       if File.exists? captions_json
         old_captions = JSON.parse(File.read(captions_json))
       end
+      old_captions.reject! { |item| item["locale"] == captions_code }
       captions = { "localeName" => language_name, "locale" => captions_code }
       old_captions << captions
       File.open(captions_json, "w") do |f|
