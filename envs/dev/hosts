@@ -32,7 +32,7 @@ felipe-docker.mconf.com
 test-live1.dev.mconf.com
 test-live2.dev.mconf.com
 kamailio.dev.mconf.com
-elastic.dev.mconf.com
+elastic.mconf.dev
 greenlight.dev.mconf.com
 
 [mconf-live200]
