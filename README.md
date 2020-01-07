@@ -16,7 +16,10 @@ sudo pip install --upgrade pip pyopenssl docker zabbix-api mitogen
 * Install ansible dependency roles
 ```bash
 ansible-galaxy install -r requirements.yml
+mkdir ~/.ansible/plugins/modules
+cp -r ~/.ansible/roles/jpnewman.json ~/.ansible/plugins/modules/
 ```
+
 * Make sure the remote servers have python3 installed (default on Ubuntu 16.04.2)
 ```bash
 python3 --version
