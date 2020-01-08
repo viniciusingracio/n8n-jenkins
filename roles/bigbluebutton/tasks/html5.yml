@@ -1,8 +1,9 @@
 - name: Add mongo apt key
   become: yes
   apt_key:
-    keyserver: hkp://keyserver.ubuntu.com:80
-    id: 0C49F3730359A14518585931BC711F9BA15703C6
+    # keyserver: hkp://keyserver.ubuntu.com:80
+    # id: 0C49F3730359A14518585931BC711F9BA15703C6
+    url: https://www.mongodb.org/static/pgp/server-3.4.asc
     state: present
   register: aptkey
 
