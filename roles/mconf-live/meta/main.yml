@@ -1,5 +1,7 @@
 ---
 
 dependencies:
-  - docker-host
+  - role: docker-host
+    tags:
+      - docker
   - role: handlers

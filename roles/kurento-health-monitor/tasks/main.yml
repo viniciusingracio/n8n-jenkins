@@ -17,7 +17,7 @@
     docker_ip: '{{ docker_ip_raw.stdout }}'
 
 - name: Determine kurento running instances
-  shell: docker ps | grep 'kurento_[0-9]*' | sed 's:.*kurento_\([0-9]*\)$:\1:g' | sort
+  shell: docker ps -a | grep 'kurento_' | sed 's:.*kurento_\(.*\)$:\1:g' | sort
   register: running_kurento_raw
 
 - set_fact:
@@ -32,7 +32,7 @@
 - name: Start kurento health monitor
   docker_container:
     name: kurento-health-monitor
-    image: mconf/kurento-health-monitor:master
+    image: mconf/kurento-health-monitor:v0.0.2-dev
     pull: yes
     restart_policy: always
     memory: 128M
