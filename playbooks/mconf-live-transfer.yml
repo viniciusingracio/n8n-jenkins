@@ -1,0 +1,87 @@
+---
+
+- hosts:
+    - all
+
+  handlers:
+    - name: reload nginx
+      become: yes
+      service: name=nginx state=reloaded
+
+    - name: restart bigbluebutton
+      become: yes
+      command: /usr/local/bigbluebutton/core/scripts/utils/restart-mconf.sh
+      ignore_errors: yes
+
+  tasks:
+    - include_role:
+        name: docker-host
+
+    - name: Check if bbb-web is running on a standalone app
+      stat:
+        path: /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
+      register: reg_standalone
+    - set_fact:
+        bigbluebutton_servlet_dir: /usr/share/bbb-web
+        bigbluebutton_user: bigbluebutton
+        bbb_web_port: 8090
+      when: reg_standalone.stat.exists
+    - set_fact:
+        bigbluebutton_servlet_dir: /var/lib/tomcat7/webapps/bigbluebutton
+        bigbluebutton_user: tomcat7
+        bbb_web_port: 8080
+      when: not reg_standalone.stat.exists
+
+    - name: Register Docker host IP
+      shell: "ifconfig docker0 | grep 'inet addr:' | cut -d: -f2 | awk '{print $1}'"
+      register: docker_ip_raw
+
+    - name: Get BigBlueButton secret
+      shell: cat {{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
+      register: bbb_secret_raw
+
+    - name: Get BigBlueButton URL
+      shell: cat {{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties | grep '^bigbluebutton.web.serverURL=' | cut -d'=' -f2 | awk '{print $1"/bigbluebutton/api"}'
+      register: bbb_api_entry_point_raw
+
+    - set_fact:
+        docker_ip: '{{ docker_ip_raw.stdout }}'
+        bbb_secret: '{{ bbb_secret_raw.stdout }}'
+        bbb_api_entry_point: '{{ bbb_api_entry_point_raw.stdout }}'
+
+    - name: Start mconf-live-transfer container
+      docker_container:
+        name: mconf-live-transfer
+        image: mconf/mconf-live-transfer:latest
+        pull: yes
+        restart_policy: always
+        ports:
+          - 3013:9090
+          - 3014:9091
+        env:
+          REDIS_HOST: '{{ docker_ip }}'
+          BIGBLUEBUTTON_URL: '{{ bbb_api_entry_point | regex_replace("/api") }}'
+          BIGBLUEBUTTON_SECRET: '{{ bbb_secret }}'
+        labels:
+          hostname: '{{ inventory_hostname }}'
+
+    - name: Copy nginx file
+      copy:
+        src: files/mconf-live-transfer.nginx
+        dest: /etc/bigbluebutton/nginx/mconf-live-transfer.nginx
+      become: yes
+      notify: reload nginx
+
+    - name: Set bigbluebutton.properties
+      become: yes
+      replace:
+        path: '{{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties'
+        regexp: '{{ item.regexp }}'
+        replace: '{{ item.replace }}'
+        encoding: iso-8859-1
+      with_items:
+        - { regexp: '^defaultGuestPolicy=.*', replace: 'defaultGuestPolicy=ASK_MODERATOR' }
+        - { regexp: '^defaultGuestWaitURL=.*', replace: 'defaultGuestWaitURL=${bigbluebutton.web.serverURL}/guest' }
+        - { regexp: '^allowTransfer=.*', replace: 'allowTransfer=true' }
+        - { regexp: '^svgImagesRequired=.*', replace: 'svgImagesRequired=true' }
+      notify: restart bigbluebutton

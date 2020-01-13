@@ -34,7 +34,7 @@ bigbluebutton_stun_server:
   - stun:stun.l.google.com:19302
 
 bigbluebutton_docker_webrtc_sfu_enabled: false
-bigbluebutton_docker_webrtc_sfu_image: mconf/bbb-webrtc-sfu:v2.4.7
+bigbluebutton_docker_webrtc_sfu_image: mconf/bbb-webrtc-sfu:v2.4.8
 # it can be VP8, H264 or ANY
 bigbluebutton_docker_webrtc_sfu_codec: ANY
 bigbluebutton_docker_mcs_sip_enabled: false
@@ -51,7 +51,7 @@ bigbluebutton_docker_suite_password: suite
 bigbluebutton_docker_kurento_enabled: false
 bigbluebutton_docker_kurento_instances: 1
 bigbluebutton_docker_kurento_first_port: 3100
-bigbluebutton_docker_kurento_image: mconf/kurento:6.12.0-mconf-dev
+bigbluebutton_docker_kurento_image: mconf/kurento:6.12.1-mconf-dev
 bigbluebutton_docker_kurento_allowed_candidates:
 
 bigbluebutton_sip_default_gateway:
