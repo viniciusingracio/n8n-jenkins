@@ -44,7 +44,8 @@ BigBlueButton.logger = logger
 props = YAML::load(File.open(File.expand_path('../transcribe.yml', __FILE__)))
 project_id = props["gcloud_project_id"]
 bucket_name = props["gcloud_bucket_name"]
-credentials = props["gcloud_credentials_path"]
+credentials_speech2text = props["gcloud_credentials_path_asr"]
+credentials_storage = props["gcloud_credentials_path_storage"]
 language_code = props["language_code"]
 language_name = props["language_name"]
 caption_duration = props["caption_duration"]
@@ -84,13 +85,14 @@ if ! File.exist?(vtt_file)
   if ! File.exist?(audio_file)
     raw_dir = "/var/bigbluebutton/recording/raw/#{meeting_id}"
     if Dir.exist?(raw_dir)
+      BigBlueButton::EDL::Audio::FFMPEG_AFORMAT += ",volume=1.5,highpass=f=200,lowpass=f=2500"
       BigBlueButton::AudioProcessor.process(raw_dir, "#{speech_dir}/audio")
     elsif Dir.exist?(published_dir)
       command = ""
       if File.exist?("#{published_dir}/video/webcams.webm")
-        command = "ffmpeg -i #{published_dir}/video/webcams.webm -vn -af aformat=s16:48000 #{audio_file}"
+        command = "ffmpeg -i #{published_dir}/video/webcams.webm -vn -af 'volume=1.5, highpass=f=200, lowpass=f=2500, aformat=s16:48000' #{audio_file}"
       elsif File.exist?("#{published_dir}/video/webcams.mp4")
-        command = "ffmpeg -i #{published_dir}/video/webcams.mp4 -vn -af aformat=s16:48000 #{audio_file}"
+        command = "ffmpeg -i #{published_dir}/video/webcams.mp4 -vn -af 'volume=1.5, highpass=f=200, lowpass=f=2500, aformat=s16:48000' #{audio_file}"
       else
         raise "Can't find any file to extract the audio file"
       end
@@ -100,12 +102,12 @@ if ! File.exist?(vtt_file)
 
   if File.exist?(audio_file)
     BigBlueButton.logger.info("Storing audio file as #{storage_file_name} at #{bucket_name}")
-    storage = Google::Cloud::Storage.new project_id: project_id, credentials: credentials
+    storage = Google::Cloud::Storage.new project_id: project_id, credentials: credentials_storage
     bucket  = storage.bucket bucket_name
     file = bucket.create_file audio_file, storage_file_name
 
     BigBlueButton.logger.info("Transcribing #{storage_file_name} to #{language_code}")
-    speech = Google::Cloud::Speech.new credentials: credentials
+    speech = Google::Cloud::Speech.new credentials: credentials_speech2text
     config = { encoding: :FLAC,
                sample_rate_hertz: 48_000,
                audio_channel_count: 2,
@@ -192,6 +194,7 @@ if ! File.exist?(vtt_file)
       if File.exists? captions_json
         old_captions = JSON.parse(File.read(captions_json))
       end
+      old_captions.reject! { |item| item["locale"] == captions_code }
       captions = { "localeName" => language_name, "locale" => captions_code }
       old_captions << captions
       File.open(captions_json, "w") do |f|

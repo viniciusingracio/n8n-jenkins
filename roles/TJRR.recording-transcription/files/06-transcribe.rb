@@ -33,7 +33,7 @@ logger = Logger.new("/var/log/bigbluebutton/post_publish.log", "weekly")
 logger.level = Logger::INFO
 BigBlueButton.logger = logger
 
-props = YAML::load(File.open(File.expand_path('../transcribe.yml', __FILE__)))
+props = YAML::load(File.open(File.expand_path('../../transcribe/transcribe.yml', __FILE__)))
 engine = props["engine"]
 
 command = "ruby transcribe/transcribe-#{engine}.rb -m #{meeting_id}"
