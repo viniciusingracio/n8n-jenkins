@@ -1,5 +1,7 @@
 # encoding: UTF-8
 
+# sudo gem install optimist tz terminal-table
+
 require 'nokogiri'
 require 'date'
 require 'json'

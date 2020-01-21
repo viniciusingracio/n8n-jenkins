@@ -1,0 +1,7 @@
+/usr/bin/ansible-playbook -v -i envs/rnp/prod/hosts -l live-ifsc01.mconf.rnp.br,live-ifsc02.mconf.rnp.br,live-usp07.mconf.rnp.br,live-usp08.mconf.rnp.br,webinar-esr.mconf.rnp.br provision.yml --tags docker
+
+live-ifsc01.mconf.rnp.br: 58 OK, 21 changed, 0 unreachable, 0 failed
+live-ifsc02.mconf.rnp.br: 58 OK, 21 changed, 0 unreachable, 0 failed
+live-usp07.mconf.rnp.br: 58 OK, 21 changed, 0 unreachable, 0 failed
+live-usp08.mconf.rnp.br: 58 OK, 21 changed, 0 unreachable, 0 failed
+webinar-esr.mconf.rnp.br: 58 OK, 21 changed, 0 unreachable, 0 failed

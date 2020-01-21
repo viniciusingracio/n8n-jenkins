@@ -1,0 +1,33 @@
+- name: Start mconf-live-transfer container
+  docker_container:
+    name: mconf-live-transfer
+    image: mconf/mconf-live-transfer:latest
+    pull: yes
+    restart_policy: always
+    memory: 512M
+    ports:
+      - 3013:9090
+      - 3014:9091
+    env:
+      REDIS_HOST: '{{ docker_ip }}'
+      BIGBLUEBUTTON_URL: '{{ bbb_api_entry_point | regex_replace("/api") }}'
+      BIGBLUEBUTTON_SECRET: '{{ bbb_secret }}'
+    labels:
+      hostname: '{{ inventory_hostname }}'
+    state: '{% if bigbluebutton_allow_transfer %}started{% else %}absent{% endif %}'
+
+- name: Copy nginx file
+  copy:
+    src: files/mconf-live-transfer.nginx
+    dest: /etc/bigbluebutton/nginx/mconf-live-transfer.nginx
+  become: yes
+  when: bigbluebutton_allow_transfer
+  notify: reload nginx
+
+- name: Remove nginx file
+  file:
+    path: /etc/bigbluebutton/nginx/mconf-live-transfer.nginx
+    state: absent
+  become: yes
+  when: not bigbluebutton_allow_transfer
+  notify: reload nginx

@@ -69,6 +69,9 @@ bigbluebutton_ssl_certificate_key: /etc/nginx/ssl/{{ inventory_hostname }}.key
 bigbluebutton_local_ssl_certificate:
 bigbluebutton_local_ssl_certificate_key:
 
+bigbluebutton_guest_policy: ALWAYS_ACCEPT
+bigbluebutton_allow_transfer: false
+
 bigbluebutton_sysctl:
   - { name: 'net.ipv4.tcp_syncookies' , value: '1' }
   - { name: 'net.ipv4.tcp_timestamps' , value: '0' }
@@ -121,6 +124,10 @@ bigbluebutton_properties_config:
   - { key: 'maxNumPages', value: '300' }
   - { key: 'allowModsToUnmuteUsers', value: 'true' }
   - { key: 'swfSlidesRequired', value: '{{ not bigbluebutton_html5_only }}' }
+  - { key: 'defaultGuestPolicy', value: '{{ bigbluebutton_guest_policy }}' }
+  - { key: 'svgImagesRequired', value: 'true' }
+  - { key: 'defaultGuestWaitURL', value: '${bigbluebutton.web.serverURL}/guest' }
+  - { key: 'allowTransfer', value: '{{ bigbluebutton_allow_transfer }}' }
 
 bigbluebutton_stun_server:
   - stun:stun.l.google.com:19302

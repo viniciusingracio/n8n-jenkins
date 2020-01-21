@@ -66,6 +66,7 @@
     image: '{{ bigbluebutton_docker_webrtc_sfu_image }}'
     pull: yes
     restart_policy: always
+    memory: 512M
     ports:
       - 3008:3008
       - 3009:3009
@@ -99,7 +100,10 @@
       VIDEO_RNP_REDIRECT_URI: 'https://{{ inventory_hostname }}/oauth2_redirect'
       VIDEO_RNP_HOST_IP: '{{ external_ip }}'
       KURENTO_ALLOWED_CANDIDATE_IPS: '{{ bigbluebutton_docker_kurento_allowed_candidates | default("", true) | to_json }}'
+      LOG_FILENAME: /var/log/bbb-webrtc-sfu/bbb-webrtc-sfu.log
+      TZ: '{{ lookup("file", "/etc/timezone") }}'
     volumes:
+      - /var/log/bbb-webrtc-sfu:/var/log/bbb-webrtc-sfu
       - /var/run/docker.sock:/var/run/docker.sock
       - /usr/local/bigbluebutton/bbb-webrtc-sfu/config/client_secret.json:/app/client_secret.json
     labels:

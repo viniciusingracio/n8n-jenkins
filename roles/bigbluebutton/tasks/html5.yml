@@ -1,8 +1,6 @@
 - name: Add mongo apt key
   become: yes
   apt_key:
-    # keyserver: hkp://keyserver.ubuntu.com:80
-    # id: 0C49F3730359A14518585931BC711F9BA15703C6
     url: https://www.mongodb.org/static/pgp/server-3.4.asc
     state: present
   register: aptkey
@@ -80,15 +78,3 @@
     state: absent
   when: not bigbluebutton_html5_external_log_enabled
   notify: reload nginx
-
-- name: Set bigbluebutton.properties
-  become: yes
-  replace:
-    path: '{{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties'
-    regexp: '{{ item.regexp }}'
-    replace: '{{ item.replace }}'
-    encoding: '{{ properties_charset }}'
-  with_items:
-    - { regexp: '^defaultGuestPolicy=.*', replace: 'defaultGuestPolicy=ALWAYS_ACCEPT' }
-    - { regexp: '^svgImagesRequired=.*', replace: 'svgImagesRequired=true' }
-  notify: restart bigbluebutton

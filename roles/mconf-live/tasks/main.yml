@@ -79,6 +79,12 @@
     - sip
     - docker
 
+- include: docker-transfer.yml
+  when: bigbluebutton_html5
+  tags:
+    - transfer
+    - docker
+
 - name: Install basic stats
   become: yes
   apt:

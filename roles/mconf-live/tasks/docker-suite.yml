@@ -21,6 +21,7 @@
     image: '{{ bigbluebutton_docker_suite_image }}'
     pull: yes
     restart_policy: always
+    memory: 512M
     ports:
       - 3013:3000
     links:

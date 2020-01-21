@@ -39,6 +39,7 @@
     image: '{{ bigbluebutton_docker_mcs_sip_image }}'
     pull: yes
     restart_policy: always
+    memory: 512M
     ports:
       - 5060:5060
       - 5060:5060/udp
@@ -52,13 +53,16 @@
       SIP_API_PATH: /mcs-sip
       ENABLE_EXTERNAL_API: "true"
       REGISTRAR: '{{ registrar_config | to_json }}'
-      SIP_DEFAULT_GATEWAY: '{{ bigbluebutton_sip_default_gateway | default(bigbluebutton_sip_registrar_address, true) }}'
+      SIP_DEFAULT_GATEWAY: '{{ bigbluebutton_sip_default_gateway | to_json }}'
       ENABLE_MCS_BFCP: '{{ bigbluebutton_docker_mcs_bfcp_enabled | string }}'
       MCS_BFCP_ADDRESS: 'ws://{{ ansible_default_ipv4.address }}:8000'
       INFO_INTRAFRAME_INTERVAL: '{{ bigbluebutton_docker_mcs_sip_intraframe_interval | string }}'
       ENABLE_ALERTS: '{{ ( not ( bigbluebutton_docker_mcs_sip_alert_url is none or bigbluebutton_docker_mcs_sip_alert_url | trim == "" ) ) | string}}'
-      WEBHOOK_URL: '{{ bigbluebutton_docker_mcs_sip_alert_url }}'
+      WEBHOOK_URL: '{{ bigbluebutton_docker_mcs_sip_alert_url | string }}'
       ALERT_TAG: '{{ inventory_hostname }}'
+      LOG_FILENAME: /var/log/mcs-sip/mcs-sip.log
+    volumes:
+      - /var/log/mcs-sip:/var/log/mcs-sip
     labels:
       hostname: '{{ inventory_hostname }}'
   notify: restart docker components

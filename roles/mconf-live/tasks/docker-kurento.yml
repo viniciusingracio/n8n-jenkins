@@ -41,7 +41,6 @@
     pull: yes
     restart_policy: always
     network_mode: host
-    # limit memory to avoid complete colapse
     memory: 2G
     volumes:
       - /var/kurento:/var/kurento

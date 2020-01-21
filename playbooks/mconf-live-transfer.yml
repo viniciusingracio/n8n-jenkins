@@ -80,8 +80,6 @@
         replace: '{{ item.replace }}'
         encoding: iso-8859-1
       with_items:
-        - { regexp: '^defaultGuestPolicy=.*', replace: 'defaultGuestPolicy=ASK_MODERATOR' }
         - { regexp: '^defaultGuestWaitURL=.*', replace: 'defaultGuestWaitURL=${bigbluebutton.web.serverURL}/guest' }
         - { regexp: '^allowTransfer=.*', replace: 'allowTransfer=true' }
-        - { regexp: '^svgImagesRequired=.*', replace: 'svgImagesRequired=true' }
       notify: restart bigbluebutton
