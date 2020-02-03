@@ -60,7 +60,8 @@
       ENABLE_ALERTS: '{{ ( not ( bigbluebutton_docker_mcs_sip_alert_url is none or bigbluebutton_docker_mcs_sip_alert_url | trim == "" ) ) | string}}'
       WEBHOOK_URL: '{{ bigbluebutton_docker_mcs_sip_alert_url | string }}'
       ALERT_TAG: '{{ inventory_hostname }}'
-      LOG_FILENAME: /var/log/mcs-sip/mcs-sip.log
+      APP_LOG_FILENAME: /var/log/mcs-sip/mcs-sip.log
+      SIPTRACE_LOG_FILENAME: /var/log/mcs-sip/siptrace.log
     volumes:
       - /var/log/mcs-sip:/var/log/mcs-sip
     labels:

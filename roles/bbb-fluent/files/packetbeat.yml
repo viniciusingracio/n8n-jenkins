@@ -1,0 +1,12 @@
+packetbeat.protocols:
+  - type: redis
+    ports: [6379]
+
+processors:
+- add_cloud_metadata: ~
+- add_docker_metadata: ~
+
+logging.level: warning
+
+output.logstash:
+  hosts: 'localhost:5044'

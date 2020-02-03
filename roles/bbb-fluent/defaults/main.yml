@@ -1,0 +1,7 @@
+---
+
+bbb_fluent_elastic_path:
+bbb_fluent_elastic_host:
+bbb_fluent_elastic_port:
+bbb_fluent_elastic_auth_user:
+bbb_fluent_elastic_auth_pass:

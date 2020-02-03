@@ -1,0 +1,3 @@
+/usr/bin/ansible-playbook -v -i envs/prod/ufrgs/hosts -l mconf2.ufrgs.br provision.yml
+
+mconf2.ufrgs.br: 267 OK, 81 changed, 0 unreachable, 0 failed

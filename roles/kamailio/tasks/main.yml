@@ -2,9 +2,9 @@
 
 - name: Download source code
   git:
-    repo: git@github.com:mconf/kamailio-docker.git
+    repo: '{{ kamailio_repo_url }}'
     dest: '{{ ansible_env.HOME }}/kamailio'
-    version: dpf
+    version: '{{ kamailio_repo_ref }}'
     accept_hostkey: true
     force: yes
 
@@ -25,12 +25,13 @@
     build: yes
   environment:
     FQDN: '{{ inventory_hostname }}'
-    EXTERNAL_IP: '{{ ansible_host }}'
-    DB_ROOT_PASSWORD: 'de8e1d1b916351539aab0c9dc83f880c9371b9060d64067de8e609ac2b20a48f'
-    SSL_ENABLED: 'true'
+    EXTERNAL_IP: '{{ kamailio_external_ip }}'
+    ADVERTISED_ROUTE: '{{ kamailio_advertised_route | default(external_ip, true) }}'
+    DB_ROOT_PASSWORD: '{{ kamailio_db_password }}'
+    SSL_ENABLED: '{{ kamailio_ssl_enabled }}'
     SSL_CERTIFICATE: '{{ kamailio_ssl_certificate }}'
     SSL_CERTIFICATE_KEY: '{{ kamailio_ssl_certificate_key }}'
-    GATEWAY_IP: "200.169.41.155" # SBC2: - 200.169.41.167
+    GATEWAY_IP: '{{ kamailio_gateway_ip }}'
 
 - include: ufw.yml
   when: common_ufw_enabled

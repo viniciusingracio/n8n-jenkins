@@ -32,7 +32,7 @@
 - name: Pull streaming image
   docker_image:
     name: '{{ mconf_live_presentation_recorder_image }}:{{ mconf_live_presentation_recorder_version }}'
-    pull: yes
+    source: pull
 
 - name:
   become: yes
@@ -66,7 +66,7 @@
     image: '{{ bigbluebutton_docker_webrtc_sfu_image }}'
     pull: yes
     restart_policy: always
-    memory: 512M
+    memory: 768M
     ports:
       - 3008:3008
       - 3009:3009
@@ -102,6 +102,7 @@
       KURENTO_ALLOWED_CANDIDATE_IPS: '{{ bigbluebutton_docker_kurento_allowed_candidates | default("", true) | to_json }}'
       LOG_FILENAME: /var/log/bbb-webrtc-sfu/bbb-webrtc-sfu.log
       TZ: '{{ lookup("file", "/etc/timezone") }}'
+      FREESWITCH_IP_MAPPINGS: '{{ ip_mappings | to_json }}'
     volumes:
       - /var/log/bbb-webrtc-sfu:/var/log/bbb-webrtc-sfu
       - /var/run/docker.sock:/var/run/docker.sock

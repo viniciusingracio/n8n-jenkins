@@ -49,3 +49,13 @@
 
 - set_fact:
     kurento_ip: "{% if bigbluebutton_kurento_use_internal_ip %}{{ ansible_default_ipv4.address }}{% else %}{{ external_ip }}{% endif %}"
+
+- name: Determine IPs used for exchange with private, public and local network. Used for FreeSWITCH and Kurento
+  set_fact:
+    ip_mappings: "{{ { 'public': bigbluebutton_docker_webrtc_sfu_ip_public | default(external_ip, true) } }}"
+- set_fact:
+    ip_mappings: "{{ ip_mappings | combine({ 'private': bigbluebutton_docker_webrtc_sfu_ip_private }) }}"
+  when: not bigbluebutton_docker_webrtc_sfu_ip_private is none
+- set_fact:
+    ip_mappings: "{{ ip_mappings | combine({ 'local': bigbluebutton_docker_webrtc_sfu_ip_local }) }}"
+  when: not bigbluebutton_docker_webrtc_sfu_ip_local is none

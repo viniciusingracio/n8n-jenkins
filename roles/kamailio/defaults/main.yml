@@ -1,0 +1,13 @@
+---
+
+kamailio_repo_url: git@github.com:mconf/kamailio-docker.git
+kamailio_repo_ref: master
+kamailio_local_ssl_certificate:
+kamailio_local_ssl_certificate_key:
+kamailio_ssl_enabled: false
+kamailio_ssl_certificate:
+kamailio_ssl_certificate_key:
+kamailio_db_password:
+kamailio_gateway_ip:
+kamailio_external_ip: '{{ ansible_host }}'
+kamailio_advertised_route:

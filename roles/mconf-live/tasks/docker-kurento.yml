@@ -31,7 +31,7 @@
 
 - name: Determine kurento URLs to configure bbb-webrtc-sfu
   set_fact:
-    kurento_config: "{{ kurento_config|default([]) + [ { 'ip': kurento_ip, 'url': 'ws://' + docker_ip + ':' + item + '/kurento' } ] }}"
+    kurento_config: "{{ kurento_config|default([]) + [ { 'ip': kurento_ip, 'url': 'ws://' + docker_ip + ':' + item + '/kurento' } | combine( { 'ipClassMapping': ip_mappings } ) ] }}"
   with_items: '{{ kurento_ports }}'
 
 - name: Start kurento containers

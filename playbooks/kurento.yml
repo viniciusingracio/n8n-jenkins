@@ -1,0 +1,13 @@
+---
+
+- hosts:
+    - mconf-live220
+  tasks:
+    - include_role:
+        name: docker-host
+
+    - include_role:
+        name: mconf-live
+        apply:
+          tags:
+            kurento

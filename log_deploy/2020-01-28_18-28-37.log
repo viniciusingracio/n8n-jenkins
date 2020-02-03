@@ -1,0 +1,3 @@
+/usr/bin/ansible-playbook -v -i envs/prod/tjrr-staging/hosts -l hlive02-vc.tjrr.jus.br provision.yml --tags docker
+
+hlive02-vc.tjrr.jus.br: 56 OK, 17 changed, 0 unreachable, 0 failed
