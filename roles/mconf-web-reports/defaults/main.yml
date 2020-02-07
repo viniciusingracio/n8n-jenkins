@@ -16,12 +16,18 @@ mconf_web_reports_output_dir: /var/www/mconf-web/shared/private
 
 # Configurations for the cron jobs
 mconf_web_reports_cron_log_file: /var/log/mconf-web-reports.log
-mconf_web_reports_cron_schedule_minute: 5
-mconf_web_reports_cron_schedule_hour: "*"
+mconf_web_reports_cron_log_file_previous_month: /var/log/mconf-web-reports-previous-month.log
+mconf_web_reports_cron_schedule_minute: 0
+mconf_web_reports_cron_schedule_hour: 9,21
 mconf_web_reports_cron_schedule_day: "*"
-mconf_web_reports_cron_previous_month_schedule_minute: 30
-mconf_web_reports_cron_previous_month_schedule_hour: 4 # after 3am to make sure it's after utc if server in br
-mconf_web_reports_cron_previous_month_schedule_day: 1
+
+# run twice a day after the turn of the month
+# the last run is the one that really matters, must run before
+# around 7:00 UTC of the 3rd, the moment Iugu creates invoices
+# run more than once to make sure all meetings ended and all recordings are done
+mconf_web_reports_cron_previous_month_schedule_minute: 0
+mconf_web_reports_cron_previous_month_schedule_hour: 10,22
+mconf_web_reports_cron_previous_month_schedule_day: 1,2
 
 # paths to the config files, passed when running the docker container
 # TODO: this was done to accommodate the migration to a .tsv config, remove after
