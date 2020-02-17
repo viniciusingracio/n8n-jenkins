@@ -74,3 +74,6 @@
 - name: Enable ufw
   become: yes
   ufw: state=enabled
+
+- include_role:
+    name: ufw.docker

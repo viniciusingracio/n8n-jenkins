@@ -91,6 +91,7 @@
     - { repo: 'deb http://deb.nodesource.com/node_8.x {{ ansible_lsb.codename }} main', filename: 'node' }
     - { repo: 'ppa:rmescandon/yq', filename: 'yq' }
     - { repo: 'ppa:nginx/stable', filename: 'nginx' }
+    - { repo: 'ppa:bigbluebutton/support', filename: 'bigbluebutton_support' }
 
 - name: Update apt if keys changed
   become: yes
@@ -315,8 +316,8 @@
     - { regexp: 'bbbWebAPI[ ]*=', line: '  bbbWebAPI = "{{ bbb_url }}api"' }
     - { regexp: 'sharedSecret[ ]*=', line: '  sharedSecret = "{{ bbb_secret }}"' }
     - { regexp: 'deskshareip[ ]*=', line: '  deskshareip = "{{ inventory_hostname }}"' }
-    - { regexp: 'recordCodec[ ]*=', line: '  recordCodec = "wav"' }
-    - { regexp: 'inactivity[ ]*=', line: '  recordCodec = "3600"' }
+    - { regexp: 'recordCodec[ ]*=', line: '  recordCodec = "opus"' }
+    - { regexp: 'inactivity[ ]*=', line: '  inactivity = "3600"' }
   notify: restart bigbluebutton
 
 # TODO move this to a new role/task
@@ -613,6 +614,18 @@
   tags: [storage]
 
 - include: log.yml
+
+- file:
+    path: /etc/systemd/system/bbb-fsesl-akka.service.d
+    state: directory
+  become: yes
+
+- name: Copy fsesl-akka systemd restart file
+  copy:
+    src: bbb-fsesl-akka-restart.conf
+    dest: /etc/systemd/system/bbb-fsesl-akka.service.d/bbb-fsesl-akka-restart.conf
+  become: yes
+  notify: reload systemctl daemon
 
 # - name: Check if reboot is required
 #   stat:

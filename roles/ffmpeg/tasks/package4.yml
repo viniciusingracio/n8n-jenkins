@@ -5,6 +5,12 @@
     state: absent
     force: yes
 
+- name: Remove old ffmpeg ppa
+  become: yes
+  apt_repository:
+    repo: ppa:jonathonf/ffmpeg-4
+    state: absent
+
 - name: Add ffmpeg 4.0 repo to apt
   become: yes
   apt_repository:

@@ -3,7 +3,7 @@
 - name: Download source code
   git:
     repo: '{{ kamailio_repo_url }}'
-    dest: '{{ ansible_env.HOME }}/kamailio'
+    dest: '{{ kamailio_path }}'
     version: '{{ kamailio_repo_ref }}'
     accept_hostkey: true
     force: yes
@@ -21,12 +21,12 @@
   # notify: restart kamailio
 
 - docker_compose:
-    project_src: ~/kamailio
+    project_src: '{{ kamailio_path }}'
     build: yes
   environment:
     FQDN: '{{ inventory_hostname }}'
     EXTERNAL_IP: '{{ kamailio_external_ip }}'
-    ADVERTISED_ROUTE: '{{ kamailio_advertised_route | default(external_ip, true) }}'
+    ADVERTISED_ROUTE: '{{ kamailio_advertised_route }}'
     DB_ROOT_PASSWORD: '{{ kamailio_db_password }}'
     SSL_ENABLED: '{{ kamailio_ssl_enabled }}'
     SSL_CERTIFICATE: '{{ kamailio_ssl_certificate }}'

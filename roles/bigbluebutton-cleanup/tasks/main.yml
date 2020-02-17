@@ -1,5 +1,11 @@
 ---
 
+- name: Add mongo apt key
+  become: yes
+  apt_key:
+    url: https://www.mongodb.org/static/pgp/server-3.4.asc
+    state: present
+
 - name: Remove old ppa
   become: yes
   apt_repository:

@@ -42,3 +42,7 @@
 - name: reboot
   become: yes
   command: shutdown -r 1
+
+- name: reload systemctl daemon
+  become: yes
+  command: systemctl daemon-reload

@@ -34,19 +34,19 @@ bigbluebutton_stun_server:
   - stun:stun.l.google.com:19302
 
 bigbluebutton_docker_webrtc_sfu_enabled: false
-bigbluebutton_docker_webrtc_sfu_image: mconf/bbb-webrtc-sfu:v2.4.10
+bigbluebutton_docker_webrtc_sfu_image: mconf/bbb-webrtc-sfu:v2.4.x-release
 # it can be VP8, H264 or ANY
 bigbluebutton_docker_webrtc_sfu_codec: ANY
 bigbluebutton_docker_webrtc_sfu_ip_public:
 bigbluebutton_docker_webrtc_sfu_ip_private:
 bigbluebutton_docker_webrtc_sfu_ip_local:
 bigbluebutton_docker_mcs_sip_enabled: false
-bigbluebutton_docker_mcs_sip_image: mconf/mcs-sip:v2.2.8
+bigbluebutton_docker_mcs_sip_image: mconf/mcs-sip:v2.2.9
 bigbluebutton_docker_mcs_sip_intraframe_interval: 0
 bigbluebutton_docker_mcs_sip_alert_url:
-bigbluebutton_docker_sfu_phone_image: mconf/sfu-phone:v2.1.5
+bigbluebutton_docker_sfu_phone_image: mconf/sfu-phone:v2.1.6
 bigbluebutton_docker_mcs_bfcp_enabled: false
-bigbluebutton_docker_mcs_bfcp_image: mconf/mcs-bfcp:v0.0.4
+bigbluebutton_docker_mcs_bfcp_image: mconf/mcs-bfcp:v0.0.5
 bigbluebutton_docker_mcs_bfcp_num_ports: 40
 bigbluebutton_docker_suite_enabled: false
 bigbluebutton_docker_suite_image: mconf/suite:suite-bbb-webrtc-sfu-2.4.0dev

@@ -33,6 +33,6 @@
 - name: Download ufw-docker
   become: yes
   get_url:
-    url: https://raw.githubusercontent.com/chaifeng/ufw-docker/3d2259125be810f9454311751bcb4b7a691bf51d/ufw-docker
+    url: https://raw.githubusercontent.com/chaifeng/ufw-docker/ab03a6aa643e3477e55096a6e7d869e3d9a1be49/ufw-docker
     dest: /usr/local/bin/ufw-docker
     mode: 0755

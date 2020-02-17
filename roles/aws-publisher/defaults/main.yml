@@ -8,7 +8,7 @@ aws_publisher_repo_url: git@github.com:mconf/mconf-live.git
 aws_publisher_repo_ref: mconf-2.2
 
 aws_publisher_image: mconf/aws-publisher
-aws_publisher_image_version: 0.0.9-4d06f93214
+aws_publisher_image_version: 0.0.11-b67870a170
 
 aws_publisher_region:
 aws_publisher_key:

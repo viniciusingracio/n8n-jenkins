@@ -48,5 +48,5 @@
 
 - name: Remove temporary directory for bbb-client
   file:
-    path: '{{ tmpdir_client }}'
+    path: '{{ tmpdir_client.path }}'
     state: absent

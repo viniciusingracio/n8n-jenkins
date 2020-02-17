@@ -16,6 +16,54 @@
       hostname: '{{ inventory_hostname }}'
     state: '{% if bigbluebutton_allow_transfer %}started{% else %}absent{% endif %}'
 
+- name: Create temporary directory for locales
+  tempfile:
+    state: directory
+  register: tmpdir_transfer
+  when: bigbluebutton_allow_transfer
+
+- name: Copy locales
+  command: docker cp mconf-live-transfer:/opt/locales {{ tmpdir_transfer.path }}
+  when: bigbluebutton_allow_transfer
+
+- name: List content of tmpdir_transfer
+  command: ls {{ tmpdir_transfer.path }}/locales
+  register: locale_files
+  when: bigbluebutton_allow_transfer
+
+- shell: |
+    cp {{ item }} {{ item }}.orig
+    sed -i 's|BigBlueButton|{{ bigbluebutton_branding_name }}|g' {{ item }}
+    # keep in the directory only the modified files
+    if diff {{ item }}.orig {{ item }} > /dev/null; then
+      rm {{ item }}
+    fi
+    rm {{ item }}.orig
+  args:
+    chdir: '{{ tmpdir_transfer.path }}/locales'
+  with_items: '{{ locale_files.stdout_lines }}'
+  when: bigbluebutton_allow_transfer
+
+- name: List content of tmpdir_transfer
+  command: ls {{ tmpdir_transfer.path }}/locales
+  register: locale_files
+  when: bigbluebutton_allow_transfer
+
+- name: Copy locales back to the container
+  command: docker cp {{ tmpdir_transfer.path }}/locales/{{ item }} mconf-live-transfer:/opt/locales/
+  with_items: '{{ locale_files.stdout_lines }}'
+  when: bigbluebutton_allow_transfer
+
+- name: Restart container
+  command: docker restart mconf-live-transfer
+  when: bigbluebutton_allow_transfer and locale_files.stdout_lines | length > 0
+
+- name: Remove temporary directory
+  file:
+    path: '{{ tmpdir_transfer.path }}'
+    state: absent
+  when: bigbluebutton_allow_transfer
+
 - name: Copy nginx file
   copy:
     src: files/mconf-live-transfer.nginx
