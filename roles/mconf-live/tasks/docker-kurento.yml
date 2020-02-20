@@ -53,6 +53,8 @@
       STUN_IP: '{{ stun_server_ip }}'
       STUN_PORT: '{{ stun_server_port | string }}'
       # GST_DEBUG: 'Kurento*:5,kms*:5'
+      GST_DEBUG: '3,Kurento*:4,kms*:4,KurentoWebSocketTransport:5'
+      TZ: '{{ lookup("file", "/etc/timezone") }}'
     labels:
       hostname: '{{ inventory_hostname }}'
   with_items: '{{ kurento_ports }}'

@@ -65,6 +65,7 @@
       CACHE_NUM_KEYS: '{{ rec_proxy_cache_num_keys | string }}'
       CACHE_EXPIRE_AFTER: '{{ rec_proxy_cache_expire_after | string }}'
       CACHE_MAX_SIZE: '{{ rec_proxy_cache_max_size | string }}'
+      TZ: '{{ lookup("file", "/etc/timezone") }}'
     labels:
       hostname: '{{ inventory_hostname }}'
   notify: clean docker

@@ -15,6 +15,7 @@
       ENABLE_REGISTER: '{{ bigbluebutton_sip_registrar_enabled | string }}'
       ENABLE_FLOOR_N: 'true'
       LOG_FILENAME: /var/log/sfu-phone/sfu-phone.log
+      TZ: '{{ lookup("file", "/etc/timezone") }}'
     volumes:
       - /var/log/sfu-phone:/var/log/sfu-phone
     labels:

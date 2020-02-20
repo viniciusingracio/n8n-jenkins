@@ -62,6 +62,8 @@
       ALERT_TAG: '{{ inventory_hostname }}'
       APP_LOG_FILENAME: /var/log/mcs-sip/mcs-sip.log
       SIPTRACE_LOG_FILENAME: /var/log/mcs-sip/siptrace.log
+      TZ: '{{ lookup("file", "/etc/timezone") }}'
+      INVITE_WITH_SDP: '{{ bigbluebutton_sip_invite_with_sdp | string }}'
     volumes:
       - /var/log/mcs-sip:/var/log/mcs-sip
     labels:

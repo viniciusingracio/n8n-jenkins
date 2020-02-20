@@ -1,10 +1,20 @@
 ---
 
-- name: Copy scripts
-  synchronize:
-    src: files/
-    dest: /etc/bbb-fluent/
-    use_ssh_args: yes
+- name: Create reindex files
+  file:
+    path: '{{ item }}'
+    state: touch
+  with_items:
+    - /var/log/nginx/html5-client-reindex.log
+    - /var/log/bigbluebutton/audio-stats-reindex.log
+  become: yes
+
+- name: Create bbb-fluent directory
+  file:
+    path: /etc/bbb-fluent
+    owner: '{{ ansible_user }}'
+    group: '{{ ansible_user }}'
+    state: directory
   become: yes
 
 - name: Start fluentd container
@@ -24,13 +34,24 @@
       - 5044:5044
       - 9880:9880
     env:
-      ELASTIC_PATH: "{{ bbb_fluent_elastic_path }}"
-      ELASTIC_HOST: "{{ bbb_fluent_elastic_host }}"
-      ELASTIC_PORT: "{{ bbb_fluent_elastic_port }}"
-      ELASTIC_AUTH_USER: "{{ bbb_fluent_elastic_auth_user }}"
-      ELASTIC_AUTH_PASS: "{{ bbb_fluent_elastic_auth_pass }}"
+      TZ: '{{ lookup("file", "/etc/timezone") }}'
+      ELASTIC_PATH: "{{ bbb_fluent_elastic_path | string }}"
+      ELASTIC_HOST: "{{ bbb_fluent_elastic_host | string }}"
+      ELASTIC_PORT: "{{ bbb_fluent_elastic_port | string }}"
+      ELASTIC_AUTH_USER: "{{ bbb_fluent_elastic_auth_user | string }}"
+      ELASTIC_AUTH_PASS: "{{ bbb_fluent_elastic_auth_pass | string }}"
+      READ_LOGS_FROM_HEAD: "false"
+      REAL_TIME_SUMMARY_UPDATES: "true"
     labels:
       hostname: '{{ inventory_hostname }}'
+  notify: clean docker
+
+- name: Copy files from the container
+  command: docker cp fluentd:/fluentd/utils/{{ item }} /etc/bbb-fluent/
+  with_items:
+    - packetbeat.yml
+    - audio-stats.rb
+  notify: restart packetbeat
 
 - name: Start packetbeat container
   docker_container:
@@ -51,12 +72,13 @@
     network_mode: host
     labels:
       hostname: '{{ inventory_hostname }}'
+  notify: clean docker
 
 - name: Install cron job to generate audio-stats
   become: yes
   cron:
     name: audio-stats to fluentd, sleep {{ item }}
-    job: "sleep {{ item }}; /usr/bin/ruby /etc/bbb-fluent/audio-stats.rb | curl -H 'Content-Type: multipart/form-data' -X POST -d @- http://localhost:9880/audio_stats"
+    job: sleep {{ item }}; /usr/bin/ruby /etc/bbb-fluent/audio-stats.rb
   with_items:
     - 30
     - 60
@@ -77,13 +99,3 @@
   with_items:
     - audio-stats to fluentd, sleep 30
     - audio-stats to fluentd, sleep 60
-
-- name: Check if html5 client reindex file exists
-  stat:
-    path: /var/log/nginx/html5-client-reindex.log
-  register: reg_reindex
-
-- name: Create reindex file
-  shell: ruby /etc/bbb-fluent/reindex-client-logs.rb | tee /var/log/nginx/html5-client-reindex.log > /dev/null
-  become: yes
-  when: not reg_reindex.stat.exists

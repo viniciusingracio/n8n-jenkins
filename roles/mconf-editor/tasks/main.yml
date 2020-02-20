@@ -45,6 +45,7 @@
     env:
       EDITOR_SECRET: '{{ bbb_secret }}'
       EDITOR_CRYPTO: SHA-1
+      TZ: '{{ lookup("file", "/etc/timezone") }}'
     labels:
       hostname: '{{ inventory_hostname }}'
   notify: clean docker
