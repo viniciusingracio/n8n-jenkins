@@ -12,7 +12,7 @@
       MCS_PORT: "3009"
       MCS_HOST: '{{ docker_ip }}'
       SIP_API_ADDRESS: wss://{{ inventory_hostname }}/mcs-sip
-      ENABLE_REGISTER: '{{ bigbluebutton_sip_registrar_enabled | string }}'
+      ENABLE_REGISTER: '{{ bigbluebutton_sip_registrar_enabled | lower }}'
       ENABLE_FLOOR_N: 'true'
       LOG_FILENAME: /var/log/sfu-phone/sfu-phone.log
       TZ: '{{ lookup("file", "/etc/timezone") }}'
