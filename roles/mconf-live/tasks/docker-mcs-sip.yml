@@ -24,7 +24,11 @@
   become: yes
 
 - set_fact:
-    registrar_config: '{{ { "register": true, "registrarServer": { "server": bigbluebutton_sip_registrar_address, "authorizationUser": bigbluebutton_sip_registrar_username, "password": bigbluebutton_sip_registrar_password } } }}'
+    bigbluebutton_sip_registrar_password: '{{ ( "sip_" + bbb_secret ) | hash("sha256") }}'
+  when: bigbluebutton_sip_registrar_calculated_password | bool
+
+- set_fact:
+    registrar_config: '{{ { "register": true, "transport": "WS", "registrarServer": { "server": bigbluebutton_sip_registrar_address, "uri": "wss://" + bigbluebutton_sip_registrar_address + "/ws", "authorizationUser": bigbluebutton_sip_registrar_username, "password": bigbluebutton_sip_registrar_password } } }}'
   when: bigbluebutton_sip_registrar_enabled
 - set_fact:
     registrar_config: '{{ { "register": false, "registrarServer": { "server": "", "authorizationUser": "", "password": "" } } }}'
@@ -47,8 +51,7 @@
     env:
       EXTERNAL_IP: '{{ contact_ip }}'
       BIND_IP: 0.0.0.0
-      MCS_PORT: "3009"
-      MCS_HOST: '{{ docker_ip }}'
+      MCS_HOST: 'ws://{{ docker_ip }}:3009/mcs'
       SIP_API_PORT: "3012"
       SIP_API_PATH: /mcs-sip
       ENABLE_EXTERNAL_API: "true"
@@ -64,6 +67,7 @@
       SIPTRACE_LOG_FILENAME: /var/log/mcs-sip/siptrace.log
       TZ: '{{ lookup("file", "/etc/timezone") }}'
       INVITE_WITH_SDP: '{{ bigbluebutton_sip_invite_with_sdp | lower }}'
+      SIP_TRANSPORT_TYPE: "WS"
     volumes:
       - /var/log/mcs-sip:/var/log/mcs-sip
     labels:

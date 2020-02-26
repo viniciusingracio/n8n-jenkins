@@ -47,13 +47,11 @@
     external_props:
       - { name: "ext-rtp-ip", value: '$${external_rtp_ip}' }
       - { name: "ext-sip-ip", value: '$${external_sip_ip}' }
-      - { name: "enable-3pcc", value: "proxy" }
-      - { name: "disable-rtp-auto-adjust", value: "true" }
-      - { name: "rtp-autofix-timing", value: "false" }
+      - { name: "disable-rtp-auto-adjust" }
+      - { name: "rtp-autofix-timing" }
       - { name: "ws-binding", value: "{{ ws_binding_value }}" }
       - { name: "wss-binding", value: "{{ wss_binding_value }}" }
       - { name: "apply-candidate-acl", value: "0.0.0.0/0" }
-      - { name: "liberal-dtmf", value: "true" }
       - { name: "dtmf_type" }
       - { name: "dtmf-type" }
 

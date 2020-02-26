@@ -41,10 +41,10 @@ bigbluebutton_docker_webrtc_sfu_ip_public:
 bigbluebutton_docker_webrtc_sfu_ip_private:
 bigbluebutton_docker_webrtc_sfu_ip_local:
 bigbluebutton_docker_mcs_sip_enabled: false
-bigbluebutton_docker_mcs_sip_image: mconf/mcs-sip:v2.2.11
+bigbluebutton_docker_mcs_sip_image: mconf/mcs-sip:v2.2.12
 bigbluebutton_docker_mcs_sip_intraframe_interval: 0
 bigbluebutton_docker_mcs_sip_alert_url:
-bigbluebutton_docker_sfu_phone_image: mconf/sfu-phone:v2.1.7
+bigbluebutton_docker_sfu_phone_image: mconf/sfu-phone:v2.1.8
 bigbluebutton_docker_mcs_bfcp_enabled: false
 bigbluebutton_docker_mcs_bfcp_image: mconf/mcs-bfcp:v0.0.5
 bigbluebutton_docker_mcs_bfcp_num_ports: 40
@@ -66,6 +66,7 @@ bigbluebutton_sip_registrar_use_internal_ip: false
 bigbluebutton_sip_registrar_address:
 bigbluebutton_sip_registrar_username:
 bigbluebutton_sip_registrar_password:
+bigbluebutton_sip_registrar_calculated_password: false
 bigbluebutton_sip_invite_with_sdp: true
 
 bigbluebutton_kurento_use_internal_ip: false
