@@ -1,0 +1,17 @@
+/usr/bin/ansible-playbook -v -i envs/prod/tjrr/hosts -l mconf-live220 setup.yml
+
+aer-vc.tjrr.jus.br: 25 OK, 16 changed, 0 unreachable, 0 failed
+bfi-vc.tjrr.jus.br: 25 OK, 16 changed, 0 unreachable, 0 failed
+ckr-vc.tjrr.jus.br: 25 OK, 16 changed, 0 unreachable, 0 failed
+fcr-vc.tjrr.jus.br: 25 OK, 16 changed, 0 unreachable, 0 failed
+fcv-vc.tjrr.jus.br: 25 OK, 16 changed, 0 unreachable, 0 failed
+live01-vc.tjrr.jus.br: 25 OK, 16 changed, 0 unreachable, 0 failed
+live02-vc.tjrr.jus.br: 24 OK, 12 changed, 0 unreachable, 0 failed
+live03-vc.tjrr.jus.br: 25 OK, 16 changed, 0 unreachable, 0 failed
+live04-vc.tjrr.jus.br: 25 OK, 16 changed, 0 unreachable, 0 failed
+mji-vc.tjrr.jus.br: 25 OK, 16 changed, 0 unreachable, 0 failed
+pac-vc.tjrr.jus.br: 25 OK, 16 changed, 0 unreachable, 0 failed
+pjs-vc.tjrr.jus.br: 25 OK, 16 changed, 0 unreachable, 0 failed
+rli-vc.tjrr.jus.br: 25 OK, 16 changed, 0 unreachable, 0 failed
+slz-vc.tjrr.jus.br: 25 OK, 16 changed, 0 unreachable, 0 failed
+vij-vc.tjrr.jus.br: 25 OK, 16 changed, 0 unreachable, 0 failed

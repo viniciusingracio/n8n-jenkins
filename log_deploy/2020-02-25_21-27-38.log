@@ -1,0 +1,3 @@
+/usr/bin/ansible-playbook -v -i envs/prod/tjrr/hosts -l kamailio setup.yml
+
+sip-vc.tjrr.jus.br: 25 OK, 14 changed, 0 unreachable, 0 failed
