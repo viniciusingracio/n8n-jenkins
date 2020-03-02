@@ -1,0 +1,3 @@
+/usr/local/bin/ansible-playbook -v -i envs/prod/com-staging -l d.mconf.com --tags jekyll provision.yml
+
+d.mconf.com: 22 OK, 12 changed, 0 unreachable, 0 failed
