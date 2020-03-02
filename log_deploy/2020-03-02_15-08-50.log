@@ -1,0 +1,3 @@
+/usr/local/bin/ansible-playbook -v -i envs/prod/com-staging -l mconf-web-reports --tags mconf-web-reports provision.yml
+
+d.elos.vc: 15 OK, 3 changed, 0 unreachable, 0 failed
