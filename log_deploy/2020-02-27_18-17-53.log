@@ -1,0 +1,4 @@
+/usr/bin/ansible-playbook -v -i envs/rnp/h/hosts -l mconf-live220 provision.yml --tags docker
+
+live-compute03.h.mconf.rnp.br: 66 OK, 27 changed, 0 unreachable, 0 failed
+live-compute04.h.mconf.rnp.br: 49 OK, 18 changed, 1 unreachable, 0 failed
