@@ -1,0 +1,12 @@
+/usr/bin/ansible-playbook -v -i envs/rnp/prod/hosts -l mconf-rec,mconf-recw playbooks/bigbluebutton-cleanup.yml
+
+rec-ifsc01.mconf.rnp.br: 2 OK, 1 changed, 0 unreachable, 0 failed
+rec-uepg01.mconf.rnp.br: 2 OK, 1 changed, 0 unreachable, 0 failed
+rec-ufg01.mconf.rnp.br: 2 OK, 1 changed, 0 unreachable, 0 failed
+rec01.mconf.rnp.br: 2 OK, 1 changed, 0 unreachable, 0 failed
+recw01-p.mconf.rnp.br: 1 OK, 1 changed, 0 unreachable, 0 failed
+recw02-p.mconf.rnp.br: 1 OK, 1 changed, 0 unreachable, 0 failed
+recw03-p.mconf.rnp.br: 1 OK, 1 changed, 0 unreachable, 0 failed
+recw04-p.mconf.rnp.br: 1 OK, 1 changed, 0 unreachable, 0 failed
+recw05-p.mconf.rnp.br: 1 OK, 1 changed, 0 unreachable, 0 failed
+recw06-p.mconf.rnp.br: 1 OK, 1 changed, 0 unreachable, 0 failed

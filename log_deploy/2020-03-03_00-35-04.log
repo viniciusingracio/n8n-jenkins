@@ -1,0 +1,30 @@
+/usr/bin/ansible-playbook -v -i envs/rnp/prod/hosts -l mconf-live220 provision.yml
+
+live-ac01.mconf.rnp.br: 297 OK, 97 changed, 0 unreachable, 0 failed
+live-al01.mconf.rnp.br: 297 OK, 97 changed, 0 unreachable, 0 failed
+live-cdcrec12.mconf.rnp.br: 297 OK, 97 changed, 0 unreachable, 0 failed
+live-cdcrec13.mconf.rnp.br: 297 OK, 97 changed, 0 unreachable, 0 failed
+live-cdcrec14.mconf.rnp.br: 297 OK, 97 changed, 0 unreachable, 0 failed
+live-cdcrec15.mconf.rnp.br: 297 OK, 97 changed, 0 unreachable, 0 failed
+live-cdcrec16.mconf.rnp.br: 297 OK, 97 changed, 0 unreachable, 0 failed
+live-cdcrec17.mconf.rnp.br: 291 OK, 69 changed, 0 unreachable, 0 failed
+live-cdcrec18.mconf.rnp.br: 297 OK, 97 changed, 0 unreachable, 0 failed
+live-embrapa-df01.mconf.rnp.br: 297 OK, 98 changed, 0 unreachable, 0 failed
+live-embrapa-df02.mconf.rnp.br: 297 OK, 96 changed, 0 unreachable, 0 failed
+live-embrapa-df03.mconf.rnp.br: 297 OK, 97 changed, 0 unreachable, 0 failed
+live-embrapa-df04.mconf.rnp.br: 297 OK, 97 changed, 0 unreachable, 0 failed
+live-embrapa-df05.mconf.rnp.br: 149 OK, 50 changed, 0 unreachable, 1 failed
+live-es01.mconf.rnp.br: 297 OK, 96 changed, 0 unreachable, 0 failed
+live-ifsc01.mconf.rnp.br: 53 OK, 14 changed, 0 unreachable, 1 failed
+live-ifsc02.mconf.rnp.br: 271 OK, 92 changed, 0 unreachable, 1 failed
+live-ifsc03.mconf.rnp.br: 273 OK, 96 changed, 0 unreachable, 1 failed
+live-ifsc04.mconf.rnp.br: 149 OK, 50 changed, 0 unreachable, 1 failed
+live-ma01.mconf.rnp.br: 149 OK, 51 changed, 0 unreachable, 1 failed
+live-mt01.mconf.rnp.br: 249 OK, 87 changed, 0 unreachable, 1 failed
+live-rs01.mconf.rnp.br: 271 OK, 90 changed, 0 unreachable, 1 failed
+live-sc01.mconf.rnp.br: 149 OK, 51 changed, 0 unreachable, 1 failed
+live-to01.mconf.rnp.br: 149 OK, 50 changed, 0 unreachable, 1 failed
+live-usp02.mconf.rnp.br: 149 OK, 51 changed, 0 unreachable, 1 failed
+live-usp07.mconf.rnp.br: 149 OK, 51 changed, 0 unreachable, 1 failed
+live-usp08.mconf.rnp.br: 297 OK, 97 changed, 0 unreachable, 0 failed
+webinar-esr.mconf.rnp.br: 148 OK, 49 changed, 0 unreachable, 1 failed

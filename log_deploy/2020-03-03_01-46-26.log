@@ -1,0 +1,15 @@
+/usr/bin/ansible-playbook -v -i envs/rnp/prod/hosts -l live-embrapa-df05.mconf.rnp.br,live-ifsc01.mconf.rnp.br,live-ifsc02.mconf.rnp.br,live-ifsc03.mconf.rnp.br,live-ifsc04.mconf.rnp.br,live-ma01.mconf.rnp.br,live-mt01.mconf.rnp.br,live-rs01.mconf.rnp.br,live-sc01.mconf.rnp.br,live-to01.mconf.rnp.br,live-usp02.mconf.rnp.br,live-usp07.mconf.rnp.br,webinar-esr.mconf.rnp.br provision.yml
+
+live-embrapa-df05.mconf.rnp.br: 0 OK, 0 changed, 1 unreachable, 0 failed
+live-ifsc01.mconf.rnp.br: 289 OK, 63 changed, 0 unreachable, 0 failed
+live-ifsc02.mconf.rnp.br: 289 OK, 61 changed, 0 unreachable, 0 failed
+live-ifsc03.mconf.rnp.br: 289 OK, 61 changed, 0 unreachable, 0 failed
+live-ifsc04.mconf.rnp.br: 263 OK, 56 changed, 0 unreachable, 1 failed
+live-ma01.mconf.rnp.br: 289 OK, 62 changed, 0 unreachable, 0 failed
+live-mt01.mconf.rnp.br: 289 OK, 61 changed, 0 unreachable, 0 failed
+live-rs01.mconf.rnp.br: 289 OK, 61 changed, 0 unreachable, 0 failed
+live-sc01.mconf.rnp.br: 289 OK, 62 changed, 0 unreachable, 0 failed
+live-to01.mconf.rnp.br: 289 OK, 62 changed, 0 unreachable, 0 failed
+live-usp02.mconf.rnp.br: 289 OK, 62 changed, 0 unreachable, 0 failed
+live-usp07.mconf.rnp.br: 289 OK, 62 changed, 0 unreachable, 0 failed
+webinar-esr.mconf.rnp.br: 0 OK, 0 changed, 1 unreachable, 0 failed

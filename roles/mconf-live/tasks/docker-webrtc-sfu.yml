@@ -83,7 +83,6 @@
       ESL_IP: '{{ docker_ip }}'
       ESL_PORT: "8021"
       LOG_LEVEL: info
-      LOG_FILENAME: 'null'
       STREAM_CONTAINER_TYPE: docker
       STREAM_IMAGE_NAME: '{{ mconf_live_presentation_recorder_image }}:{{ mconf_live_presentation_recorder_version }}'
       STREAM_BIGBLUEBUTTON_URL: '{{ bbb_api_entry_point | regex_replace("/api") }}'

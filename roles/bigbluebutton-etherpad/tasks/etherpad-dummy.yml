@@ -23,7 +23,7 @@
   ignore_errors: yes
 
 - name: Hold package (with aptitude)
-  command: aptitude -y {{ hold_unhold }} bbb-etherpad
+  command: aptitude -y {{ hold_unhold }} -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confnew bbb-etherpad
   become: yes
 
 - name: Hold package (with dpkg)

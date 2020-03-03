@@ -34,7 +34,7 @@ bigbluebutton_stun_server:
   - stun:stun.l.google.com:19302
 
 bigbluebutton_docker_webrtc_sfu_enabled: false
-bigbluebutton_docker_webrtc_sfu_image: mconf/bbb-webrtc-sfu:v2.4.x-release
+bigbluebutton_docker_webrtc_sfu_image: mconf/bbb-webrtc-sfu:v2.4.12
 # it can be VP8, H264 or ANY
 bigbluebutton_docker_webrtc_sfu_codec: ANY
 bigbluebutton_docker_webrtc_sfu_ip_public:
@@ -44,18 +44,18 @@ bigbluebutton_docker_mcs_sip_enabled: false
 bigbluebutton_docker_mcs_sip_image: mconf/mcs-sip:v2.2.12
 bigbluebutton_docker_mcs_sip_intraframe_interval: 0
 bigbluebutton_docker_mcs_sip_alert_url:
-bigbluebutton_docker_sfu_phone_image: mconf/sfu-phone:v2.1.8
+bigbluebutton_docker_sfu_phone_image: mconf/sfu-phone:v2.1.9
 bigbluebutton_docker_mcs_bfcp_enabled: false
 bigbluebutton_docker_mcs_bfcp_image: mconf/mcs-bfcp:v0.0.5
 bigbluebutton_docker_mcs_bfcp_num_ports: 40
 bigbluebutton_docker_suite_enabled: false
-bigbluebutton_docker_suite_image: mconf/suite:suite-bbb-webrtc-sfu-2.4.0dev
+bigbluebutton_docker_suite_image: mconf/suite:new-interface
 bigbluebutton_docker_suite_password: suite
 
 bigbluebutton_docker_kurento_enabled: false
 bigbluebutton_docker_kurento_instances: 1
 bigbluebutton_docker_kurento_first_port: 3100
-bigbluebutton_docker_kurento_image: mconf/kurento:6.12.1-mconf-dev
+bigbluebutton_docker_kurento_image: mconf/kurento:6.13.0-mconf
 bigbluebutton_docker_kurento_allowed_candidates:
 
 bigbluebutton_allow_transfer: false
@@ -63,6 +63,7 @@ bigbluebutton_allow_transfer: false
 bigbluebutton_sip_default_gateway: []
 bigbluebutton_sip_registrar_enabled: false
 bigbluebutton_sip_registrar_use_internal_ip: false
+bigbluebutton_sip_registrar_transport: UDP
 bigbluebutton_sip_registrar_address:
 bigbluebutton_sip_registrar_username:
 bigbluebutton_sip_registrar_password:
@@ -71,7 +72,7 @@ bigbluebutton_sip_invite_with_sdp: true
 
 bigbluebutton_kurento_use_internal_ip: false
 
-bigbluebutton_sfu_auth_enabled: false
+bigbluebutton_sfu_auth_enabled: true
 
 bigbluebutton_streaming_enabled: false
 bigbluebutton_streaming_secret: {}

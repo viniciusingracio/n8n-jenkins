@@ -34,6 +34,16 @@
     kurento_config: "{{ kurento_config|default([]) + [ { 'ip': kurento_ip, 'url': 'ws://' + docker_ip + ':' + item + '/kurento' } | combine( { 'ipClassMapping': ip_mappings } ) ] }}"
   with_items: '{{ kurento_ports }}'
 
+- name: Determine default network interface
+  shell: route -n | grep "^0.0.0.0" | tr -s ' ' | cut -d' ' -f 8
+  register: default_route_raw
+
+- name: Stop kurento health monitor
+  docker_container:
+    name: kurento-health-monitor
+    state: stopped
+  ignore_errors: yes
+
 - name: Start kurento containers
   docker_container:
     name: kurento_{{ item }}
@@ -52,13 +62,19 @@
       KURENTO_LOGS_PATH: /var/log/kurento-media-server
       STUN_IP: '{{ stun_server_ip }}'
       STUN_PORT: '{{ stun_server_port | string }}'
-      # GST_DEBUG: 'Kurento*:5,kms*:5'
       GST_DEBUG: '3,Kurento*:4,kms*:4,KurentoWebSocketTransport:5'
       TZ: '{{ lookup("file", "/etc/timezone") }}'
+      NETWORK_INTERFACES: '{{ default_route_raw.stdout }}'
     labels:
       hostname: '{{ inventory_hostname }}'
   with_items: '{{ kurento_ports }}'
   notify: restart docker components
+
+- name: Start kurento health monitor
+  docker_container:
+    name: kurento-health-monitor
+    state: started
+  ignore_errors: yes
 
 - name: Remove old images
   shell: docker images {{ bigbluebutton_docker_kurento_image.split(":")[0] }} --filter 'before={{ bigbluebutton_docker_kurento_image }}' -q | xargs -r docker rmi --force

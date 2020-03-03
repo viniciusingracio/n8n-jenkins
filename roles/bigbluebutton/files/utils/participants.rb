@@ -49,25 +49,22 @@ doc = Nokogiri::XML(requester.get_response(uri).body)
 
 output = Hash.from_xml(doc.to_s)
 participants = []
-if output[:response][:returncode] == "SUCCESS" and ! output[:response][:meetings].nil?
+if output[:response][:returncode] == "SUCCESS" and ! output[:response][:meetings].nil? and ! output[:response][:meetings][:meeting].nil?
   output[:response][:meetings][:meeting] = [ output[:response][:meetings][:meeting] ] if output[:response][:meetings][:meeting].is_a?(Hash)
   output[:response][:meetings][:meeting].each do |meeting|
-    # puts PP.pp meeting
-
     next if meeting[:attendees].is_a?(String)
     meeting[:attendees] = meeting[:attendees][:attendee]
     meeting[:attendees] = [ meeting[:attendees] ] if meeting[:attendees].is_a?(Hash)
+    audio_data = voice_data.select{ |row| meeting[:voiceBridge].to_s == row[:voice_bridge] }
     meeting[:attendees].each do |attendee|
       attendee[:meeting] = Marshal.load(Marshal.dump(meeting))
-      attendee[:audio] = voice_data.select do |row|
-        if attendee[:clientType] == "DIAL-IN"
-          attendee[:fullName] == row[:cid_name]
-        else
-          attendee[:userID] == row[:user_id]
-        end
-      end.first || {}
+      if attendee[:hasJoinedVoice] == "true"
+        attendee[:audio] = audio_data.select{ |row| attendee[:fullName] == row[:cid_name] }.first || audio_data.select{ |row| attendee[:userID] == row[:user_id] }.first || audio_data.select{ |row| attendee[:fullName] == row[:user_name] }.first || {}
+      else
+        attendee[:audio] = {}
+      end
       attendee[:meeting].delete(:attendees)
-      participants << attendee     
+      participants << attendee
     end
   end
 end
@@ -99,14 +96,12 @@ if ! output.nil?
     if stats.has_key?(:out_skip_packet_count_diff) and stats.has_key?(:out_packet_count_diff) and (stats[:out_skip_packet_count_diff] + stats[:out_packet_count_diff] > 0)
       stats[:out_skip_packet_count_diff_rate] = stats[:out_skip_packet_count_diff] / (stats[:out_skip_packet_count_diff] + stats[:out_packet_count_diff]).to_f
     end
- 
+
     if stats.has_key?(:in_flaw_total_diff) and stats.has_key?(:in_packet_count_diff) and (stats[:in_flaw_total_diff] + stats[:in_packet_count_diff] > 0)
       stats[:in_flaw_total_diff_rate] = stats[:in_flaw_total_diff] / (stats[:in_flaw_total_diff] + stats[:in_packet_count_diff]).to_f
     end
   end
 end
-
-# puts PP.pp participants
 
 redis.set("participants-monitoring-cache", participants.to_json)
 
