@@ -1,0 +1,5 @@
+---
+
+- hosts: mconf-live220
+  roles:
+  - nrpe

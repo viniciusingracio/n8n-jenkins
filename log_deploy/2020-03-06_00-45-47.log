@@ -1,0 +1,9 @@
+/usr/bin/ansible-playbook -v -i envs/rnp/prod/hosts -l webinar-esr.mconf.rnp.br,live-mt01.mconf.rnp.br,live-ma01.mconf.rnp.br,live-embrapa-df04.mconf.rnp.br,live-embrapa-df02.mconf.rnp.br,live-cdcrec16.mconf.rnp.br,live-ac01.mconf.rnp.br playbooks/nrpe.yml
+
+live-ac01.mconf.rnp.br: 11 OK, 3 changed, 0 unreachable, 0 failed
+live-cdcrec16.mconf.rnp.br: 11 OK, 3 changed, 0 unreachable, 0 failed
+live-embrapa-df02.mconf.rnp.br: 11 OK, 3 changed, 0 unreachable, 0 failed
+live-embrapa-df04.mconf.rnp.br: 11 OK, 3 changed, 0 unreachable, 0 failed
+live-ma01.mconf.rnp.br: 11 OK, 3 changed, 0 unreachable, 0 failed
+live-mt01.mconf.rnp.br: 11 OK, 3 changed, 0 unreachable, 0 failed
+webinar-esr.mconf.rnp.br: 11 OK, 3 changed, 0 unreachable, 0 failed

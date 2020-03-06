@@ -6,7 +6,8 @@ $fdir="/var/freeswitch/meetings";
 @errors="";
 
 #get freeswitch user properties
-($fuser,$passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell) = getpwnam("$FSuser");
+($fuser,$passwd, $uid, $quota, $comment, $gcos, $dir, $shell) = getpwnam("$FSuser");
+$gid = getpwnam("daemon");
 
         #check if user exists based on its var
         if (defined $fuser) {
@@ -29,7 +30,7 @@ $fdir="/var/freeswitch/meetings";
                                                         `su - freeswitch -c "rm $fdir/test.txt" -s /bin/bash`;
                                                 }#end if
 
-                                                #oopss, something is wrong, could write a file into freeswitch dir
+                                                #oopss, something is wrong, could not write a file into freeswitch dir
                                                 else {
                                                         push @errors,"Could not write to freeswitch directory($fdir)\n";
                                                 }
