@@ -1,0 +1,4 @@
+/usr/bin/ansible-playbook -v -i envs/dev/hosts -l suite.* provision.yml -T 180 --force-handlers
+
+suite.dev.mconf.com: 208 OK, 60 changed, 0 unreachable, 1 failed
+suite.mconf.com: 266 OK, 84 changed, 0 unreachable, 0 failed

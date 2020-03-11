@@ -5,7 +5,7 @@
 
 - name: Create password file
   become: yes
-  shell: echo {{ bigbluebutton_docker_suite_password }} | htpasswd -i -c /etc/apache2/.htpasswd suite
+  shell: echo {{ bigbluebutton_docker_suite_password }} | htpasswd -i -c /etc/apache2/suite.htpasswd suite
 
 - name: Start mongo container
   docker_container:

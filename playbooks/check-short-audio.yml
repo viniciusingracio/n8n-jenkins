@@ -1,0 +1,18 @@
+---
+
+- hosts:
+    - all
+
+  tasks:
+    - name: Copy script
+      copy:
+        src: files/check-short-audio.rb
+        dest: /tmp/check-short-audio.rb
+
+    - name: Run script
+      shell: ruby /tmp/check-short-audio.rb | tee /tmp/check-short-audio.log > /dev/null
+
+    - name: Gather logs
+      fetch:
+        src: /tmp/check-short-audio.log
+        dest: /tmp/check-short-audio

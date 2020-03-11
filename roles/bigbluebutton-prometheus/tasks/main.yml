@@ -65,7 +65,7 @@
 
 - name: Create password file
   become: yes
-  shell: echo {{ bigbluebutton_prometheus_password }} | htpasswd -i -c /etc/apache2/.htpasswd prometheus
+  shell: echo {{ bigbluebutton_prometheus_password }} | htpasswd -i -c /etc/apache2/prometheus.htpasswd prometheus
 
 - name: Setup reverse proxy on nginx
   become: yes
