@@ -63,7 +63,7 @@ bigbluebutton_allow_transfer: false
 bigbluebutton_sip_default_gateway: []
 bigbluebutton_sip_registrar_enabled: false
 bigbluebutton_sip_registrar_use_internal_ip: false
-bigbluebutton_sip_registrar_transport: UDP
+bigbluebutton_sip_registrar_transport: WS
 bigbluebutton_sip_registrar_address:
 bigbluebutton_sip_registrar_username:
 bigbluebutton_sip_registrar_password:

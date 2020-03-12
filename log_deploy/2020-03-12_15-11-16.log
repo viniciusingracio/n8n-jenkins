@@ -1,0 +1,3 @@
+/usr/bin/ansible-playbook -v -i envs/rnp/prod/hosts -l live-embrapa-df01.mconf.rnp.br provision.yml --tags docker --skip nrpe
+
+live-embrapa-df01.mconf.rnp.br: 64 OK, 22 changed, 0 unreachable, 0 failed
