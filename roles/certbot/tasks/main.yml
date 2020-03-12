@@ -27,7 +27,7 @@
 
 - name: open firewall for certbot
   become: yes
-  ufw: rule=allow port=80 proto=tcp
+  ufw: rule=allow port=80 proto=tcp route=true
   notify: restart ufw
   when: firewall_blocking_80 # port was not open yet
 
@@ -42,7 +42,6 @@
       - /var/log/letsencrypt:/var/log/letsencrypt
     published_ports:
       - 80:80
-    # auto_remove: true # on ansible 2.4
     detach: false
     labels:
       hostname: '{{ certbot_domain }}'
@@ -63,7 +62,6 @@
       - "{{ certbot_webroot_path }}:{{ certbot_webroot_path }}" # webroot
       - /etc/letsencrypt:/etc/letsencrypt
       - /var/log/letsencrypt:/var/log/letsencrypt
-    # auto_remove: true # on ansible 2.4
     detach: false
     labels:
       hostname: '{{ certbot_domain }}'
@@ -72,7 +70,7 @@
 
 - name: close firewall after certbot standalone
   become: yes
-  ufw: rule=allow port=80 proto=tcp delete=true
+  ufw: rule=allow port=80 proto=tcp route=true delete=true
   notify: restart ufw
   when: firewall_blocking_80 # port was not open before
 

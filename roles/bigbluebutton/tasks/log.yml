@@ -8,6 +8,7 @@
     - /usr/share/bbb-apps-akka/conf/logback.xml
     - /usr/share/bbb-fsesl-akka/conf/logback.xml
     - /usr/share/bbb-transcode-akka/conf/logback.xml
+    - /usr/share/bbb-web/WEB-INF/classes/logback.xml
   notify: restart bigbluebutton
 
 - name: Set log retention
