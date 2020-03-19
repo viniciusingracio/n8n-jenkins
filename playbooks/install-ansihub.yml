@@ -1,0 +1,83 @@
+---
+# run with:
+# ansible-playbook -v -i envs/prod/com/hosts --extra-vars "dynamic_inventory_hostname=live-do01.elos.vc" playbooks/install-ansihub.yml
+
+- hosts: localhost
+  tasks:
+  - add_host:
+      name: '{{ dynamic_inventory_hostname }}'
+      groups: mconf-live220
+    when: dynamic_inventory_hostname is defined
+
+- hosts: '{{ dynamic_inventory_hostname | default("all") }}'
+  roles:
+  - kwoodson.yedit
+
+- hosts: '{{ dynamic_inventory_hostname | default("all") }}'
+  tasks:
+  - name: Update apt (if older than 60m)
+    become: yes
+    apt: update_cache=yes cache_valid_time=3600
+
+  - name: Install dependency for apt_repository
+    become: yes
+    apt:
+      name: software-properties-common
+
+  - name: Add ansible ppa
+    become: yes
+    apt_repository:
+      repo: ppa:ansible/ansible
+      filename: ansible
+      state: present
+    register: aptrepos
+
+  - name: Install ansible
+    become: yes
+    apt:
+      name:
+        - ansible
+        - python-pip
+
+  - name: Install python libraries
+    become: yes
+    command: pip install --upgrade pip pyopenssl docker zabbix-api
+
+  - name: Copy ansihub
+    command: rsync -avzm --delete --include-from=../{{ inventory_dir }}/files/include_filter.txt {{ playbook_dir }}/.. {{ ansible_user }}@{{ inventory_hostname }}:~/mconf-ansihub
+    delegate_to: 127.0.0.1
+
+  - name: Create log_deploy dir
+    file:
+      path: '{{ ansible_env.HOME }}/mconf-ansihub/log_deploy'
+      recurse: yes
+      state: directory
+
+  - name: Install requirements
+    command: ansible-galaxy install -r requirements.yml
+    args:
+      chdir: '{{ ansible_env.HOME }}/mconf-ansihub'
+
+  - name: Create ansible modules dir
+    file:
+      path: '{{ ansible_env.HOME }}/.ansible/plugins/modules'
+      recurse: yes
+      state: directory
+
+  - name: Copy jpnewman
+    copy:
+      src: '{{ ansible_env.HOME }}/.ansible/roles/jpnewman.json'
+      dest: '{{ ansible_env.HOME }}/.ansible/plugins/modules/'
+      remote_src: yes
+
+  - name: Run ansible-playbook
+    command: ansible-playbook -i {{ inventory_dir | replace(ansible_env.HOME + '/mconf-ansihub/', '') }}/hosts -l {{ inventory_hostname }} --connection=local provision.yml
+    args:
+      chdir: '{{ ansible_env.HOME }}/mconf-ansihub'
+    tags:
+      - provision
+
+  - name: Remove ansihub after installation
+    file:
+      path: '{{ ansible_env.HOME }}/mconf-ansihub'
+      state: absent

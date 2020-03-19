@@ -3,19 +3,19 @@
 
 # TODO create ca if key and crt don't exist
 # - name: Check if ca files exist
-#   local_action: stat path=envs/{{ env }}/files/beats/ca.crt
+#   local_action: stat path='{{ inventory_dir }}/files/beats/ca.crt'
 #   register: stat_ca
-# 
+#
 # - name: Create ca key if needed
 #   local_action: command openssl genrsa -out ca.key 2048
 #   args:
-#     chdir: envs/{{ env }}/files/beats
+#     chdir: '{{ inventory_dir }}/files/beats'
 #   when: not stat_ca.stat.exists
-# 
+#
 # - name: Create ca cert if needed
 #   local_action: command openssl req -x509 -new -nodes -key ca.key -sha256 -days 3650 -out ca.crt
 #   args:
-#     chdir: envs/{{ env }}/files/beats
+#     chdir: '{{ inventory_dir }}/files/beats'
 #   when: not stat_ca.stat.exists
 
 - stat:
@@ -54,7 +54,7 @@
   when: build_certs
 
 - name: Extract serial from ca cert
-  local_action: shell openssl x509 -in envs/{{ env }}/files/beat/ca.crt -text -noout -serial | grep serial | cut -f"2" -d"=" > envs/{{ env }}/files/beat/serial
+  local_action: shell openssl x509 -in {{ inventory_dir }}/files/beat/ca.crt -text -noout -serial | grep serial | cut -f"2" -d"=" > {{ inventory_dir }}/files/beat/serial
   when: build_certs
 
 - name: Create temporary file for crt
@@ -66,7 +66,7 @@
   when: build_certs
 
 - name: Create crt
-  local_action: command openssl x509 -days 3650 -req -sha512 -in '{{ tmp_csr_file.path }}' -CAserial envs/{{ env }}/files/beat/serial -CA envs/{{ env }}/files/beat/ca.crt -CAkey envs/{{ env }}/files/beat/ca.key -out {{ tmp_crt_file.path }} -extensions v3_req -extensions usr_cert -extfile {{ role_path }}/files/beat.conf
+  local_action: command openssl x509 -days 3650 -req -sha512 -in '{{ tmp_csr_file.path }}' -CAserial {{ inventory_dir }}/files/beat/serial -CA {{ inventory_dir }}/files/beat/ca.crt -CAkey {{ inventory_dir }}/files/beat/ca.key -out {{ tmp_crt_file.path }} -extensions v3_req -extensions usr_cert -extfile {{ role_path }}/files/beat.conf
   when: build_certs
 
 - name: Create remote dirs
@@ -86,7 +86,7 @@
     src: '{{ item.src }}'
     dest: '{{ item.dest }}'
   with_items:
-    - { src: 'envs/{{ env }}/files/beat/ca.crt', dest: '{{ bbb_beats_certs_dir }}/ca.crt' }
+    - { src: '{{ inventory_dir }}/files/beat/ca.crt', dest: '{{ bbb_beats_certs_dir }}/ca.crt' }
     - { src: '{{ tmp_key_file.path }}', dest: '{{ bbb_beats_certs_dir }}/beat.key' }
     - { src: '{{ tmp_crt_file.path }}', dest: '{{ bbb_beats_certs_dir }}/beat.crt' }
   when: build_certs

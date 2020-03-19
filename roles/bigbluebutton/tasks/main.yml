@@ -377,6 +377,8 @@
     bigbluebutton_properties_config: "{{ bigbluebutton_properties_config + [ item ] }}"
   with_items:
     - { key: 'allowRequestsWithoutSession', value: '{{ not bigbluebutton_html5_require_cookie }}' }
+    - { key: 'breakoutRoomsEnabled', value: '{{ bigbluebutton_html5_breakout_rooms_enabled }}' }
+    - { key: 'lockSettingsDisableCam', value: '{{ bigbluebutton_html5_lock_settings_cam }}' }
 
 - name: Customize bigbluebutton.properties
   replace:

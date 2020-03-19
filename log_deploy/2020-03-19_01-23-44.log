@@ -1,0 +1,11 @@
+/usr/bin/ansible-playbook -i envs/rnp/prod/hosts -l upgrade-20200318 provision.yml
+
+live-cdcrec11.mconf.rnp.br: 315 OK, 149 changed, 0 unreachable, 0 failed
+live-ce01.mconf.rnp.br: 317 OK, 152 changed, 0 unreachable, 0 failed
+live-ms01.mconf.rnp.br: 141 OK, 70 changed, 0 unreachable, 1 failed
+live-pa01.mconf.rnp.br: 317 OK, 151 changed, 0 unreachable, 0 failed
+live-pb01.mconf.rnp.br: 317 OK, 152 changed, 0 unreachable, 0 failed
+live-pe01.mconf.rnp.br: 317 OK, 153 changed, 0 unreachable, 0 failed
+live-pi01.mconf.rnp.br: 317 OK, 151 changed, 0 unreachable, 0 failed
+live-rj01.mconf.rnp.br: 317 OK, 151 changed, 0 unreachable, 0 failed
+live-rn01.mconf.rnp.br: 317 OK, 151 changed, 0 unreachable, 0 failed

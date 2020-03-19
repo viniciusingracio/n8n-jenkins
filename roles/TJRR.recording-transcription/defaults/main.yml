@@ -2,8 +2,8 @@
 
 asr_enabled: false
 transcribe_gcloud_bucket_name:
-transcribe_gcloud_credentials_src_asr: envs/{{ env }}/files/asr-credentials.json
-transcribe_gcloud_credentials_src_storage: envs/{{ env }}/files/asr-credentials.json
+transcribe_gcloud_credentials_src_asr: '{{ inventory_dir }}/files/asr-credentials.json'
+transcribe_gcloud_credentials_src_storage: '{{ inventory_dir }}/files/asr-credentials.json'
 transcribe_gcloud_credentials_path_asr: /usr/local/bigbluebutton/core/scripts/transcribe/asr-credentials.json
 transcribe_gcloud_credentials_path_storage: /usr/local/bigbluebutton/core/scripts/transcribe/asr-credentials.json
 asr_matcher: []

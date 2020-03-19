@@ -1,4 +1,4 @@
 ---
 rec_worker_authorized_user: rec-worker
-rec_worker_authorized_ssh_key: "envs/{{ env }}/files/rec_worker"
-rec_worker_authorized_ssh_key_pub: "envs/{{ env }}/files/rec_worker.pub"
+rec_worker_authorized_ssh_key: '{{ inventory_dir }}/files/rec_worker'
+rec_worker_authorized_ssh_key_pub: '{{ inventory_dir }}/files/rec_worker.pub'

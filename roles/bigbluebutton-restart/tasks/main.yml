@@ -12,9 +12,6 @@
 - set_fact:
     restart_mconf_command: /usr/bin/ruby /usr/local/bigbluebutton/core/scripts/utils/abort-if-meetings-running.rb && {{ restart_mconf_command }}
   when: bigbluebutton_skip_restart_if_meetings_running | bool
-- set_fact:
-    restart_mconf_command: '{{ restart_mconf_command }}; systemctl stop red5 bbb-transcode-akka; systemctl disable red5 bbb-transcode-akka'
-  when: bigbluebutton_html5_only|bool
 
 - name: Install cron job to restart KMS daily
   cron:

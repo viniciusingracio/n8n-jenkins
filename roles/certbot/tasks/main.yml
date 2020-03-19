@@ -15,7 +15,7 @@
   set_fact:
     firewall_installed: '{{ ufw_status is succeeded }}'
     firewall_running: '{{ ufw_status is succeeded and not ufw_status.stdout is match("Status: inactive") }}'
-    firewall_blocking_80: '{{ ufw_status is succeeded and not ufw_status.stdout is search("80/tcp.*ALLOW IN") }}'
+    firewall_blocking_80: '{{ ufw_status is succeeded and not ufw_status.stdout is search("80/tcp.*ALLOW FWD") }}'
 
 - name: concatenate cmd for all domains
   set_fact:

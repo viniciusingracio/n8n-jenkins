@@ -1,0 +1,4 @@
+/usr/bin/ansible-playbook -v -i envs/prod/redclara/hosts -l mconf-renata.renata.edu.co,mconf-renata1.renata.edu.co provision.yml
+
+mconf-renata.renata.edu.co: 286 OK, 173 changed, 0 unreachable, 1 failed
+mconf-renata1.renata.edu.co: 286 OK, 173 changed, 0 unreachable, 1 failed

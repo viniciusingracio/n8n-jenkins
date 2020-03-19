@@ -32,13 +32,15 @@
 - name: Start kurento health monitor
   docker_container:
     name: kurento-health-monitor
-    image: mconf/kurento-health-monitor:v0.0.2
+    image: mconf/kurento-health-monitor:v0.0.4
     pull: yes
     restart_policy: always
     memory: 128M
     env:
       KURENTO: '{{ kurento_config | to_json }}'
-      WEBHOOK_URL: 'https://mconf.rocket.chat/hooks/9AsDWnbg6LetB4gau/iaMTtbe6XHzhYhejo5a4C75RpBwaKubK3Rat8gPiW6PToweP'
+      WEBHOOK_URL: '{{ kurento_health_monitor_webhook }}'
       HOST_ADDRESS: '{{ inventory_hostname }}'
+      ESL_IP: '{{ docker_ip }}'
+      ESL_PORT: '8021'
     labels:
       hostname: '{{ inventory_hostname }}'

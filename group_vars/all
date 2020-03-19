@@ -10,8 +10,8 @@ ansible_user: mconf
 # User used to deploy the applications
 deploy_user: mconf
 # to upload a local ssh key for the deploy user
-# deploy_user_ssh_key: "envs/{{ env }}/files/id_rsa"
-# deploy_user_ssh_key_pub: "envs/{{ env }}/files/id_rsa.pub"
+# deploy_user_ssh_key: '{{ inventory_dir }}/files/id_rsa'
+# deploy_user_ssh_key_pub: '{{ inventory_dir }}/files/id_rsa.pub'
 
 # Default registry where images for Mconf components are pulled from
 # mconf_registry_host: registry.hub.docker.com

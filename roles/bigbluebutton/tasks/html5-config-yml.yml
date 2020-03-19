@@ -9,6 +9,6 @@
 
 - name: Update yml values
   become: yes
-  command: yq w -i /usr/share/meteor/bundle/programs/server/assets/app/config/settings.yml {{ item.key }} "{{ item.value }}"
+  command: yq w -i /usr/share/meteor/bundle/programs/server/assets/app/config/settings.yml "{{ item.key }}" "{{ item.value }}"
   with_items: '{{ bigbluebutton_html5_config_yml }}'
   notify: restart bbb-html5

@@ -4,7 +4,7 @@ bigbluebutton_apt_package: bigbluebutton
 bigbluebutton_apt_key: https://jenkins-live.mconf.com/apt/public.asc
 bigbluebutton_apt_source: deb https://jenkins-live.mconf.com/apt/development/mconf-220/xenial-2.2.0 mconf-xenial main
 
-bigbluebutton_default_presentation: envs/{{ env }}/files/default.pdf
+bigbluebutton_default_presentation: '{{ inventory_dir }}/files/default.pdf'
 
 bigbluebutton_sip: true
 bigbluebutton_sip_sources:
@@ -96,3 +96,5 @@ bigbluebutton_sip_default_gateway:
 bigbluebutton_sip_registrar_enabled: true
 bigbluebutton_sip_registrar_address: sip.mconf.com
 bigbluebutton_sip_registrar_username: '{{ inventory_hostname }}'
+
+kurento_health_monitor_webhook: https://mconf.rocket.chat/hooks/gQ7xa6XsT2AJJQwHh/BycR6bGKN4fz4qEsvtztfKaNp368L9bWrS6yqkpnDFRf9HRZ

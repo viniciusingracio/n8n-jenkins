@@ -180,6 +180,8 @@ bigbluebutton_html5_external_log_url: 'https://{{ inventory_hostname }}/html5Log
 bigbluebutton_html5_external_log_method: POST
 bigbluebutton_html5_external_log_throttle: 5000
 bigbluebutton_html5_require_cookie: true
+bigbluebutton_html5_breakout_rooms_enabled: true
+bigbluebutton_html5_lock_settings_cam: false
 
 bigbluebutton_docker_webrtc_sfu_enabled: false
 

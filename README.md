@@ -94,6 +94,9 @@ ansible all -v -i envs/rnp/prod/hosts -l mconf-live220 --extra-vars "ansible_use
 
 # count sessions
 ansible all -v -i envs/rnp/prod/hosts -l mconf-live220 --extra-vars "ansible_user=mconf" -m raw -a "ls -1 /var/bigbluebutton/events/" | wc -l
+
+# end all sessions
+ansible all -v -i envs/rnp/prod/hosts -l restart-20200318 --extra-vars "ansible_user=mconf" --become -m raw -a '/usr/bin/ruby /usr/local/bigbluebutton/core/scripts/utils/end-all.rb'
 ```
 
 ### Other playbooks

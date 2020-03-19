@@ -8,7 +8,7 @@ jekyll_tmp_path: /tmp/jekyll/repo
 # build configurations
 jekyll_build_dir: _site
 jekyll_build_cmd: build
-jekyll_config_file: "envs/{{ env }}/files/jekyll/_config.yml"
+jekyll_config_file: '{{ inventory_dir }}/files/jekyll/_config.yml'
 
 # docker image to run jekyll from
 jekyll_docker_image_name: jekyll

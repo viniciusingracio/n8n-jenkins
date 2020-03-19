@@ -37,5 +37,5 @@ mconf_web_reports_remote_config_path: '/root/mconf-web-reports-config.{{ mconf_w
 mconf_web_reports_docker_config_path: '/usr/src/app/config.{{ mconf_web_reports_config_extension }}'
 
 # Configuration files used when running the container
-mconf_web_reports_env_file: "envs/{{ env }}/files/mconf-web-reports/.env.local"
-mconf_web_reports_config_file: "envs/{{ env }}/files/mconf-web-reports/config.{{ mconf_web_reports_config_extension }}"
+mconf_web_reports_env_file: '{{ inventory_dir }}/files/mconf-web-reports/.env.local'
+mconf_web_reports_config_file: '{{ inventory_dir }}/files/mconf-web-reports/config.{{ mconf_web_reports_config_extension }}'
