@@ -1,0 +1,14 @@
+{
+  "id": "{{ inventory_hostname }}",
+  "use": "generic-passive-host",
+  "hostgroups": [
+    "mconf-node"
+  ],
+  "custom_variables": {
+    "bbb_url": "https://{{ inventory_hostname }}/bigbluebutton/",
+    "bbb_port": "443",
+    "bbb_salt": "{{ bbb_secret }}"
+  },
+  "host_name": "{{ inventory_hostname }}",
+  "address": "{{ inventory_hostname }}"
+}

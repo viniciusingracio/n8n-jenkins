@@ -1,0 +1,25 @@
+---
+
+- hosts:
+  - all
+
+  tasks:
+  - name: Get BigBlueButton secret
+    shell: cat /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
+    register: bbb_secret_raw
+
+  - set_fact:
+      bbb_secret: '{{ bbb_secret_raw.stdout }}'
+    delegate_to: localhost
+
+  - name: Create directory
+    file:
+      path: /tmp/nagios-hosts
+      state: directory
+    delegate_to: localhost
+
+  - name: Create template
+    template:
+      src: templates/nagios-host-template.json.j2
+      dest: /tmp/nagios-hosts/{{ inventory_hostname }}.json
+    delegate_to: localhost
