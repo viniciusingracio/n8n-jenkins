@@ -1,0 +1,27 @@
+FROM ruby:2.6.5-alpine
+
+ENV app /usr/src/app
+
+# Create app directory
+RUN mkdir -p $app
+WORKDIR $app
+
+RUN apk add --update curl net-tools tzdata postgresql-client postgresql-dev
+
+# Dependencies to connect to a db on Kubernetes
+RUN wget https://github.com/digitalocean/doctl/releases/download/v1.22.0/doctl-1.22.0-linux-amd64.tar.gz
+RUN tar -xzf doctl-1.22.0-linux-amd64.tar.gz
+RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.15.0/bin/linux/amd64/kubectl && chmod +x kubectl
+
+# dumb-init
+ADD dumb-init_1.2.0 /usr/bin/dumb-init
+RUN chmod +x /usr/bin/dumb-init
+
+COPY ./.env $app/
+COPY ./wait-db.sh $app/
+COPY ./db.sh $app/
+RUN chmod +x $app/db.sh
+
+ENTRYPOINT ["/usr/bin/dumb-init", "--", "sh", "/usr/src/app/db.sh"]
+
+CMD []
