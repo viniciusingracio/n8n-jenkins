@@ -1,0 +1,5 @@
+---
+
+- hosts: snmp
+  roles:
+  - { role: snmp, tags: [ snmp ] }

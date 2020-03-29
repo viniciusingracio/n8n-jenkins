@@ -1,0 +1,9 @@
+- hosts: all
+  connection: local
+  tasks:
+  # - name: Determine hosts
+  #   set_fact:
+  #     nodes: '{{ nodes | default([]) + groups["gluster"] | map("extract", hostvars, ["gluster_ip"]) | list }}'
+  - debug:
+      msg: '{{ ansible_play_hosts_all }}'
+    delegate_to: localhost

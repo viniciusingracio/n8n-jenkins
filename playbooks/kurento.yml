@@ -1,13 +1,17 @@
 ---
 
-- hosts:
-    - mconf-live220
-  tasks:
-    - include_role:
-        name: docker-host
+- hosts: mconf-live220
+  roles:
+  - kwoodson.yedit
 
-    - include_role:
-        name: mconf-live
-        apply:
-          tags:
-            kurento
+- hosts:
+  - mconf-live220
+  tasks:
+  - include_role:
+      name: docker-host
+
+  - include_role:
+      name: mconf-live
+      apply:
+        tags:
+          kurento

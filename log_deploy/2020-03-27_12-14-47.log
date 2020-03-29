@@ -1,0 +1,3 @@
+/usr/bin/ansible-playbook -v -i envs/prod/com/hosts -l *.rocket.chat provision.yml
+
+video.telemedicine.rocket.chat: 268 OK, 71 changed, 0 unreachable, 1 failed

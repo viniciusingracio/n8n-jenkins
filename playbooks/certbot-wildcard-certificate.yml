@@ -1,0 +1,32 @@
+---
+
+- hosts: all
+  roles:
+  - docker-host
+
+- hosts: all
+  become: yes
+  tasks:
+  - file:
+      path: '{{ ansible_env.HOME }}/.secrets/certbot'
+      state: directory
+
+  - template:
+      src: templates/digitalocean.ini.j2
+      dest: '{{ ansible_env.HOME }}/.secrets/certbot/digitalocean.ini'
+
+  - name: concatenate cmd for all domains
+    set_fact:
+      certbot_all_domains_cmd: "{{ certbot_all_domains | join(' --domain ') }}"
+
+  - name: start the certbot container standalone
+    docker_container:
+      name: certbot
+      image: certbot/dns-digitalocean
+      pull: yes
+      command: certonly --non-interactive --email felipe@mconf.com --agree-tos --server https://acme-v02.api.letsencrypt.org/directory --expand --domain {{ certbot_all_domains_cmd }} --dns-digitalocean --dns-digitalocean-credentials /root/digitalocean.ini
+      volumes:
+        - /etc/letsencrypt:/etc/letsencrypt
+        - /var/log/letsencrypt:/var/log/letsencrypt
+        - '{{ ansible_env.HOME }}/.secrets/certbot/digitalocean.ini:/root/digitalocean.ini'
+      detach: false

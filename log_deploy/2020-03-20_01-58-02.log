@@ -1,0 +1,4 @@
+/usr/bin/ansible-playbook -i envs/prod/com/hosts -l turn* provision.yml
+
+turn1: 12 OK, 4 changed, 0 unreachable, 0 failed
+turn2: 12 OK, 4 changed, 0 unreachable, 0 failed

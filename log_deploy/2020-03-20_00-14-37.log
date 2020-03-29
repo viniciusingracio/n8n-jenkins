@@ -1,0 +1,4 @@
+/usr/bin/ansible-playbook -i envs/prod/com/hosts -l turn* --extra-vars ansible_user=root setup.yml
+
+turn1: 33 OK, 26 changed, 0 unreachable, 0 failed
+turn2: 33 OK, 26 changed, 0 unreachable, 0 failed

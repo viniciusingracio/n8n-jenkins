@@ -1,0 +1,3 @@
+/usr/bin/ansible-playbook -i envs/prod/com/hosts -l db.elos.vc playbooks/postgresql.yml
+
+db.elos.vc: 25 OK, 3 changed, 0 unreachable, 0 failed

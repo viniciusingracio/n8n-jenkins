@@ -1,0 +1,4 @@
+/usr/bin/ansible-playbook -i envs/prod/com/hosts --extra-vars dynamic_inventory_hostname=live-do01.elos.vc inventory_dir=envs/prod/com playbooks/install-ansihub.yml --skip cleanup
+
+live-do01.elos.vc: 11 OK, 5 changed, 0 unreachable, 0 failed
+localhost: 1 OK, 1 changed, 0 unreachable, 0 failed

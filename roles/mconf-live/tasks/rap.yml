@@ -1,5 +1,5 @@
 - set_fact:
-    presentation_video_enabled: '"presentation_video" in mconf_live_enabled_recording_formats'
+    presentation_video_enabled: '{{ "presentation_video" in mconf_live_enabled_recording_formats }}'
 
 - name: Adjust mconf-presentation-recorder.yml
   yedit:
@@ -11,7 +11,7 @@
       - { key: 'simultaneous_meetings', value: '{{ mconf_live_num_presentation_recorders }}' }
     state: present
   become: yes
-  when: presentation_video_enabled
+  when: presentation_video_enabled | bool
 
 - name: Configure video formats
   become: yes
@@ -32,7 +32,7 @@
     - { key: 'audio_offset', value: '2300' }
     state: present
   become: yes
-  when: presentation_video_enabled
+  when: presentation_video_enabled | bool
 
 - name: List rap scripts enabled
   find:
@@ -62,13 +62,20 @@
   docker_image:
     name: '{{ mconf_live_presentation_recorder_image }}:{{ mconf_live_presentation_recorder_version }}'
     pull: yes
-  when: presentation_video_enabled
+    source: pull
+  when: presentation_video_enabled | bool
+
+- name: Pull nginx
+  docker_image:
+    name: nginx
+    pull: yes
+  when: presentation_video_enabled | bool
 
 # tag is needed because the rap script always use latest
 # TODO specify on presentation_video the image version
 - name: Tag presentation recorder image to latest
   command: docker tag {{ mconf_live_presentation_recorder_image }}:{{ mconf_live_presentation_recorder_version }} {{ mconf_live_presentation_recorder_image }}:latest
-  when: presentation_video_enabled
+  when: presentation_video_enabled | bool
 
 - name: Add bigbluebutton user to docker group
   become: yes
@@ -76,7 +83,7 @@
     name: '{{ bigbluebutton_user }}'
     groups: docker
     append: yes
-  when: presentation_video_enabled
+  when: presentation_video_enabled | bool
   notify: restart mconf-presentation-recorder
 
 - name: Stop the recorder if presentation_video isn't enabled
@@ -89,7 +96,8 @@
     - mconf-presentation-recorder.target
     - mconf-presentation-recorder.service
     - mconf-presentation-recorder.timer
-  when: not presentation_video_enabled
+  when: not presentation_video_enabled | bool
+  ignore_errors: yes
 
 - name: Launch recorder if presentation_video is enabled
   become: yes
@@ -97,4 +105,4 @@
     name: mconf-presentation-recorder.timer
     state: restarted
     enabled: true
-  when: presentation_video_enabled
+  when: presentation_video_enabled | bool

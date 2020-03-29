@@ -16,12 +16,11 @@
 - name: Remove packages that depend on bbb-record-core
   become: yes
   apt:
-    name: '{{ item }}'
-    purge: yes
-    state: absent
-  with_items:
+    name:
     - mconf-recording-decrypter
     - mconf-recording-encrypted
+    purge: yes
+    state: absent
 
 - name: Remove packages from specific apt repository
   become: yes

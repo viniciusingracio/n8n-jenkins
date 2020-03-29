@@ -1,0 +1,17 @@
+- hosts: all
+  handlers:
+    - name: reload nginx
+      become: yes
+      service: name=nginx state=reloaded
+  tasks:
+    - name: Copy certificates
+      copy:
+        src: '{{ item.src }}'
+        dest: '{{ item.dest }}'
+      become: yes
+      with_items:
+        - { src: '{{ bigbluebutton_local_ssl_certificate }}', dest: '{{ bigbluebutton_ssl_certificate }}' }
+        - { src: '{{ bigbluebutton_local_ssl_certificate_key }}', dest: '{{ bigbluebutton_ssl_certificate_key }}' }
+      when: not bigbluebutton_local_ssl_certificate is none and not bigbluebutton_local_ssl_certificate_key is none
+      ignore_errors: yes
+      notify: reload nginx

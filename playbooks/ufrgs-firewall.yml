@@ -1,0 +1,13 @@
+- hosts: all
+  handlers:
+    - name: reload firewall
+      become: yes
+      service: name=firewall state=restarted
+  tasks:
+
+    - name: Copy iptables file
+      become: yes
+      copy:
+        src: files/ufrgs-firewall.iptables
+        dest: /etc/default/firewall
+      notify: reload firewall

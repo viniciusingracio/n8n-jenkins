@@ -1,0 +1,70 @@
+---
+
+- hosts: all
+  roles:
+  - kwoodson.yedit
+
+- hosts:
+  - mconf-recw
+  tasks:
+  - name: Stop services for presentation and presentation_video
+    become: yes
+    command: systemctl stop bbb-rap* bbb-record* bbb_record* mconf-presentation*
+
+  - name: Stop recorders
+    become: yes
+    shell: docker ps --filter name=record_* -aq | xargs docker stop
+    ignore_errors: yes
+
+  - name: Stop nginx containers
+    become: yes
+    shell: docker ps --filter name=nginx_* -aq | xargs docker stop
+    ignore_errors: yes
+
+  - name: Stop nfs
+    become: yes
+    command: umount -a -t nfs4
+
+- hosts:
+  - mconf-rec
+  - mconf-recw
+  roles:
+  - { role: certbot, when: certbot_enabled | bool, tags: [ certbot ] }
+  - mconf-rec
+  - bigbluebutton-webhooks
+
+- hosts:
+  - mconf-recw
+  tasks:
+  - cron:
+      name: '{{ item }}'
+      state: absent
+    with_items:
+      - remove norecord
+      - remove archived
+      - remove encrypted
+      - restart mconf
+      - cleanup published done
+      - enable audio-stats, sleep 30)
+      - enable audio-stats, sleep 60)
+      - generate list of recordings
+      - bbb-prometheus-exporter
+      - bbb-prometheus-exporter-rec
+    become: yes
+
+  - name: Start nfs
+    become: yes
+    command: mount -a
+
+  - name: Start recording services
+    become: yes
+    service:
+      name: bbb-record-core.timer
+      state: started
+
+  - name: Start presentation recorder
+    become: yes
+    service:
+      name: mconf-presentation-recorder.timer
+      state: started
+    ignore_errors: yes

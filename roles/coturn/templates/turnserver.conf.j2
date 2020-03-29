@@ -3,7 +3,7 @@ min-port=49152
 max-port=65535
 fingerprint
 lt-cred-mech
-realm={{ inventory_hostname }}
+realm={{ coturn_domain_name }}
 {% if coturn_ssl_enabled %}
 tls-listening-port={{ coturn_ssl_port }}
 cert={{ coturn_ssl_certificate }}

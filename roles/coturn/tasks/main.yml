@@ -55,7 +55,8 @@
 
 - name: Determine external IP
   set_fact:
-    external_ip: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | grep \"[0-9]*\\.[0-9]*\\.[0-9]*\\.[0-9]*\" | head -n 1') }}"
+    external_ip: "{{ lookup('pipe', 'dig {{ coturn_domain_name }} @8.8.8.8 A +short | grep \"[0-9]*\\.[0-9]*\\.[0-9]*\\.[0-9]*\" | head -n 1') }}"
+  when: external_ip is undefined
 
 - name: Copy templates
   become: yes

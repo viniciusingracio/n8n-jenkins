@@ -1,0 +1,3 @@
+/usr/bin/ansible-playbook -i envs/prod/com/hosts -l live-dof01.elos.app --extra-vars ansible_user=root setup.yml
+
+live-dof01.elos.app: 32 OK, 25 changed, 0 unreachable, 0 failed

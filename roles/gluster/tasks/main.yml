@@ -7,11 +7,10 @@
 - name: Install gluster dependencies
   become: yes
   apt:
-    name: '{{ item }}'
-  with_items:
-    - python-software-properties
-    - software-properties-common
-    - xfsprogs
+    name:
+      - python-software-properties
+      - software-properties-common
+      - xfsprogs
 
 - name: Add gluster ppa
   become: yes
@@ -101,12 +100,7 @@
 
 - name: Determine cluster
   set_fact:
-    cluster: '{{ cluster | default([]) + groups["gluster"] | map("extract", hostvars, ["ansible_default_ipv4", "address"]) | list }}'
-
-- name: Set gluster_ip var in case it's undefined
-  set_fact:
-    gluster_ip: '{{ ansible_default_ipv4.address }}'
-  when: gluster_ip is none
+    cluster: '{{ cluster | default([]) + groups["gluster"] | map("extract", hostvars, ["gluster_ip"]) | list }}'
 
 - name: Determine brick path and master
   set_fact:

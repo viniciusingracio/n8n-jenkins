@@ -37,6 +37,8 @@
 - include: hold-music.yml
 
 - include: rap.yml
+  tags:
+    - rap
 
 - include_role:
     name: bigbluebutton-etherpad

@@ -1,0 +1,4 @@
+/usr/bin/ansible-playbook -i envs/prod/com/hosts -l turn* --extra-vars digitalocean_token=XXX playbooks/certbot-digitalocean.yml
+
+turn1: 8 OK, 1 changed, 0 unreachable, 0 failed
+turn2: 3 OK, 0 changed, 0 unreachable, 0 failed

@@ -25,7 +25,3 @@ test_webrtc_enabled: false
 
 # Enable ufw by default
 common_ufw_enabled: true
-
-public_keys: 
-- public_keys/daronco.pub
-- public_keys/fcecagno.pub

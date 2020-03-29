@@ -1,0 +1,61 @@
+---
+
+- hosts: all
+  roles:
+  - docker-host
+
+- hosts: all
+  become: yes
+  tasks:
+  - name: Create a symbolic link
+    become: yes
+    file:
+      src: /mnt/shared_letsencrypt/data
+      dest: /etc/letsencrypt
+      state: link
+
+  - name: Determine cluster
+    set_fact:
+      cluster: '{{ cluster | default([]) + groups["gluster"] | map("extract", hostvars, ["ansible_default_ipv4", "address"]) | list }}'
+
+  - name: Determine master
+    set_fact:
+      im_master: '{{ ( cluster | first ) == ansible_default_ipv4.address }}'
+
+  - file:
+      path: '{{ ansible_env.HOME }}/.secrets/certbot'
+      state: directory
+    when: im_master
+
+  - template:
+      src: templates/digitalocean.ini.j2
+      dest: '{{ ansible_env.HOME }}/.secrets/certbot/digitalocean.ini'
+    when: im_master
+
+  - name: concatenate cmd for all domains
+    set_fact:
+      certbot_all_domains_cmd: "{{ certbot_all_domains | join(' --domain ') }}"
+    when: im_master
+
+  - name: start the certbot container standalone
+    docker_container:
+      name: certbot
+      image: certbot/dns-digitalocean
+      pull: yes
+      command: certonly --non-interactive --email felipe@mconf.com --agree-tos --expand --domain {{ certbot_all_domains_cmd }} --dns-digitalocean --dns-digitalocean-credentials /root/digitalocean.ini
+      volumes:
+        - /etc/letsencrypt:/etc/letsencrypt
+        - /var/log/letsencrypt:/var/log/letsencrypt
+        - '{{ ansible_env.HOME }}/.secrets/certbot/digitalocean.ini:/root/digitalocean.ini'
+      detach: false
+      labels:
+        hostname: '{{ certbot_domain }}'
+    when: im_master
+
+  - name: Install crontab for certbot
+    cron:
+      name: run certbot
+      special_time: daily
+      user: '{{ deploy_user }}'
+      job: 'docker run --rm -v /var/log/letsencrypt:/var/log/letsencrypt -v /etc/letsencrypt:/etc/letsencrypt -v {{ ansible_env.HOME }}/.secrets/certbot/digitalocean.ini:/root/digitalocean.ini certbot/certbot renew 2>&1 | /usr/bin/logger -t certbot_cron'
+    when: im_master

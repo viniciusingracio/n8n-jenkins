@@ -1,0 +1,35 @@
+---
+
+# - hosts: localhost
+#   connection: local
+#   roles:
+#   - docker-host
+
+- hosts: localhost
+  connection: local
+  tasks:
+  - name: Download source code
+    git:
+      repo: git@github.com:pedrobmarin/mconf-live-test.git
+      dest: ~/workspace/mconf-live-test
+      version: master
+      accept_hostkey: true
+      force: yes
+
+- hosts: all
+  tasks:
+  - name: Get BigBlueButton secret
+    shell: cat /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
+    register: bbb_secret_raw
+
+  - set_fact:
+      bbb_secret: '{{ bbb_secret_raw.stdout }}'
+
+  - docker_compose:
+      project_name: 'test_{{ inventory_hostname }}'
+      project_src: ~/workspace/mconf-live-test
+      build: yes
+    environment:
+      BIGBLUEBOT_HOST: https://{{ inventory_hostname }}/bigbluebutton/
+      BIGBLUEBOT_SECRET: '{{ bbb_secret }}'
+    delegate_to: localhost

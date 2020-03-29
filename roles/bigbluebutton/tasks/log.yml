@@ -8,8 +8,18 @@
     - /usr/share/bbb-apps-akka/conf/logback.xml
     - /usr/share/bbb-fsesl-akka/conf/logback.xml
     - /usr/share/bbb-transcode-akka/conf/logback.xml
-    - /usr/share/bbb-web/WEB-INF/classes/logback.xml
   notify: restart bigbluebutton
+
+- name: Set log retention
+  xml:
+    path: '{{ item }}'
+    xpath: //MaxHistory
+    value: '{{ bigbluebutton_log_retention | string }}'
+  become: yes
+  with_items:
+    - '{{ bigbluebutton_servlet_dir }}/WEB-INF/classes/logback.xml'
+  notify: restart bigbluebutton
+  when: bigbluebutton_html5_only | bool
 
 - name: Set log retention
   xml:
@@ -20,4 +30,4 @@
   with_items:
     - /usr/share/red5/conf/logback.xml
   notify: restart bigbluebutton
-  when: not bigbluebutton_html5_only|bool
+  when: not bigbluebutton_html5_only | bool

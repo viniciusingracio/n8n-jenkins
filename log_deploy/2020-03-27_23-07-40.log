@@ -1,0 +1,16 @@
+/usr/bin/ansible-playbook -i envs/rnp/prod/hosts -l mconf-recw playbooks/update-recw.yml --tags rap
+
+recw01-p.mconf.rnp.br: 31 OK, 7 changed, 0 unreachable, 0 failed
+recw02-p.mconf.rnp.br: 31 OK, 7 changed, 0 unreachable, 0 failed
+recw03-p.mconf.rnp.br: 31 OK, 7 changed, 0 unreachable, 0 failed
+recw04-p.mconf.rnp.br: 31 OK, 7 changed, 0 unreachable, 0 failed
+recw05-p.mconf.rnp.br: 31 OK, 7 changed, 0 unreachable, 0 failed
+recw06-p.mconf.rnp.br: 31 OK, 7 changed, 0 unreachable, 0 failed
+recw07-p.mconf.rnp.br: 31 OK, 7 changed, 0 unreachable, 0 failed
+recw08-p.mconf.rnp.br: 31 OK, 7 changed, 0 unreachable, 0 failed
+recw09-p.mconf.rnp.br: 31 OK, 7 changed, 0 unreachable, 0 failed
+recw10-p.mconf.rnp.br: 31 OK, 7 changed, 0 unreachable, 0 failed
+recw11-p.mconf.rnp.br: 31 OK, 7 changed, 0 unreachable, 0 failed
+recw12-p.mconf.rnp.br: 31 OK, 7 changed, 0 unreachable, 0 failed
+recw13-p.mconf.rnp.br: 31 OK, 7 changed, 0 unreachable, 0 failed
+recw14-p.mconf.rnp.br: 31 OK, 7 changed, 0 unreachable, 0 failed

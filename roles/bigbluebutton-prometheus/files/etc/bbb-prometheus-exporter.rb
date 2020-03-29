@@ -6,6 +6,7 @@ require 'nokogiri'
 require 'trollop'
 require 'digest/sha1'
 require 'benchmark'
+require 'uri'
 
 # Manage BBB properties such as server address and salt.
 # These informations can be loaded from file (bigbluebutton.properties) or
@@ -101,6 +102,7 @@ class HTTPRequester
   def get_response(uri)
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = @ssl_enabled
+    http.read_timeout = 5
 
     # It never raises an exception
     http.get(uri.request_uri)
@@ -324,6 +326,14 @@ def fill_template(results)
     # HELP bbb_api_create_response_code Response code of the create endpoint of the API
     # TYPE bbb_api_create_response_code gauge
     bbb_api_create_response_code{method="get",messageKey="<%= results[:bbb_api_create_message_key] %>"} <%= results[:bbb_api_create_response_code] %>
+
+    # HELP bbb_webhook_code Response code of the create endpoint of the API
+    # TYPE bbb_webhook_code gauge
+    bbb_webhook_response_code{method="get",host="<%= results.has_key?(:bbb_webhook_host) ? results[:bbb_webhook_host] : nil %>"} <%= results[:bbb_webhook_response_code] %>
+
+    # HELP bbb_webhook_response_time The response time for webhooks GET
+    # TYPE bbb_webhook_response_time gauge
+    bbb_webhook_response_time <%= results[:bbb_webhook_response_time] %>
   HEREDOC
 
   ERB.new(template).result
@@ -334,8 +344,8 @@ opts = Trollop::options do
   opt :server, "Server address in format '<scheme://<addr>:<port>/bigbluebutton'", :type => :string # --host, default nil
   opt :salt, "Salt of BBB server", :type => :string # --salt, default nil
   opt :ssl, "Enable secure HTTP with SSL" # --ssl, default false
+  opt :webhook, "Webhook URL to check", :type => :string
 end
-
 
 # If server or salt are not passed as arguments,
 # load properties from bigbluebutton.properties.
@@ -364,6 +374,17 @@ results[:bbb_api_create_response_code], results[:bbb_api_create_message_key] = r
   message_key = parse_xml(data, "/response/messageKey")
 
   [code, message_key]
+end
+
+if opts[:webhook]
+  uri = URI.parse(opts[:webhook])
+  results[:bbb_webhook_host] = uri.host
+  response = nil
+  time = Benchmark.measure do
+    response = requester.get_response(uri) rescue nil
+  end
+  results[:bbb_webhook_response_code] = response ? response.code : "500"
+  results[:bbb_webhook_response_time] = time.to_s[/\(\s*([\d.]*)\)/, 1]
 end
 
 results.merge!(Meetings.process_meetings)

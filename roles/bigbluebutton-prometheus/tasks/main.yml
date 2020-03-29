@@ -21,17 +21,21 @@
 
 - name: Copy scripts
   become: yes
-  synchronize:
-    src: files/etc/
-    dest: /usr/local/etc/bigbluebutton-prometheus/
-    delete: yes
-    use_ssh_args: yes
+  copy:
+    src: files/etc/bbb-prometheus-exporter.rb
+    dest: /usr/local/etc/bigbluebutton-prometheus/bbb-prometheus-exporter.rb
+
+- set_fact:
+    cmd: /usr/bin/ruby /usr/local/etc/bigbluebutton-prometheus/bbb-prometheus-exporter.rb --ssl true
+- set_fact:
+    cmd: '{{ cmd }} --webhook {{ ( bigbluebutton_docker_webhooks_permanent_hooks | first ).url }}/health'
+  when: bigbluebutton_docker_webhooks_permanent_hooks is defined and bigbluebutton_docker_webhooks_permanent_hooks | length > 0
 
 - name: Install cron job monitor metrics
   become: yes
   cron:
     name: bbb-prometheus-exporter
-    job: /usr/bin/ruby /usr/local/etc/bigbluebutton-prometheus/bbb-prometheus-exporter.rb --ssl true | sponge /usr/local/share/prometheus/bbb-prometheus-exporter.prom
+    job: '{{ cmd }} | sponge /usr/local/share/prometheus/bbb-prometheus-exporter.prom'
     user: root
 - cron:
     name: bbb-prometheus-exporter-rec

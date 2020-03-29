@@ -1,6 +1,6 @@
 ---
 coturn_build_from_source: yes
-coturn_version: 4.5.0.7
+coturn_version: 4.5.1.1
 coturn_runtime_options:
 
 coturn_ssl_enabled: false
@@ -11,4 +11,5 @@ coturn_ssl_certificate_key: /etc/ssl/private.key
 coturn_ssl_dh_file: /etc/ssl/dhp-2048.pem
 coturn_ssl_port: 5349
 
+coturn_domain_name: '{{ inventory_hostname }}'
 coturn_secret:

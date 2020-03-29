@@ -13,3 +13,6 @@
 
 - src: nickhammond.logrotate
   version: v0.0.5
+
+- src: geerlingguy.postgresql
+  version: 2.2.0

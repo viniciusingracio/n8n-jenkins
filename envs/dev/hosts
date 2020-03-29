@@ -86,3 +86,6 @@ bigbluebutton_docker_mcs_sip_image=mconf/mcs-sip:v2.2.0-dev
 [suite]
 suite.mconf.com
 suite.dev.mconf.com
+
+[bbb-prometheus:children]
+mconf-live220

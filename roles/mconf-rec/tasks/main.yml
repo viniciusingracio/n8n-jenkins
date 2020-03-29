@@ -37,16 +37,20 @@
   stat:
     path: /usr/local/bigbluebutton/core/scripts/mconf-decrypter.yml
   register: reg_decrypter
+  tags:
+    - update-urls
 
 - name: Adjust mconf-presentation-recorder.yml
   yedit:
-    src: /usr/local/bigbluebutton/core/scripts/mconf-decrypter.yml 
+    src: /usr/local/bigbluebutton/core/scripts/mconf-decrypter.yml
     edits:
     - { key: 'get_recordings_url', value: '{{ mconf_rec_get_recordings_url }}' }
     - { key: 'verify_ssl_certificate', value: '{{ not use_self_signed_certificate | default(true) }}' }
     state: present
   become: yes
   when: reg_decrypter.stat.exists
+  tags:
+    - update-urls
 
 - name: Install mysql-client
   become: yes

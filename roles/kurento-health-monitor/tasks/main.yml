@@ -32,7 +32,7 @@
 - name: Start kurento health monitor
   docker_container:
     name: kurento-health-monitor
-    image: mconf/kurento-health-monitor:v0.0.4
+    image: mconf/kurento-health-monitor:v0.0.5
     pull: yes
     restart_policy: always
     memory: 128M

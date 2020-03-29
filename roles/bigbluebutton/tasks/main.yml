@@ -556,6 +556,10 @@
     dest: /usr/local/bigbluebutton/core/scripts/utils/
     use_ssh_args: yes
   become: yes
+  retries: 40
+  delay: 2
+  register: task_result
+  until: task_result.rc == 0
 
 - name: Install cron job to remove media files from non-recorded meetings
   cron:
@@ -594,8 +598,8 @@
 - name: Install cron job to restart KMS daily
   cron:
     name: restart kms
-    minute: 0
-    hour: 4
+    minute: '0'
+    hour: '4'
     user: root
     state: absent
   become: yes
@@ -603,8 +607,8 @@
 - name: Install cron job to restart Mconf daily
   cron:
     name: restart mconf
-    minute: 0
-    hour: 4
+    minute: '0'
+    hour: '4'
     job: '{{ restart_mconf_command }}'
     user: root
   become: yes

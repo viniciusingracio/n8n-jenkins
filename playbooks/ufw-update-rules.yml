@@ -1,0 +1,20 @@
+- name: Configure custom ufw rules
+  hosts: all
+  handlers:
+    - include: ../roles/handlers/handlers/main.yml
+  tasks:
+    - name: Configure custom rules
+      become: yes
+      ufw:
+        rule: '{{ item.rule }}'
+        port: '{{ item.port | default(omit) }}'
+        proto: '{{ item.proto | default(omit) }}'
+        from_ip: '{{ item.from_ip | default(omit) }}'
+        route: '{{ item.route | default(omit) }}'
+        direction: '{{ item.direction | default(omit) }}'
+        interface: '{{ item.interface | default(omit) }}'
+      with_items:
+        - "{{ common_ufw_rules }}"
+      when: common_ufw_rules is defined
+      notify:
+        - restart ufw
