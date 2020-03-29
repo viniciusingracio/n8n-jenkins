@@ -54,6 +54,7 @@
       BEARER_AUTH: '1'
       SERVER_DOMAIN: '{{ inventory_hostname }}'
       PERMANENT_HOOKS: '{{ bigbluebutton_docker_webhooks_permanent_hooks | to_json }}'
+      INCLUDE_EVENTS: '{{ bigbluebutton_docker_webhooks_include_events | to_json }}'
     labels:
       hostname: '{{ inventory_hostname }}'
     state: '{% if bigbluebutton_webhooks %}started{% else %}absent{% endif %}'

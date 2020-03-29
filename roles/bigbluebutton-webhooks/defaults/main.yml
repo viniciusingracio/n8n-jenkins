@@ -1,5 +1,6 @@
 ---
 
 bigbluebutton_webhooks: true
-bigbluebutton_docker_webhooks_image: mconf/bbb-webhooks:1.0.1-dd5dd1aa63
+bigbluebutton_docker_webhooks_image: mconf/bbb-webhooks:1.0.2-68425ff
 bigbluebutton_docker_webhooks_permanent_hooks: []
+bigbluebutton_docker_webhooks_include_events: []
