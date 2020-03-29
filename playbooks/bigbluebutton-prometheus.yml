@@ -2,5 +2,5 @@
 
 - hosts: bbb-prometheus
   roles:
-  - bigbluebutton-prometheus
-  - node-exporter
+    - node-exporter
+    - bigbluebutton-prometheus

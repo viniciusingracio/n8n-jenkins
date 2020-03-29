@@ -19,7 +19,7 @@
     - /usr/local/etc/bigbluebutton-prometheus
     - /usr/local/share/prometheus
 
-- name: Copy scripts
+- name: Copy bbb-prometheus-exporter
   become: yes
   copy:
     src: files/etc/bbb-prometheus-exporter.rb
@@ -77,3 +77,38 @@
     src: files/node-exporter.nginx
     dest: /etc/bigbluebutton/nginx/node-exporter.nginx
   notify: reload nginx
+
+- name: Start nginx exporter
+  docker_container:
+    name: nginx-exporter
+    image: nginx/nginx-prometheus-exporter:0.6.0
+    command: -nginx.scrape-uri https://{{ inventory_hostname }}/stub_status -web.telemetry-path /nginx_metrics
+    pull: yes
+    restart_policy: always
+    ports:
+      - 9113:9113
+    labels:
+      hostname: '{{ inventory_hostname }}'
+
+- name: Copy process exporter config
+  become: yes
+  copy:
+    src: files/etc/process-exporter.yml
+    dest: /usr/local/etc/bigbluebutton-prometheus/process-exporter.yml
+  notify: restart process exporter
+
+- name: Start process exporter
+  docker_container:
+    name: process-exporter
+    image: ncabatoff/process-exporter
+    command: -procfs /host/proc -config.path /config/config.yml -web.telemetry-path /process_metrics
+    pull: yes
+    privileged: yes
+    restart_policy: always
+    ports:
+      - 9256:9256
+    volumes:
+      - /proc:/host/proc
+      - /usr/local/etc/bigbluebutton-prometheus/process-exporter.yml:/config/config.yml
+    labels:
+      hostname: '{{ inventory_hostname }}'

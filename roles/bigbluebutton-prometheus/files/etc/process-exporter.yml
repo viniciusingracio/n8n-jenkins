@@ -1,0 +1,44 @@
+process_names:
+  - name: freeswitch
+    exe:
+    - freeswitch
+  - name: kurento
+    exe:
+    - kurento-media-server
+  - name: nginx
+    exe:
+    - /usr/sbin/nginx
+  - name: meteor
+    exe:
+    - bash
+    cmdline:
+    - -e /usr/share/meteor/bundle/systemd_start.sh
+  # for some reason, redis isn't working
+  - name: redis
+    exe:
+    - /usr/bin/redis-server
+  - name: bbb-web
+    exe:
+    - bash
+    cmdline:
+    - /usr/share/bbb-web/run-prod.sh
+  - name: mongodb
+    exe:
+    - mongod
+    cmdline:
+    - --config /usr/share/meteor/bundle/mongo-ramdisk.conf
+  - name: bbb-apps
+    exe:
+    - java
+    cmdline:
+    - -cp /usr/share/bbb-apps-akka/
+  - name: bbb-fsesl
+    exe:
+    - java
+    cmdline:
+    - -cp /usr/share/bbb-fsesl-akka/
+  - name: etherpad
+    exe:
+    - node
+    cmdline:
+    - node_modules/ep_etherpad_lite/node/server.js
