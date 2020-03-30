@@ -18,3 +18,6 @@ done
 echo 'Done waiting'
 
 psql -h 127.0.0.1 -U $DB_USER -d $DB_NAME "$@"
+
+# to dump the schema
+# pg_dump -h 127.0.0.1 -U $DB_USER -s $DB_NAME > /tmp/schema.sql

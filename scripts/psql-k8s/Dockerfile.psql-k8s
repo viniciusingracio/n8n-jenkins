@@ -18,7 +18,6 @@ ADD dumb-init_1.2.0 /usr/bin/dumb-init
 RUN chmod +x /usr/bin/dumb-init
 
 COPY ./.env $app/
-COPY ./wait-db.sh $app/
 COPY ./db.sh $app/
 RUN chmod +x $app/db.sh
 
