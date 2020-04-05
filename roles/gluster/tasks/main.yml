@@ -8,7 +8,6 @@
   become: yes
   apt:
     name:
-      - python-software-properties
       - software-properties-common
       - xfsprogs
 
