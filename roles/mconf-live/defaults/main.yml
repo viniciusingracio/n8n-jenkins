@@ -21,7 +21,7 @@ mconf_live_rec_proxy_jwt_secret:
 mconf_live_sounds_hold_music:
 
 mconf_live_presentation_recorder_image: mconf/mconf-presentation-recorder
-mconf_live_presentation_recorder_version: 0.0.12-7e12998
+mconf_live_presentation_recorder_version: 0.0.13-c710bc4
 
 # these attributes are optional and will be set to default values if empty
 mconf_live_recording_auth_entry_point:
@@ -34,7 +34,7 @@ bigbluebutton_stun_server:
   - stun:stun.l.google.com:19302
 
 bigbluebutton_docker_webrtc_sfu_enabled: false
-bigbluebutton_docker_webrtc_sfu_image: mconf/bbb-webrtc-sfu:v2.4.12
+bigbluebutton_docker_webrtc_sfu_image: mconf/bbb-webrtc-sfu:v2.4.13
 # it can be VP8, H264 or ANY
 bigbluebutton_docker_webrtc_sfu_codec: ANY
 bigbluebutton_docker_webrtc_sfu_ip_public:

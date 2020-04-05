@@ -1,0 +1,3 @@
+/usr/bin/ansible-playbook -i envs/prod/com/hosts -l live-do02.elos.vc --extra-vars aws_publisher_run_resync=false playbooks/aws-publisher.yml
+
+live-do02.elos.vc: 12 OK, 4 changed, 0 unreachable, 0 failed

@@ -1,0 +1,4 @@
+/usr/bin/ansible-playbook -i envs/rnp/h/hosts -l postgresql playbooks/postgresql.yml
+
+vm-postgresql-master-hmg: 26 OK, 8 changed, 0 unreachable, 0 failed
+vm-postgresql-replica-hmg: 26 OK, 8 changed, 0 unreachable, 0 failed

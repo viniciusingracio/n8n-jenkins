@@ -19,7 +19,7 @@
 
 - name: Create directory for nginx cache
   file:
-    path: /var/cache/nginx
+    path: '{{ rec_proxy_cache_path }}'
     recurse: yes
     state: directory
   become: yes
@@ -30,6 +30,7 @@
       - /var/www:/usr/local/openresty/nginx/html # for certbot --webroot and static pages
       - '{{ rec_proxy_certs_path_root }}:{{ rec_proxy_certs_path_root }}'
       - '{{ rec_proxy_cache_path }}:/var/cache/nginx'
+      - /var/log/openresty:/usr/local/openresty/nginx/logs
 
 - name: Include playback volume
   set_fact:

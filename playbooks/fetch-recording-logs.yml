@@ -1,0 +1,16 @@
+---
+- hosts: '{{ dynamic_inventory_hostname | default("all") }}'
+  tasks:
+  - file:
+      path: /tmp/recording-logs/{{ inventory_hostname }}
+      state: directory
+      recurse: yes
+    delegate_to: 127.0.0.1
+
+  - shell: chmod a+r /var/log/bigbluebutton/mconf_decrypter.log*
+    become: yes
+    ignore_errors: yes
+
+  - name: Copy logs
+    command: rsync -azm -e 'ssh -p {{ ansible_port }} {{ ansible_ssh_common_args }}' {{ ansible_user }}@{{ inventory_hostname }}:/var/log/bigbluebutton/{bbb-rap-worker.log*,mconf_decrypter.log*} /tmp/recording-logs/{{ inventory_hostname }}/
+    delegate_to: 127.0.0.1

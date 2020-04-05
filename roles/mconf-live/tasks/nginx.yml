@@ -1,56 +1,3 @@
-- stat:
-    path: '{{ item }}'
-  with_items:
-    - /etc/bigbluebutton/nginx/presentation.nginx
-    - /etc/bigbluebutton/nginx/presentation_video.nginx
-  register: nginx_files
-
-- command: mv {{ item.item }}.orig {{ item.item }}
-  with_items: '{{ nginx_files.results }}'
-  become: yes
-  when: item.stat.exists and item.stat.islnk and not mconf_live_rec_proxy_enabled
-  notify: reload nginx
-
-- command: mv {{ item.item }} {{ item.item }}.orig
-  with_items: '{{ nginx_files.results }}'
-  become: yes
-  when: item.stat.exists and not item.stat.islnk and mconf_live_rec_proxy_enabled
-  notify: reload nginx
-
-- template:
-    src: templates/{{ item.item | basename }}.j2
-    dest: '{{ item.item }}.openresty'
-  with_items: '{{ nginx_files.results }}'
-  become: yes
-  when: item.stat.exists and mconf_live_rec_proxy_enabled
-  notify: reload nginx
-
-- file:
-    path: '{{ item.item }}.openresty'
-    state: absent
-  with_items: '{{ nginx_files.results }}'
-  become: yes
-  when: not mconf_live_rec_proxy_enabled
-  notify: reload nginx
-
-- file:
-    src: '{{ item.item }}.openresty'
-    dest: '{{ item.item }}'
-    state: link
-  with_items: '{{ nginx_files.results }}'
-  become: yes
-  when: item.stat.exists and mconf_live_rec_proxy_enabled
-  notify: reload nginx
-
-- file:
-    src: '{{ item.item }}.openresty'
-    dest: '{{ item.item }}'
-    state: link
-  with_items: '{{ nginx_files.results }}'
-  become: yes
-  when: item.stat.exists and mconf_live_rec_proxy_enabled
-  notify: reload nginx
-
 - template:
     src: templates/rec_auth_token.nginx.j2
     dest: '/etc/bigbluebutton/nginx/rec_auth_token.nginx'
@@ -65,41 +12,15 @@
   when: not ( mconf_live_rec_proxy_enabled or mconf_live_rec_proxy_api_enabled )
   notify: reload nginx
 
-- name: Add recording server fallback for presentation
-  blockinfile:
-    dest: /etc/bigbluebutton/nginx/presentation.nginx
-    block: |2
-                      set $test "";
-                      if ($arg_meetingId) {
-                              set $test "Exists";
-                      }
-                      if (!-f /var/bigbluebutton/published/presentation/$arg_meetingId/shapes.svg) {
-                              set $test "${test}ButMissing";
-                      }
-                      if ($test = ExistsButMissing) {
-                              return 301 {{ mconf_live_rec_fallback }}$request_uri;
-                      }
-
-    insertafter: '.*location /playback/presentation {$'
-    marker: '                # {mark} ANSIBLE MANAGED BLOCK server fallback'
-    state: '{% if mconf_live_rec_proxy_enabled or mconf_live_rec_fallback is none %}absent{% else %}present{% endif %}'
+- name: Update nginx files
   become: yes
-  ignore_errors: yes
-  notify: reload nginx
-
-- name: Add recording server fallback for presentation_video
-  blockinfile:
-    dest: /etc/bigbluebutton/nginx/presentation_video.nginx
-    block: |2
-                      if (!-f /var/bigbluebutton/published$uri) {
-                              return 301 {{ mconf_live_rec_fallback }}$request_uri;
-                      }
-
-    insertafter: '.*location.* /presentation_video.* {$'
-    marker: '                # {mark} ANSIBLE MANAGED BLOCK server fallback'
-    state: '{% if mconf_live_rec_proxy_enabled or mconf_live_rec_fallback is none %}absent{% else %}present{% endif %}'
-  become: yes
-  ignore_errors: yes
+  template:
+    src: templates/{{ item }}.nginx.j2
+    dest: /etc/bigbluebutton/nginx/{{ item }}.nginx
+  with_items:
+    - presentation
+    - presentation_video
+  when: item in mconf_live_enabled_recording_formats
   notify: reload nginx
 
 - set_fact:

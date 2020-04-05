@@ -44,7 +44,7 @@
     command: pip install --upgrade pip pyopenssl docker zabbix-api
 
   - name: Copy ansihub
-    command: rsync -avzm --delete --include-from=../{{ inventory_dir }}/files/include_filter.txt {{ playbook_dir }}/.. {{ ansible_user }}@{{ inventory_hostname }}:~/mconf-ansihub
+    command: rsync -azm --delete -e 'ssh -p {{ ansible_port }} {{ ansible_ssh_common_args }}' --include-from={{ inventory_dir }}/files/include_filter.txt {{ playbook_dir }}/.. {{ ansible_user }}@{{ inventory_hostname }}:~/mconf-ansihub
     delegate_to: 127.0.0.1
 
   - name: Create log_deploy dir
@@ -70,8 +70,11 @@
       dest: '{{ ansible_env.HOME }}/.ansible/plugins/modules/'
       remote_src: yes
 
+  - name: End all meetings
+    command: ruby /usr/local/bigbluebutton/core/scripts/utils/end-all.rb
+
   - name: Run ansible-playbook
-    command: ansible-playbook -i {{ inventory_dir | replace(ansible_env.HOME + '/mconf-ansihub/', '') }}/hosts -l {{ inventory_hostname }} --connection=local provision.yml
+    shell: ansible-playbook -i {{ inventory_dir | regex_replace('.*\/mconf-ansihub\/', '') }}/hosts -l {{ inventory_hostname }} --connection=local provision.yml > /dev/null
     args:
       chdir: '{{ ansible_env.HOME }}/mconf-ansihub'
     tags:
@@ -82,4 +85,4 @@
       path: '{{ ansible_env.HOME }}/mconf-ansihub'
       state: absent
     tags:
-      - provision
+      - cleanup

@@ -1,0 +1,3 @@
+/usr/bin/ansible-playbook -v -i envs/prod/com/hosts -l rec.mconf.com provision.yml
+
+rec.mconf.com: 25 OK, 10 changed, 0 unreachable, 0 failed
