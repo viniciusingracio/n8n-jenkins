@@ -1,0 +1,6 @@
+/usr/local/bin/ansible-playbook -v -i envs/rnp/h -l mconf-web,gluster provision.yml
+
+172.16.1.85: 13 OK, 2 changed, 0 unreachable, 1 failed
+172.16.1.86: 13 OK, 2 changed, 0 unreachable, 1 failed
+vm-portal-0-hmg: 11 OK, 2 changed, 0 unreachable, 0 failed
+vm-portal-1-hmg: 11 OK, 2 changed, 0 unreachable, 0 failed

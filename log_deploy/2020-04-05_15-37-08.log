@@ -1,0 +1,4 @@
+/usr/local/bin/ansible-playbook -v -i envs/rnp/h -l mconf-db setup.yml
+
+vm-mysql-master-hmg: 23 OK, 11 changed, 0 unreachable, 0 failed
+vm-mysql-replica-hmg: 23 OK, 11 changed, 0 unreachable, 0 failed
