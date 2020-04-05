@@ -1,0 +1,4 @@
+/usr/local/bin/ansible-playbook -v -i envs/rnp/h -l mconf-web setup.yml
+
+vm-portal-0-hmg: 23 OK, 11 changed, 0 unreachable, 0 failed
+vm-portal-1-hmg: 23 OK, 11 changed, 0 unreachable, 0 failed

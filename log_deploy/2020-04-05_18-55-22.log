@@ -1,0 +1,4 @@
+/usr/local/bin/ansible-playbook -v -i envs/rnp/h -l mconf-web provision.yml
+
+vm-portal-0-hmg: 15 OK, 6 changed, 0 unreachable, 0 failed
+vm-portal-1-hmg: 15 OK, 6 changed, 0 unreachable, 0 failed
