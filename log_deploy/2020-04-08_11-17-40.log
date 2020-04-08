@@ -1,0 +1,6 @@
+/usr/local/bin/ansible-playbook -v -i envs/rnp/h -l mconf-db,postgresql playbooks/dynatrace-agent.yml
+
+vm-mysql-master-hmg: 4 OK, 4 changed, 0 unreachable, 0 failed
+vm-mysql-replica-hmg: 4 OK, 4 changed, 0 unreachable, 0 failed
+vm-postgresql-master-hmg: 5 OK, 4 changed, 0 unreachable, 0 failed
+vm-postgresql-replica-hmg: 5 OK, 4 changed, 0 unreachable, 0 failed
