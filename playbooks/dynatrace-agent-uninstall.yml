@@ -1,0 +1,8 @@
+# Uninstalls dynatrace's agent.
+
+- name: Uninstall dynatrace's agent
+  hosts: all
+  tasks:
+  - name: Run the uninstall script
+    become: yes
+    shell: /opt/dynatrace/oneagent/agent/uninstall.sh
