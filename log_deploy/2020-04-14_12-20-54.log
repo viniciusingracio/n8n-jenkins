@@ -1,0 +1,4 @@
+/usr/local/bin/ansible-playbook -v -i envs/rnp/h -l postgresql playbooks/dynatrace-agent-uninstall.yml
+
+vm-postgresql-master-hmg: 2 OK, 1 changed, 0 unreachable, 0 failed
+vm-postgresql-replica-hmg: 2 OK, 1 changed, 0 unreachable, 0 failed
