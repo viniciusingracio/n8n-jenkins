@@ -1,0 +1,3 @@
+/usr/local/bin/ansible-playbook -v -i envs/rnp/prod -l mconf-web -l portal03-p.mconf.rnp.br setup.yml
+
+portal03-p.mconf.rnp.br: 50 OK, 39 changed, 0 unreachable, 0 failed
