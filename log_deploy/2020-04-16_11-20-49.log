@@ -1,0 +1,10 @@
+/usr/local/bin/ansible-playbook -v -i envs/rnp/h -l mconf-live220 --tags ssh-keys setup.yml
+
+live-cdcrec02.h.mconf.rnp.br: 2 OK, 0 changed, 0 unreachable, 0 failed
+live-cdcrec03.h.mconf.rnp.br: 2 OK, 1 changed, 0 unreachable, 0 failed
+live-cdcrec04.h.mconf.rnp.br: 2 OK, 1 changed, 0 unreachable, 0 failed
+live-usp11.mconf.rnp.br: 2 OK, 1 changed, 0 unreachable, 0 failed
+live-usp12.mconf.rnp.br: 2 OK, 1 changed, 0 unreachable, 0 failed
+live-usp13.mconf.rnp.br: 2 OK, 1 changed, 0 unreachable, 0 failed
+live-usp14.mconf.rnp.br: 2 OK, 1 changed, 0 unreachable, 0 failed
+live-usp15.mconf.rnp.br: 2 OK, 1 changed, 0 unreachable, 0 failed

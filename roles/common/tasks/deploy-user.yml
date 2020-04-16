@@ -19,6 +19,7 @@
     state: present
     key: '{{ item }}'
   with_file: '{{ public_keys }}'
+  tags: ssh-keys
 
 - name: Add to sudoers
   become: yes
