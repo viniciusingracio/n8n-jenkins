@@ -1,0 +1,3 @@
+/usr/local/bin/ansible-playbook -v -i envs/rnp/prod -l mconf-web -l portal04-p.mconf.rnp.br provision.yml
+
+portal04-p.mconf.rnp.br: 22 OK, 9 changed, 0 unreachable, 1 failed

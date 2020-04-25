@@ -1,0 +1,10 @@
+---
+
+mconf_web_api_proxy_enable: false
+mconf_web_api_proxy_image_name: kong-mconf
+mconf_web_api_proxy_image_tag: latest
+mconf_web_api_proxy_service_name: mconf-lb
+mconf_web_api_proxy_url: http://api.elos.vc
+mconf_web_api_proxy_connect_timeout: 10000
+mconf_web_api_proxy_read_timeout: 34000
+mconf_web_api_proxy_write_timeout: 34000

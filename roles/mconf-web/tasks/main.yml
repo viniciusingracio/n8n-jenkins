@@ -1,2 +1,5 @@
 - include: ufw.yml
   tags: [ufw,firewall]
+- include: api-proxy.yml
+  tags: [api-proxy]
+  when: mconf_web_api_proxy_enable
