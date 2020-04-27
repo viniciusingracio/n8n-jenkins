@@ -1,0 +1,5 @@
+/usr/local/bin/ansible-playbook -v -i envs/rnp/prod -l gluster provision.yml
+
+172.16.1.85: 17 OK, 6 changed, 0 unreachable, 1 failed
+172.16.1.86: 16 OK, 5 changed, 0 unreachable, 1 failed
+172.16.1.88: 16 OK, 5 changed, 0 unreachable, 1 failed
