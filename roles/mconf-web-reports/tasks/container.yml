@@ -1,5 +1,6 @@
 - name: Pull the docker image
   docker_image:
+    source: pull
     name: '{{ mconf_web_reports_image }}:{{ mconf_web_reports_image_version }}'
 
 - name: Setup cron to update the current reports
@@ -10,7 +11,7 @@
     hour: "{{ mconf_web_reports_cron_schedule_hour }}"
     day: "{{ mconf_web_reports_cron_schedule_day }}"
     user: root
-    job: "docker run --rm -v {{ mconf_web_reports_remote_config_path }}:{{ mconf_web_reports_docker_config_path }} -v /root/mconf-web-reports.env.local:/usr/src/app/.env.local -v {{ mconf_web_reports_output_dir }}:/usr/src/app/output -e SAVE_TO=/usr/src/app/output {{ mconf_web_reports_image }}:{{ mconf_web_reports_image_version }} > {{ mconf_web_reports_cron_log_file }} 2>&1"
+    job: "docker run --rm -v {{ mconf_web_reports_remote_config_path }}:{{ mconf_web_reports_docker_config_path }} -v /root/mconf-web-reports.env.local:/usr/src/app/.env.local -v {{ mconf_web_reports_output_dir }}:/usr/src/app/output -e SAVE_TO=/usr/src/app/output {{ mconf_web_reports_image }}:{{ mconf_web_reports_image_version }} {{ mconf_web_reports_image_cmd }} > {{ mconf_web_reports_cron_log_file }} 2>&1"
     cron_file: mconf-web-reports-run
 
 - name: Setup cron to update the report of the previous month
@@ -21,5 +22,5 @@
     hour: "{{ mconf_web_reports_cron_previous_month_schedule_hour }}"
     day: "{{ mconf_web_reports_cron_previous_month_schedule_day }}"
     user: root
-    job: "docker run --rm -e TARGET_MONTH=$(date -d \"-1 month -$(expr $(date +\\%d) - 1) days\" +\"\\%Y-\\%m\") -v {{ mconf_web_reports_remote_config_path }}:{{ mconf_web_reports_docker_config_path }} -v /root/mconf-web-reports.env.local:/usr/src/app/.env.local -v {{ mconf_web_reports_output_dir }}:/usr/src/app/output -e SAVE_TO=/usr/src/app/output {{ mconf_web_reports_image }}:{{ mconf_web_reports_image_version }} > {{ mconf_web_reports_cron_log_file_previous_month }} 2>&1"
+    job: "docker run --rm -e TARGET_MONTH=$(date -d \"-1 month -$(expr $(date +\\%d) - 1) days\" +\"\\%Y-\\%m\") -v {{ mconf_web_reports_remote_config_path }}:{{ mconf_web_reports_docker_config_path }} -v /root/mconf-web-reports.env.local:/usr/src/app/.env.local -v {{ mconf_web_reports_output_dir }}:/usr/src/app/output -e SAVE_TO=/usr/src/app/output {{ mconf_web_reports_image }}:{{ mconf_web_reports_image_version }} {{ mconf_web_reports_image_cmd }} > {{ mconf_web_reports_cron_log_file_previous_month }} 2>&1"
     cron_file: mconf-web-reports-previous-month

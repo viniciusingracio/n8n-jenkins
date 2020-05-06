@@ -178,8 +178,11 @@
   roles:
   - { role: certbot, when: certbot_enabled | bool, tags: [ certbot ] }
   - mconf-web
-  - { role: mconf-web-reports, when: mconf_web_reports_enabled, tags: [ mconf-web-reports ] }
   - { role: test-webrtc, when: test_webrtc_enabled }
+
+- hosts: mconf-web-reports
+  roles:
+  - { role: mconf-web-reports, when: mconf_web_reports_enabled, tags: [ mconf-web-reports ] }
 
 - hosts: snmp
   roles:
