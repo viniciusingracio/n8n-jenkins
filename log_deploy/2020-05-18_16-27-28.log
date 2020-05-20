@@ -1,0 +1,4 @@
+/usr/local/bin/ansible-playbook -i envs/rnp/h/hosts -l mconf-web provision.yml
+
+portal-idc01.h.mconf.rnp.br: 38 OK, 10 changed, 0 unreachable, 0 failed
+portal-idc02.h.mconf.rnp.br: 34 OK, 8 changed, 0 unreachable, 0 failed

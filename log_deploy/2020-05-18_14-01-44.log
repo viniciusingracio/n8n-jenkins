@@ -1,0 +1,4 @@
+/usr/local/bin/ansible-playbook -i envs/rnp/h/hosts -l mconf-db setup.yml
+
+db-idc01.h.mconf.rnp.br: 45 OK, 18 changed, 0 unreachable, 0 failed
+db-idc02.h.mconf.rnp.br: 45 OK, 18 changed, 0 unreachable, 0 failed

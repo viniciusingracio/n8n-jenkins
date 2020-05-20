@@ -1,0 +1,4 @@
+/usr/local/bin/ansible-playbook -i envs/rnp/h/hosts -l mconf-db provision.yml
+
+db-mysql-idc01.h.mconf.rnp.br: 27 OK, 18 changed, 0 unreachable, 0 failed
+db-mysql-replica-idc01.h.mconf.rnp.br: 21 OK, 12 changed, 1 unreachable, 0 failed
