@@ -1,0 +1,4 @@
+/usr/local/bin/ansible-playbook -i envs/rnp/h/hosts -l memcached --tags memcached provision.yml
+
+db-mysql-idc01.h.mconf.rnp.br: 5 OK, 0 changed, 0 unreachable, 0 failed
+db-mysql-replica-idc01.h.mconf.rnp.br: 5 OK, 0 changed, 0 unreachable, 0 failed
