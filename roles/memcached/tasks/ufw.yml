@@ -1,0 +1,15 @@
+---
+
+- name: Configure ufw rules for memcached
+  become: yes
+  ufw:
+    rule: '{{ item.rule }}'
+    port: '{{ item.port | default(omit) }}'
+    proto: '{{ item.proto | default(omit) }}'
+    from_ip: '{{ item.from_ip | default(omit) }}'
+  with_items:
+    - "{{ memcached_ufw_rules }}"
+  when: memcached_ufw_rules is defined
+  notify:
+    - restart ufw
+

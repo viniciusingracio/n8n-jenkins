@@ -235,6 +235,10 @@
   roles:
   - mconf-editor
 
+- hosts: memcached
+  roles:
+  - { role: memcached, tags: [ memcached ] }
+
 - hosts: all
   roles:
   - { role: reboot, tags: always }
