@@ -132,3 +132,26 @@
   become: yes
   command: 'find /usr/share/meteor/bundle/programs/server/assets/app/locales/ -name "*.json" -exec sed -i "s|BigBlueButton|{{ bigbluebutton_branding_name }}|g" {} \;'
   when: bigbluebutton_html5
+
+- stat:
+    path: /var/bigbluebutton/playback/presentation/2.3/index.html
+  register: reg_playback_23
+
+- name:
+  copy:
+    src: /var/www/bigbluebutton-default/favicon.ico
+    dest: /var/bigbluebutton/playback/presentation/2.3/favicon.ico
+    remote: yes
+  become: yes
+  ignore_errors: yes
+  when: reg_playback_23.stat.exists
+
+- name:
+  command: ruby -e 'require "nokogiri"; path = "/var/bigbluebutton/playback/presentation/2.3/index.html"; doc = Nokogiri::HTML(File.open(path)) { |x| x.noblanks }; doc.at_xpath("/html/head/meta[@name=\"description\"]/@content").content = "{{ bigbluebutton_branding_playback_title }}"; file = File.new(path, "w"); file.write(doc.to_html(:indent => 2)); file.close'
+  become: yes
+  when: reg_playback_23.stat.exists
+
+- name:
+  command: ruby -e 'require "json"; path = "/var/bigbluebutton/playback/presentation/2.3/manifest.json"; doc = JSON.parse(File.read(path), :symbolize_names => true); doc[:name] = "{{ bigbluebutton_branding_playback_title }}"; file = File.new(path, "w"); file.write(JSON.pretty_generate(doc)); file.close'
+  become: yes
+  when: reg_playback_23.stat.exists

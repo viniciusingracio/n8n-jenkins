@@ -9,7 +9,7 @@ location /presentation_video {
 }
 {% else %}
 location ~* /presentation_video/(?<meeting_id>[0-9a-z]+-[0-9]+)/.*(?<extension>\.webm|\.mp4) {
-{% if mconf_live_rec_fallback | length > 0 %}
+{% if mconf_live_rec_fallback is not none %}
         if (!-f /var/bigbluebutton/published$uri) {
                 return 301 {{ mconf_live_rec_fallback }}$request_uri;
         }
@@ -24,7 +24,7 @@ location ~* /presentation_video/(?<meeting_id>[0-9a-z]+-[0-9]+)/.*(?<extension>\
 }
 
 location /presentation_video {
-{% if mconf_live_rec_fallback | length > 0 %}
+{% if mconf_live_rec_fallback is not none %}
         if (!-f /var/bigbluebutton/published$uri) {
                 return 301 {{ mconf_live_rec_fallback }}$request_uri;
         }

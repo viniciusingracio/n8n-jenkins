@@ -60,6 +60,7 @@
   include_vars:
     file: '{{ role_path }}/../../.docker-auth'
     name: docker_auth
+  no_log: yes
   ignore_errors: yes
 
 - name: Log out of DockerHub

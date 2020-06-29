@@ -1,0 +1,18 @@
+---
+
+- hosts:
+  - all
+  tasks:
+  - name: Stop services for presentation and presentation_video
+    become: yes
+    command: systemctl stop mconf-presentation-recorder
+
+  - name: Stop recorders
+    become: yes
+    shell: docker ps --filter name=record_* -aq | xargs docker stop
+    ignore_errors: yes
+
+  - name: Stop nginx containers
+    become: yes
+    shell: docker ps --filter name=nginx_* -aq | xargs docker stop
+    ignore_errors: yes

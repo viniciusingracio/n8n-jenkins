@@ -33,12 +33,23 @@
   docker_image:
     name: '{{ mconf_live_presentation_recorder_image }}:{{ mconf_live_presentation_recorder_version }}'
     source: pull
+    force_source: yes
+
+# - name: Remove old images
+#   shell: docker images {{ mconf_live_presentation_recorder_image }} --filter 'before={{ mconf_live_presentation_recorder_image }}:{{ mconf_live_presentation_recorder_version }}' -q | xargs -r docker rmi --force
+#   notify: clean docker
 
 - name:
   become: yes
   copy:
     content: '{{ bigbluebutton_streaming_secret }}'
     dest: /usr/local/bigbluebutton/bbb-webrtc-sfu/config/client_secret.json
+
+- name:
+  become: yes
+  copy:
+    src: '{{ bigbluebutton_docker_webrtc_sfu_k8s_local_config_file }}'
+    dest: '{{ bigbluebutton_docker_webrtc_sfu_k8s_config_file }}'
 
 - name:
   set_fact:
@@ -75,7 +86,9 @@
       KURENTO: '{{ kurento_config | to_json }}'
       REDIS_HOST: '{{ docker_ip }}'
       MCS_PORT: "3009"
-      MCS_HOST: '{{ docker_ip }}'
+      MCS_HOST: 0.0.0.0
+      CLIENT_HOST: 0.0.0.0
+      MCS_ADDRESS: '{{ docker_ip }}'
       # this can be removed when everyone is using v2.4 or above
       FREESWITCH_IP: '{{ ansible_default_ipv4.address }}'
       FREESWITCH_SIP_IP: '{{ ansible_default_ipv4.address }}'
@@ -83,11 +96,12 @@
       ESL_IP: '{{ docker_ip }}'
       ESL_PORT: "8021"
       LOG_LEVEL: info
-      STREAM_CONTAINER_TYPE: docker
+      STREAM_CONTAINER_TYPE: '{% if bigbluebutton_docker_webrtc_sfu_k8s_enabled %}kubernetes{% else %}docker{% endif %}'
       STREAM_IMAGE_NAME: '{{ mconf_live_presentation_recorder_image }}:{{ mconf_live_presentation_recorder_version }}'
       STREAM_BIGBLUEBUTTON_URL: '{{ bbb_api_entry_point | regex_replace("/api") }}'
       STREAM_BIGBLUEBUTTON_SECRET: '{{ bbb_secret }}'
       STREAM_BOT_NAME: 'Streaming'
+      STREAM_K8S_NAMESPACE: streaming
       SFU_PROCESSES: '{{ sfu_processes | to_json }}'
       CODEC_VIDEO_MAIN: '{{ bigbluebutton_docker_webrtc_sfu_codec }}'
       CODEC_VIDEO_CONTENT: '{{ bigbluebutton_docker_webrtc_sfu_codec }}'
@@ -102,10 +116,12 @@
       LOG_FILENAME: /var/log/bbb-webrtc-sfu/bbb-webrtc-sfu.log
       TZ: '{{ lookup("file", "/etc/timezone") }}'
       FREESWITCH_IP_MAPPINGS: '{{ ip_mappings | to_json }}'
+      KUBECONFIG: '{% if bigbluebutton_docker_webrtc_sfu_k8s_enabled %}/app/kube-config{% endif %}'
     volumes:
       - /var/log/bbb-webrtc-sfu:/var/log/bbb-webrtc-sfu
       - /var/run/docker.sock:/var/run/docker.sock
       - /usr/local/bigbluebutton/bbb-webrtc-sfu/config/client_secret.json:/app/client_secret.json
+      - '{{ bigbluebutton_docker_webrtc_sfu_k8s_config_file }}:/app/kube-config'
     labels:
       hostname: '{{ inventory_hostname }}'
   notify: restart docker components

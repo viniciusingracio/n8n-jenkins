@@ -1,0 +1,19 @@
+---
+
+- hosts: all
+
+  handlers:
+    - name: reload nginx
+      become: yes
+      service: name=nginx state=reloaded
+
+  vars:
+    ansible_user: mconf
+
+  tasks:
+  - name: Copy bbb-web.nginx
+    copy:
+      src: files/bbb-web.nginx
+      dest: /etc/bigbluebutton/nginx/web
+    become: yes
+    notify: reload nginx

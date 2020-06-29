@@ -1,0 +1,10 @@
+- hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  tasks:
+    - name: Copy script
+      copy:
+        src: files/check_mconf.pl
+        dest: /usr/lib/nagios/plugins/check_mconf.pl
+        mode: 0755
+      become: yes

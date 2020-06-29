@@ -55,6 +55,11 @@
       SERVER_DOMAIN: '{{ inventory_hostname }}'
       PERMANENT_HOOKS: '{{ bigbluebutton_docker_webhooks_permanent_hooks | to_json }}'
       INCLUDE_EVENTS: '{{ bigbluebutton_docker_webhooks_include_events | to_json }}'
+      KAFKA_BROKERS: '{{ bigbluebutton_docker_webhooks_kafka_brokers | to_json }}'
+      KAFKA_MECHANISM: '{{ bigbluebutton_docker_webhooks_kafka_mechanism }}'
+      KAFKA_SSL: '{{ bigbluebutton_docker_webhooks_kafka_ssl }}'
+      KAFKA_USERNAME: '{{ bigbluebutton_docker_webhooks_kafka_username }}'
+      KAFKA_PASSWORD: '{{ bigbluebutton_docker_webhooks_kafka_password }}'
     labels:
       hostname: '{{ inventory_hostname }}'
     state: '{% if bigbluebutton_webhooks %}started{% else %}absent{% endif %}'

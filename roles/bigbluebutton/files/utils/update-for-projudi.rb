@@ -53,7 +53,7 @@ files.each do |filename|
         if xml_node.nil?
             logger.warn "Couldn't find /recording/meta/mconflb-institution-name for #{record_id}"
         else
-            next if xml_node.content == "Projudi"
+            # next if xml_node.content == "Projudi"
             xml_node.content = "Projudi"
         end
         logger.info "#{process_number} => #{filename}"
@@ -65,18 +65,14 @@ files.each do |filename|
             xml_node.content = "4"
         end
 
-        xml_node = doc.at_xpath("/recording/meta/meetingId")
-        if xml_node.nil?
-            logger.warn "Couldn't find /recording/meta/meetingId for #{record_id}"
-        else
-            xml_node.content = process_number
-        end
-
-        xml_node = doc.at_xpath("/recording/meeting/@externalId")
-        if xml_node.nil?
-            logger.warn "Couldn't find /recording/meeting/@externalId for #{record_id}"
-        else
-            xml_node.content = process_number
+        [ "/recording/meta/meetingId", "/recording/meeting/@externalId",
+          "/recording/meta/meetingName", "/recording/meeting/@name" ].each do |expr|
+            xml_node = doc.at_xpath(expr)
+            if xml_node.nil?
+                logger.warn "Couldn't find #{expr} for #{record_id}"
+            else
+                xml_node.content = process_number
+            end
         end
 
         if ! opts[:dry_run]

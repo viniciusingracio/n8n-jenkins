@@ -21,6 +21,7 @@
   docker_container:
     name: fluentd
     image: mconf/bbb-fluent:latest
+    command: -c /fluentd/etc/fluent-light.conf
     pull: yes
     restart_policy: unless-stopped
     user: root
@@ -33,6 +34,7 @@
     ports:
       - 5044:5044
       - 9880:9880
+      - 24231:24231
     env:
       TZ: '{{ lookup("file", "/etc/timezone") }}'
       ELASTIC_PATH: "{{ bbb_fluent_elastic_path | string }}"
@@ -42,12 +44,13 @@
       ELASTIC_AUTH_PASS: "{{ bbb_fluent_elastic_auth_pass | string }}"
       READ_LOGS_FROM_HEAD: "false"
       REAL_TIME_SUMMARY_UPDATES: "true"
+      FLUENTD_CONF: "fluent-light.conf"
     labels:
       hostname: '{{ inventory_hostname }}'
   notify: clean docker
 
 - name: Copy files from the container
-  command: docker cp fluentd:/fluentd/utils/{{ item }} /etc/bbb-fluent/
+  shell: docker exec fluentd cat /fluentd/utils/{{ item }} > /etc/bbb-fluent/{{ item }}
   with_items:
     - packetbeat.yml
     - audio-stats.rb

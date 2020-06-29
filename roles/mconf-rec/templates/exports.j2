@@ -1,0 +1,9 @@
+/var/bigbluebutton/published                            {% for item in groups[nfs_group] %} {{ hostvars[item].nfs_ip }}/32(rw,nohide,no_subtree_check,async){% endfor %}
+
+/var/bigbluebutton/recording/status/published           {% for item in groups[nfs_group] %} {{ hostvars[item].nfs_ip }}/32(rw,nohide,no_subtree_check,async){% endfor %}
+
+/var/bigbluebutton/recording/raw                        {% for item in groups[nfs_group] %} {{ hostvars[item].nfs_ip }}/32(ro,nohide,no_subtree_check,async){% endfor %}
+
+{% for item in groups[nfs_group] %}
+/var/bigbluebutton/recording/status/sanity_{{ hostvars[item].nfs_name }}    {{ hostvars[item].nfs_ip }}/32(rw,nohide,no_subtree_check,async)
+{% endfor %}

@@ -1,0 +1,14 @@
+---
+
+- name: Start nginx exporter
+  docker_container:
+    name: nginx-exporter
+    image: nginx/nginx-prometheus-exporter:0.6.0
+    command: -nginx.scrape-uri https://{{ inventory_hostname }}/stub_status -web.telemetry-path /nginx_metrics
+    pull: yes
+    restart_policy: always
+    ports:
+      - 9113:9113
+    labels:
+      hostname: '{{ inventory_hostname }}'
+    state: '{% if bigbluebutton_prometheus_nginx_exporter_enabled %}started{% else %}stopped{% endif %}'

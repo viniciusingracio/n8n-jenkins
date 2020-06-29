@@ -1,0 +1,118 @@
+location /metrics {
+    proxy_pass         http://localhost:9100;
+    proxy_redirect     default;
+    proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+    proxy_set_header   X-Real-IP         $remote_addr;
+    proxy_set_header   Host              $http_host;
+    proxy_set_header   X-NginX-Proxy     true;
+
+    auth_basic           "Administrator's area";
+    auth_basic_user_file /etc/apache2/prometheus.htpasswd;
+}
+{% if bigbluebutton_prometheus_nginx_exporter_enabled %}
+
+location /nginx_metrics {
+    proxy_pass         http://localhost:9113;
+    proxy_redirect     default;
+    proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+    proxy_set_header   X-Real-IP         $remote_addr;
+    proxy_set_header   Host              $http_host;
+    proxy_set_header   X-NginX-Proxy     true;
+
+    auth_basic           "Administrator's area";
+    auth_basic_user_file /etc/apache2/prometheus.htpasswd;
+}
+
+location = /stub_status {
+    stub_status;
+
+    allow 172.17.0.0/16;
+    deny all;
+}
+{% endif %}
+{% if bigbluebutton_prometheus_nginx_logs_exporter_enabled %}
+
+location /nginx_log_metrics {
+    rewrite /nginx_log_metrics /metrics  break;
+    proxy_pass         http://localhost:9257;
+    proxy_redirect     default;
+    proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+    proxy_set_header   X-Real-IP         $remote_addr;
+    proxy_set_header   Host              $http_host;
+    proxy_set_header   X-NginX-Proxy     true;
+
+    auth_basic           "Administrator's area";
+    auth_basic_user_file /etc/apache2/prometheus.htpasswd;
+}
+{% endif %}
+{% if bigbluebutton_prometheus_docker_exporter_enabled %}
+
+location /docker_metrics {
+    rewrite /docker_metrics /metrics  break;
+    proxy_pass         http://localhost:9323;
+    proxy_redirect     default;
+    proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+    proxy_set_header   X-Real-IP         $remote_addr;
+    proxy_set_header   Host              $http_host;
+    proxy_set_header   X-NginX-Proxy     true;
+
+    auth_basic           "Administrator's area";
+    auth_basic_user_file /etc/apache2/prometheus.htpasswd;
+}
+{% endif %}
+{% if bigbluebutton_prometheus_process_exporter_enabled %}
+
+location /process_metrics {
+    proxy_pass         http://localhost:9256;
+    proxy_redirect     default;
+    proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+    proxy_set_header   X-Real-IP         $remote_addr;
+    proxy_set_header   Host              $http_host;
+    proxy_set_header   X-NginX-Proxy     true;
+
+    auth_basic           "Administrator's area";
+    auth_basic_user_file /etc/apache2/prometheus.htpasswd;
+}
+{% endif %}
+{% if bigbluebutton_prometheus_redis_exporter_enabled %}
+
+location /redis_metrics {
+    proxy_pass         http://localhost:9121;
+    proxy_redirect     default;
+    proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+    proxy_set_header   X-Real-IP         $remote_addr;
+    proxy_set_header   Host              $http_host;
+    proxy_set_header   X-NginX-Proxy     true;
+
+    auth_basic           "Administrator's area";
+    auth_basic_user_file /etc/apache2/prometheus.htpasswd;
+}
+{% endif %}
+{% if bigbluebutton_prometheus_fluentd_exporter_enabled %}
+
+location /fluentd_metrics {
+    proxy_pass         http://localhost:24231;
+    proxy_redirect     default;
+    proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+    proxy_set_header   X-Real-IP         $remote_addr;
+    proxy_set_header   Host              $http_host;
+    proxy_set_header   X-NginX-Proxy     true;
+
+    auth_basic           "Administrator's area";
+    auth_basic_user_file /etc/apache2/prometheus.htpasswd;
+}
+{% endif %}
+{% if bigbluebutton_prometheus_ntp_exporter_enabled %}
+
+location /ntp_metrics {
+    proxy_pass         http://localhost:9559;
+    proxy_redirect     default;
+    proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+    proxy_set_header   X-Real-IP         $remote_addr;
+    proxy_set_header   Host              $http_host;
+    proxy_set_header   X-NginX-Proxy     true;
+
+    auth_basic           "Administrator's area";
+    auth_basic_user_file /etc/apache2/prometheus.htpasswd;
+}
+{% endif %}

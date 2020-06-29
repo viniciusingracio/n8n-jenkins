@@ -13,10 +13,9 @@ process_names:
     - bash
     cmdline:
     - -e /usr/share/meteor/bundle/systemd_start.sh
-  # for some reason, redis isn't working
   - name: redis
-    exe:
-    - /usr/bin/redis-server
+    comm:
+    - redis-server
   - name: bbb-web
     exe:
     - bash

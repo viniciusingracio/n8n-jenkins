@@ -1,5 +1,8 @@
+- include: facts.yml
+
 - include_role:
     name: mconf-live
+  tags: [ mconf-live ]
 
 - name: Disable services not needed
   become: yes

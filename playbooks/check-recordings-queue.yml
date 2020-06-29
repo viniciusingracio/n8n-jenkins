@@ -1,0 +1,20 @@
+- hosts: all
+  tasks:
+    - name: Copy script
+      synchronize:
+        src: files/check-recordings-queue.sh
+        dest: /usr/local/bigbluebutton/core/scripts/utils/check-recordings-queue.sh
+        use_ssh_args: yes
+      become: yes
+      retries: 10
+      delay: 5
+      register: task_result
+      until: task_result.rc == 0
+
+    - name: Check queue
+      shell: /usr/local/bigbluebutton/core/scripts/utils/check-recordings-queue.sh
+      become: yes
+      register: queue_out
+
+    - debug:
+        msg: '{{ queue_out.stdout_lines }}'

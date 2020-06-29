@@ -1,4 +1,4 @@
-- hosts: database
+- hosts: postgresql
   roles:
     - role: geerlingguy.postgresql
       become: yes

@@ -1,0 +1,14 @@
+---
+
+- name: Start ntp exporter
+  docker_container:
+    name: ntp-exporter
+    image: sapcc/ntp-exporter:v1.1.2
+    command: -ntp.source cli -ntp.measurement-duration 5s -ntp.server {{ bigbluebutton_prometheus_ntp_exporter_server }} -web.telemetry-path /ntp_metrics
+    pull: yes
+    restart_policy: always
+    ports:
+      - 9559:9559
+    labels:
+      hostname: '{{ inventory_hostname }}'
+    state: '{% if bigbluebutton_prometheus_ntp_exporter_enabled %}started{% else %}stopped{% endif %}'

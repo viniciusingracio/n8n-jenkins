@@ -16,11 +16,10 @@
 - name: Install python libraries for SSL
   become: yes
   pip:
-    name: '{{ item }}'
+    name:
+      - urllib3[secure]
+      - pyOpenSSL
+      - ndg-httpsclient
+      - pyasn1
     state: present
-  with_items:
-    - urllib3[secure]
-    - pyOpenSSL
-    - ndg-httpsclient
-    - pyasn1
   when: ansible_python_interpreter == '/usr/bin/python2'

@@ -1,0 +1,44 @@
+- name: Create temporary directory for bbb-config
+  tempfile:
+    state: directory
+  register: tmpdir_config
+
+- name: Download bbb-config from repo
+  command: apt-get download bbb-config
+  args:
+    chdir: '{{ tmpdir_config.path }}'
+    warn: False
+
+- name: Extract cron job
+  shell: 'dpkg-deb --fsys-tarfile bbb-config_*.deb | tar -x ./etc/cron.daily/bigbluebutton --strip-components=3'
+  args:
+    chdir: '{{ tmpdir_config.path }}'
+
+- name: Configure retention
+  lineinfile:
+    dest: '{{ tmpdir_config.path }}/bigbluebutton'
+    state: present
+    regexp: '{{ item.regexp }}'
+    line: '{{ item.line }}'
+  with_items:
+  - { regexp: '^history=', line: 'history={{ bigbluebutton_retention_runtime }}' }
+  - { regexp: '^unrecorded_days=', line: 'unrecorded_days={{ bigbluebutton_retention_unrecorded }}' }
+  - { regexp: '^published_days=', line: 'published_days={{ bigbluebutton_retention_published_raw }}' }
+  - { regexp: '^log_history=', line: 'log_history={{ bigbluebutton_log_retention }}' }
+  - { regexp: '^[#]?remove_raw_of_recordings_without_marks$', line: 'remove_raw_of_recordings_without_marks', when: '{{ not bigbluebutton_retention_unrecorded is none }}' }
+  - { regexp: '^[#]?remove_raw_of_recordings_without_marks$', line: '#remove_raw_of_recordings_without_marks', when: '{{ bigbluebutton_retention_unrecorded is none }}' }
+  - { regexp: '^[#]?remove_raw_of_published_recordings$', line: 'remove_raw_of_published_recordings', when: '{{ not bigbluebutton_retention_published_raw is none }}' }
+  - { regexp: '^[#]?remove_raw_of_published_recordings$', line: '#remove_raw_of_published_recordings', when: '{{ bigbluebutton_retention_published_raw is none }}' }
+  when: item.when is undefined or item.when == true
+
+- name: Copy temporary cron job
+  copy:
+    src: '{{ tmpdir_config.path }}/bigbluebutton'
+    dest: /etc/cron.daily/bigbluebutton
+    remote_src: yes
+  become: yes
+
+- name: Remove temporary directory for bbb-config
+  file:
+    path: '{{ tmpdir_config.path }}'
+    state: absent

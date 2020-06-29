@@ -33,12 +33,18 @@
     state: 'latest'
 
 - include: rec-proxy.yml
+  tags:
+    - rec-proxy
 
 - include: hold-music.yml
 
 - include: rap.yml
   tags:
     - rap
+
+- include: docker-daemon.yml
+  tags:
+    - docker
 
 - include_role:
     name: bigbluebutton-etherpad

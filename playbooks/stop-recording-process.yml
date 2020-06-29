@@ -1,0 +1,17 @@
+---
+
+- hosts: all
+  tasks:
+  - name: Stop services for presentation and presentation_video
+    become: yes
+    command: systemctl stop bbb-rap* bbb-record* bbb_record* mconf-presentation*
+
+  - name: Stop recorders
+    shell: '{{ item }}'
+    with_items:
+      - docker ps --filter name=record_* -aq | xargs -r docker rm -f
+      - docker ps --filter name=nginx_* -aq | xargs -r docker rm -f
+      - docker network ls --filter name=record_* --format '\{\{.Name\}\}' | cut -d'_' -f2 | xargs -I{} -r docker network disconnect -f record_{} nginx_{}
+      - docker network ls --filter name=record_* --format '\{\{.Name\}\}' | cut -d'_' -f2 | xargs -I{} -r docker network disconnect -f record_{} record_{}
+      - docker network ls --filter name=record_* -q | xargs -r docker network rm
+    ignore_errors: yes

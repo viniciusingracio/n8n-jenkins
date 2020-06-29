@@ -20,6 +20,14 @@
   shell: "ifconfig docker0 | grep 'inet addr:' | cut -d: -f2 | awk '{print $1}'"
   register: docker_ip
 
+# it doesn't work to send a symlink to the container, so we need to figure that out
+- stat:
+    path: /var/bigbluebutton
+  register: reg_var_bigbluebutton
+
+- set_fact:
+    recordings_dir: '{% if reg_var_bigbluebutton.stat.islnk is defined and reg_var_bigbluebutton.stat.islnk %}{{ reg_var_bigbluebutton.stat.lnk_source }}{% else %}{{ reg_var_bigbluebutton.stat.path }}{% endif %}'
+
 - name: Start the aws-publisher container
   docker_container:
     command: bundle exec ruby s3.rb --watch
@@ -28,9 +36,10 @@
     pull: yes
     restart_policy: always
     volumes:
-      - /var/bigbluebutton:/var/bigbluebutton
+      - '{{ recordings_dir }}:/var/bigbluebutton'
       - /var/log/bigbluebutton:/var/log/bigbluebutton
     env:
+      BBB_AWS_ENDPOINT: '{{ aws_publisher_endpoint | string }}'
       BBB_AWS_REGION: '{{ aws_publisher_region | string }}'
       BBB_AWS_KEY: '{{ aws_publisher_key | string }}'
       BBB_AWS_SECRET: '{{ aws_publisher_secret | string }}'
@@ -42,6 +51,8 @@
       BBB_AWS_KEEP_LOCAL: '{{ aws_publisher_keep_local | string }}'
       BBB_AWS_REDIS_HOST: '{{ docker_ip.stdout | string }}'
       BBB_AWS_FAST_RESYNC: '{{ aws_publisher_fast_resync | string }}'
+      BBB_AWS_KEEP_DELETED: '{{ aws_publisher_keep_deleted | string }}'
+      BBB_AWS_RESYNC: '0'
     labels:
       hostname: '{{ inventory_hostname }}'
 
@@ -52,9 +63,10 @@
     image: '{{ aws_publisher_image }}:{{ aws_publisher_image_version }}'
     pull: yes
     volumes:
-      - /var/bigbluebutton:/var/bigbluebutton
+      - '{{ recordings_dir }}:/var/bigbluebutton'
       - /var/log/bigbluebutton:/var/log/bigbluebutton
     env:
+      BBB_AWS_ENDPOINT: '{{ aws_publisher_endpoint | string }}'
       BBB_AWS_REGION: '{{ aws_publisher_region | string }}'
       BBB_AWS_KEY: '{{ aws_publisher_key | string }}'
       BBB_AWS_SECRET: '{{ aws_publisher_secret | string }}'
@@ -66,9 +78,7 @@
       BBB_AWS_KEEP_LOCAL: '{{ aws_publisher_keep_local | string }}'
       BBB_AWS_REDIS_HOST: '{{ docker_ip.stdout | string }}'
       BBB_AWS_FAST_RESYNC: '{{ aws_publisher_fast_resync | string }}'
+      BBB_AWS_KEEP_DELETED: '{{ aws_publisher_keep_deleted | string }}'
     labels:
       hostname: '{{ inventory_hostname }}'
-  when: aws_publisher_run_resync
-
-
-# sudo tc qdisc add dev `ifconfig | grep veth | tail -1 | awk '{print $1; exit}'` root tbf rate 100kbit latency 50ms burst 800000
+    state: '{% if aws_publisher_run_resync %}started{% else %}stopped{% endif %}'

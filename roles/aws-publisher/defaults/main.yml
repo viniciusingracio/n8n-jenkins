@@ -10,6 +10,7 @@ aws_publisher_repo_ref: mconf-2.2
 aws_publisher_image: mconf/aws-publisher
 aws_publisher_image_version: 0.0.12-024a23b38f
 
+aws_publisher_endpoint:
 aws_publisher_region:
 aws_publisher_key:
 aws_publisher_secret:
@@ -19,6 +20,7 @@ aws_publisher_remote_playback: 0
 aws_publisher_remote_playback_url:
 aws_publisher_available_formats: presentation,presentation_video
 aws_publisher_keep_local: 1
+aws_publisher_keep_deleted: 1
 aws_publisher_fast_resync: 0
 
 aws_publisher_run_resync: false

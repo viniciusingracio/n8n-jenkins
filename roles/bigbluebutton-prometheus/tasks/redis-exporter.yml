@@ -1,0 +1,14 @@
+---
+
+- name: Start redis exporter
+  docker_container:
+    name: redis-exporter
+    image: oliver006/redis_exporter:v1.5.3-alpine
+    command: --redis.addr redis://{{ docker_ip }}:6379 --web.telemetry-path /redis_metrics --redis-only-metrics true
+    pull: yes
+    restart_policy: always
+    ports:
+      - 9121:9121
+    labels:
+      hostname: '{{ inventory_hostname }}'
+    state: '{% if bigbluebutton_prometheus_redis_exporter_enabled %}started{% else %}stopped{% endif %}'

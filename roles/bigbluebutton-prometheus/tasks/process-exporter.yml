@@ -1,0 +1,25 @@
+---
+
+- name: Copy process exporter config
+  become: yes
+  copy:
+    src: files/etc/process-exporter.yml
+    dest: /usr/local/etc/bigbluebutton-prometheus/process-exporter.yml
+  notify: restart process exporter
+
+- name: Start process exporter
+  docker_container:
+    name: process-exporter
+    image: ncabatoff/process-exporter:0.6.0
+    command: -procfs /host/proc -config.path /config/config.yml -web.telemetry-path /process_metrics
+    pull: yes
+    privileged: yes
+    restart_policy: always
+    ports:
+      - 9256:9256
+    volumes:
+      - /proc:/host/proc:ro
+      - /usr/local/etc/bigbluebutton-prometheus/process-exporter.yml:/config/config.yml:ro
+    labels:
+      hostname: '{{ inventory_hostname }}'
+    state: '{% if bigbluebutton_prometheus_process_exporter_enabled %}started{% else %}stopped{% endif %}'

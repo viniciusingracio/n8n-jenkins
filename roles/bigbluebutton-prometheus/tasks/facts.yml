@@ -1,0 +1,33 @@
+---
+
+- name: Check if bbb-web is running on a standalone app
+  stat:
+    path: /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
+  register: reg_standalone
+- set_fact:
+    bigbluebutton_servlet_dir: /usr/share/bbb-web
+  when: reg_standalone.stat.exists
+- set_fact:
+    bigbluebutton_servlet_dir: /var/lib/tomcat7/webapps/bigbluebutton
+  when: not reg_standalone.stat.exists
+
+- name: Get BigBlueButton secret
+  shell: cat {{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2  | hash('sha256')
+  register: bbb_secret_raw
+  when: bigbluebutton_prometheus_password is none
+
+- name: Register Docker host IP
+  shell: "ifconfig docker0 | grep 'inet addr:' | cut -d: -f2 | awk '{print $1}'"
+  register: docker_ip_raw
+
+- set_fact:
+    docker_ip: '{{ docker_ip_raw.stdout }}'
+
+- name: Determine external IP
+  set_fact:
+    external_ip: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | grep \"[0-9]*\\.[0-9]*\\.[0-9]*\\.[0-9]*\" | head -n 1') }}"
+  when: external_ip is undefined or external_ip is none
+- name: Set external IP as internal IP if nothing returns from dig
+  set_fact:
+    external_ip: '{{ ansible_default_ipv4.address }}'
+  when: external_ip is undefined or external_ip is none or external_ip | trim == ""

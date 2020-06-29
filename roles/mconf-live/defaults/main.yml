@@ -14,6 +14,7 @@ mconf_live_num_presentation_recorders: 1
 mconf_live_rec_proxy_http_port: 8091
 mconf_live_rec_proxy_enabled: false
 mconf_live_rec_fallback:
+mconf_live_rec_redirect_23_playback: false
 mconf_live_rec_proxy_api_enabled: false
 mconf_live_rec_proxy_image_version: latest
 mconf_live_rec_proxy_jwt_secret:
@@ -21,7 +22,7 @@ mconf_live_rec_proxy_jwt_secret:
 mconf_live_sounds_hold_music:
 
 mconf_live_presentation_recorder_image: mconf/mconf-presentation-recorder
-mconf_live_presentation_recorder_version: 0.0.13-c710bc4
+mconf_live_presentation_recorder_version: 0.0.14-2ae375e
 
 # these attributes are optional and will be set to default values if empty
 mconf_live_recording_auth_entry_point:
@@ -34,14 +35,17 @@ bigbluebutton_stun_server:
   - stun:stun.l.google.com:19302
 
 bigbluebutton_docker_webrtc_sfu_enabled: false
-bigbluebutton_docker_webrtc_sfu_image: mconf/bbb-webrtc-sfu:v2.4.13
+bigbluebutton_docker_webrtc_sfu_image: mconf/bbb-webrtc-sfu:v2.4.14.95b01a
 # it can be VP8, H264 or ANY
 bigbluebutton_docker_webrtc_sfu_codec: ANY
 bigbluebutton_docker_webrtc_sfu_ip_public:
 bigbluebutton_docker_webrtc_sfu_ip_private:
 bigbluebutton_docker_webrtc_sfu_ip_local:
+bigbluebutton_docker_webrtc_sfu_k8s_enabled: false
+bigbluebutton_docker_webrtc_sfu_k8s_local_config_file: files/kube-config
+bigbluebutton_docker_webrtc_sfu_k8s_config_file: /usr/local/bigbluebutton/bbb-webrtc-sfu/config/kube-config
 bigbluebutton_docker_mcs_sip_enabled: false
-bigbluebutton_docker_mcs_sip_image: mconf/mcs-sip:v2.2.12
+bigbluebutton_docker_mcs_sip_image: mconf/mcs-sip:v2.2.14
 bigbluebutton_docker_mcs_sip_intraframe_interval: 0
 bigbluebutton_docker_mcs_sip_alert_url:
 bigbluebutton_docker_sfu_phone_image: mconf/sfu-phone:v2.1.9
@@ -55,7 +59,7 @@ bigbluebutton_docker_suite_password: suite
 bigbluebutton_docker_kurento_enabled: false
 bigbluebutton_docker_kurento_instances: 1
 bigbluebutton_docker_kurento_first_port: 3100
-bigbluebutton_docker_kurento_image: mconf/kurento:6.13.0-2-mconf
+bigbluebutton_docker_kurento_image: mconf/kurento:6.13.2-1-mconf
 bigbluebutton_docker_kurento_allowed_candidates:
 
 bigbluebutton_allow_transfer: false

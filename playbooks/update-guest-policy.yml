@@ -1,0 +1,34 @@
+---
+
+- hosts: all
+  handlers:
+    - name: restart bigbluebutton
+      become: yes
+      command: timeout 180 /usr/local/bigbluebutton/core/scripts/utils/restart-mconf.sh
+  tasks:
+    - name: Check if bbb-web is running on a standalone app
+      stat:
+        path: /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
+      register: reg_standalone
+    - set_fact:
+        bigbluebutton_servlet_dir: /usr/share/bbb-web
+      when: reg_standalone.stat.exists
+    - set_fact:
+        bigbluebutton_servlet_dir: /var/lib/tomcat7/webapps/bigbluebutton
+      when: not reg_standalone.stat.exists
+
+    - name: Determine if reset encoding needed on bigbluebutton.properties
+      set_fact:
+        properties_charset: 'iso-8859-1'
+
+    - name: Customize bigbluebutton.properties
+      replace:
+        path: '{{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties'
+        regexp: '^({{ item.key }})=.*'
+        replace: '\1={{ item.value }}'
+        encoding: '{{ properties_charset }}'
+      with_items:
+        - { key: 'defaultGuestPolicy', value: '{{ bigbluebutton_guest_policy }}' }
+      when: not item.value is none
+      become: yes
+      notify: restart bigbluebutton

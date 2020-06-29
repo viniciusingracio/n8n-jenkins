@@ -1,0 +1,61 @@
+---
+
+- name: Check if daemon.json exists
+  become: yes
+  stat:
+    path: /etc/docker/daemon.json
+  register: reg_daemon
+
+- name: Create file if it doesn't exist
+  become: yes
+  shell: echo '{}' | tee /etc/docker/daemon.json
+  when: not reg_daemon.stat.exists
+
+- name: Create temporary directory
+  tempfile:
+    state: directory
+  register: tmpdir
+
+- name: Copy to temporary dir
+  become: yes
+  copy:
+    src: /etc/docker/daemon.json
+    dest: '{{ tmpdir.path }}/daemon.json'
+    remote_src: yes
+    owner: '{{ ansible_user }}'
+    group: '{{ ansible_user }}'
+
+- shell: cat {{ tmpdir.path }}/daemon.json
+  register: data
+
+- set_fact:
+    content: '{{ data.stdout | from_yaml }}'
+- set_fact:
+    content: '{% set value=item.value | int if item.cast_int | default(false) else item.value %}{{ content | combine({ item.key: value }, recursive=true) }}'
+  with_items: '{{ docker_daemon_config_add | default([]) }}'
+
+- set_fact:
+    content: '{% set removed=content.pop(item.key) %}{{ content }}'
+  with_items: '{{ docker_daemon_config_remove | default([]) }}'
+  ignore_errors: yes
+
+- name: Dump content to file
+  shell: echo '{{ content | to_json }}' | tee {{ tmpdir.path }}/daemon.json
+
+- name: Copy from temporary dir
+  copy:
+    src: '{{ tmpdir.path }}/daemon.json'
+    dest: /etc/docker/daemon.json
+    remote_src: yes
+  become: yes
+  register: reg_updated
+
+- name: Restart docker daemon
+  become: yes
+  service: name=docker state=restarted
+  when: reg_updated is changed
+
+- name: Remove temporary directory
+  file:
+    path: '{{ tmpdir.path }}'
+    state: absent

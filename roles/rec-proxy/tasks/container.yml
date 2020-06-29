@@ -17,6 +17,22 @@
     force: true
   when: rec_proxy_build_from_source | bool and rec_proxy_code.changed
 
+- name: Create a network
+  docker_network:
+    name: rec-proxy-network
+
+- name: Launch redis
+  docker_container:
+    name: redis
+    image: redis
+    pull: yes
+    restart_policy: always
+    networks:
+      - name: rec-proxy-network
+    labels:
+      hostname: '{{ inventory_hostname }}'
+  notify: clean docker
+
 - name: Create directory for nginx cache
   file:
     path: '{{ rec_proxy_cache_path }}'
@@ -66,7 +82,12 @@
       CACHE_NUM_KEYS: '{{ rec_proxy_cache_num_keys | string }}'
       CACHE_EXPIRE_AFTER: '{{ rec_proxy_cache_expire_after | string }}'
       CACHE_MAX_SIZE: '{{ rec_proxy_cache_max_size | string }}'
+      AUTH_NONCE_REDIS_HOST: redis
       TZ: '{{ lookup("file", "/etc/timezone") }}'
+    networks:
+      - name: rec-proxy-network
+    links:
+     - redis
     labels:
       hostname: '{{ inventory_hostname }}'
   notify: clean docker

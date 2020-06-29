@@ -2,9 +2,12 @@ require '/usr/local/bigbluebutton/core/lib/recordandplayback.rb'
 require 'trollop'
 
 opts = Trollop::options do
-  opt :metadata_xml_path, "Metadata file to repost event", :type => String
+  opt :meeting_id, "Meeting ID", :type => String, :required => true
   opt :dry_run, "Do not execute anything", :type => :flag, :default => false
+  opt :sanity_only, "", :type => :flag, :default => false
+  opt :skip_sanity, "", :type => :flag, :default => false
 end
+meeting_id = opts[:meeting_id]
 
 if ! opts[:dry_run]
   props = YAML::load(File.open('/usr/local/bigbluebutton/core/scripts/bigbluebutton.yml'))
@@ -14,33 +17,41 @@ if ! opts[:dry_run]
   BigBlueButton.redis_publisher = BigBlueButton::RedisWrapper.new(redis_host, redis_port, redis_password)
 end
 
-list = opts[:metadata_xml_path].nil? ? Dir.glob( "/var/bigbluebutton/published/**/metadata.xml" ) : [ opts[:metadata_xml_path] ]
+list = Dir.glob( [ "/var/bigbluebutton/published/*/#{meeting_id}/metadata.xml", "/var/bigbluebutton/unpublished/*/#{meeting_id}/metadata.xml", "/var/bigbluebutton/deleted/*/#{meeting_id}/metadata.xml" ] )
+exit 0 if list.empty?
+
+if ! opts[:dry_run] && ! opts[:skip_sanity]
+  BigBlueButton.redis_publisher.put_sanity_started(meeting_id)
+  BigBlueButton.redis_publisher.put_sanity_ended(meeting_id)
+end
+
+exit 0 if opts[:sanity_only]
+
 list.each do |metadata_xml_path|
-  next if ! File.exists? metadata_xml_path
   match = /\/var\/bigbluebutton\/(?<visibility>\w+)\/(?<format>\w+)\/(?<record_id>\w+-\d+)\/metadata.xml/.match metadata_xml_path
   next if match.nil?
-  meeting_id = match[:record_id]
   publish_type = match[:format]
-  playback = {}
-  metadata = {}
-  download = {}
-  raw_size = {}
-  start_time = {}
-  end_time = {}
-  step_succeeded = true
-  step_time = 0
+  visibility = match[:visibility]
+  BigBlueButton.logger.info "Processing record_id #{meeting_id}, format #{publish_type}, visibility #{visibility}"
+
+  payload = {}
   begin
     doc = Hash.from_xml(File.open(metadata_xml_path))
-    playback = doc[:recording][:playback] if ! doc[:recording][:playback].nil?
+    playback = doc.dig(:recording, :playback) || {}
 
     xml_doc = Nokogiri::XML(File.open(metadata_xml_path)) { |x| x.noblanks }
     playback[:extensions][:preview][:images][:image] = [ playback[:extensions][:preview][:images][:image] ] if xml_doc.xpath("/recording/playback/extensions/preview/images/image").size == 1
 
-    metadata = doc[:recording][:meta] if ! doc[:recording][:meta].nil?
-    download = doc[:recording][:download] if ! doc[:recording][:download].nil?
-    raw_size = doc[:recording][:raw_size] if ! doc[:recording][:raw_size].nil?
-    start_time = doc[:recording][:start_time] if ! doc[:recording][:start_time].nil?
-    end_time = doc[:recording][:end_time] if ! doc[:recording][:end_time].nil?
+    payload = {
+      "success" => true,
+      "step_time" => 0,
+      "playback" => playback,
+      "metadata" => doc.dig(:recording, :meta) || {},
+      "download" => doc.dig(:recording, :download) || {},
+      "raw_size" => doc.dig(:recording, :raw_size) || {},
+      "start_time" => doc.dig(:recording, :start_time) || {},
+      "end_time" => doc.dig(:recording, :end_time) || {}
+    }
   rescue Exception => e
     BigBlueButton.logger.warn "An exception occurred while loading the extra information for the publish event"
     BigBlueButton.logger.warn e.message
@@ -50,16 +61,6 @@ list.each do |metadata_xml_path|
     next
   end
 
-  payload = {
-    "success" => step_succeeded,
-    "step_time" => step_time,
-    "playback" => playback,
-    "metadata" => metadata,
-    "download" => download,
-    "raw_size" => raw_size,
-    "start_time" => start_time,
-    "end_time" => end_time
-  }
   if opts[:dry_run]
     obj = {
       "publish_type" => publish_type,
@@ -68,6 +69,12 @@ list.each do |metadata_xml_path|
     }
     BigBlueButton.logger.info JSON.pretty_generate(obj)
   else
+    BigBlueButton.redis_publisher.put_process_started(publish_type, meeting_id)
+    BigBlueButton.redis_publisher.put_process_ended(publish_type, meeting_id)
+    BigBlueButton.redis_publisher.put_publish_started(publish_type, meeting_id)
     BigBlueButton.redis_publisher.put_publish_ended(publish_type, meeting_id, payload)
   end
+
+  next if visibility == "published"
+  BigBlueButton.redis_publisher.put_message_workflow(visibility, publish_type, meeting_id) if ! opts[:dry_run]
 end

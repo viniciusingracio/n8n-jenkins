@@ -79,10 +79,12 @@
 
 - name: Add bigbluebutton user to docker group
   become: yes
-  user:
-    name: '{{ bigbluebutton_user }}'
-    groups: docker
-    append: yes
+  command: usermod -aG docker {{ bigbluebutton_user }}
+  # the following give us an error on ansible
+  # user:
+  #   name: '{{ bigbluebutton_user }}'
+  #   groups: docker
+  #   append: yes
   when: presentation_video_enabled | bool
   notify: restart mconf-presentation-recorder
 
@@ -106,3 +108,4 @@
     state: restarted
     enabled: true
   when: presentation_video_enabled | bool
+  ignore_errors: yes

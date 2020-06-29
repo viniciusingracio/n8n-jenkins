@@ -27,7 +27,7 @@ props['matcher'].each do |item|
   node = metadata.at_xpath(item['xpath'])
 
   if ! node.nil? && node.text == item['value']
-    new_video_file = "#{published_dir}/video/new.mp4"
+    new_video_file = "/tmp/#{record_id}.mp4"
     command = "ffmpeg -i #{video_file} -c:v libx264 -x264-params 'nal-hrd=cbr' -b:v 100k -minrate 100k -maxrate 100k -bufsize 200k -vf scale=320:240 -c:a libfdk_aac -b:a 48k #{new_video_file}"
     result = BigBlueButton.execute command, false
     if result.success?

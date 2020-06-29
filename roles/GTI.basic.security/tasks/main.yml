@@ -24,13 +24,25 @@
 #   command: unattended-upgrades
 #   when: ansible_os_family == "Debian"
 
+- name: Check if grub exists (Ubuntu)
+  stat:
+    path: /boot/grub/grub.cfg
+  register: reg_grub_cfg
+  when: ansible_os_family == "Debian"
+
 - name: Changing grub.cfg permissions (Ubuntu)
   file:
    path: /boot/grub/grub.cfg
    owner: root
    group: root
    mode: 0600
-  when: ansible_os_family == "Debian"
+  when: ansible_os_family == "Debian" and reg_grub_cfg.stat.exists
+
+- name: Check if grub exists (Redhat7/CentOS7)
+  stat:
+    path: /boot/grub2/grub.cfg
+  register: reg_grub_cfg
+  when: ansible_os_family == "RedHat" and ansible_distribution_release == "Core"
 
 - name: Changing grub.cfg permissions (Redhat7/CentOS7)
   file:
@@ -38,7 +50,13 @@
    owner: root
    group: root
    mode: 0600
-  when: ansible_os_family == "RedHat" and ansible_distribution_release == "Core"
+  when: ansible_os_family == "RedHat" and ansible_distribution_release == "Core" and reg_grub_cfg.stat.exists
+
+- name: Check if grub exists (Redhat6/CentOS6)
+  stat:
+    path: /boot/grub/grub.conf
+  register: reg_grub_cfg
+  when: ansible_os_family == "RedHat" and ansible_distribution_release == "Final"
 
 - name: Changing grub.cfg permissions (Redhat6/CentOS6)
   file:
@@ -46,7 +64,7 @@
    owner: root
    group: root
    mode: 0600
-  when: ansible_os_family == "RedHat" and ansible_distribution_release == "Final"
+  when: ansible_os_family == "RedHat" and ansible_distribution_release == "Final" and reg_grub_cfg.stat.exists
 
 - name: stat compilers files
   stat:

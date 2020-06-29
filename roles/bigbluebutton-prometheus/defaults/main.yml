@@ -1,3 +1,12 @@
 ---
 
 bigbluebutton_prometheus_password:
+bigbluebutton_prometheus_process_exporter_enabled: false
+bigbluebutton_prometheus_nginx_exporter_enabled: false
+bigbluebutton_prometheus_nginx_logs_exporter_enabled: false
+bigbluebutton_prometheus_redis_exporter_enabled: false
+bigbluebutton_prometheus_docker_exporter_enabled: false
+bigbluebutton_prometheus_fluentd_exporter_enabled: false
+bigbluebutton_prometheus_sipp_exporter_enabled: false
+bigbluebutton_prometheus_ntp_exporter_enabled: false
+bigbluebutton_prometheus_ntp_exporter_server:

@@ -7,6 +7,10 @@ require 'trollop'
 require 'digest/sha1'
 require 'benchmark'
 require 'uri'
+require 'docker'
+require 'date'
+require 'open4'
+require 'json'
 
 # Manage BBB properties such as server address and salt.
 # These informations can be loaded from file (bigbluebutton.properties) or
@@ -62,7 +66,7 @@ class URIBuilder
   end
 
   def self.client_uri
-    @@client_uri ||= build_uri "client/conf/config.xml"
+    @@client_uri ||= build_uri "/html5client"
   end
 
   def self.api_method_uri(method, params = nil)
@@ -99,10 +103,10 @@ class HTTPRequester
     @ssl_enabled = ssl_enabled
   end
 
-  def get_response(uri)
+  def get_response(uri, use_ssl: false)
     http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = @ssl_enabled
-    http.read_timeout = 5
+    http.use_ssl = use_ssl || @ssl_enabled
+    http.read_timeout = 10
 
     # It never raises an exception
     http.get(uri.request_uri)
@@ -152,10 +156,13 @@ class Meetings < MonitoredService
     update_meetings
 
     meetings_hash = {
+      :bbb_meetings_success => @@success,
       :bbb_meetings_response_code => @@response_code,
       :bbb_meetings_total => 0,
+      :bbb_meetings_response_time => @@time,
       :bbb_meetings_participants_total => 0,
       :bbb_meetings_sent_videos_total => 0,
+      :bbb_meetings_max_sent_videos => 0,
       :bbb_meetings_received_videos_total => 0,
       :bbb_meetings_sent_audio_total => 0,
       :bbb_meetings_received_audio_total => 0,
@@ -175,6 +182,7 @@ class Meetings < MonitoredService
           meetings_hash[:bbb_meetings_list] << meeting_name
           meetings_hash[:bbb_meetings_participants_total] += participant_count
           meetings_hash[:bbb_meetings_sent_videos_total] += video_count
+          meetings_hash[:bbb_meetings_max_sent_videos] = [ meetings_hash[:bbb_meetings_max_sent_videos], video_count ].max
           meetings_hash[:bbb_meetings_received_videos_total] += video_count * (participant_count - 1)
           meetings_hash[:bbb_meetings_sent_audio_total] += voice_participant_count
           meetings_hash[:bbb_meetings_received_audio_total] += listener_count
@@ -187,11 +195,23 @@ class Meetings < MonitoredService
 
   def self.update_meetings
     uri = URIBuilder.api_method_uri 'getMeetings'
-    response = @@requester.get_response(uri)
-    @@response_code = response.code
-    doc = Nokogiri::XML(response.body)
+    response = nil
+    time = Benchmark.measure do
+      response = @@requester.get_response(uri) rescue nil
+    end
 
-    @@meetings = doc.xpath('/response/meetings/meeting')
+    @@time = time.to_s[/\(\s*([\d.]*)\)/, 1]
+    if response
+      @@response_code = response.code
+      doc = Nokogiri::XML(response.body)
+      @@meetings = doc.xpath('/response/meetings/meeting')
+      node = doc.at_xpath('/response/returncode')
+      @@success = ( ! node.nil? and node.text == "SUCCESS" ) ? 1 : 0
+    else
+      @@success = 0
+      @@response_code = "NaN"
+      @@meetings = []
+    end
   end
 
   private_class_method :update_meetings
@@ -203,15 +223,19 @@ class Recordings < MonitoredService
     update_recordings
 
     {
+      :bbb_recordings_success => @@success,
       :bbb_recordings_response_code => @@response_code,
       :bbb_recordings_total => @@recordings.length,
       :bbb_recordings_response_time => @@time,
       :bbb_recordings_published_presentation_count => Dir.glob("/var/bigbluebutton/published/presentation/*").count,
       :bbb_recordings_published_presentation_video_count => Dir.glob("/var/bigbluebutton/published/presentation_video/*").count,
+      :bbb_recordings_published_mconf_encrypted_count => Dir.glob("/var/bigbluebutton/published/mconf_encrypted/*").count,
       :bbb_recordings_unpublished_presentation_count => Dir.glob("/var/bigbluebutton/unpublished/presentation/*").count,
       :bbb_recordings_unpublished_presentation_video_count => Dir.glob("/var/bigbluebutton/unpublished/presentation_video/*").count,
+      :bbb_recordings_unpublished_mconf_encrypted_count => Dir.glob("/var/bigbluebutton/unpublished/mconf_encrypted/*").count,
       :bbb_recordings_deleted_presentation_count => Dir.glob("/var/bigbluebutton/deleted/presentation/*").count,
       :bbb_recordings_deleted_presentation_video_count => Dir.glob("/var/bigbluebutton/deleted/presentation_video/*").count,
+      :bbb_recordings_deleted_mconf_encrypted_count => Dir.glob("/var/bigbluebutton/deleted/mconf_encrypted/*").count,
       :bbb_recordings_sanity_count => Dir.glob("/var/bigbluebutton/recording/status/sanity/*").count,
       :bbb_recordings_fail_count => Dir.glob("/var/bigbluebutton/recording/status/**/*.fail").count,
     }
@@ -221,13 +245,21 @@ class Recordings < MonitoredService
     uri = URIBuilder.api_method_uri('getRecordings', '')
     response = nil
     time = Benchmark.measure do
-      response = @@requester.get_response(uri)
+      response = @@requester.get_response(uri) rescue nil
     end
 
-    @@response_code = response.code
     @@time = time.to_s[/\(\s*([\d.]*)\)/, 1]
-    doc = Nokogiri::XML(response.body)
-    @@recordings = doc.xpath('/response/recordings/recording')
+    if response
+      @@response_code = response.code
+      doc = Nokogiri::XML(response.body)
+      @@recordings = doc.xpath('/response/recordings/recording')
+      node = doc.at_xpath('/response/returncode')
+      @@success = ( ! node.nil? and node.text == "SUCCESS" ) ? 1 : 0
+    else
+      @@success = 0
+      @@response_code = "NaN"
+      @@recordings = []
+    end
   end
 
   private_class_method :update_recordings
@@ -243,6 +275,10 @@ end
 def fill_template(results)
   template =
   <<~HEREDOC
+    # HELP bbb_api_success Success on /bigbluebutton/api call
+    # TYPE bbb_api_success gauge
+    bbb_api_success <%= results[:bbb_api_success] %>
+
     # HELP bbb_api_response_code Response code of the BBB API
     # TYPE bbb_api_response_code gauge
     bbb_api_response_code <%= results[:bbb_api_response_code] %>
@@ -251,9 +287,17 @@ def fill_template(results)
     # TYPE bbb_demo_response_code gauge
     bbb_demo_response_code <%= results[:bbb_demo_response_code] %>
 
+    # HELP bbb_meetings_success Success on /bigbluebutton/api/getMeetings call
+    # TYPE bbb_meetings_success gauge
+    bbb_meetings_success <%= results[:bbb_meetings_success] %>
+
     # HELP bbb_meetings_response_code Response code of getMeetings call
     # TYPE bbb_meetings_response_code gauge
     bbb_meetings_response_code <%= results[:bbb_meetings_response_code] %>
+
+    # HELP bbb_meetings_response_time The response time for getMeetings
+    # TYPE bbb_meetings_response_time gauge
+    bbb_meetings_response_time <%= results[:bbb_meetings_response_time] %>
 
     # HELP bbb_meetings_total The total number of meetings running
     # TYPE bbb_meetings_total gauge
@@ -271,6 +315,10 @@ def fill_template(results)
     # TYPE bbb_meetings_received_videos gauge
     bbb_meetings_received_videos <%= results[:bbb_meetings_received_videos_total] %>
 
+    # HELP bbb_meetings_max_sent_videos The max number of cameras in a session
+    # TYPE bbb_meetings_max_sent_videos gauge
+    bbb_meetings_max_sent_videos <%= results[:bbb_meetings_max_sent_videos] %>
+
     # HELP bbb_meetings_sent_audio The total number of audio sent
     # TYPE bbb_meetings_sent_audio gauge
     bbb_meetings_sent_audio <%= results[:bbb_meetings_sent_audio_total] %>
@@ -278,6 +326,10 @@ def fill_template(results)
     # HELP bbb_meetings_received_audio The total number of audio received
     # TYPE bbb_meetings_received_audio gauge
     bbb_meetings_received_audio <%= results[:bbb_meetings_received_audio_total] %>
+
+    # HELP bbb_recordings_success Success on /bigbluebutton/api/getRecordings call
+    # TYPE bbb_recordings_success gauge
+    bbb_recordings_success <%= results[:bbb_recordings_success] %>
 
     # HELP bbb_recordings_total The total number of recordings
     # TYPE bbb_recordings_total gauge
@@ -291,29 +343,17 @@ def fill_template(results)
     # TYPE bbb_recordings_response_code gauge
     bbb_recordings_response_code <%= results[:bbb_recordings_response_code] %>
 
-    # HELP bbb_recordings_published_presentation_count The number of published recordings for presentation
-    # TYPE bbb_recordings_published_presentation_count gauge
-    bbb_recordings_published_presentation_count <%= results[:bbb_recordings_published_presentation_count] %>
-
-    # HELP bbb_recordings_published_presentation_video_count The number of published recordings for presentation_video
-    # TYPE bbb_recordings_published_presentation_video_count gauge
-    bbb_recordings_published_presentation_video_count <%= results[:bbb_recordings_published_presentation_video_count] %>
-
-    # HELP bbb_recordings_unpublished_presentation_count The number of unpublished recordings for presentation
-    # TYPE bbb_recordings_unpublished_presentation_count gauge
-    bbb_recordings_unpublished_presentation_count <%= results[:bbb_recordings_unpublished_presentation_count] %>
-
-    # HELP bbb_recordings_unpublished_presentation_video_count The number of unpublished recordings for presentation_video
-    # TYPE bbb_recordings_unpublished_presentation_video_count gauge
-    bbb_recordings_unpublished_presentation_video_count <%= results[:bbb_recordings_unpublished_presentation_video_count] %>
-
-    # HELP bbb_recordings_deleted_presentation_count The number of deleted recordings for presentation
-    # TYPE bbb_recordings_deleted_presentation_count gauge
-    bbb_recordings_deleted_presentation_count <%= results[:bbb_recordings_deleted_presentation_count] %>
-
-    # HELP bbb_recordings_deleted_presentation_video_count The number of deleted recordings for presentation_video
-    # TYPE bbb_recordings_deleted_presentation_video_count gauge
-    bbb_recordings_deleted_presentation_video_count <%= results[:bbb_recordings_deleted_presentation_video_count] %>
+    # HELP bbb_recordings_count The number of recordings for each visibility and format
+    # TYPE bbb_recordings_count gauge
+    bbb_recordings_count{visibility="published",format="presentation"} <%= results[:bbb_recordings_published_presentation_count] %>
+    bbb_recordings_count{visibility="published",format="presentation_video"} <%= results[:bbb_recordings_published_presentation_video_count] %>
+    bbb_recordings_count{visibility="published",format="mconf_encrypted"} <%= results[:bbb_recordings_published_mconf_encrypted_count] %>
+    bbb_recordings_count{visibility="unpublished",format="presentation"} <%= results[:bbb_recordings_unpublished_presentation_count] %>
+    bbb_recordings_count{visibility="unpublished",format="presentation_video"} <%= results[:bbb_recordings_unpublished_presentation_video_count] %>
+    bbb_recordings_count{visibility="unpublished",format="mconf_encrypted"} <%= results[:bbb_recordings_unpublished_mconf_encrypted_count] %>
+    bbb_recordings_count{visibility="deleted",format="presentation"} <%= results[:bbb_recordings_deleted_presentation_count] %>
+    bbb_recordings_count{visibility="deleted",format="presentation_video"} <%= results[:bbb_recordings_deleted_presentation_video_count] %>
+    bbb_recordings_count{visibility="deleted",format="mconf_encrypted"} <%= results[:bbb_recordings_deleted_mconf_encrypted_count] %>
 
     # HELP bbb_recordings_sanity_count The number of pending recordings
     # TYPE bbb_recordings_sanity_count gauge
@@ -327,6 +367,14 @@ def fill_template(results)
     # TYPE bbb_api_create_response_code gauge
     bbb_api_create_response_code{method="get",messageKey="<%= results[:bbb_api_create_message_key] %>"} <%= results[:bbb_api_create_response_code] %>
 
+    # HELP bbb_webhook_success Success calling the webhook endpoint
+    # TYPE bbb_webhook_success gauge
+    bbb_webhook_success <%= results[:bbb_webhook_success] %>
+
+    # HELP bbb_webhook_queue_length Webhooks queue length
+    # TYPE bbb_webhook_queue_length gauge
+    bbb_webhook_queue_length <%= results[:bbb_webhook_queue_length] %>
+
     # HELP bbb_webhook_code Response code of the create endpoint of the API
     # TYPE bbb_webhook_code gauge
     bbb_webhook_response_code{method="get",host="<%= results.has_key?(:bbb_webhook_host) ? results[:bbb_webhook_host] : nil %>"} <%= results[:bbb_webhook_response_code] %>
@@ -334,61 +382,167 @@ def fill_template(results)
     # HELP bbb_webhook_response_time The response time for webhooks GET
     # TYPE bbb_webhook_response_time gauge
     bbb_webhook_response_time <%= results[:bbb_webhook_response_time] %>
+
+    # HELP bbb_client_success Success calling the html5 client endpoint
+    # TYPE bbb_client_success gauge
+    bbb_client_success <%= results[:bbb_client_success] %>
+
+    # HELP bbb_total_time Generation time for all the data
+    # TYPE bbb_total_time gauge
+    bbb_total_time <%= results[:bbb_total_time] %>
+
+    # HELP bbb_freeswitch_clock_drift Clock drift of FreeSWITCH compared to the system
+    # TYPE bbb_freeswitch_clock_drift gauge
+    bbb_freeswitch_clock_drift <%= results[:bbb_freeswitch_clock_drift] %>
+
+    # HELP bbb_freeswitch_channels_full_audio Full audio channels on FreeSWITCH
+    # TYPE bbb_freeswitch_channels_full_audio gauge
+    bbb_freeswitch_channels_full_audio <%= results[:bbb_freeswitch_channels_full_audio] %>
+
+    # HELP bbb_freeswitch_channels_listen_only_freeswitch Listen only channels for individuals on FreeSWITCH
+    # TYPE bbb_freeswitch_channels_listen_only_freeswitch gauge
+    bbb_freeswitch_channels_listen_only_freeswitch <%= results[:bbb_freeswitch_channels_listen_only_freeswitch] %>
+
+    # HELP bbb_freeswitch_channels_listen_only_kurento Listen only channels for rooms on FreeSWITCH
+    # TYPE bbb_freeswitch_channels_listen_only_kurento gauge
+    bbb_freeswitch_channels_listen_only_kurento <%= results[:bbb_freeswitch_channels_listen_only_kurento] %>
+<% if results.has_key? :bbb_freeswitch_audio_score %>
+    # HELP bbb_freeswitch_audio_score Audio score for full audio channels on FreeSWITCH
+    # TYPE bbb_freeswitch_audio_score gauge
+    bbb_freeswitch_audio_score <%= results[:bbb_freeswitch_audio_score] %>
+<% end %>
+    # HELP bbb_streaming_count Number of containers running for streaming
+    # TYPE bbb_streaming_count gauge
+    bbb_streaming_count <%= results[:bbb_streaming_count] %>
+
+    # HELP bbb_recorder_count Number of containers running for presentation_video recording
+    # TYPE bbb_recorder_count gauge
+    bbb_recorder_count <%= results[:bbb_recorder_count] %>
   HEREDOC
 
   ERB.new(template).result
 end
 
-
-opts = Trollop::options do
-  opt :server, "Server address in format '<scheme://<addr>:<port>/bigbluebutton'", :type => :string # --host, default nil
-  opt :salt, "Salt of BBB server", :type => :string # --salt, default nil
-  opt :ssl, "Enable secure HTTP with SSL" # --ssl, default false
-  opt :webhook, "Webhook URL to check", :type => :string
-end
-
-# If server or salt are not passed as arguments,
-# load properties from bigbluebutton.properties.
-unless opts[:server] and opts[:salt]
-  BBBProperties.load_properties_from_file
-else
-  BBBProperties.load_properties_from_cli(opts[:server], opts[:salt])
-end
-
-if BBBProperties.server_url =~ /^http[s]?:\/\//
-  URIBuilder.server_url = BBBProperties.server_url
-else
-  URIBuilder.server_url = (opts[:ssl] ? "https://" : "http://") + BBBProperties.server_url
-end
-
-requester = HTTPRequester.new(opts[:ssl])
-
-Meetings.requester = requester
-Recordings.requester = requester
-
 results = Hash.new(0)
 
-results[:bbb_api_response_code] = requester.get_response_code(URIBuilder.api_uri)
-results[:bbb_demo_response_code] = requester.get_response_code(URIBuilder.demo_uri)
-results[:bbb_api_create_response_code], results[:bbb_api_create_message_key] = requester.process(URIBuilder.create_uri) do |code, data|
-  message_key = parse_xml(data, "/response/messageKey")
-
-  [code, message_key]
-end
-
-if opts[:webhook]
-  uri = URI.parse(opts[:webhook])
-  results[:bbb_webhook_host] = uri.host
-  response = nil
-  time = Benchmark.measure do
-    response = requester.get_response(uri) rescue nil
+results[:bbb_total_time] = Benchmark.measure do
+  opts = Trollop::options do
+    opt :server, "Server address in format '<scheme://<addr>:<port>/bigbluebutton'", :type => :string # --host, default nil
+    opt :salt, "Salt of BBB server", :type => :string # --salt, default nil
+    opt :ssl, "Enable secure HTTP with SSL" # --ssl, default false
+    opt :webhook, "Webhook URL to check", :type => :string
   end
-  results[:bbb_webhook_response_code] = response ? response.code : "500"
-  results[:bbb_webhook_response_time] = time.to_s[/\(\s*([\d.]*)\)/, 1]
-end
 
-results.merge!(Meetings.process_meetings)
-results.merge!(Recordings.process_recordings)
+  # If server or salt are not passed as arguments,
+  # load properties from bigbluebutton.properties.
+  unless opts[:server] and opts[:salt]
+    BBBProperties.load_properties_from_file
+  else
+    BBBProperties.load_properties_from_cli(opts[:server], opts[:salt])
+  end
+
+  if BBBProperties.server_url =~ /^http[s]?:\/\//
+    URIBuilder.server_url = BBBProperties.server_url
+  else
+    URIBuilder.server_url = (opts[:ssl] ? "https://" : "http://") + BBBProperties.server_url
+  end
+
+  requester = HTTPRequester.new(opts[:ssl])
+
+  Meetings.requester = requester
+  Recordings.requester = requester
+
+  response = requester.get_response(URIBuilder.api_uri) rescue nil
+  if response
+    results[:bbb_api_response_code] = response.code
+    doc = Nokogiri::XML(response.body)
+    node = doc.at_xpath('/response/returncode')
+    results[:bbb_api_success] = ( ! node.nil? and node.text == "SUCCESS" ) ? 1 : 0
+  else
+    results[:bbb_api_response_code] = "NaN"
+    results[:bbb_api_success] = 0
+  end
+
+  results[:bbb_api_create_response_code], results[:bbb_api_create_message_key] = requester.process(URIBuilder.create_uri) do |code, data|
+    message_key = parse_xml(data, "/response/messageKey")
+
+    [code, message_key]
+  end rescue [ "NaN", "" ]
+
+  results[:bbb_client_success] = requester.is_responding?('client') ? 1 : 0
+
+  all_containers = Docker::Container.all(:all => true)
+  # make sure we the docker container is running if we're running the webooks on docker
+  container = all_containers.select{ |container| container.info["Names"].first == "/webhooks" }
+  if container.empty? || container.first.info["State"] == "running"
+    results[:bbb_webhook_success] = 1
+  else
+    results[:bbb_webhook_success] = 0
+  end
+
+  results[:bbb_streaming_count] = all_containers.select{ |container| container.info["Names"].first.start_with?("/streaming_") and container.info["State"] == "running" }.length
+  results[:bbb_recorder_count] = all_containers.select{ |container| container.info["Names"].first.start_with?("/record_") and container.info["State"] == "running" }.length
+
+  if opts[:webhook]
+    uri = URI.parse(opts[:webhook])
+    results[:bbb_webhook_host] = uri.host
+    response = nil
+    time = Benchmark.measure do
+      response = requester.get_response(uri, use_ssl: uri.scheme == "https" ) rescue nil
+    end
+
+    results[:bbb_webhook_queue_length] = `redis-cli llen bigbluebutton:webhooks:events:1 | sed 's/(integer)//g'`.strip
+    results[:bbb_webhook_response_time] = time.to_s[/\(\s*([\d.]*)\)/, 1]
+    if response
+      results[:bbb_webhook_success] = ( response.code == "200" ) ? 1 : 0
+      results[:bbb_webhook_response_code] = response.code
+    else
+      results[:bbb_webhook_success] = 0
+      results[:bbb_webhook_response_code] = "NaN"
+    end
+  end
+
+  results[:bbb_freeswitch_clock_drift] = (DateTime.parse(`/opt/freeswitch/bin/fs_cli -x "strftime"`) - DateTime.now).to_i
+
+  output = ""
+  command = "/opt/freeswitch/bin/fs_cli -x 'show channels as json'"
+  Open4::popen4(command) do |pid, stdin, stdout, stderr|
+    output = stdout.readlines
+  end
+
+  voice_data = JSON.parse(output.join(), symbolize_names: true)[:rows] || []
+  full_audio_regex = /.*-bbbID-.*/
+  listen_only_freeswitch_regex = /.*-bbbID-LISTENONLY-.*/
+  listen_only_kurento_regex = /^GLOBAL_AUDIO_\d+$/
+
+  audio_score_list = []
+  full_audio_data = voice_data.select{ |row| ! full_audio_regex.match(row[:cid_name]).nil? and listen_only_freeswitch_regex.match(row[:cid_name]).nil? }
+  full_audio_data.each do |row|
+    stats_query = {
+      'command' => 'mediaStats',
+      'data' => {
+        'uuid' => row[:uuid]
+      }
+    }
+    command = "/opt/freeswitch/bin/fs_cli -x 'json #{JSON.dump(stats_query)}'"
+    Open4::popen4(command) do |pid, stdin, stdout, stderr|
+      output = stdout.readlines
+    end
+    response = JSON.parse(output.join(), symbolize_names: true)
+    next if response[:status] != "success"
+    audio_score = response.dig(:response, :audio, :in_quality_percentage)
+    next if audio_score.nil?
+    audio_score_list << audio_score.to_i
+  end
+
+  results[:bbb_freeswitch_audio_score] = ( audio_score_list.inject{ |sum, el| sum + el }.to_f / audio_score_list.size ) if ! audio_score_list.empty?
+  results[:bbb_freeswitch_channels_full_audio] = full_audio_data.length
+  results[:bbb_freeswitch_channels_listen_only_freeswitch] = voice_data.select{ |row| ! listen_only_freeswitch_regex.match(row[:cid_name]).nil? }.length
+  results[:bbb_freeswitch_channels_listen_only_kurento] = voice_data.select{ |row| ! listen_only_kurento_regex.match(row[:cid_name]).nil? }.length
+
+  results.merge!(Meetings.process_meetings)
+  results.merge!(Recordings.process_recordings)
+end.to_s[/\(\s*([\d.]*)\)/, 1]
 
 filled_template = fill_template(results)
 

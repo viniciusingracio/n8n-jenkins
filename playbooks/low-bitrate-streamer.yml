@@ -1,0 +1,28 @@
+---
+
+- hosts: all
+  handlers:
+    - include: ../roles/handlers/handlers/main.yml
+  vars:
+    mconf_live_presentation_recorder_image: mconf/mconf-presentation-recorder
+  tasks:
+    - name: Load local docker authentication variables
+      include_vars:
+        file: '{{ playbook_dir }}/../.docker-auth'
+        name: docker_auth
+      no_log: yes
+      ignore_errors: yes
+
+    - name: Log into DockerHub
+      docker_login:
+        email: '{{ docker_auth.email }}'
+        username: '{{ docker_auth.user }}'
+        password: '{{ docker_auth.password }}'
+        reauthorize: yes
+      notify: docker logout
+
+    - name: Pull image
+      docker_image:
+        name: '{{ mconf_live_presentation_recorder_image }}:low-bitrate'
+        source: pull
+        force_source: yes

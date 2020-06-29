@@ -46,6 +46,7 @@ events = []
 record_duration_sec = 0
 record_last_segment = 0
 start_recording = nil
+participants = 0
 
 talking = {}
 
@@ -64,7 +65,8 @@ doc.xpath("/recording/event").sort_by{ |node| node.at_xpath("@timestamp").text.t
         :timestamp_utc => timestamp_utc,
         :date => date_utc,
         :record_duration_sec => record_duration_sec,
-        :record_duration => seconds_to_duration(record_duration_sec)
+        :record_duration => seconds_to_duration(record_duration_sec),
+        :participants => participants
     }
     if event_module == "PARTICIPANT"
         case event_name
@@ -72,17 +74,21 @@ doc.xpath("/recording/event").sort_by{ |node| node.at_xpath("@timestamp").text.t
             user_id = node.at_xpath("userId").text
             user_name = node.at_xpath("name").text
             user_id_to_name[user_id] = user_name
+            participants += 1
             event.merge!({
                 :user => user_name,
-                :event => "Joined the session"
+                :event => "Joined the session",
+                :participants => participants
             })
             events << event
         when "ParticipantLeftEvent"
             user_id = node.at_xpath("userId").text
             user_name = user_id_to_name[user_id]
+            participants -= 1
             event.merge!({
                 :user => user_name,
-                :event => "Left the session"
+                :event => "Left the session",
+                :participants => participants
             })
             events << event
         when "RecordStatusEvent"

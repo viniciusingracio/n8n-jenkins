@@ -1,0 +1,15 @@
+---
+
+- import_tasks: '{{ awd | default(playbook_dir) }}/playbooks/docker-daemon-config.yml'
+  vars:
+    docker_daemon_config_add:
+      - { key: 'metrics-addr', value: '127.0.0.1:9323' }
+      - { key: 'experimental', value: true }
+  when: bigbluebutton_prometheus_docker_exporter_enabled
+
+- import_tasks: '{{ awd | default(playbook_dir) }}/playbooks/docker-daemon-config.yml'
+  vars:
+    docker_daemon_config_remove:
+      - metrics-addr
+      - experimental
+  when: not bigbluebutton_prometheus_docker_exporter_enabled

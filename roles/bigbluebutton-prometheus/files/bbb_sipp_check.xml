@@ -1,0 +1,10 @@
+<include>
+  <extension name="bbb_sipp_check">
+    <condition field="${bbb_authorized}" expression="true" break="on-false"/>
+    <condition field="destination_number" expression="^sippcheck$">
+      <action application="answer"/>
+      <action application="sleep" data="500"/>
+      <action application="echo"/>
+    </condition>
+  </extension>
+</include>

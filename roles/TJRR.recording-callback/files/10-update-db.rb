@@ -11,24 +11,32 @@ require 'trollop'
 require 'date'
 require 'net/http'
 
-logger = Logger.new("/var/log/bigbluebutton/post_publish.log", 'weekly' )
+opts = Trollop::options do
+  opt :meeting_id, "Meeting id to archive", :type => String
+  opt :dry_run, "Do not record in the database, just lookup", :type => :flag, :default => false
+end
+
+logger = if opts[:dry_run]
+        Logger.new(STDOUT)
+    else
+        Logger.new("/var/log/bigbluebutton/post_publish.log", 'weekly' )
+    end
 logger.level = Logger::INFO
 BigBlueButton.logger = logger
 
-opts = Trollop::options do
-  opt :meeting_id, "Meeting id to archive", :type => String
-end
 record_id = opts[:meeting_id]
 
 metadata_xml = "/var/bigbluebutton/published/presentation/#{record_id}/metadata.xml"
-exit 0 if ! File.exists? metadata_xml
+if ! File.exists? metadata_xml
+  BigBlueButton.logger.error "Cannot find a metadata.xml for the recording #{record_id}"
+  exit 0
+end
 
 props = YAML::load(File.open(File.expand_path('../10-update-db.yml', __FILE__)))
 db_username = props['db_username']
 db_password = props['db_password']
 db_database = props['db_database']
 db_host = props['db_host']
-callback_uri = props['callback_uri']
 
 client = Mysql2::Client.new(:host => db_host,
     :username => db_username,
@@ -38,15 +46,12 @@ client = Mysql2::Client.new(:host => db_host,
 doc = Hash.from_xml(File.open(metadata_xml))
 doc = JSON.parse(doc.to_json)
 
-size = 0
-uri = nil
-if ! doc["recording"]["download"].nil? and ! doc["recording"]["download"]["link"].nil?
-  size += doc["recording"]["download"]["size"].to_i
-  uri = URI.parse(doc["recording"]["download"]["link"])
-elsif ! doc["recording"]["playback"].nil? and ! doc["recording"]["playback"]["link"].nil?
-  size += doc["recording"]["playback"]["size"].to_i
-  uri = URI.parse(doc["recording"]["playback"]["link"])
-end
+doc["recording"]["playback"]["link"].strip! if ! doc.dig("recording", "playback", "link").nil?
+doc["recording"]["download"]["link"].strip! if ! doc.dig("recording", "download", "link").nil?
+
+uri = doc.dig("recording", "playback", "link") || doc.dig("recording", "download", "link")
+uri = URI.parse(uri)
+size = ( doc.dig("recording", "playback", "size") || doc.dig("recording", "download", "size") || 0 ).to_i
 
 server_id = nil
 server_type = nil
@@ -92,11 +97,28 @@ if ! data["playback"].empty?
   data["playback"]["url"] = data["playback"].delete("link")
   data["playback"]["processingTime"] = data["playback"].delete("processing_time")
   data["playback"]["length"] = (data["playback"].delete("duration").to_f / 60000).to_i
+
   if data["playback"].key?("extensions")
     data["playback"].delete("extensions").each do |k, v|
       data["playback"][k] = v
     end
   end
+
+  def process_image(image)
+    image["\#"] = image.delete("value").strip
+    image["\@"] = image.delete("attributes")
+    image
+  end
+
+  images = data.dig("playback", "preview", "images")
+  if ! images.nil?
+    if images.is_a?(Array)
+      images.map { |k, v| [ k, process_image(image) ] }.to_h
+    else
+      images["image"] = process_image(images["image"])
+    end
+  end
+
   playback = data.delete("playback")
   data["playback"] = { "format" => playback }
 end
@@ -115,26 +137,23 @@ end
 end
 
 begin
-  results = client.query("SELECT id FROM Recordings WHERE recordId = \"#{record_id}\";")
+  results = client.query("SELECT * FROM Recordings WHERE recordId = \"#{record_id}\";")
   if results.count > 0
-    update_fields = data.select{ |k, v| [ "updateAt", "serverId", "serverType", "playback", "size", "metadata" ].include?(k) }.map{ |k, v| "#{k} = \"#{client.escape(v.to_s)}\""}.join(", ")
+    BigBlueButton.logger.info "Results before update:\n#{JSON.pretty_generate(results.to_a)}"
+
+    update_fields = data.select{ |k, v| [ "updateAt", "serverId", "serverType", "playback", "size", "metadata", "integrationId", "meetingId", "name" ].include?(k) }.map{ |k, v| "#{k} = \"#{client.escape(v.to_s)}\""}.join(", ")
     query = "UPDATE Recordings SET #{update_fields} WHERE recordId = \"#{record_id}\";"
     BigBlueButton.logger.info "Running #{query}"
-    results = client.query(query)
+    results = client.query(query) if ! opts[:dry_run]
+
+    results = client.query("SELECT * FROM Recordings WHERE recordId = \"#{record_id}\";")
+    BigBlueButton.logger.info "Results after update:\n#{JSON.pretty_generate(results.to_a)}"
   else
     fields = data.map{ |k, v| k }.join(", ")
     values = data.map{ |k, v| "\"#{client.escape(v.to_s)}\"" }.join(", ")
     query = "INSERT INTO Recordings (#{fields}) VALUES (#{values});"
     BigBlueButton.logger.info "Running #{query}"
-    results = client.query(query)
-  end
-
-  uri = URI("#{callback_uri}?meetingId=#{meeting_id}")
-  status_response = Net::HTTP.get_response(uri)
-  if status_response.kind_of? Net::HTTPSuccess
-    BigBlueButton.logger.info "HTTP callback to #{uri.to_s} succeeded"
-  else
-    BigBlueButton.logger.info "HTTP callback to #{uri.to_s} failed with #{status_response.code} #{status_response.message}"
+    results = client.query(query) if ! opts[:dry_run]
   end
 rescue => e
   BigBlueButton.logger.info("Rescued")

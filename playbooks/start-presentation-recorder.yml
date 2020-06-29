@@ -1,0 +1,11 @@
+---
+
+- hosts:
+  - all
+  tasks:
+  - name: Start mconf-presentation-recorder
+    service:
+      name: mconf-presentation-recorder
+      state: started
+      enabled: yes
+    become: yes

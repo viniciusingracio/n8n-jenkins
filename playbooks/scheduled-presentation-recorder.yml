@@ -1,0 +1,43 @@
+---
+
+- hosts: all
+  vars:
+    simult:
+      - { hour: '6', simultaneous_meetings: '0' }
+      - { hour: '12', simultaneous_meetings: '1' }
+      - { hour: '13', simultaneous_meetings: '2' }
+      - { hour: '17', simultaneous_meetings: '1' }
+      - { hour: '18', simultaneous_meetings: '0' }
+      - { hour: '23', simultaneous_meetings: '1' }
+      - { hour: '0', simultaneous_meetings: '3' }
+      - { hour: '1', simultaneous_meetings: '6' }
+      - { hour: '5', simultaneous_meetings: '2' }
+  tasks:
+    - name: Purge previous configuration
+      cron:
+        name: "scheduled_recorder_{{ item }}"
+        state: absent
+      with_sequence: start=0 end=23
+      become: yes
+
+    - name:
+      shell: echo '{{ item.hour }}' | ruby -e "require 'date'; puts DateTime.new(1970,1,1,gets.chomp.to_i,0,0,'-03:00').new_offset(DateTime.now.zone).strftime('%k').strip"
+      with_items: '{{ simult }}'
+      register: reg_out
+
+    - set_fact:
+        simult_local: '{{ simult_local | default([]) + [{ "hour": item.stdout, "simultaneous_meetings": simult[ansible_loop.index0].simultaneous_meetings }] }}'
+      loop: '{{ reg_out.results }}'
+      loop_control:
+        extended: yes
+
+    - name: Schedule presentation recorder
+      cron:
+        name: scheduled_recorder_{{ item.hour }}
+        hour: '{{ item.hour }}'
+        minute: 0
+        job: yq w -i /usr/local/bigbluebutton/core/scripts/mconf-presentation-recorder.yml "simultaneous_meetings" "{{ item.simultaneous_meetings }}"
+        user: root
+        state: present
+      with_items: '{{ simult_local }}'
+      become: yes

@@ -239,6 +239,11 @@
   roles:
   - { role: memcached, tags: [ memcached ] }
 
+- hosts: bbb-fluent
+  roles:
+  - bbb-fluent
+
 - hosts: all
   roles:
-  - { role: reboot, tags: always }
+  - { role: reboot, tags: [ reboot ] }
+

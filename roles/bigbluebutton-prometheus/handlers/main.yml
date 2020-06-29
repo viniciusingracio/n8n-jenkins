@@ -4,6 +4,10 @@
   become: yes
   service: name=nginx state=reloaded
 
+- name: reload freeswitch
+  become: yes
+  command: /opt/freeswitch/bin/fs_cli -x 'reloadxml'
+
 - name: restart process exporter
   command: docker restart process-exporter
   ignore_errors: yes

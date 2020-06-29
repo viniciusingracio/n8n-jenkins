@@ -1,0 +1,23 @@
+---
+
+- hosts:
+  - mconf-recw
+  tasks:
+  - cron:
+      name: '{{ item }}'
+      state: absent
+    with_items:
+      - remove norecord
+      - remove archived
+      - remove encrypted
+      - restart mconf
+      - cleanup published done
+      - enable audio-stats, sleep 30)
+      - enable audio-stats, sleep 60)
+      - generate list of recordings
+      - bbb-prometheus-exporter-rec
+    become: yes
+
+  - name: Update simultaneous recorders
+    command: yq w -i /usr/local/bigbluebutton/core/scripts/mconf-presentation-recorder.yml "simultaneous_meetings" "2"
+    become: yes

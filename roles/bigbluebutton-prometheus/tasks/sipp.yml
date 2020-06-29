@@ -1,0 +1,33 @@
+---
+
+- name: Install sipp
+  become: yes
+  apt:
+    name: sip-tester
+
+- name: Copy FreeSWITCH config file
+  become: yes
+  copy:
+    src: files/bbb_sipp_check.xml
+    dest: /opt/freeswitch/conf/dialplan/default/bbb_sipp_check.xml
+  notify:
+    - reload freeswitch
+
+- name: Define FreeSWITCH external SIP port
+  set_fact:
+    freeswitch_sip_port: '{% if bigbluebutton_sip %}5062{% else %}5060{% endif %}'
+
+- name: Copy checker
+  become: yes
+  copy:
+    src: files/freeswitch_sipp_check.sh
+    dest: /usr/local/bin/freeswitch_sipp_check.sh
+    mode: 0755
+
+- name: Install cron job monitor metrics
+  become: yes
+  cron:
+    name: freeswitch-sipp-check
+    minute: '*/2'
+    job: TERM=xterm /usr/local/bin/freeswitch_sipp_check.sh {{ external_ip }} {{ freeswitch_sip_port }} | sponge /usr/local/share/prometheus/freeswitch-sipp-check.prom
+    user: root

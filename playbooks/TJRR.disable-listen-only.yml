@@ -7,7 +7,8 @@
     become: yes
     command: yq w -i /usr/share/meteor/bundle/programs/server/assets/app/config/settings.yml {{ item.key }} "{{ item.value }}"
     with_items:
-      - { key: 'public.genericContent.multipleNotes.enabled', value: '{{ bigbluebutton_notes_multiple_enabled }}' }
+      - { key: 'public.app.listenOnlyMode', value: 'false' }
+      - { key: 'public.kurento.autoShareWebcam', value: 'true' }
 
   - name: Restart bigbluebutton
     become: yes

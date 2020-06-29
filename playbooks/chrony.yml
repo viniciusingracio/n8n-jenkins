@@ -1,0 +1,46 @@
+---
+
+- hosts: all
+  vars:
+    chrony_timezone: America/Sao_Paulo
+  tasks:
+    - name: Disable ntpd
+      systemd:
+        name: ntpd
+        enabled: false
+        state: stopped
+      become: yes
+      ignore_errors: yes
+
+    - name: Set timezone
+      command: timedatectl set-timezone {{ chrony_timezone }}
+      become: yes
+
+    - name: Disable ntp update on timedatectl
+      command: timedatectl set-ntp no
+      become: yes
+
+    - name: Schedule ntpdate
+      cron:
+        name: ntpdate
+        state: absent
+      become: yes
+
+- hosts: all
+  become: true
+  vars:
+    chrony_package_name: chrony
+    chrony_service_name: chrony
+    chrony_config_file_location: /etc/chrony.conf
+    chrony_driftfile_path: /var/lib/chrony/drift
+    chrony_logdir_path: /var/log/chrony
+    chrony_makestep: 1.0 3
+    chrony_rtc_settings:
+      - rtcsync
+    chrony_role_action: all
+    chrony_ntp_servers: '{{ custom_ntp_servers | default([]) + default_ntp_servers }}'
+    chrony_extra_options:
+      - corrtimeratio 100
+      - allow 127/8
+  roles:
+  - openstack.chrony

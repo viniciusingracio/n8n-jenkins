@@ -1,0 +1,111 @@
+- hosts: '{{ groups["postgresql"] | first }}'
+  vars:
+    db: mconf_api_production
+    login_host: 172.17.0.1
+    login_user: postgres
+    login_password: 1234
+
+  tasks:
+    - name: Install python libraries for postgres
+      become: yes
+      pip:
+        name:
+          - psycopg2
+        state: present
+      tags:
+        - install
+
+    - set_fact:
+        postgresql_users: '{{ groups["postgresql"] | map("extract", hostvars, ["postgresql_users"]) | list | first }}'
+        postgresql_databases: '{{ groups["postgresql"] | map("extract", hostvars, ["postgresql_databases"]) | list | first }}'
+    - set_fact:
+        # login_host: '{{ groups["postgresql"] | list | first }}'
+        login_host: localhost
+        login_user: '{{ ( postgresql_users | first )["name"] }}'
+        login_password: '{{ ( postgresql_users | first )["password"] }}'
+        db: '{{ ( postgresql_databases | first )["name"] }}'
+
+    - set_fact:
+        updates: '{{ updates | default([]) + [ { "server": "https://" + item, "enabled": update_batch is undefined or update_batch != "1" } ] }}'
+      with_items: '{{ groups["mconf-live220"] | difference(groups["update-second"]) }}'
+    - set_fact:
+        updates: '{{ updates | default([]) + [ { "server": "https://" + item, "enabled": update_batch is undefined or update_batch != "2" } ] }}'
+      with_items: '{{ groups["update-second"] }}'
+    - debug:
+        msg: '{{ updates }}'
+    - set_fact:
+        update_query: UPDATE servers set enabled = {{ item.enabled }} WHERE name = '{{ item.server }}'; {{ update_query | default("") }}
+      with_items: '{{ updates }}'
+    - debug:
+        msg: '{{ update_query }}'
+
+    - postgresql_query:
+        db: '{{ db }}'
+        login_host: '{{ login_host }}'
+        login_user: '{{ login_user }}'
+        login_password: '{{ login_password }}'
+        query: '{{ update_query }}'
+
+#     - set_fact:
+#         updates:
+#           - { subnet: 'UPDATE_BATCH_1', enabled: '{{ update_batch is undefined or update_batch != 1 }}' }
+#           - { subnet: 'UPDATE_BATCH_2', enabled: '{{ update_batch is undefined or update_batch != 2 }}' }
+#
+#     # create the update subnets
+#     - postgresql_query:
+#         db: '{{ db }}'
+#         login_host: '{{ login_host }}'
+#         login_user: '{{ login_user }}'
+#         login_password: '{{ login_password }}'
+#         query: INSERT INTO subnets (name) SELECT name FROM subnets UNION VALUES ('{{ item }}') EXCEPT SELECT name FROM subnets;
+#       with_items:
+#         - UPDATE_BATCH_1
+#         - UPDATE_BATCH_2
+#
+#     # assign servers unnasigned to UPDATE_BATCH_1
+#     - postgresql_query:
+#         db: '{{ db }}'
+#         login_host: '{{ login_host }}'
+#         login_user: '{{ login_user }}'
+#         login_password: '{{ login_password }}'
+#         query: INSERT INTO servers_subnets (server_id, subnet_id) SELECT id as server_id, (SELECT id FROM subnets WHERE name = 'UPDATE_BATCH_1') as subnet_id FROM servers WHERE enabled = true AND id NOT IN (SELECT ss.server_id AS id FROM servers_subnets ss JOIN subnets su ON ss.subnet_id = su.id WHERE su.name = 'UPDATE_BATCH_1' OR su.name = 'UPDATE_BATCH_2');
+#       register: result
+#     - debug:
+#         msg: '{{ result.query_result }}'
+#
+#     - postgresql_query:
+#         db: '{{ db }}'
+#         login_host: '{{ login_host }}'
+#         login_user: '{{ login_user }}'
+#         login_password: '{{ login_password }}'
+#         query: UPDATE servers_subnets set subnet_id = (SELECT id FROM subnets WHERE name = 'UPDATE_BATCH_2') WHERE subnet_id = (SELECT id FROM subnets WHERE name = 'UPDATE_BATCH_1') AND server_id IN (SELECT id FROM servers WHERE name LIKE 'https://live-do0%' and name = 'https://mconf8.ufrgs.br');
+#       register: result
+#     - debug:
+#         msg: '{{ result.query_result }}'
+#
+#       # assign a few servers to UPDATE_BATCH_2
+#     - postgresql_query:
+#         db: '{{ db }}'
+#         login_host: '{{ login_host }}'
+#         login_user: '{{ login_user }}'
+#         login_password: '{{ login_password }}'
+#         query: UPDATE servers_subnets set subnet_id = (SELECT id FROM subnets WHERE name = 'UPDATE_BATCH_2') WHERE subnet_id = (SELECT id FROM subnets WHERE name = 'UPDATE_BATCH_1') AND server_id IN (SELECT id FROM servers WHERE name LIKE 'https://live-do0%' and name = 'https://mconf8.ufrgs.br');
+#
+#     - postgresql_query:
+#         db: '{{ db }}'
+#         login_host: '{{ login_host }}'
+#         login_user: '{{ login_user }}'
+#         login_password: '{{ login_password }}'
+#         query: UPDATE servers set enabled = {{ item.enabled }} WHERE id IN (SELECT ss.server_id AS id FROM servers_subnets ss JOIN subnets su ON ss.subnet_id = su.id WHERE su.name = '{{ item.subnet }}');
+#       with_items: '{{ updates }}'
+#
+#     - postgresql_query:
+#         db: '{{ db }}'
+#         login_host: '{{ login_host }}'
+#         login_user: '{{ login_user }}'
+#         login_password: '{{ login_password }}'
+#         # query: SELECT se.name AS server_name, su.name AS subnet_name, se.enabled AS enabled FROM servers_subnets ss JOIN subnets su ON ss.subnet_id = su.id JOIN servers se ON ss.server_id = se.id WHERE su.name = 'UPDATE_BATCH_1' OR su.name = 'UPDATE_BATCH_2';
+#         query: SELECT se.name AS server_name, su.name AS subnet_name, se.enabled AS enabled FROM servers_subnets ss JOIN subnets su ON ss.subnet_id = su.id JOIN servers se ON ss.server_id = se.id;
+#       register: result
+#     - debug:
+#         msg: '{{ result.query_result }}'

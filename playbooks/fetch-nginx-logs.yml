@@ -1,0 +1,19 @@
+---
+- hosts: '{{ dynamic_inventory_hostname | default("all") }}'
+  tasks:
+  - file:
+      path: /tmp/nginx-logs/{{ inventory_hostname }}
+      state: directory
+      recurse: yes
+    delegate_to: 127.0.0.1
+
+  - name: Copy logs
+    command: rsync -azm -e 'ssh -p {{ ansible_port }} {{ ansible_ssh_common_args }}' {{ ansible_user }}@{{ inventory_hostname }}:/var/log/nginx/bigbluebutton.access.log* /tmp/nginx-logs/{{ inventory_hostname }}/
+    delegate_to: 127.0.0.1
+
+# zgrep "GET /bigbluebutton/api/join" /tmp/nginx-logs/live-idc01.mconf.rnp.br/bigbluebutton.access.log.1 | sed 's|^[^\[]*\[\([^]]*\).*|\1|g' | ruby -e 'require "date"; while d = gets.chomp; puts DateTime.strptime(d, "%d/%b/%Y:%H:%M:%S %z").strftime("%d/%m/%Y %H:%M"); end rescue nil' > /tmp/join.csv
+# zgrep "POST /bigbluebutton/api/create" /tmp/nginx-logs/live-idc01.mconf.rnp.br/bigbluebutton.access.log.1 | sed 's|^[^\[]*\[\([^]]*\).*|\1|g' | ruby -e 'require "date"; while d = gets.chomp; puts DateTime.strptime(d, "%d/%b/%Y:%H:%M:%S %z").strftime("%d/%m/%Y %H:%M"); end rescue nil' > /tmp/create.csv
+# sort /tmp/names.csv | uniq -c | sort -n -r
+# zgrep "GET /bigbluebutton/api/join" /tmp/nginx-logs/live-idc01.mconf.rnp.br/bigbluebutton.access.log.1 | sed 's|.*fullName=\([^&]*\).*|\1|g' | sort > /tmp/names.csv
+
+# zgrep "POST /bigbluebutton/api/create" /var/log/nginx/bigbluebutton.access.log | sed 's|^[^\[]*\[\([^]]*\).*|\1|g' | ruby -e 'require "date"; while d = gets.chomp; puts DateTime.strptime(d, "%d/%b/%Y:%H:%M:%S %z").strftime("%d/%m/%Y %H:%M"); end rescue nil'

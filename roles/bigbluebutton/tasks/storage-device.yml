@@ -54,4 +54,3 @@
     fstype: ext4
     opts: defaults
     state: mounted
-  when: device_needed

@@ -73,4 +73,3 @@ ip6tables -A INPUT -p all -m limit --limit 10/m -j LOG --log-prefix "[FIREWALL6]
 
 # Reload docker daemon para atualizar regras de firewall do docker
 systemctl restart docker
- 

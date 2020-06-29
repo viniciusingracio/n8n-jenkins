@@ -6,7 +6,7 @@
   tasks:
   - add_host:
       name: '{{ dynamic_inventory_hostname }}'
-      groups: mconf-live220
+      groups: '{{ dynamic_inventory_group | default([ "mconf-live220" ]) | list }}'
     when: dynamic_inventory_hostname is defined
 
 - hosts: '{{ dynamic_inventory_hostname | default("all") }}'
@@ -38,14 +38,21 @@
       name:
         - ansible
         - python-pip
+      state: latest
 
   - name: Install python libraries
     become: yes
     command: pip install --upgrade pip pyopenssl docker zabbix-api
 
   - name: Copy ansihub
-    command: rsync -azm --delete -e 'ssh -p {{ ansible_port }} {{ ansible_ssh_common_args }}' --include-from={{ inventory_dir }}/files/include_filter.txt {{ playbook_dir }}/.. {{ ansible_user }}@{{ inventory_hostname }}:~/mconf-ansihub
+    command: rsync -azm --delete -e 'ssh -p {{ ansible_port }} {{ ansible_ssh_common_args }} -o StrictHostKeyChecking=no' --include-from={{ inventory_dir }}/files/include_filter.txt {{ playbook_dir }}/.. {{ ansible_user }}@{{ inventory_hostname }}:~/mconf-ansihub
     delegate_to: 127.0.0.1
+    retries: 10
+    delay: 2
+    register: task_result
+    until: task_result.rc == 0
+
+  - setup:
 
   - name: Create log_deploy dir
     file:
@@ -72,11 +79,20 @@
 
   - name: End all meetings
     command: ruby /usr/local/bigbluebutton/core/scripts/utils/end-all.rb
+    tags:
+      - provision
+
+  - name: Reinstall python
+    become: yes
+    command: apt install --reinstall python3-pip
+    when: ansible_python_interpreter == '/usr/bin/python3'
 
   - name: Run ansible-playbook
-    shell: ansible-playbook -i {{ inventory_dir | regex_replace('.*\/mconf-ansihub\/', '') }}/hosts -l {{ inventory_hostname }} --connection=local provision.yml > /dev/null
+    shell: ansible-playbook -i {{ inventory_dir | regex_replace('.*\/mconf-ansihub\/', '') }}/hosts -l {{ inventory_hostname }} --connection=local provision.yml --skip-tags 'reboot' > /var/log/ansible-execution-$(date +%Y%m%d%H%M).log
     args:
       chdir: '{{ ansible_env.HOME }}/mconf-ansihub'
+    async: 3600
+    poll: 30
     tags:
       - provision
 
@@ -86,3 +102,7 @@
       state: absent
     tags:
       - cleanup
+
+- hosts: '{{ dynamic_inventory_hostname | default("all") }}'
+  roles:
+  - { role: reboot, tags: [ reboot ] }

@@ -2,6 +2,15 @@
   become: yes
   service: name=kurento-media-server state=stopped enabled=false
 
+- name: Get memory
+  shell: cat /proc/meminfo | grep 'MemTotal:' | tr -s ' ' | cut -d' ' -f2
+  register: memory_raw
+
+  # kurento will use 1/4 of the server total memory
+- name: Determine amount of memory for Kurento
+  set_fact:
+    kurento_memory: '{{ ( memory_raw.stdout|int / 4096 )|int }}'
+
 - name: Get number of cores
   shell: "grep -c ^processor /proc/cpuinfo"
   register: num_proc_auto_raw
@@ -57,7 +66,7 @@
     pull: yes
     restart_policy: always
     network_mode: host
-    memory: 2G
+    memory: '{{ kurento_memory }}M'
     volumes:
       - /var/kurento:/var/kurento
       - /var/log/kurento-media-server:/var/log/kurento-media-server

@@ -1,3 +1,5 @@
+- include: facts.yml
+
 - include: container.yml
   tags: [container,docker]
 - include: ufw.yml

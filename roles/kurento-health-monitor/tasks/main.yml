@@ -23,6 +23,7 @@
 - set_fact:
     kurento_ip: "{% if bigbluebutton_kurento_use_internal_ip %}{{ ansible_default_ipv4.address }}{% else %}{{ external_ip }}{% endif %}"
     kurento_ports: '{{ running_kurento_raw.stdout_lines }}'
+    kurento_config: []
 
 - name: Determine kurento URLs to configure kurento health monitor
   set_fact:
@@ -32,7 +33,7 @@
 - name: Start kurento health monitor
   docker_container:
     name: kurento-health-monitor
-    image: mconf/kurento-health-monitor:v0.0.5
+    image: mconf/kurento-health-monitor:v0.1.0
     pull: yes
     restart_policy: always
     memory: 128M
@@ -42,5 +43,6 @@
       HOST_ADDRESS: '{{ inventory_hostname }}'
       ESL_IP: '{{ docker_ip }}'
       ESL_PORT: '8021'
+      SIP_WSS_URL: 'wss://{{ inventory_hostname }}/ws'
     labels:
       hostname: '{{ inventory_hostname }}'

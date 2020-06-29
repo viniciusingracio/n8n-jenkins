@@ -6,4 +6,8 @@ transcribe_gcloud_credentials_src_asr: '{{ inventory_dir }}/files/asr-credential
 transcribe_gcloud_credentials_src_storage: '{{ inventory_dir }}/files/asr-credentials.json'
 transcribe_gcloud_credentials_path_asr: /usr/local/bigbluebutton/core/scripts/transcribe/asr-credentials.json
 transcribe_gcloud_credentials_path_storage: /usr/local/bigbluebutton/core/scripts/transcribe/asr-credentials.json
+transcribe_aws_key:
+transcribe_aws_secret:
+transcribe_aws_region:
+transcribe_aws_bucket_name:
 asr_matcher: []

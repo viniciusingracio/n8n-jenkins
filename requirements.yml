@@ -14,5 +14,14 @@
 - src: nickhammond.logrotate
   version: v0.0.5
 
-- src: geerlingguy.postgresql
-  version: 2.2.0
+# - src: geerlingguy.postgresql
+#   version: 2.2.0
+# this is the original 2.2.0 + https://github.com/geerlingguy/ansible-role-postgresql/pull/126
+- src: https://github.com/Incanus3/ansible-role-postgresql
+  version: 01d540aa7171070c33c652ef604a2734d2015051
+  name: geerlingguy.postgresql
+
+- src: https://github.com/openstack/ansible-role-chrony
+  version: 03e7fbe5da4a91d0cf05a2915fabc7350340025f
+  name: openstack.chrony
+

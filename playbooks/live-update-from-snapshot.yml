@@ -4,34 +4,17 @@
   tasks:
   - add_host:
       name: '{{ dynamic_inventory_hostname }}'
-      groups: mconf-live220-elos-app
-
-- hosts: '{{ dynamic_inventory_hostname }}'
-  vars:
-    new_secret: "{{ lookup('password', '/dev/null length=42 chars=ascii_letters') }}"
-    inventory_dir: "{{ ansible_inventory_sources | first | dirname }}"
-  tasks:
-  - name: Stop nginx
-    become: yes
-    service:
-      name: nginx
-      state: stopped
-
-  - name: Stop kurento health monitor
-    docker_container:
-      name: kurento-health-monitor
-      state: stopped
-
-  - name: Set new salt
-    become: yes
-    command: bbb-conf --setsecret {{ new_secret }}
+      groups: '{{ dynamic_inventory_group | default([ "mconf-live220" ]) | list }}'
 
 - hosts: '{{ dynamic_inventory_hostname }}'
   vars:
     inventory_dir: "{{ ansible_inventory_sources | first | dirname }}"
   roles:
   - kwoodson.yedit
-  - { role: certbot, when: certbot_enabled | bool, tags: [ certbot ] }
   - mconf-live
+  - aws-publisher
   - bigbluebutton-webhooks
+  - bigbluebutton-prometheus
+  - node-exporter
   - kurento-health-monitor
+  - bbb-fluent

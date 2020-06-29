@@ -1,5 +1,7 @@
 ---
 
+- include: facts.yml
+
 - name: Update apt (if older than 60m)
   become: yes
   apt: update_cache=yes cache_valid_time=3600
@@ -47,22 +49,6 @@
   apt:
     name: apache2-utils
 
-- name: Check if bbb-web is running on a standalone app
-  stat:
-    path: /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
-  register: reg_standalone
-- set_fact:
-    bigbluebutton_servlet_dir: /usr/share/bbb-web
-  when: reg_standalone.stat.exists
-- set_fact:
-    bigbluebutton_servlet_dir: /var/lib/tomcat7/webapps/bigbluebutton
-  when: not reg_standalone.stat.exists
-
-- name: Get BigBlueButton secret
-  shell: cat {{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2  | hash('sha256')
-  register: bbb_secret_raw
-  when: bigbluebutton_prometheus_password is none
-
 - set_fact:
     bigbluebutton_prometheus_password: '{{ bbb_secret_raw.stdout }}'
   when: bigbluebutton_prometheus_password is none
@@ -73,42 +59,16 @@
 
 - name: Setup reverse proxy on nginx
   become: yes
-  copy:
-    src: files/node-exporter.nginx
+  template:
+    src: templates/node-exporter.nginx.j2
     dest: /etc/bigbluebutton/nginx/node-exporter.nginx
   notify: reload nginx
 
-- name: Start nginx exporter
-  docker_container:
-    name: nginx-exporter
-    image: nginx/nginx-prometheus-exporter:0.6.0
-    command: -nginx.scrape-uri https://{{ inventory_hostname }}/stub_status -web.telemetry-path /nginx_metrics
-    pull: yes
-    restart_policy: always
-    ports:
-      - 9113:9113
-    labels:
-      hostname: '{{ inventory_hostname }}'
-
-- name: Copy process exporter config
-  become: yes
-  copy:
-    src: files/etc/process-exporter.yml
-    dest: /usr/local/etc/bigbluebutton-prometheus/process-exporter.yml
-  notify: restart process exporter
-
-- name: Start process exporter
-  docker_container:
-    name: process-exporter
-    image: ncabatoff/process-exporter
-    command: -procfs /host/proc -config.path /config/config.yml -web.telemetry-path /process_metrics
-    pull: yes
-    privileged: yes
-    restart_policy: always
-    ports:
-      - 9256:9256
-    volumes:
-      - /proc:/host/proc
-      - /usr/local/etc/bigbluebutton-prometheus/process-exporter.yml:/config/config.yml
-    labels:
-      hostname: '{{ inventory_hostname }}'
+- include: docker-exporter.yml
+- include: nginx-exporter.yml
+- include: nginx-logs-exporter.yml
+- include: process-exporter.yml
+- include: redis-exporter.yml
+- include: sipp.yml
+  when: bigbluebutton_prometheus_sipp_exporter_enabled
+- include: ntp-exporter.yml

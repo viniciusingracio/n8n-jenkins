@@ -1,0 +1,119 @@
+- hosts: all
+  ignore_errors: yes
+  serial: 1
+  vars:
+    num_udp_tests: 30
+  tasks:
+    - set_fact:
+        ok_os: yes
+        ok_cpu: yes
+        ok_memory: yes
+        ok_udp: yes
+        ok_http: yes
+        ok_https: yes
+
+    - name: Check if OS meets the requirements
+      set_fact:
+        ok_operational_system: no
+      when: not ( ansible_distribution == "Ubuntu" and ansible_distribution_release == "xenial" )
+
+    - name: Get memory
+      shell: cat /proc/meminfo | grep 'MemTotal:' | tr -s ' ' | cut -d' ' -f2
+      register: memory_raw
+
+    - name: Check if memory meets the requirements
+      set_fact:
+        ok_memory: no
+      when: memory_raw.stdout|int < 8000000
+
+    - name: Get number of cores
+      shell: "grep -c ^processor /proc/cpuinfo"
+      register: num_proc_auto_raw
+
+    - name: Check if cpu meets the requirements
+      set_fact:
+        ok_cpu: no
+      when: num_proc_auto_raw.stdout|int < 8
+
+    - name: Test curl
+      command: curl -s -o /dev/null -w "%{http_code}" {{ item }}
+      with_items:
+        - http://{{ inventory_hostname }}
+        - https://{{ inventory_hostname }}
+      register: reg_curl
+
+    - set_fact:
+        test_url: '{{ test_url | default([]) + [ { "url": item.item, "success": item.stdout == "200" } ] }}'
+      with_items: '{{ reg_curl.results }}'
+
+    - set_fact:
+        ok_http: no
+      when: not test_url[0].success
+    - set_fact:
+        ok_https: no
+      when: not test_url[1].success
+
+    - set_fact:
+        udp_range_begin: '{{ bigbluebutton_freeswitch_udp_range_begin | default("6000") }}'
+        udp_range_end: '{{ bigbluebutton_kms_udp_range_end | default("11999") }}'
+    - set_fact:
+        interval: '{{ ( ( udp_range_end|int - udp_range_begin|int + 1 ) / num_udp_tests ) | int }}'
+
+    - name: Start UDP server
+      docker_container:
+        name: udp-server
+        image: mconf/node-udp-bind
+        pull: yes
+        restart_policy: always
+        network_mode: host
+        env:
+          RANGE_MIN: '{{ udp_range_begin }}'
+          RANGE_MAX: '{{ udp_range_end }}'
+          INTERVAL: '{{ interval }}'
+        labels:
+          hostname: '{{ inventory_hostname }}'
+
+    - name: Wait
+      command: sleep 10
+      delegate_to: 127.0.0.1
+
+    - name: Start UDP client
+      docker_container:
+        name: udp-client-{{ inventory_hostname }}
+        image: mconf/node-udp-scan
+        pull: yes
+        detach: no
+        env:
+          RANGE_MIN: '{{ udp_range_begin }}'
+          RANGE_MAX: '{{ udp_range_end }}'
+          INTERVAL: '{{ interval }}'
+          HOST: '{{ inventory_hostname }}'
+      register: reg_test
+      delegate_to: 127.0.0.1
+      ignore_errors: true
+
+    - name: Stop UDP server
+      docker_container:
+        name: udp-server
+        state: absent
+
+    - name: Stop UDP client
+      docker_container:
+        name: udp-client-{{ inventory_hostname }}
+        state: absent
+
+    - name: Check if UDP test failed
+      set_fact:
+        ok_udp: no
+      when: reg_test is not succeeded
+
+    - name:
+      debug:
+        msg: '{{ item.key }}: {{ item.value }}'
+      with_items:
+        - { key: 'Operational system', value: '{{ ok_os }}' }
+        - { key: '# vCPU', value: '{{ ok_cpu }}' }
+        - { key: 'Memory', value: '{{ ok_memory }}' }
+        - { key: 'UDP ports', value: '{{ ok_udp }}' }
+        - { key: 'HTTP', value: '{{ ok_http }}' }
+        - { key: 'HTTPS', value: '{{ ok_https }}' }

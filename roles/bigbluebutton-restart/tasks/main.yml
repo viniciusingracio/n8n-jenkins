@@ -1,11 +1,15 @@
 ---
 
-- name: Copy scripts for recordings
+- name: Copy utilities for restart
   synchronize:
     src: files/
     dest: /usr/local/bigbluebutton/core/scripts/utils/
     use_ssh_args: yes
   become: yes
+  retries: 10
+  delay: 2
+  register: task_result
+  until: task_result.rc == 0
 
 - set_fact:
     restart_mconf_command: /usr/local/bigbluebutton/core/scripts/utils/restart-mconf.sh >> /var/log/restart-mconf.log 2>&1

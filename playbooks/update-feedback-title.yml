@@ -1,0 +1,16 @@
+- hosts: all
+
+  vars:
+    ansible_user: mconf
+
+  tasks:
+    - name: Configure locale
+      become: yes
+      lineinfile:
+        dest: '{{ item.file }}'
+        state: present
+        regexp: '{{ item.regexp }}'
+        line: '{{ item.line }}'
+      with_items:
+        - { file: '/usr/share/meteor/bundle/programs/server/assets/app/locales/pt_BR.json', regexp: '"app.navBar.feedbackDropdown.feedbackTitle"', line: '    "app.navBar.feedbackDropdown.feedbackTitle": "O que você acha do Conferência Web?",' }
+        - { file: '/usr/share/meteor/bundle/programs/server/assets/app/locales/en.json', regexp: '"app.navBar.feedbackDropdown.feedbackTitle"', line: '    "app.navBar.feedbackDropdown.feedbackTitle": "How do you like Conferência Web?",' }

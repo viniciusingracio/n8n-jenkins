@@ -1,11 +1,9 @@
 ---
 
-- hosts: all
-  roles:
-  - docker-host
-
-- hosts: all
-  become: yes
+- hosts: localhost
+  vars:
+    certbot_all_domains:
+      - '*.elos.vc'
   tasks:
   - file:
       path: '{{ ansible_env.HOME }}/.secrets/certbot'

@@ -72,6 +72,8 @@ bigbluebutton_local_ssl_certificate_key:
 bigbluebutton_guest_policy: ALWAYS_ACCEPT
 bigbluebutton_allow_transfer: false
 
+bigbluebutton_max_participants: 0
+
 bigbluebutton_sysctl:
   - { name: 'net.ipv4.tcp_syncookies' , value: '1' }
   - { name: 'net.ipv4.tcp_timestamps' , value: '0' }
@@ -128,6 +130,9 @@ bigbluebutton_properties_config:
   - { key: 'svgImagesRequired', value: 'true' }
   - { key: 'defaultGuestWaitURL', value: '${bigbluebutton.web.serverURL}/guest' }
   - { key: 'allowTransfer', value: '{{ bigbluebutton_allow_transfer }}' }
+  - { key: 'defaultMaxUsers', value: '{{ bigbluebutton_max_participants }}' }
+
+bigbluebutton_properties_config_custom: []
 
 bigbluebutton_stun_server:
   - stun:stun.l.google.com:19302
@@ -179,9 +184,12 @@ bigbluebutton_html5_external_log_level: info
 bigbluebutton_html5_external_log_url: 'https://{{ inventory_hostname }}/html5Log'
 bigbluebutton_html5_external_log_method: POST
 bigbluebutton_html5_external_log_throttle: 5000
+
 bigbluebutton_html5_require_cookie: true
 bigbluebutton_html5_breakout_rooms_enabled: true
 bigbluebutton_html5_lock_settings_cam: false
+bigbluebutton_html5_local_default_logo:
+bigbluebutton_html5_remote_default_logo:
 
 bigbluebutton_docker_webrtc_sfu_enabled: false
 

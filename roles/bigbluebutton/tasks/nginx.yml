@@ -1,0 +1,33 @@
+- name: Setup file for timed combined log
+  become: yes
+  copy:
+    src: files/bbb-log.conf
+    dest: /etc/nginx/conf.d/bbb-log.conf
+  notify: reload nginx
+
+- name: Configure log format
+  become: yes
+  lineinfile:
+    dest: /etc/nginx/sites-available/bigbluebutton
+    state: present
+    regexp: 'access_log[ ]*/var/log/nginx/bigbluebutton.access.log'
+    line: '     access_log /var/log/nginx/bigbluebutton.access.log timed_combined;'
+  notify: reload nginx
+
+- name: Configure worker connections
+  become: yes
+  lineinfile:
+    dest: /etc/nginx/nginx.conf
+    state: present
+    regexp: '\s+worker_connections\s+\d+;'
+    line: '        worker_connections 8192;'
+  notify: reload nginx
+
+- name: Configure worker nofile
+  become: yes
+  lineinfile:
+    dest: /etc/nginx/nginx.conf
+    state: present
+    insertafter: '^pid '
+    line: 'worker_rlimit_nofile 60000;'
+  notify: reload nginx

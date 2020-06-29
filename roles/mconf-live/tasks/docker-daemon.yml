@@ -1,0 +1,10 @@
+---
+
+- shell: |
+    ip addr | grep " {{ ansible_default_ipv4.interface }}: .*mtu" | cut -d" " -f5
+  register: reg_mtu_raw
+
+- import_tasks: '{{ awd | default(playbook_dir) }}/playbooks/docker-daemon-config.yml'
+  vars:
+    docker_daemon_config_add:
+      - { key: 'mtu', value: '{{ reg_mtu_raw.stdout }}', cast_int: true }

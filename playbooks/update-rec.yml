@@ -52,6 +52,13 @@
       - bbb-prometheus-exporter-rec
     become: yes
 
+  - file:
+      path: /var/bigbluebutton/recording/status/published
+      owner: bigbluebutton
+      group: bigbluebutton
+      state: directory
+    become: yes
+
   - name: Start nfs
     become: yes
     command: mount -a
@@ -61,10 +68,12 @@
     service:
       name: bbb-record-core.timer
       state: started
+      enabled: yes
 
   - name: Start presentation recorder
     become: yes
     service:
       name: mconf-presentation-recorder.timer
       state: started
+      enabled: yes
     ignore_errors: yes

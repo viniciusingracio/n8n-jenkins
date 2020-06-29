@@ -1,13 +1,27 @@
+- name: Check current UDP interval
+  shell: ufw status | grep "^[[:digit:]]*:[[:digit:]]*/udp[[:space:]]*ALLOW[[:space:]]*Anywhere" | cut -d'/' -f1 | uniq
+  become: yes
+  register: reg_previous_udp_rule
+
+- set_fact:
+    bbb_udp_interval: '{{ [bigbluebutton_freeswitch_udp_range_begin, bigbluebutton_kms_udp_range_begin] | min }}:{{ [bigbluebutton_freeswitch_udp_range_end, bigbluebutton_kms_udp_range_end] | max }}'
+
 - name: Configure ufw rules for BigBlueButton
   become: yes
-  ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
+  ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }} delete={{ item.delete | default(false) }}
   with_items:
     - { rule: 'allow', port: 80, proto: 'tcp' }
     - { rule: 'allow', port: 443, proto: 'tcp' }
     - { rule: 'allow', port: 1935, proto: 'tcp', delete: '{{ bigbluebutton_html5_only|bool }}' }
-    - { rule: 'allow', port: '{{ [bigbluebutton_freeswitch_udp_range_begin, bigbluebutton_kms_udp_range_begin] | min }}:{{ [bigbluebutton_freeswitch_udp_range_end, bigbluebutton_kms_udp_range_end] | max }}', proto: 'udp' }
+    - { rule: 'allow', port: '{{ bbb_udp_interval }}', proto: 'udp' }
   notify:
     - restart ufw
+
+- name: Remove any old UDP range configuration
+  become: yes
+  ufw: rule=allow port={{ item }} proto=udp delete=yes
+  with_items: '{{ reg_previous_udp_rule.stdout_lines }}'
+  when: item != bbb_udp_interval
 
 - name: Configure ufw rules for SIP
   become: yes

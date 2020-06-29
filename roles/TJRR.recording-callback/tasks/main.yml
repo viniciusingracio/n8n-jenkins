@@ -13,23 +13,30 @@
     user_install: no
   become: yes
 
+- set_fact:
+    task_files:
+      - { src: 'files/10-update-db.rb', dest: '/usr/local/bigbluebutton/core/scripts/post_publish/10-update-db.rb', template: false }
+      - { src: 'files/10-update-db.yml', dest: '/usr/local/bigbluebutton/core/scripts/post_publish/10-update-db.yml', template: true }
+      - { src: 'files/11-moodle-callback.rb', dest: '/usr/local/bigbluebutton/core/scripts/post_publish/11-moodle-callback.rb', template: false }
+      - { src: 'files/11-moodle-callback.yml', dest: '/usr/local/bigbluebutton/core/scripts/post_publish/11-moodle-callback.yml', template: true }
+
 - copy:
-    src: files/10-update-db.rb
-    dest: /usr/local/bigbluebutton/core/scripts/post_publish/10-update-db.rb
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
   become: yes
-  when: recording_callback_enabled
+  with_items: '{{ task_files }}'
+  when: recording_callback_enabled and not item.template
 
 - template:
-    src: templates/10-update-db.yml.j2
-    dest: /usr/local/bigbluebutton/core/scripts/post_publish/10-update-db.yml
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
   become: yes
-  when: recording_callback_enabled
+  with_items: '{{ task_files }}'
+  when: recording_callback_enabled and item.template
 
 - file:
-    path: '{{ item }}'
+    path: '{{ item.dest }}'
     state: absent
-  with_items:
-    - /usr/local/bigbluebutton/core/scripts/post_publish/10-update-db.rb
-    - /usr/local/bigbluebutton/core/scripts/post_publish/10-update-db.yml
+  with_items: '{{ task_files }}'
   become: yes
   when: not recording_callback_enabled

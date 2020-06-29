@@ -1,3 +1,7 @@
+- set_fact:
+    nfs_group: mconf-recw
+  when: nfs_group is undefined
+
 - name: Install nfs server
   become: yes
   apt:
@@ -6,8 +10,8 @@
 - name: Configure ufw rules for nfs
   become: yes
   ufw: rule=allow port=nfs src={{ hostvars[item].nfs_ip }}
-  with_items: "{{ groups['mconf-recw'] }}"
-  when: hostvars[item].nfs_ip is defined
+  with_items: "{{ groups[nfs_group] }}"
+  when: common_ufw_enabled and hostvars[item].nfs_ip is defined
   notify:
     - restart ufw
 
@@ -18,7 +22,7 @@
     state: directory
     owner: '{{ bigbluebutton_user }}'
     group: '{{ bigbluebutton_user }}'
-  with_items: "{{ groups['mconf-recw'] }}"
+  with_items: "{{ groups[nfs_group] }}"
 
 - name: Remove sanity dir
   become: yes
@@ -30,6 +34,6 @@
 - name: Update exports
   become: yes
   template:
-    src: files/exports.j2
+    src: templates/exports.j2
     dest: /etc/exports
   notify: restart nfs-server

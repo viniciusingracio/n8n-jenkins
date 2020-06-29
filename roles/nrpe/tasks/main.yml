@@ -10,6 +10,8 @@
     name:
       - nagios-nrpe-server
       - nagios-plugins
+      - liblist-moreutils-perl
+      - libexperimental-perl
     state: latest
 
 - name: Allowed hosts
@@ -17,8 +19,11 @@
   lineinfile:
     dest: /etc/nagios/nrpe.cfg
     state: present
-    regexp: ^allowed_hosts=
-    line: 'allowed_hosts={{ nrpe_sources|join(", ") }}'
+    regexp: '{{ item.regexp }}'
+    line: '{{ item.line }}'
+  with_items:
+    - { regexp: '^allowed_hosts=', line: 'allowed_hosts={{ nrpe_sources|join(", ") }}' }
+    - { regexp: '^dont_blame_nrpe=', line: 'dont_blame_nrpe=1' }
   notify: restart nrpe
 
 - name: Add check_mconf.pl to nrpe config
@@ -27,15 +32,27 @@
     dest: /etc/nagios/nrpe.cfg
     block: |
       command[check_mconf]=sudo /usr/lib/nagios/plugins/check_mconf.pl
+      command[check_passenger]=sudo /usr/lib/nagios/plugins/check_passenger.pl
+      command[check_dns]=/usr/lib/nagios/plugins/check_dns -H $ARG1$ -w $ARG2$ -c $ARG3$
+      command[check_recw2nfs]=sudo /usr/lib/nagios/plugins/check_recw2nfs.pl
+      command[check_rpc]=/usr/lib/nagios/plugins/check_rpc -H 200.130.35.187 -p 2049 -t -C nfs
     marker: '# {mark} ANSIBLE MANAGED BLOCK'
   notify: restart nrpe
 
 - name: Copy check_mconf.pl
   become: yes
   copy:
-    src: files/check_mconf.pl
-    dest: /usr/lib/nagios/plugins/check_mconf.pl
+    src: files/{{ item }}
+    dest: /usr/lib/nagios/plugins/{{ item }}
+    owner: root
+    group: root
     mode: 0755
+  with_items:
+    - check_mconf.pl
+    - check_passenger.pl
+    - check_recw2nfs.pl
+    - check_dns
+    - check_rpc
   notify: restart nrpe
 
 - name: Remove check_mconf.sudoers
@@ -49,10 +66,11 @@
   lineinfile:
     dest: /etc/sudoers
     regex: '^Cmnd_Alias NAGIOS\s'
-    line: 'Cmnd_Alias NAGIOS = /usr/lib/nagios/plugins/check_mconf.pl'
+    line: 'Cmnd_Alias NAGIOS = /usr/lib/nagios/plugins/check_mconf.pl, /usr/lib/nagios/plugins/check_recw2nfs.pl, /usr/lib/nagios/plugins/check_passenger.pl'
     backup: yes
     state: present
     validate: visudo -cf %s
+  ignore_errors: yes
 
 - name: Add nagios permissions to sudoers
   become: yes
@@ -64,6 +82,7 @@
     backup: yes
     state: present
     validate: visudo -cf %s
+  ignore_errors: yes
 
 - include: ufw.yml
   when: common_ufw_enabled
