@@ -1,5 +1,6 @@
 ---
 
+bbb_fluent_image_version: mconf/bbb-fluent:latest
 bbb_fluent_elastic_path:
 bbb_fluent_elastic_host:
 bbb_fluent_elastic_port:

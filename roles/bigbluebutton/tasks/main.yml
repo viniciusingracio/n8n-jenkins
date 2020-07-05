@@ -57,24 +57,21 @@
   apt_key:
     url: '{{ item }}'
     state: present
-  register: aptkey
   with_items:
     - '{{ bigbluebutton_apt_key }}'
     - https://deb.nodesource.com/gpgkey/nodesource.gpg.key
 
 - name: Find repos to remove
-  become: yes
-  find:
-    paths: /etc/apt/sources.list.d
-    pattern: 'jenkins_live_mconf_com*'
+  command: grep -l 'jenkins-live.mconf.com' /etc/apt/sources.list.d -R
   register: jenkins_repos
+  ignore_errors: yes
 
 - name: Clear repos
   become: yes
   file:
     path: '{{ item }}'
     state: absent
-  with_items: "{{ jenkins_repos.files | map(attribute='path') | list + [ '/etc/apt/sources.list.d/archive_ubuntu_com_ubuntu.list', '/etc/apt/sources.list.d/deb_nodesource_com_node_8_x.list' ] | list }}"
+  with_items: "{{ jenkins_repos.stdout_lines | default([]) + [ '/etc/apt/sources.list.d/archive_ubuntu_com_ubuntu.list', '/etc/apt/sources.list.d/deb_nodesource_com_node_8_x.list' ] | list }}"
 
 - name: Add multiverse and BigBlueButton repos to apt
   become: yes
@@ -82,7 +79,6 @@
     repo: '{{ item.repo }}'
     filename: '{{ item.filename }}'
     state: present
-  register: aptrepos
   with_items:
     - { repo: 'deb http://archive.ubuntu.com/ubuntu/ {{ ansible_lsb.codename }} universe multiverse', filename: 'ubuntu' }
     - { repo: 'deb http://archive.ubuntu.com/ubuntu/ {{ ansible_lsb.codename }}-security universe multiverse', filename: 'ubuntu_security' }
@@ -96,7 +92,6 @@
 - name: Update apt if keys changed
   become: yes
   apt: update_cache=yes
-  when: aptkey is changed or aptrepos is changed
 
 - name: Remove kurento-media-server-6.0
   become: yes
@@ -517,7 +512,7 @@
 - include: freeswitch.yml
 
 - include: config-xml.yml
-  when: not bigbluebutton_html5_only
+  when: not bigbluebutton_html5_only|bool
 
 - include_role:
     name: bigbluebutton-webhooks

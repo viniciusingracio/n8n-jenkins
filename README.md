@@ -194,12 +194,15 @@ ansible-playbook -i envs/dev -l mconf-db playbooks/mconf-db-dump.yml
 
 * To run docker inside an LXC container, edit `/var/lib/lxc/your-container-name/config` and include:
 
-    ```
+```
 lxc.aa_profile = unconfined
 lxc.cgroup.devices.allow = a
 lxc.cap.drop =
-    ```
+```
 
+```
 sudo cp -L /etc/letsencrypt/live/elos.vc/* envs/prod/com/files/elos.vc/
 sudo cp -L /etc/letsencrypt/live/elos.app/* envs/prod/com/files/elos.app/
 sudo chown -R $USER:$USER envs/prod/com/files/
+```
+

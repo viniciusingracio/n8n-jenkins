@@ -374,11 +374,11 @@ def fill_template(results)
     # HELP bbb_webhook_queue_length Webhooks queue length
     # TYPE bbb_webhook_queue_length gauge
     bbb_webhook_queue_length <%= results[:bbb_webhook_queue_length] %>
-
+<% if results.has_key? :bbb_webhook_response_code %>
     # HELP bbb_webhook_code Response code of the create endpoint of the API
     # TYPE bbb_webhook_code gauge
     bbb_webhook_response_code{method="get",host="<%= results.has_key?(:bbb_webhook_host) ? results[:bbb_webhook_host] : nil %>"} <%= results[:bbb_webhook_response_code] %>
-
+<% end %>
     # HELP bbb_webhook_response_time The response time for webhooks GET
     # TYPE bbb_webhook_response_time gauge
     bbb_webhook_response_time <%= results[:bbb_webhook_response_time] %>
@@ -491,14 +491,15 @@ results[:bbb_total_time] = Benchmark.measure do
       response = requester.get_response(uri, use_ssl: uri.scheme == "https" ) rescue nil
     end
 
-    results[:bbb_webhook_queue_length] = `redis-cli llen bigbluebutton:webhooks:events:1 | sed 's/(integer)//g'`.strip
+    queue_length = `redis-cli llen bigbluebutton:webhooks:events:1 | sed 's/(integer)//g'`.strip.to_i
+    results[:bbb_webhook_queue_length] = queue_length
     results[:bbb_webhook_response_time] = time.to_s[/\(\s*([\d.]*)\)/, 1]
     if response
-      results[:bbb_webhook_success] = ( response.code == "200" ) ? 1 : 0
+      # mark as not success if the queue is bigger than 5 elements, it will prevent new sessions to use the server
+      results[:bbb_webhook_success] = ( response.code == "200" and queue_length <= 5 ) ? 1 : 0
       results[:bbb_webhook_response_code] = response.code
     else
       results[:bbb_webhook_success] = 0
-      results[:bbb_webhook_response_code] = "NaN"
     end
   end
 

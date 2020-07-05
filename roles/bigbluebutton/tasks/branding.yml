@@ -141,9 +141,8 @@
   copy:
     src: /var/www/bigbluebutton-default/favicon.ico
     dest: /var/bigbluebutton/playback/presentation/2.3/favicon.ico
-    remote: yes
+    remote_src: yes
   become: yes
-  ignore_errors: yes
   when: reg_playback_23.stat.exists
 
 - name:

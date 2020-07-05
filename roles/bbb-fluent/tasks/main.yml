@@ -20,7 +20,7 @@
 - name: Start fluentd container
   docker_container:
     name: fluentd
-    image: mconf/bbb-fluent:latest
+    image: '{{ bbb_fluent_image_version }}'
     command: -c /fluentd/etc/fluent-light.conf
     pull: yes
     restart_policy: unless-stopped
@@ -47,6 +47,10 @@
       FLUENTD_CONF: "fluent-light.conf"
     labels:
       hostname: '{{ inventory_hostname }}'
+  notify: clean docker
+
+- name: Remove old images
+  shell: docker images {{ bbb_fluent_image_version.split(":")[0] }} --filter 'before={{ bbb_fluent_image_version }}' -q | xargs -r docker rmi --force
   notify: clean docker
 
 - name: Copy files from the container
