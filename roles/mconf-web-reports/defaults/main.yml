@@ -21,6 +21,7 @@ mconf_web_reports_cron_log_file_previous_month: /var/log/mconf-web-reports-previ
 mconf_web_reports_cron_schedule_minute: '0'
 mconf_web_reports_cron_schedule_hour: '9,21'
 mconf_web_reports_cron_schedule_day: '*'
+mconf_web_reports_cron_schedule_weekday: '*'
 
 # run twice a day after the turn of the month
 # the last run is the one that really matters, must run before
@@ -29,6 +30,7 @@ mconf_web_reports_cron_schedule_day: '*'
 mconf_web_reports_cron_previous_month_schedule_minute: '0'
 mconf_web_reports_cron_previous_month_schedule_hour: '10,22,23'
 mconf_web_reports_cron_previous_month_schedule_day: '1,2'
+mconf_web_reports_cron_previous_month_schedule_weekday: '*'
 
 # paths to the config files, passed when running the docker container
 # TODO: this was done to accommodate the migration to a .tsv config, remove after
