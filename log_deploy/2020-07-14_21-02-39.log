@@ -1,0 +1,3 @@
+/usr/local/bin/ansible-playbook -v -i envs/prod/com-staging/hosts -l d.elos.vc --tags jekyll provision.yml
+
+d.elos.vc: 20 OK, 12 changed, 0 unreachable, 0 failed
