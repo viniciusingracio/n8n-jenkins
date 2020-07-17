@@ -7,7 +7,7 @@
 - name: Copy the Dockerfile to build Kong
   become: yes
   copy:
-    src: 'files/kong-Dockerfile'
+    src: 'files/Dockerfile'
     dest: '{{ temp_config.path }}/Dockerfile'
 
 - name: Save Kong's configuration file
@@ -20,15 +20,15 @@
 - name: Build the docker image
   docker_image:
     build_path: '{{ temp_config.path }}'
-    name: '{{ mconf_web_api_proxy_image_name }}'
-    tag: '{{ mconf_web_api_proxy_image_tag }}'
+    name: '{{ kong_image_name }}'
+    tag: '{{ kong_image_tag }}'
     force: true
   when: conf.changed
 
 - name: Start the container
   docker_container:
-    name: '{{ mconf_web_api_proxy_image_name }}'
-    image: '{{ mconf_web_api_proxy_image_name }}:{{ mconf_web_api_proxy_image_tag }}'
+    name: '{{ kong_image_name }}'
+    image: '{{ kong_image_name }}:{{ kong_image_tag }}'
     restart_policy: unless-stopped
     published_ports:
       - 8000:8000

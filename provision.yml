@@ -184,6 +184,10 @@
   roles:
   - { role: mconf-web-reports, when: mconf_web_reports_enabled, tags: [ mconf-web-reports ] }
 
+- hosts: kong
+  roles:
+  - { role: kong, tags: [ kong ] }
+
 - hosts: snmp
   roles:
   - { role: snmp, tags: [ snmp ] }
