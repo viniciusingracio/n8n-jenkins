@@ -1,0 +1,8 @@
+---
+
+- hosts:
+    - deployment-20200709
+  roles:
+    - bigbluebutton-prometheus
+
+- include: '{{ awd | default(playbook_dir) }}/playbooks/scheduled-presentation-recorder.yml'

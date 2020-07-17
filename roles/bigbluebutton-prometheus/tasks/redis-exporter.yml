@@ -11,4 +11,4 @@
       - 9121:9121
     labels:
       hostname: '{{ inventory_hostname }}'
-    state: '{% if bigbluebutton_prometheus_redis_exporter_enabled %}started{% else %}stopped{% endif %}'
+    state: '{% if bigbluebutton_prometheus_redis_exporter_enabled %}started{% else %}absent{% endif %}'

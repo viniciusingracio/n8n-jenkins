@@ -1,23 +1,20 @@
 ---
 
-- hosts: all
+- hosts: mconf-live220
+  gather_facts: no
   vars:
     simult:
       - { hour: '6', simultaneous_meetings: '0' }
       - { hour: '12', simultaneous_meetings: '1' }
-      - { hour: '13', simultaneous_meetings: '2' }
-      - { hour: '17', simultaneous_meetings: '1' }
-      - { hour: '18', simultaneous_meetings: '0' }
-      - { hour: '23', simultaneous_meetings: '1' }
+      - { hour: '13', simultaneous_meetings: '0' }
+      - { hour: '18', simultaneous_meetings: '1' }
+      - { hour: '22', simultaneous_meetings: '2' }
       - { hour: '0', simultaneous_meetings: '3' }
       - { hour: '1', simultaneous_meetings: '6' }
       - { hour: '5', simultaneous_meetings: '2' }
   tasks:
     - name: Purge previous configuration
-      cron:
-        name: "scheduled_recorder_{{ item }}"
-        state: absent
-      with_sequence: start=0 end=23
+      shell: '( crontab -l | sed -e "/^#Ansible: scheduled_recorder_[0-9]*/,+1d" ) | crontab -'
       become: yes
 
     - name:

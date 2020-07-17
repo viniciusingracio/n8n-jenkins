@@ -1,0 +1,10 @@
+---
+
+- hosts:
+  - mconf-live220
+  gather_facts: no
+  tasks:
+    - name:
+      command: "ruby -e 'require \"nokogiri\"; path = \"/var/www/bigbluebutton-default/guest/index.html\"; doc = Nokogiri::HTML(File.open(path)) { |x| x.noblanks }; doc.at_xpath(\"/html/body/@style\").content = doc.at_xpath(\"/html/body/@style\").content.gsub(/background-color:[^;]*/, \"background-color: {{ bigbluebutton_branding_background_color }}\"); file = File.new(path, \"w\"); file.write(doc.to_html(:indent => 2)); file.close'"
+      become: yes
+      when: not bigbluebutton_branding_background_color is none

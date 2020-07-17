@@ -1,9 +1,10 @@
 - name: Configure custom ufw rules
   hosts: all
+  gather_facts: no
   handlers:
     - include: ../roles/handlers/handlers/main.yml
   tasks:
-    - name: Configure custom rules
+    - name: Add custom rules
       become: yes
       ufw:
         rule: '{{ item.rule }}'

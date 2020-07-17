@@ -13,4 +13,4 @@
       - /var/log/nginx:/var/log/nginx:ro
     labels:
       hostname: '{{ inventory_hostname }}'
-    state: '{% if bigbluebutton_prometheus_nginx_logs_exporter_enabled %}started{% else %}stopped{% endif %}'
+    state: '{% if bigbluebutton_prometheus_nginx_logs_exporter_enabled %}started{% else %}absent{% endif %}'

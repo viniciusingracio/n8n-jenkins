@@ -1,4 +1,5 @@
 - hosts: all
+  gather_facts: no
   handlers:
     - name: reload nginx
       become: yes

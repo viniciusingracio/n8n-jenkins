@@ -43,10 +43,6 @@
     kurento_config: "{{ kurento_config|default([]) + [ { 'ip': kurento_ip, 'url': 'ws://' + docker_ip + ':' + item + '/kurento' } | combine( { 'ipClassMapping': ip_mappings } ) ] }}"
   with_items: '{{ kurento_ports }}'
 
-- name: Determine default network interface
-  shell: route -n | grep "^0.0.0.0" | tr -s ' ' | cut -d' ' -f 8
-  register: default_route_raw
-
 - name: Stop kurento health monitor
   docker_container:
     name: kurento-health-monitor
@@ -79,7 +75,6 @@
       STUN_PORT: '{{ kms_stun_server_port | string | default(omit, true) }}'
       GST_DEBUG: '3,Kurento*:4,kms*:4,KurentoWebSocketTransport:5'
       TZ: '{{ lookup("file", "/etc/timezone") }}'
-      NETWORK_INTERFACES: '{{ default_route_raw.stdout }}'
     labels:
       hostname: '{{ inventory_hostname }}'
   with_items: '{{ kurento_ports }}'

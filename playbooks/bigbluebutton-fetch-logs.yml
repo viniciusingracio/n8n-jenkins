@@ -1,0 +1,20 @@
+---
+
+- hosts:
+  - mconf-live220
+  - mconf-rec
+  - mconf-recw
+  tasks:
+  - file:
+      path: /tmp/logs/{{ inventory_hostname }}
+      state: directory
+      recurse: yes
+    delegate_to: 127.0.0.1
+
+  - name: Copy files
+    command: rsync -azm -e 'ssh -p {{ ansible_port }} {{ ansible_ssh_common_args }}' {{ ansible_user }}@{{ inventory_hostname }}:{/var/log/bigbluebutton,/var/log/bbb-*,/var/log/nginx} /tmp/logs/{{ inventory_hostname }}
+    delegate_to: 127.0.0.1
+    retries: 10
+    delay: 2
+    register: task_result
+    until: task_result.rc == 0

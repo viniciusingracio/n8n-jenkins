@@ -104,12 +104,12 @@ class HTTPRequester
   end
 
   def get_response(uri, use_ssl: false)
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = use_ssl || @ssl_enabled
-    http.read_timeout = 10
-
-    # It never raises an exception
-    http.get(uri.request_uri)
+    response = nil
+    Net::HTTP.start(uri.host, uri.port, :use_ssl => use_ssl || @ssl_enabled, :read_timeout => 10) do |http|
+      request = Net::HTTP::Get.new uri
+      response = http.request request
+    end
+    response
   end
 
   def get_response_code(*args)
@@ -491,12 +491,10 @@ results[:bbb_total_time] = Benchmark.measure do
       response = requester.get_response(uri, use_ssl: uri.scheme == "https" ) rescue nil
     end
 
-    queue_length = `redis-cli llen bigbluebutton:webhooks:events:1 | sed 's/(integer)//g'`.strip.to_i
-    results[:bbb_webhook_queue_length] = queue_length
+    results[:bbb_webhook_queue_length] = `redis-cli llen bigbluebutton:webhooks:events:1 | sed 's/(integer)//g'`.strip.to_i
     results[:bbb_webhook_response_time] = time.to_s[/\(\s*([\d.]*)\)/, 1]
     if response
-      # mark as not success if the queue is bigger than 5 elements, it will prevent new sessions to use the server
-      results[:bbb_webhook_success] = ( response.code == "200" and queue_length <= 5 ) ? 1 : 0
+      results[:bbb_webhook_success] = ( response.code == "200" ) ? 1 : 0
       results[:bbb_webhook_response_code] = response.code
     else
       results[:bbb_webhook_success] = 0

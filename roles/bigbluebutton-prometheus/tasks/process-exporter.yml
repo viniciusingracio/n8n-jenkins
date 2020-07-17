@@ -22,4 +22,4 @@
       - /usr/local/etc/bigbluebutton-prometheus/process-exporter.yml:/config/config.yml:ro
     labels:
       hostname: '{{ inventory_hostname }}'
-    state: '{% if bigbluebutton_prometheus_process_exporter_enabled %}started{% else %}stopped{% endif %}'
+    state: '{% if bigbluebutton_prometheus_process_exporter_enabled %}started{% else %}absent{% endif %}'

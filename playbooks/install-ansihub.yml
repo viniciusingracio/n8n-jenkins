@@ -79,6 +79,7 @@
 
   - name: End all meetings
     command: ruby /usr/local/bigbluebutton/core/scripts/utils/end-all.rb
+    ignore_errors: yes
     tags:
       - provision
 
@@ -87,8 +88,15 @@
     command: apt install --reinstall python3-pip
     when: ansible_python_interpreter == '/usr/bin/python3'
 
+  - file:
+      path: /var/www/bigbluebutton-default/status
+      state: absent
+    become: yes
+
   - name: Run ansible-playbook
-    shell: ansible-playbook -i {{ inventory_dir | regex_replace('.*\/mconf-ansihub\/', '') }}/hosts -l {{ inventory_hostname }} --connection=local provision.yml --skip-tags 'reboot' > /var/log/ansible-execution-$(date +%Y%m%d%H%M).log
+    shell: |
+      ansible-playbook -i {{ inventory_dir | regex_replace('.*\/mconf-ansihub\/', '') }}/hosts -l {{ inventory_hostname }} --connection=local provision.yml --skip-tags 'reboot' > /var/log/ansible-execution-$(date +%Y%m%d%H%M).log
+      echo $? | tee /var/www/bigbluebutton-default/status
     args:
       chdir: '{{ ansible_env.HOME }}/mconf-ansihub'
     async: 3600

@@ -97,10 +97,12 @@
   when: ansible_os_family == "Debian"
 
 - name: Add gtiadm to wheel group
-  user:
-   name: gtiadm
-   groups: wheel
-   append: yes
+  command: usermod -aG wheel gtiadm
+  # the following give us an error on ansible
+  # user:
+  #  name: gtiadm
+  #  groups: wheel
+  #  append: yes
   when: ansible_os_family == "RedHat" or ansible_os_family == "Debian"
 
 - name: Modify create mode permission in logrotate.conf

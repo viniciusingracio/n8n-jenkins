@@ -1,18 +1,18 @@
 ---
 
 - hosts:
-  - all
+    - all
+  gather_facts: no
   tasks:
-  - name: Stop services for presentation and presentation_video
-    become: yes
-    command: systemctl stop mconf-presentation-recorder
+    - name: Reset
+      command: yq w -i /usr/local/bigbluebutton/core/scripts/mconf-presentation-recorder.yml "simultaneous_meetings" "0"
+      become: yes
 
-  - name: Stop recorders
-    become: yes
-    shell: docker ps --filter name=record_* -aq | xargs docker stop
-    ignore_errors: yes
-
-  - name: Stop nginx containers
-    become: yes
-    shell: docker ps --filter name=nginx_* -aq | xargs docker stop
-    ignore_errors: yes
+    - name: Stop recorders
+      shell: |
+        docker ps --filter name=record_* -aq | xargs -r docker rm -f
+        docker ps --filter name=nginx_* -aq | xargs -r docker rm -f
+        docker network ls --filter name=record_* --format '\{\{.Name\}\}' | cut -d'_' -f2 | xargs -I{} -r docker network disconnect -f record_{} nginx_{}
+        docker network ls --filter name=record_* --format '\{\{.Name\}\}' | cut -d'_' -f2 | xargs -I{} -r docker network disconnect -f record_{} record_{}
+        docker network ls --filter name=record_* -q | xargs -r docker network rm
+      ignore_errors: yes

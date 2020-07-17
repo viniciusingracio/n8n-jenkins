@@ -154,3 +154,8 @@
   command: ruby -e 'require "json"; path = "/var/bigbluebutton/playback/presentation/2.3/manifest.json"; doc = JSON.parse(File.read(path), :symbolize_names => true); doc[:name] = "{{ bigbluebutton_branding_playback_title }}"; file = File.new(path, "w"); file.write(JSON.pretty_generate(doc)); file.close'
   become: yes
   when: reg_playback_23.stat.exists
+
+- name:
+  command: "ruby -e 'require \"nokogiri\"; path = \"/var/www/bigbluebutton-default/guest/index.html\"; doc = Nokogiri::HTML(File.open(path)) { |x| x.noblanks }; doc.at_xpath(\"/html/body/@style\").content = doc.at_xpath(\"/html/body/@style\").content.gsub(/background-color:[^;]*/, \"background-color: {{ bigbluebutton_branding_background_color }}\"); file = File.new(path, \"w\"); file.write(doc.to_html(:indent => 2)); file.close'"
+  become: yes
+  when: not bigbluebutton_branding_background_color is none
