@@ -23,6 +23,7 @@
     become: yes
     apt:
       name: software-properties-common
+      state: latest
 
   - name: Add ansible ppa
     become: yes

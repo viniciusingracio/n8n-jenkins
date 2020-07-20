@@ -1,0 +1,9 @@
+---
+
+- hosts:
+  - mconf-live220
+  roles:
+    - kong
+    - bigbluebutton-webhooks
+    - bbb-fluent
+    - bigbluebutton-prometheus

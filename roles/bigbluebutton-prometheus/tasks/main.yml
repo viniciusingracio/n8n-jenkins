@@ -30,7 +30,7 @@
 - set_fact:
     cmd: /usr/bin/ruby /usr/local/etc/bigbluebutton-prometheus/bbb-prometheus-exporter.rb --ssl true
 - set_fact:
-    cmd: 'sleep {{ 30 | random }}; {{ cmd }} --webhook {{ ( bigbluebutton_docker_webhooks_permanent_hooks | first ).url }}/health'
+    cmd: 'sleep {{ 30 | random }}; {{ cmd }} --webhook {{ bigbluebutton_prometheus_webhook_url | default(( bigbluebutton_docker_webhooks_permanent_hooks | first ).url, true) }}/health'
   when: bigbluebutton_docker_webhooks_permanent_hooks is defined and bigbluebutton_docker_webhooks_permanent_hooks | length > 0
 
 - name: Install cron job monitor metrics

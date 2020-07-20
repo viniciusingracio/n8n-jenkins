@@ -1,6 +1,7 @@
 ---
 
 bigbluebutton_prometheus_password:
+bigbluebutton_prometheus_webhook_url:
 bigbluebutton_prometheus_process_exporter_enabled: false
 bigbluebutton_prometheus_nginx_exporter_enabled: false
 bigbluebutton_prometheus_nginx_logs_exporter_enabled: false

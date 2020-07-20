@@ -1,16 +1,22 @@
 _format_version: "1.1"
 services:
-- name: {{ kong_service_name }}
-  url: {{ kong_url }}
+{% for item in kong_config %}
+- name: {{ item.service_name }}
+  url: {{ item.url }}
   routes:
-  - name: {{ kong_route_name }}
+  - name: {{ item.route_name }}
     paths:
-    - /
-  connect_timeout: {{ kong_connect_timeout }}
-  read_timeout: {{ kong_read_timeout }}
-  write_timeout: {{ kong_write_timeout }}
+{% for path in item.paths %}
+    - {{ path }}
+{% endfor %}
+  connect_timeout: {{ item.connect_timeout | default(kong_connect_timeout) }}
+  read_timeout: {{ item.read_timeout | default(kong_read_timeout) }}
+  write_timeout: {{ item.write_timeout | default(kong_write_timeout) }}
 
+{% endfor %}
 plugins:
+{% for item in kong_config %}
 - name: prometheus
-  service: {{ kong_service_name }}
+  service: {{ item.service_name }}
   config:
+{% endfor %}

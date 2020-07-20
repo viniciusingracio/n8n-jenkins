@@ -103,9 +103,10 @@ class HTTPRequester
     @ssl_enabled = ssl_enabled
   end
 
-  def get_response(uri, use_ssl: false)
+  def get_response(uri, **params)
+    use_ssl = params.has_key?(:use_ssl) ? params[:use_ssl] : @ssl_enabled
     response = nil
-    Net::HTTP.start(uri.host, uri.port, :use_ssl => use_ssl || @ssl_enabled, :read_timeout => 10) do |http|
+    Net::HTTP.start(uri.host, uri.port, :use_ssl => use_ssl, :read_timeout => 10) do |http|
       request = Net::HTTP::Get.new uri
       response = http.request request
     end

@@ -15,21 +15,22 @@
   template:
     src: kong-declarative.yml.j2
     dest: '{{ temp_config.path }}/kong-declarative.yaml'
-  register: conf
 
 - name: Build the docker image
   docker_image:
-    build_path: '{{ temp_config.path }}'
+    build:
+      path: '{{ temp_config.path }}'
+      pull: no
+    source: build
+    force_source: yes
     name: '{{ kong_image_name }}'
     tag: '{{ kong_image_tag }}'
-    force: true
-  when: conf.changed
 
 - name: Start the container
   docker_container:
     name: '{{ kong_image_name }}'
     image: '{{ kong_image_name }}:{{ kong_image_tag }}'
-    restart_policy: unless-stopped
+    restart_policy: always
     published_ports:
-      - 8000:8000
+      - '{{ kong_port }}:8000'
     detach: true

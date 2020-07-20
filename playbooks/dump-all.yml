@@ -1,0 +1,5 @@
+- hosts: all
+  tasks:
+    - name: Dump all vars
+      action: template src=templates/dump-all.j2 dest=/tmp/ansible.out
+      delegate_to: localhost

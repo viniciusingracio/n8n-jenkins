@@ -1,0 +1,5 @@
+---
+
+- hosts: kong
+  roles:
+  - { role: kong, tags: [ kong ] }

@@ -1,4 +1,4 @@
-FROM kong
+FROM kong:2.0.4-alpine
 COPY kong-declarative.yaml /kong/declarative.yaml
 
 EXPOSE 8000

@@ -37,6 +37,7 @@
       - 24231:24231
     env:
       TZ: '{{ lookup("file", "/etc/timezone") }}'
+      ELASTIC_SCHEME: "{{ bbb_fluent_elastic_scheme | string }}"
       ELASTIC_PATH: "{{ bbb_fluent_elastic_path | string }}"
       ELASTIC_HOST: "{{ bbb_fluent_elastic_host | string }}"
       ELASTIC_PORT: "{{ bbb_fluent_elastic_port | string }}"

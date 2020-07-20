@@ -2,10 +2,12 @@
 
 kong_image_name: mconf-kong
 kong_image_tag: latest
-kong_service_name: service
-kong_route_name: api
-kong_url: 
+kong_config: []
+  # - service_name: service
+  #   route_name: api
+  #   url:
 # kong_url: http://api.elos.vc
 kong_connect_timeout: 10000
 kong_read_timeout: 10000
 kong_write_timeout: 10000
+kong_port: 8000
