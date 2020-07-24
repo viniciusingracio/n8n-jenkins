@@ -112,6 +112,18 @@
     tags:
       - cleanup
 
+  - name: Verify installation
+    command: cat /var/www/bigbluebutton-default/status
+    register: reg_status
+    tags:
+      - verify
+
+  - name: Print
+    debug:
+      msg: '{{ reg_status.stdout }}'
+    tags:
+      - verify
+
 - hosts: '{{ dynamic_inventory_hostname | default("all") }}'
   roles:
   - { role: reboot, tags: [ reboot ] }

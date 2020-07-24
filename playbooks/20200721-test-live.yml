@@ -1,0 +1,31 @@
+---
+
+- hosts:
+  - mconf-live220
+  gather_facts: no
+  tasks:
+    - set_fact:
+        ok_cpu: yes
+        ok_memory: yes
+
+    - name: Get memory
+      shell: cat /proc/meminfo | grep 'MemTotal:' | tr -s ' ' | cut -d' ' -f2
+      register: memory_raw
+
+    - name: Check if memory meets the requirements
+      set_fact:
+        ok_memory: no
+      when: memory_raw.stdout|int < 8000000
+
+    - name: Get number of cores
+      shell: "grep -c ^processor /proc/cpuinfo"
+      register: num_proc_auto_raw
+
+    - name: Check if cpu meets the requirements
+      set_fact:
+        ok_cpu: no
+      when: num_proc_auto_raw.stdout|int < 8
+
+    - fail:
+        msg: "Server {{ inventory_hostname }} doesn't meet the minimum requirements: {{ num_proc_auto_raw.stdout|int }} vCPU and {{ ( memory_raw.stdout|int / (1024 * 1024) ) | round(1) }} GB RAM"
+      when: not ok_cpu or not ok_memory

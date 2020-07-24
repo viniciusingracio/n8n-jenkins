@@ -29,5 +29,5 @@
   cron:
     name: freeswitch-sipp-check
     minute: '*/2'
-    job: TERM=xterm /usr/local/bin/freeswitch_sipp_check.sh {{ external_ip }} {{ freeswitch_sip_port }} | sponge /usr/local/share/prometheus/freeswitch-sipp-check.prom
+    job: TERM=xterm /usr/local/bin/freeswitch_sipp_check.sh {{ ansible_default_ipv4.address }} {{ freeswitch_sip_port }} {{ bigbluebutton_sip_udp_range_end + 1 }}| sponge /usr/local/share/prometheus/freeswitch-sipp-check.prom
     user: root
