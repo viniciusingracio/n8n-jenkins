@@ -11,3 +11,4 @@ kong_connect_timeout: 10000
 kong_read_timeout: 10000
 kong_write_timeout: 10000
 kong_port: 8000
+kong_admin_port: 8001

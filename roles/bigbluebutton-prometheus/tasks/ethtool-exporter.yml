@@ -1,0 +1,12 @@
+---
+
+- name: Start ethtool exporter
+  docker_container:
+    name: ethtool-exporter
+    image: mconf/ethtool-exporter
+    pull: yes
+    restart_policy: always
+    network_mode: host
+    labels:
+      hostname: '{{ inventory_hostname }}'
+    state: '{% if bigbluebutton_prometheus_ethtool_exporter_enabled %}started{% else %}absent{% endif %}'

@@ -4,8 +4,10 @@
 # ansible-playbook -vv --extra-vars digitalocean_token=XXX playbooks/certbot-wildcard-certificate.yml
 
 # and then:
-# sudo cp -L /etc/letsencrypt/live/elos.vc/* envs/prod/com/files/elos.vc/
-# sudo cp -L /etc/letsencrypt/live/elos.app/* envs/prod/com/files/elos.app/
+# sudo su
+# cp -L /etc/letsencrypt/live/elos.vc/* envs/prod/com/files/elos.vc/
+# cp -L /etc/letsencrypt/live/elos.app/* envs/prod/com/files/elos.app/
+# exit
 # sudo chown -R $USER:$USER envs/prod/com/files/
 
 - hosts: localhost

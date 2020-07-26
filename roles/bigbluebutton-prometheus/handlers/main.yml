@@ -11,3 +11,7 @@
 - name: restart process exporter
   command: docker restart process-exporter
   ignore_errors: yes
+
+- name: restart mtail exporter
+  command: docker restart mtail-exporter
+  ignore_errors: yes

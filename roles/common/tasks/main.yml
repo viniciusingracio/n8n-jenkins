@@ -8,5 +8,3 @@
   tags: [python]
 - include: swap.yml
   tags: [swap]
-
-# TODO setup NTP

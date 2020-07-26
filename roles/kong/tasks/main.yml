@@ -33,4 +33,5 @@
     restart_policy: always
     published_ports:
       - '{{ kong_port }}:8000'
+      - '{{ kong_admin_port }}:8001'
     detach: true

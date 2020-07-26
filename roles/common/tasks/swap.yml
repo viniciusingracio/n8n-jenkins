@@ -50,7 +50,7 @@
   when: create_swap
 
 - name: Set swappiness
-  command: sysctl vm.swappiness=10
+  command: sysctl vm.swappiness=0
   become: yes
   when: create_swap
 
@@ -58,7 +58,7 @@
   blockinfile:
     dest: /etc/sysctl.conf
     block: |
-      vm.swappiness=10
+      vm.swappiness=0
     marker: '# {mark} ANSIBLE MANAGED BLOCK swappiness'
   become: yes
   when: create_swap

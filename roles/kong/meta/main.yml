@@ -2,4 +2,4 @@
 
 dependencies:
   - { role: handlers }
-  - { role: docker-host }
+  - { role: docker-host, tags: [ docker ] }

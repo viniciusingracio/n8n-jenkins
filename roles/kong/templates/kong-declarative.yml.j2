@@ -3,6 +3,9 @@ services:
 {% for item in kong_config %}
 - name: {{ item.service_name }}
   url: {{ item.url }}
+{% if item.plugins is defined and item.plugins|length > 0 %}
+  plugins: {{ item.plugins | to_json }}
+{% endif %}
   routes:
   - name: {{ item.route_name }}
     paths:

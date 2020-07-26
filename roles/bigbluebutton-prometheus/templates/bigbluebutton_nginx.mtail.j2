@@ -1,0 +1,22 @@
+counter bbb_nginx_http_requests_total by request_method, status, api_method
+
+histogram bbb_nginx_http_request_duration_seconds by request_method, status, api_method buckets 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10, 15
+histogram bbb_nginx_http_upstream_response_duration_seconds by request_method, status, api_method buckets 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10, 15
+
+getfilename() =~ /bigbluebutton.access.log$/ {
+  /^(?P<remote_addr>\S+) - (?P<remote_user>\S+) \[(?P<time_local>[^\]]+)\] "(?P<request_method>\S+) (?P<request_uri>[^ ]+) (?P<http_version>HTTP[^"]+)" (?P<status>\S+) (?P<body_bytes_sent>\d+) "(?P<http_referer>[^"]+)" "(?P<http_user_agent>[^"]+)" "(?P<http_x_forwarded_for>[^"]+)" (?P<request_time>\S+) (?P<upstream_response_time>\S+) (?P<pipe>\S+) (?P<upstream_cache_status>\S+)$/ {
+    $remote_addr != "{{ external_ip }}" && $remote_addr != "127.0.0.1" {
+      $request_uri =~ /\/bigbluebutton\/api\/(?P<api_method>\w+)/ {
+        bbb_nginx_http_requests_total[$request_method][$status][$api_method]++
+
+        $request_time != "-" {
+          bbb_nginx_http_request_duration_seconds[$request_method][$status][$api_method] = float($request_time)
+        }
+
+        $upstream_response_time != "-" {
+          bbb_nginx_http_upstream_response_duration_seconds[$request_method][$status][$api_method] = float($upstream_response_time)
+        }
+      }
+    }
+  }
+}

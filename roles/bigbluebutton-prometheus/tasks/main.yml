@@ -1,6 +1,8 @@
 ---
 
 - include: facts.yml
+  tags:
+    - always
 
 - name: Update apt (if older than 60m)
   become: yes
@@ -72,3 +74,7 @@
 - include: sipp.yml
   when: bigbluebutton_prometheus_sipp_exporter_enabled
 - include: ntp-exporter.yml
+- include: ethtool-exporter.yml
+- include: mtail-exporter.yml
+  tags:
+    - mtail
