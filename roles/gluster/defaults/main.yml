@@ -19,3 +19,9 @@ gluster_dirs: []
 #     group: '{{ deploy_user }}'
 #   }
 # ]
+
+gluster_volume_options:
+# example:
+#  {
+#    cluster.favorite-child-policy: mtime
+#  }

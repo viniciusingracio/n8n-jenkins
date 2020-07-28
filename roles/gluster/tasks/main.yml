@@ -146,6 +146,7 @@
     bricks: '{{ brick_path }}'
     replicas: '{{ cluster | length }}'
     cluster: '{{ cluster }}'
+    options: '{{ gluster_volume_options }}'
     state: present
   when: im_master
 
@@ -166,7 +167,7 @@
   become: yes
   mount:
     path: '{{ data_path }}'
-    src: '{{ others_in_cluster | first }}:/{{ gluster_volume_name }}'
+    src: '{{ gluster_ip }}:/{{ gluster_volume_name }}'
     fstype: glusterfs
-    opts: defaults,_netdev,backupvolfile-server={{ gluster_ip }}
+    opts: 'defaults,_netdev,backupvolfile-server={{ others_in_cluster | first }}'
     state: mounted
