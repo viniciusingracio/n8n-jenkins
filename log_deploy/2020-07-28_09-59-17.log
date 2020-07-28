@@ -1,0 +1,3 @@
+/usr/local/bin/ansible-playbook -i envs/rnp/tst/hosts -l mconf-db setup.yml --extra-vars ansible_user=gtiadm
+
+vm-mysql-master-tst: 35 OK, 16 changed, 0 unreachable, 0 failed

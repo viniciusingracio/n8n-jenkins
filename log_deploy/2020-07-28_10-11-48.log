@@ -1,0 +1,5 @@
+/usr/local/bin/ansible-playbook -i envs/rnp/tst/hosts -l mconf-web setup.yml --extra-vars ansible_user=gtiadm
+
+vm-portal-0-tst: 44 OK, 31 changed, 0 unreachable, 0 failed
+vm-portal-1-tst: 44 OK, 31 changed, 0 unreachable, 0 failed
+vm-portal-2-tst: 44 OK, 31 changed, 0 unreachable, 0 failed

@@ -1,0 +1,3 @@
+/usr/local/bin/ansible-playbook -i envs/rnp/tst/hosts -l mconf-db playbooks/mconf-db.yml
+
+vm-mysql-master-tst: 25 OK, 17 changed, 0 unreachable, 0 failed

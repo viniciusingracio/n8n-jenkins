@@ -1,0 +1,4 @@
+---
+- hosts: mconf-db
+  roles:
+  - mconf-db

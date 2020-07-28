@@ -1,0 +1,5 @@
+/usr/local/bin/ansible-playbook -i envs/rnp/tst/hosts -l mconf-web playbooks/mconf-web.yml --tags gluster
+
+vm-portal-0-tst: 20 OK, 4 changed, 0 unreachable, 0 failed
+vm-portal-1-tst: 16 OK, 3 changed, 0 unreachable, 0 failed
+vm-portal-2-tst: 16 OK, 2 changed, 0 unreachable, 0 failed

@@ -1,5 +1,10 @@
 ---
 
-- hosts: node-exporter
+- hosts: mconf-web
   roles:
-    - node-exporter
+  - { role: certbot, when: certbot_enabled | bool, tags: [ certbot ] }
+  - mconf-web
+  - { role: test-webrtc, when: test_webrtc_enabled | bool, tags: [ test-webrtc ] }
+  - { role: kong, when: kong_enabled | bool, tags: [ kong ] }
+  - { role: node-exporter, when: node_exporter_enabled | bool, tags: [ node-exporter ] }
+  - { role: gluster, when: gluster_enabled | bool, tags: [ gluster ] }
