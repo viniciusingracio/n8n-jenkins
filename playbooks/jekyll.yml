@@ -1,0 +1,6 @@
+---
+
+- hosts: jekyll
+  roles:
+  - { role: certbot, when: certbot_enabled | bool, tags: [ certbot ] }
+  - { role: jekyll, tags: [ jekyll ] }
