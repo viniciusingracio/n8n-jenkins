@@ -1,16 +1,12 @@
 counter mconf_web_http_requests_total by request_method, status, path
 counter mconf_web_http_requests_total_overall
-counter mconf_web_http_requests_total_overall_2
-counter mconf_web_http_requests_total_overall_3
 
 getfilename() =~ /mconf-web-access.log$/ {
   mconf_web_http_requests_total_overall++
 
   /^(?P<remote_addr>\S+) - (?P<remote_user>\S+) \[(?P<time_local>[^\]]+)\] "(?P<request_method>\S+) (?P<request_uri>[^ ]+) (?P<http_version>HTTP[^"]+)" (?P<status>\S+) (?P<body_bytes_sent>[\d-]+) "(?P<http_referer>[^"]+)" "(?P<http_user_agent>[^"]+)"/ {
-    mconf_web_http_requests_total_overall_2++
 
     $remote_addr != "127.0.0.1" {
-      mconf_web_http_requests_total_overall_3++
 
       $request_uri =~ /^\/site/ {
         mconf_web_http_requests_total[$request_method][$status]["manage"]++

@@ -1,1 +1,8 @@
 ---
+
+certbot_enabled: false
+test_webrtc_enabled: false
+kong_enabled: false
+node_exporter_enabled: false
+mtail_exporter_enabled: false
+gluster_enabled: false
