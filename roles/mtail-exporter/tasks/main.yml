@@ -1,0 +1,31 @@
+---
+
+- name: Create config directory
+  become: yes
+  file:
+    path: '{{ mtail_exporter_config_path }}'
+    recurse: yes
+    state: directory
+
+- name: Setup mtail config
+  become: yes
+  template:
+    src: '{{ mtail_exporter_template }}'
+    dest: '{{ mtail_exporter_config_path }}/config.mtail'
+  notify: restart mtail exporter
+
+- name: Start mtail exporter
+  docker_container:
+    name: mtail-exporter
+    image: mconf/mtail:v3.0.0-rc36
+    command: '-logtostderr -progs /progs/config.mtail -logs {{ mtail_exporter_monitored_logs }}'
+    pull: yes
+    restart_policy: always
+    volumes:
+      - '{{ mtail_exporter_config_path }}/config.mtail:/progs/config.mtail'
+      - '{{ mtail_exporter_logs_folder }}:/var/log'
+    ports:
+      - 3903:3903
+    labels:
+      hostname: '{{ inventory_hostname }}'
+    state: '{% if mtail_exporter_enabled %}started{% else %}absent{% endif %}'

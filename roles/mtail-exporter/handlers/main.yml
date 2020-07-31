@@ -1,0 +1,5 @@
+---
+
+- name: restart mtail exporter
+  command: docker restart mtail-exporter
+  ignore_errors: yes

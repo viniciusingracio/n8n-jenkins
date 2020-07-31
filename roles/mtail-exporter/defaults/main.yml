@@ -1,0 +1,7 @@
+---
+
+mtail_exporter_enabled: false
+mtail_exporter_template: templates/empty.mtail.j2
+mtail_exporter_config_path: /usr/local/etc/mtail-exporter
+mtail_exporter_logs_folder: /var/log
+mtail_exporter_monitored_logs: /var/log/*.log
