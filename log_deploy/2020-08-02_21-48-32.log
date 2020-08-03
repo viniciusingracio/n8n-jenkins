@@ -1,0 +1,5 @@
+/usr/local/bin/ansible-playbook -i envs/rnp/prod/hosts -l mconf-web --tags node-exporter playbooks/mconf-web.yml
+
+vm-portal-0-hmg: 10 OK, 1 changed, 0 unreachable, 0 failed
+vm-portal-1-hmg: 10 OK, 1 changed, 0 unreachable, 0 failed
+vm-portal-2-hmg: 10 OK, 2 changed, 0 unreachable, 0 failed

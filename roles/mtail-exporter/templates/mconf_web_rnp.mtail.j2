@@ -1,0 +1,55 @@
+counter mconf_web_http_requests_total by request_method, status, path
+counter mconf_web_http_requests_total_overall
+
+getfilename() =~ /mconf-web-access.log$/ {
+  mconf_web_http_requests_total_overall++
+
+  /^(?P<remote_addr>\S+) - (?P<remote_user>\S+) \[(?P<time_local>[^\]]+)\] "(?P<request_method>\S+) (?P<request_uri>[^ ]+) (?P<http_version>HTTP[^"]+)" (?P<status>\S+) (?P<body_bytes_sent>[\d-]+) "(?P<http_referer>[^"]+)" "(?P<http_user_agent>[^"]+)"/ {
+
+    $remote_addr != "127.0.0.1" {
+
+      $request_uri =~ /^\/site/ {
+        mconf_web_http_requests_total[$request_method][$status]["manage"]++
+      }
+      $request_uri =~ /^\/conference/ {
+        mconf_web_http_requests_total[$request_method][$status]["conference"]++
+        $request_uri =~ /running\.json$/ {
+          mconf_web_http_requests_total[$request_method][$status]["running.json"]++
+        }
+        $request_uri =~ /\/join[^\/]*$/ {
+          mconf_web_http_requests_total[$request_method][$status]["join"]++
+        }
+      }
+      $request_uri =~ /^\/webconf/ {
+        mconf_web_http_requests_total[$request_method][$status]["webconf"]++
+      }
+      $request_uri =~ /^\/home/ {
+        mconf_web_http_requests_total[$request_method][$status]["home"]++
+      }
+      $request_uri =~ /^\/spaces/ {
+        mconf_web_http_requests_total[$request_method][$status]["spaces"]++
+      }
+      $request_uri =~ /^\/users/ {
+        mconf_web_http_requests_total[$request_method][$status]["users"]++
+      }
+      $request_uri =~ /^\/secure/ {
+        mconf_web_http_requests_total[$request_method][$status]["secure"]++
+      }
+      $request_uri =~ /^\/assets/ {
+        mconf_web_http_requests_total[$request_method][$status]["assets"]++
+      }
+      $request_uri =~ /^\/uploads/ {
+        mconf_web_http_requests_total[$request_method][$status]["uploads"]++
+      }
+      $request_uri =~ /^\/manage/ {
+        mconf_web_http_requests_total[$request_method][$status]["manage"]++
+      }
+      otherwise {
+        $request_method != "HEAD" {
+          mconf_web_http_requests_total[$request_method][$status]["other"]++
+        }
+      }
+
+    }
+  }
+}
