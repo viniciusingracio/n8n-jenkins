@@ -6,18 +6,15 @@ getfilename() =~ /mconf-web-access.log$/ {
 
   /^(?P<remote_addr>\S+) - (?P<remote_user>\S+) \[(?P<time_local>[^\]]+)\] "(?P<request_method>\S+) (?P<request_uri>[^ ]+) (?P<http_version>HTTP[^"]+)" (?P<status>\S+) (?P<body_bytes_sent>[\d-]+) "(?P<http_referer>[^"]+)" "(?P<http_user_agent>[^"]+)"/ {
 
-    $remote_addr != "127.0.0.1" {
+    $remote_addr != "127.0.0.1" && $request_method != "HEAD" {
 
-      $request_uri =~ /^\/site/ {
-        mconf_web_http_requests_total[$request_method][$status]["manage"]++
-      }
       $request_uri =~ /^\/conference/ {
         mconf_web_http_requests_total[$request_method][$status]["conference"]++
         $request_uri =~ /running\.json$/ {
-          mconf_web_http_requests_total[$request_method][$status]["running.json"]++
+          mconf_web_http_requests_total[$request_method][$status]["conference_running.json"]++
         }
         $request_uri =~ /\/join[^\/]*$/ {
-          mconf_web_http_requests_total[$request_method][$status]["join"]++
+          mconf_web_http_requests_total[$request_method][$status]["conference_join"]++
         }
       }
       $request_uri =~ /^\/webconf/ {
@@ -29,25 +26,36 @@ getfilename() =~ /mconf-web-access.log$/ {
       $request_uri =~ /^\/spaces/ {
         mconf_web_http_requests_total[$request_method][$status]["spaces"]++
       }
+      $request_uri =~ /^\/events/ {
+        mconf_web_http_requests_total[$request_method][$status]["events"]++
+      }
       $request_uri =~ /^\/users/ {
         mconf_web_http_requests_total[$request_method][$status]["users"]++
       }
-      $request_uri =~ /^\/secure/ {
-        mconf_web_http_requests_total[$request_method][$status]["secure"]++
-      }
-      $request_uri =~ /^\/assets/ {
-        mconf_web_http_requests_total[$request_method][$status]["assets"]++
-      }
-      $request_uri =~ /^\/uploads/ {
-        mconf_web_http_requests_total[$request_method][$status]["uploads"]++
-      }
-      $request_uri =~ /^\/manage/ {
+
+      # manage
+      $request_uri =~ /^\/(manage|site)/ {
         mconf_web_http_requests_total[$request_method][$status]["manage"]++
       }
-      otherwise {
-        $request_method != "HEAD" {
-          mconf_web_http_requests_total[$request_method][$status]["other"]++
+
+      # assets
+      $request_uri =~ /^\/(assets|uploads)/ {
+        mconf_web_http_requests_total[$request_method][$status]["assets"]++
+        $request_uri =~ /^\/uploads/ {
+          mconf_web_http_requests_total[$request_method][$status]["assets_uploads"]++
         }
+      }
+
+      # login
+      $request_uri =~ /^\/(login|secure|Shibboleth\.sso|users\/auth|users\/login)/ {
+        mconf_web_http_requests_total[$request_method][$status]["login"]++
+        $request_uri =~ /^\/(secure|Shibboleth)/ {
+          mconf_web_http_requests_total[$request_method][$status]["login_shibboleth"]++
+        }
+      }
+
+      otherwise {
+        mconf_web_http_requests_total[$request_method][$status]["other"]++
       }
 
     }
