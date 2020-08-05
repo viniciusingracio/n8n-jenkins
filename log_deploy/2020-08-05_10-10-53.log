@@ -1,0 +1,5 @@
+/usr/local/bin/ansible-playbook -i envs/rnp/tst/hosts -l mconf-web --tags kong playbooks/mconf-web.yml
+
+vm-portal-0-tst: 14 OK, 6 changed, 0 unreachable, 0 failed
+vm-portal-1-tst: 14 OK, 6 changed, 0 unreachable, 0 failed
+vm-portal-2-tst: 14 OK, 6 changed, 0 unreachable, 0 failed
