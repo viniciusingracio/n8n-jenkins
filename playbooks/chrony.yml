@@ -1,6 +1,6 @@
 ---
 
-- hosts: all
+- hosts: '{{ dynamic_inventory_hostname | default("all") }}'
   vars:
     chrony_timezone: America/Sao_Paulo
   tasks:
@@ -26,7 +26,7 @@
         state: absent
       become: yes
 
-- hosts: all
+- hosts: '{{ dynamic_inventory_hostname | default("all") }}'
   become: true
   vars:
     chrony_package_name: chrony

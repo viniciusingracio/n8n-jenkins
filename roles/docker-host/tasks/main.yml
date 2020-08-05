@@ -39,6 +39,9 @@
       - docker-compose
     state: present
 
+# make sure ansible_docker0 exists
+- setup:
+
 - name: Add user to docker group
   become: yes
   user:
@@ -51,7 +54,10 @@
 # so we need to quit and log again
 # https://github.com/ansible/ansible-modules-core/issues/921#issuecomment-220513111
 - name: Reset SSH
-  shell: sleep 1; pkill -u {{ ansible_ssh_user }} sshd
+  # if ansible_ssh_user is root, it will close the daemon, not only the session
+  # shell: sleep 1; pkill -u {{ ansible_ssh_user }} sshd
+  shell: "ps -aux | grep 'sshd: {{ ansible_ssh_user }}@' | head -n 1 | tr -s ' ' | cut -d' ' -f2 | xargs --no-run-if-empty -I{} kill -9 {}"
+  ignore_errors: yes
   async: 3
   poll: 2
   when: reg_docker is changed

@@ -1,0 +1,14 @@
+---
+
+- hosts: all
+
+  vars:
+    ansible_user: mconf
+
+  tasks:
+  - name: Copy presentation
+    copy:
+      src: files/20200804-presentation.rb
+      dest: /usr/local/bigbluebutton/core/scripts/publish/presentation.rb
+      backup: yes
+    become: yes

@@ -77,6 +77,8 @@ bigbluebutton_sip_invite_with_sdp: true
 bigbluebutton_kurento_use_internal_ip: false
 
 bigbluebutton_sfu_auth_enabled: true
+# TODO set it to true or remove it completely when everyone is using mcs-sip 2.2.15 or greater
+bigbluebutton_sip_auth_enabled: false
 
 bigbluebutton_streaming_enabled: false
 bigbluebutton_streaming_secret: {}

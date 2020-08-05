@@ -1,9 +1,10 @@
-- hosts: all
-  connection: local
+- hosts: localhost
+  gather_facts: no
   tasks:
-  # - name: Determine hosts
-  #   set_fact:
-  #     nodes: '{{ nodes | default([]) + groups["gluster"] | map("extract", hostvars, ["gluster_ip"]) | list }}'
-  - debug:
-      msg: '{{ ansible_play_hosts_all }}'
-    delegate_to: localhost
+  - name: Determine hosts
+    set_fact:
+      nodes: '{{ ( groups["mconf-live220"] + groups["mconf-rec"] + groups["mconf-recw"] ) | sort }}'
+
+  - template:
+      src: templates/prometheus-targets.json.j2
+      dest: /tmp/targets.json

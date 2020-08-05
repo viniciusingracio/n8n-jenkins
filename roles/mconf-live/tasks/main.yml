@@ -93,10 +93,12 @@
     - transfer
     - docker
 
-- name: Install basic stats
+- name: Remove basic stats
   become: yes
   apt:
     name: mconf-basic-stats
-    state: 'latest'
-  # this package is only available on 2.2
-  ignore_errors: yes
+    state: absent
+
+- name: Remove logs
+  command: rm -f /var/log/bigbluebutton/basic_stats.*
+  become: yes

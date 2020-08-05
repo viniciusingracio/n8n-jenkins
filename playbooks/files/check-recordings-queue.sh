@@ -83,9 +83,6 @@ for processed_fail in `find /var/bigbluebutton/recording/status/processed/ -name
     sudo -u bigbluebutton rm -f /var/bigbluebutton/recording/status/published/${record_id}-presentation_video.fail
     sudo -u bigbluebutton rm -rf /var/bigbluebutton/recording/publish/presentation_video/${record_id}
     sudo -u bigbluebutton touch /var/bigbluebutton/recording/status/sanity/${record_id}.done
-
-    # TODO remove me
-    sudo yq w -i /usr/local/bigbluebutton/core/scripts/mconf-presentation-recorder.yml "simultaneous_meetings" "6"
   fi
 done
 

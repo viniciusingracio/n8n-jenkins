@@ -1,13 +1,10 @@
 [
+    {
+        "targets":
+        [
 {% for item in nodes %}
-  {
-    "labels": {
-      "job": "{{ item.job }}",
-      "service": "{{ item.name }}"
-    },
-    "targets": [
-      "{{ item.url }}"
-    ]
-  },
+          "{{ item }}",
 {% endfor %}
+        ]
+    }
 ]

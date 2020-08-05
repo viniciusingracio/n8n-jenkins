@@ -19,11 +19,9 @@
         /var/bigbluebutton/unpublished
         /var/bigbluebutton/deleted
 
-  - name: Append raw files from failed recordings
-    shell: find /var/bigbluebutton/recording/status/ -name "*.fail" -exec basename {} \; | cut -d"-" -f1-2 | sort -u | xargs -I{} echo "/var/bigbluebutton/recording/raw/{}" | tee -a /tmp/rec-files-to-rsync.txt
 
   - name: Copy files
-    command: "rsync -azmr -e 'ssh -p {{ ansible_port }} {{ ansible_ssh_common_args }}' --files-from=:/tmp/rec-files-to-rsync.txt {{ ansible_user }}@{{ inventory_hostname }}:/ /tmp/recording-files/"
+    command: "rsync -azmr -e 'ssh -p {{ ansible_port }} {{ ansible_ssh_common_args }} -o StrictHostKeyChecking=no' --files-from=:/tmp/rec-files-to-rsync.txt {{ ansible_user }}@{{ inventory_hostname }}:/ /tmp/recording-files/"
     delegate_to: 127.0.0.1
     retries: 10
     delay: 2

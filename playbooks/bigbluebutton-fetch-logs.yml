@@ -11,10 +11,23 @@
       recurse: yes
     delegate_to: 127.0.0.1
 
+  - name:
+    command: rm -rf /var/log/bigbluebutton/basic_stats*
+    become: yes
+
+  - name:
+    command: tar --warning=no-file-changed -czf /tmp/logs.tar.gz -C /var/log/bigbluebutton /var/log/bbb-apps-akka /var/log/nginx
+    ignore_errors: yes
+
   - name: Copy files
-    command: rsync -azm -e 'ssh -p {{ ansible_port }} {{ ansible_ssh_common_args }}' {{ ansible_user }}@{{ inventory_hostname }}:{/var/log/bigbluebutton,/var/log/bbb-*,/var/log/nginx} /tmp/logs/{{ inventory_hostname }}
+    command: rsync -a -e 'ssh -p {{ ansible_port }} {{ ansible_ssh_common_args }} -o StrictHostKeyChecking=no' {{ ansible_user }}@{{ inventory_hostname }}:/tmp/logs.tar.gz /tmp/logs/{{ inventory_hostname }}
     delegate_to: 127.0.0.1
     retries: 10
     delay: 2
     register: task_result
     until: task_result.rc == 0
+
+  - name:
+    file:
+      path: /tmp/logs.tar.gz
+      state: absent

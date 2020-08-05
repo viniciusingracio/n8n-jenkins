@@ -392,6 +392,10 @@ def fill_template(results)
     # TYPE bbb_total_time gauge
     bbb_total_time <%= results[:bbb_total_time] %>
 
+    # HELP bbb_freeswitch_cli_success fs_cli connected successfully
+    # TYPE bbb_freeswitch_cli_success gauge
+    bbb_freeswitch_cli_success <%= results[:bbb_freeswitch_cli_success] %>
+<% if results[:bbb_freeswitch_cli_success] %>
     # HELP bbb_freeswitch_clock_drift Clock drift of FreeSWITCH compared to the system
     # TYPE bbb_freeswitch_clock_drift gauge
     bbb_freeswitch_clock_drift <%= results[:bbb_freeswitch_clock_drift] %>
@@ -407,6 +411,7 @@ def fill_template(results)
     # HELP bbb_freeswitch_channels_listen_only_kurento Listen only channels for rooms on FreeSWITCH
     # TYPE bbb_freeswitch_channels_listen_only_kurento gauge
     bbb_freeswitch_channels_listen_only_kurento <%= results[:bbb_freeswitch_channels_listen_only_kurento] %>
+<% end %>
 <% if results.has_key? :bbb_freeswitch_audio_score %>
     # HELP bbb_freeswitch_audio_score Audio score for full audio channels on FreeSWITCH
     # TYPE bbb_freeswitch_audio_score gauge
@@ -502,43 +507,48 @@ results[:bbb_total_time] = Benchmark.measure do
     end
   end
 
-  results[:bbb_freeswitch_clock_drift] = (DateTime.parse(`/opt/freeswitch/bin/fs_cli -x "strftime"`) - DateTime.now).to_i
+  begin
+    results[:bbb_freeswitch_clock_drift] = (DateTime.parse(`/opt/freeswitch/bin/fs_cli -x "strftime"`) - DateTime.now).to_i
+    results[:bbb_freeswitch_cli_success] = 1
 
-  output = ""
-  command = "/opt/freeswitch/bin/fs_cli -x 'show channels as json'"
-  Open4::popen4(command) do |pid, stdin, stdout, stderr|
-    output = stdout.readlines
-  end
-
-  voice_data = JSON.parse(output.join(), symbolize_names: true)[:rows] || []
-  full_audio_regex = /.*-bbbID-.*/
-  listen_only_freeswitch_regex = /.*-bbbID-LISTENONLY-.*/
-  listen_only_kurento_regex = /^GLOBAL_AUDIO_\d+$/
-
-  audio_score_list = []
-  full_audio_data = voice_data.select{ |row| ! full_audio_regex.match(row[:cid_name]).nil? and listen_only_freeswitch_regex.match(row[:cid_name]).nil? }
-  full_audio_data.each do |row|
-    stats_query = {
-      'command' => 'mediaStats',
-      'data' => {
-        'uuid' => row[:uuid]
-      }
-    }
-    command = "/opt/freeswitch/bin/fs_cli -x 'json #{JSON.dump(stats_query)}'"
+    output = ""
+    command = "/opt/freeswitch/bin/fs_cli -x 'show channels as json'"
     Open4::popen4(command) do |pid, stdin, stdout, stderr|
       output = stdout.readlines
     end
-    response = JSON.parse(output.join(), symbolize_names: true)
-    next if response[:status] != "success"
-    audio_score = response.dig(:response, :audio, :in_quality_percentage)
-    next if audio_score.nil?
-    audio_score_list << audio_score.to_i
-  end
 
-  results[:bbb_freeswitch_audio_score] = ( audio_score_list.inject{ |sum, el| sum + el }.to_f / audio_score_list.size ) if ! audio_score_list.empty?
-  results[:bbb_freeswitch_channels_full_audio] = full_audio_data.length
-  results[:bbb_freeswitch_channels_listen_only_freeswitch] = voice_data.select{ |row| ! listen_only_freeswitch_regex.match(row[:cid_name]).nil? }.length
-  results[:bbb_freeswitch_channels_listen_only_kurento] = voice_data.select{ |row| ! listen_only_kurento_regex.match(row[:cid_name]).nil? }.length
+    voice_data = JSON.parse(output.join(), symbolize_names: true)[:rows] || []
+    full_audio_regex = /.*-bbbID-.*/
+    listen_only_freeswitch_regex = /.*-bbbID-LISTENONLY-.*/
+    listen_only_kurento_regex = /^GLOBAL_AUDIO_\d+$/
+
+    audio_score_list = []
+    full_audio_data = voice_data.select{ |row| ! full_audio_regex.match(row[:cid_name]).nil? and listen_only_freeswitch_regex.match(row[:cid_name]).nil? }
+    full_audio_data.each do |row|
+      stats_query = {
+        'command' => 'mediaStats',
+        'data' => {
+          'uuid' => row[:uuid]
+        }
+      }
+      command = "/opt/freeswitch/bin/fs_cli -x 'json #{JSON.dump(stats_query)}'"
+      Open4::popen4(command) do |pid, stdin, stdout, stderr|
+        output = stdout.readlines
+      end
+      response = JSON.parse(output.join(), symbolize_names: true)
+      next if response[:status] != "success"
+      audio_score = response.dig(:response, :audio, :in_quality_percentage)
+      next if audio_score.nil?
+      audio_score_list << audio_score.to_i
+    end
+
+    results[:bbb_freeswitch_audio_score] = ( audio_score_list.inject{ |sum, el| sum + el }.to_f / audio_score_list.size ) if ! audio_score_list.empty?
+    results[:bbb_freeswitch_channels_full_audio] = full_audio_data.length
+    results[:bbb_freeswitch_channels_listen_only_freeswitch] = voice_data.select{ |row| ! listen_only_freeswitch_regex.match(row[:cid_name]).nil? }.length
+    results[:bbb_freeswitch_channels_listen_only_kurento] = voice_data.select{ |row| ! listen_only_kurento_regex.match(row[:cid_name]).nil? }.length
+  rescue Exception => e
+    results[:bbb_freeswitch_cli_success] = 0
+  end
 
   results.merge!(Meetings.process_meetings)
   results.merge!(Recordings.process_recordings)

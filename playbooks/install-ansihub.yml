@@ -39,6 +39,8 @@
       name:
         - ansible
         - python-pip
+        - libffi-dev
+        - libssl-dev
       state: latest
 
   - name: Install python libraries

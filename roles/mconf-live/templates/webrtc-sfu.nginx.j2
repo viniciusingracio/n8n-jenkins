@@ -14,17 +14,6 @@ location /bbb-webrtc-sfu {
 {% endif %}
 }
 
-location /mcs {
-    proxy_pass http://127.0.0.1:3009;
-    proxy_http_version 1.1;
-    proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection "Upgrade";
-    proxy_read_timeout 6h;
-    proxy_send_timeout 6h;
-    client_body_timeout 6h;
-    send_timeout 6h;
-}
-
 location /mcs-sip {
     proxy_pass http://127.0.0.1:3012;
     proxy_http_version 1.1;
@@ -34,6 +23,11 @@ location /mcs-sip {
     proxy_send_timeout 6h;
     client_body_timeout 6h;
     send_timeout 6h;
+{% if bigbluebutton_sip_auth_enabled %}
+
+    auth_request /bigbluebutton/connection/checkAuthorization;
+    auth_request_set $auth_status $upstream_status;
+{% endif %}
 }
 
 location /oauth2_redirect {
