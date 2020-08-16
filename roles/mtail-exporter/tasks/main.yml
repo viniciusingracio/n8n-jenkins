@@ -23,7 +23,7 @@
     restart_policy: always
     volumes:
       - '{{ mtail_exporter_config_path }}/config.mtail:/progs/config.mtail'
-      - '{{ mtail_exporter_logs_folder }}:/var/log'
+      - '{{ mtail_exporter_logs_folder }}:/logs'
     ports:
       - 3903:3903
     labels:
