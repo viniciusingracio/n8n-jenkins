@@ -5,16 +5,15 @@
   register: temp_config
 
 - name: Copy the Dockerfile to build Kong
-  become: yes
   copy:
     src: 'files/Dockerfile'
     dest: '{{ temp_config.path }}/Dockerfile'
 
 - name: Save Kong's configuration file
-  become: yes
   template:
     src: kong-declarative.yml.j2
     dest: '{{ temp_config.path }}/kong-declarative.yaml'
+    mode: '0644'
 
 - name: Build the docker image
   docker_image:
@@ -35,3 +34,7 @@
       - '{{ kong_port }}:8000'
       - '{{ kong_admin_port }}:8001'
     detach: true
+
+- file:
+    path: '{{ temp_config.path }}'
+    state: absent

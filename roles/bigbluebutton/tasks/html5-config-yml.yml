@@ -6,7 +6,7 @@
     - { key: 'public.clientLog.external.url', value: '{{ bigbluebutton_html5_external_log_url }}' }
     - { key: 'public.clientLog.external.method', value: '{{ bigbluebutton_html5_external_log_method }}' }
     - { key: 'public.clientLog.external.throttleInterval', value: '{{ bigbluebutton_html5_external_log_throttle }}' }
-    - { key: 'public.media.fallbackStunServer', value: '{{ bigbluebutton_stun_server | first }}' }
+    - { key: 'public.media.fallbackStunServer', value: '{{ ( bigbluebutton_stun_server + [""] ) | first }}' }
 
 - name: Update yml values
   become: yes

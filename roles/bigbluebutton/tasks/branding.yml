@@ -156,6 +156,20 @@
   when: reg_playback_23.stat.exists
 
 - name:
-  command: "ruby -e 'require \"nokogiri\"; path = \"/var/www/bigbluebutton-default/guest/index.html\"; doc = Nokogiri::HTML(File.open(path)) { |x| x.noblanks }; doc.at_xpath(\"/html/body/@style\").content = doc.at_xpath(\"/html/body/@style\").content.gsub(/background-color:[^;]*/, \"background-color: {{ bigbluebutton_branding_background_color }}\"); file = File.new(path, \"w\"); file.write(doc.to_html(:indent => 2)); file.close'"
+  command: "ruby -e 'require \"nokogiri\"; path = \"/var/www/bigbluebutton-default/guest/index.html\"; doc = Nokogiri::HTML(File.open(path)) { |x| x.noblanks }; node = doc.at_xpath(\"/html/body/@style\"); exit 0 if node.nil?; node.content.gsub!(/background-color:[^;]*/, \"background-color: {{ bigbluebutton_branding_background_color }}\"); file = File.new(path, \"w\"); file.write(doc.to_html(:indent => 2)); file.close'"
   become: yes
   when: not bigbluebutton_branding_background_color is none
+
+- stat:
+    path: /var/www/bigbluebutton-default/guest/styles.css
+  register: reg_styles
+  when: not bigbluebutton_branding_background_color is none
+
+- name: Configure locale
+  become: yes
+  lineinfile:
+    dest: /var/www/bigbluebutton-default/guest/styles.css
+    state: present
+    regexp: 'background-color: '
+    line: '  background-color: {{ bigbluebutton_branding_background_color }};'
+  when: not bigbluebutton_branding_background_color is none and reg_styles.stat.exists

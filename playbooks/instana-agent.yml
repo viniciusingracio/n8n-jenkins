@@ -1,0 +1,16 @@
+# Installs instana's agent.
+# Requires a server restart to start monitoring all metrics.
+
+- name: Install instana's agent
+  hosts: all
+  tasks:
+
+  - name: Download the installation script
+    get_url:
+      url: https://setup.instana.io/agent
+      dest: /tmp/setup_agent.sh
+      mode: '0700'
+
+  - name: Run the script
+    become: yes
+    shell: /tmp/setup_agent.sh -a FsFZ2ftASKeEcLZhabY-PQ -t dynamic -e ingress-orange-saas.instana.io:443 -s -y

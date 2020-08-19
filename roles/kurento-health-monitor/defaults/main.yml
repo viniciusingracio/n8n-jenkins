@@ -3,3 +3,5 @@
 external_ip:
 bigbluebutton_kurento_use_internal_ip: false
 kurento_health_monitor_webhook: https://mconf.rocket.chat/hooks/9AsDWnbg6LetB4gau/iaMTtbe6XHzhYhejo5a4C75RpBwaKubK3Rat8gPiW6PToweP
+kurento_health_monitor_enabled: true
+kurento_health_monitor_image: mconf/kurento-health-monitor:v0.2.0

@@ -45,7 +45,7 @@
   set_fact:
     stun_server_ip: "{{ lookup('pipe', 'dig {{ bigbluebutton_stun_server[0].split(\":\")[1] }} @8.8.8.8 A +short | grep \"[0-9]*\\.[0-9]*\\.[0-9]*\\.[0-9]*\" | head -n 1') }}"
     stun_server_port: "{{ bigbluebutton_stun_server[0].split(':')[2] }}"
-  when: stun_server_ip is none or stun_server_port is none
+  when: ( stun_server_ip is none or stun_server_port is none ) and not bigbluebutton_stun_server | length == 0
 
 - set_fact:
     kurento_ip: "{% if bigbluebutton_kurento_use_internal_ip %}{{ ansible_default_ipv4.address }}{% else %}{{ external_ip }}{% endif %}"

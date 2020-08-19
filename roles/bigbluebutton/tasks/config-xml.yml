@@ -8,6 +8,13 @@
   args:
     chdir: '{{ tmpdir_client.path }}'
     warn: False
+  become: yes
+
+- file:
+    path: '{{ tmpdir_client.path }}'
+    owner: '{{ ansible_user }}'
+    group: '{{ ansible_user }}'
+  become: yes
 
 - name: Reset config.xml
   shell: 'dpkg-deb --fsys-tarfile {{ tmpdir_client.path }}/bbb-client_*.deb | tar -x ./var/www/bigbluebutton/client/conf/config.xml --strip-components=6'

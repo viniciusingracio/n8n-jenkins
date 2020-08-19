@@ -3,15 +3,19 @@
 
 - name: Install dynatrace's agent
   hosts: all
+  vars:
+    agent_url: 'https://bar35571.live.dynatrace.com/api/v1/deployment/installer/agent/unix/default/latest?arch=x86&flavor=default'
+    agent_name: Dynatrace-OneAgent-Linux-1.197.134.sh
+    agent_token: SZFcbSuzT3OyvPHpnQYgz
   tasks:
 
   - name: Download the installation script
     get_url:
-      url: https://ggs06881.live.dynatrace.com/api/v1/deployment/installer/agent/unix/default/latest?arch=x86&flavor=default
-      dest: /tmp/Dynatrace-OneAgent-Linux-1.187.155.sh
+      url: '{{ agent_url }}'
+      dest: /tmp/{{ agent_name }}
       mode: '0744'
       headers:
-        Authorization: Api-Token jnZAc5ErQnOPd4P2ImUOm
+        Authorization: Api-Token {{ agent_token }}
 
   - name: Download dt-root
     get_url:
@@ -21,10 +25,10 @@
 
   - name: Configure certs
     shell: >
-      ( echo 'Content-Type: multipart/signed; protocol="application/x-pkcs7-signature"; micalg="sha-256"; boundary="--SIGNED-INSTALLER"'; echo ; echo ; echo '----SIGNED-INSTALLER' ; cat /tmp/Dynatrace-OneAgent-Linux-1.187.155.sh )
+      ( echo 'Content-Type: multipart/signed; protocol="application/x-pkcs7-signature"; micalg="sha-256"; boundary="--SIGNED-INSTALLER"'; echo ; echo ; echo '----SIGNED-INSTALLER' ; cat /tmp/{{ agent_name }} )
       | openssl cms -verify -CAfile /tmp/dt-root.pem
       > /dev/null
 
   - name: Run the script
     become: yes
-    shell: /tmp/Dynatrace-OneAgent-Linux-1.187.155.sh --set-app-log-content-access=true --set-infra-only=false
+    shell: /tmp/{{ agent_name }} --set-app-log-content-access=true --set-infra-only=false

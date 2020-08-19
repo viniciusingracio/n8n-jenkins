@@ -1,0 +1,40 @@
+CREATE TEMPORARY TABLE servers_to_add
+(
+    name VARCHAR(50),
+    secret VARCHAR(50),
+    subnet VARCHAR
+);
+
+INSERT INTO servers_to_add(name, secret, subnet) VALUES
+{% for item in nodes %}
+('{{ item.fqdn }}', '{{ item.secret }}', '{{ item.subnet }}'){{ "," if not loop.last else ";" }}
+{% endfor %}
+
+CREATE OR REPLACE PROCEDURE AddServer()
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF NOT EXISTS(SELECT name FROM servers WHERE name IN (SELECT name FROM servers_to_add)) THEN    -- Se não há servidor a ser adicionado na tabela atual de servidores
+        INSERT INTO servers(name, secret)    -- basta adicionar os servidores na tabela de servidores.
+        SELECT name, secret FROM servers_to_add;
+    ELSE    -- Senão, é necessário atualizar a senha dos servidores que já foram adicionados anteriormente
+        UPDATE servers
+        SET secret = (SELECT secret FROM servers_to_add WHERE servers_to_add.name = servers.name)
+        WHERE name = (SELECT name FROM servers_to_add WHERE servers.name = servers_to_add.name);
+
+        -- E, se houver servidor que não tenha sido adicionado anteriormente, adicioná-los com suas respectivas senhas.
+        IF EXISTS(SELECT name, secret FROM servers_to_add WHERE name NOT IN (SELECT name FROM servers)) THEN
+            INSERT INTO servers(name, secret)
+            SELECT name, secret FROM servers_to_add WHERE name NOT IN (SELECT name FROM servers);
+        END IF;
+    END IF;
+
+    -- Logo após, basta linkar as subnets com os servidores.
+    INSERT INTO servers_subnets(server_id, subnet_id)
+    SELECT servers.id, subnets.id FROM servers_to_add JOIN subnets ON (servers_to_add.subnet = subnets.name) JOIN servers ON (servers_to_add.name = servers.name)
+    WHERE NOT EXISTS (SELECT server_id, subnet_id FROM servers_subnets WHERE server_id = servers.id AND subnet_id = subnets.id);
+
+    COMMIT;
+END$$;
+
+CALL AddServer();

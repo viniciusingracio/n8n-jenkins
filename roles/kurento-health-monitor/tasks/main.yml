@@ -33,7 +33,7 @@
 - name: Start kurento health monitor
   docker_container:
     name: kurento-health-monitor
-    image: mconf/kurento-health-monitor:v0.1.0
+    image: '{{ kurento_health_monitor_image }}'
     pull: yes
     restart_policy: always
     memory: 128M
@@ -43,6 +43,10 @@
       HOST_ADDRESS: '{{ inventory_hostname }}'
       ESL_IP: '{{ docker_ip }}'
       ESL_PORT: '8021'
-      SIP_WSS_URL: 'wss://{{ inventory_hostname }}/ws'
     labels:
       hostname: '{{ inventory_hostname }}'
+    state: '{% if kurento_health_monitor_enabled %}started{% else %}absent{% endif %}'
+
+- name: Remove old images
+  shell: docker images {{ kurento_health_monitor_image.split(":")[0] }} --filter 'before={{ kurento_health_monitor_image }}' -q | xargs -r docker rmi --force
+  notify: clean docker

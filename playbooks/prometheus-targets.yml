@@ -3,7 +3,7 @@
   tasks:
   - name: Determine hosts
     set_fact:
-      nodes: '{{ ( groups["mconf-live220"] + groups["mconf-rec"] + groups["mconf-recw"] ) | sort }}'
+      nodes: '{{ ( groups["mconf-live220"]|default([]) + groups["mconf-rec"]|default([]) + groups["mconf-recw"]|default([]) ) | sort }}'
 
   - template:
       src: templates/prometheus-targets.json.j2

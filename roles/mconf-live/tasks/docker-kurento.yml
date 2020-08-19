@@ -52,8 +52,8 @@
 - set_fact:
     kms_need_stun: '{{ ansible_default_ipv4.address != external_ip }}'
 - set_fact:
-    kms_stun_server_ip: '{% if kms_need_stun %}{{ stun_server_ip }}{% endif %}'
-    kms_stun_server_port: '{% if kms_need_stun %}{{ stun_server_port }}{% endif %}'
+    kms_stun_server_ip: '{% if kms_need_stun %}{{ stun_server_ip | default("") }}{% endif %}'
+    kms_stun_server_port: '{% if kms_need_stun %}{{ stun_server_port | default("") }}{% endif %}'
 
 - name: Start kurento containers
   docker_container:

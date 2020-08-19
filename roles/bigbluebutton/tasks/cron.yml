@@ -8,6 +8,13 @@
   args:
     chdir: '{{ tmpdir_config.path }}'
     warn: False
+  become: yes
+
+- file:
+    path: '{{ tmpdir_config.path }}'
+    owner: '{{ ansible_user }}'
+    group: '{{ ansible_user }}'
+  become: yes
 
 - name: Extract cron job
   shell: 'dpkg-deb --fsys-tarfile bbb-config_*.deb | tar -x ./etc/cron.daily/bigbluebutton --strip-components=3'
