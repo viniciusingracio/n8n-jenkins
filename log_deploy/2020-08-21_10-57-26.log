@@ -1,0 +1,8 @@
+/usr/local/bin/ansible-playbook -i envs/rnp/tst/hosts -l gluster playbooks/gluster.yml
+
+172.16.0.10: 22 OK, 14 changed, 0 unreachable, 0 failed
+172.16.0.4: 26 OK, 17 changed, 0 unreachable, 0 failed
+172.16.0.5: 22 OK, 14 changed, 0 unreachable, 0 failed
+172.16.0.6: 22 OK, 14 changed, 0 unreachable, 0 failed
+172.16.0.7: 22 OK, 14 changed, 0 unreachable, 0 failed
+172.16.0.8: 22 OK, 14 changed, 0 unreachable, 0 failed

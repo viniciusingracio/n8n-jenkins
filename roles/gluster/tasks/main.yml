@@ -118,17 +118,6 @@
     - '{{ brick_path }}'
     - '{{ data_path }}'
 
-- name: Create user data directories
-  become: yes
-  file:
-    path: '{{ data_path }}/{{ item.name }}'
-    recurse: yes
-    state: directory
-    owner: '{{ item.owner }}'
-    group: '{{ item.group }}'
-  with_items:
-    - '{{ gluster_dirs }}'
-
 - include: ufw.yml
   when: common_ufw_enabled
   tags: [ufw,firewall]
@@ -171,3 +160,14 @@
     fstype: glusterfs
     opts: 'defaults,_netdev,backupvolfile-server={{ others_in_cluster | first }}'
     state: mounted
+
+- name: Create user data directories
+  become: yes
+  file:
+    path: '{{ data_path }}/{{ item.name }}'
+    recurse: yes
+    state: directory
+    owner: '{{ item.owner }}'
+    group: '{{ item.group }}'
+  with_items:
+    - '{{ gluster_dirs }}'

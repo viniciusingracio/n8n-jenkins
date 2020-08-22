@@ -1,0 +1,8 @@
+/usr/local/bin/ansible-playbook -i envs/rnp/tst/hosts -l mconf-web playbooks/mconf-web.yml
+
+vm-portal-0-tst: 29 OK, 12 changed, 0 unreachable, 0 failed
+vm-portal-1-tst: 29 OK, 12 changed, 0 unreachable, 0 failed
+vm-portal-2-tst: 29 OK, 12 changed, 0 unreachable, 0 failed
+vm-portal-3-tst: 29 OK, 12 changed, 0 unreachable, 0 failed
+vm-portal-4-tst: 29 OK, 12 changed, 0 unreachable, 0 failed
+vm-portal-5-tst: 29 OK, 12 changed, 0 unreachable, 0 failed

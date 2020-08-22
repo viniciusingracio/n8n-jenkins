@@ -1,0 +1,5 @@
+---
+
+- hosts: gluster
+  roles:
+  - gluster
