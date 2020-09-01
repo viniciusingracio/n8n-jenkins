@@ -49,7 +49,7 @@ bigbluebutton_apt_state: latest
 bigbluebutton_demos: false
 
 # Open redis to external access. Set to false remove external access.
-bigbluebutton_redis_bind: false
+bigbluebutton_redis_bind: []
 # To open use:
 # bigbluebutton_redis_bind:
 #   - 0.0.0.0

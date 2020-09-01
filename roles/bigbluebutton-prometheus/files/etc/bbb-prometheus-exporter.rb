@@ -388,6 +388,10 @@ def fill_template(results)
     # TYPE bbb_client_success gauge
     bbb_client_success <%= results[:bbb_client_success] %>
 
+    # HELP bbb_kurento_success No unhealthy Kurento containers
+    # TYPE bbb_kurento_success gauge
+    bbb_kurento_success <%= results[:bbb_kurento_success] %>
+
     # HELP bbb_total_time Generation time for all the data
     # TYPE bbb_total_time gauge
     bbb_total_time <%= results[:bbb_total_time] %>
@@ -476,6 +480,9 @@ results[:bbb_total_time] = Benchmark.measure do
   end rescue [ "NaN", "" ]
 
   results[:bbb_client_success] = requester.is_responding?('client') ? 1 : 0
+
+  unhealthy_kurento = all_containers.select{ |container| container.info["Names"].first.match(/^\/kurento_\d+/) && ( container.info["State"] != "running" || container.info["Status"].match(/ \(unhealthy\)$/) ) }.length
+  results[:bbb_kurento_success] = unhealthy_kurento  > 0 ? 0 : 1
 
   all_containers = Docker::Container.all(:all => true)
   # make sure we the docker container is running if we're running the webooks on docker

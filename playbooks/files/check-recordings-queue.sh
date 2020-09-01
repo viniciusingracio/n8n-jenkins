@@ -65,6 +65,17 @@ for sanity_file in `find /var/bigbluebutton/recording/status/sanity/ -name "*.do
   fi
 done | sort | uniq -c | sort -n -r
 
+# remove invalid unicode character that breaks sanity
+for sanity_file in `find /var/bigbluebutton/recording/status/sanity/ -name "*.fail"`; do
+  record_id=`basename ${sanity_file} | cut -d'.' -f1`
+  if [ ! -f /var/bigbluebutton/recording/raw/${record_id}/events.xml.orig ]; then
+    sudo -u bigbluebutton cp /var/bigbluebutton/recording/raw/${record_id}/events.xml /var/bigbluebutton/recording/raw/${record_id}/events.xml.orig
+  fi
+
+  sudo -u bigbluebutton sed -i 's:\xEF\xBF\xBE::g' /var/bigbluebutton/recording/raw/${record_id}/events.xml
+  sudo -u bigbluebutton rm -f ${sanity_file}
+done
+
 # cleanup recordings unpublished/deleted
 for processed_fail in `find /var/bigbluebutton/recording/status/processed/ -name "*-presentation_video.fail" -o -name "*-presentation_recorder.fail"`; do
   record_id=`basename ${processed_fail} | cut -d'.' -f1 | sed 's/-presentation_\(video\|recorder\)//g'`

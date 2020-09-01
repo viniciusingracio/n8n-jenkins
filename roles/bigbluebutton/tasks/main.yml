@@ -78,6 +78,7 @@
   apt_repository:
     repo: '{{ item.repo }}'
     filename: '{{ item.filename }}'
+    mode: '0644'
     state: present
   with_items:
     - { repo: 'deb http://archive.ubuntu.com/ubuntu/ {{ ansible_lsb.codename }} universe multiverse', filename: 'ubuntu' }
@@ -313,7 +314,7 @@
     - { regexp: 'sharedSecret[ ]*=', line: '  sharedSecret = "{{ bbb_secret }}"' }
     - { regexp: 'deskshareip[ ]*=', line: '  deskshareip = "{{ inventory_hostname }}"' }
     - { regexp: 'recordCodec[ ]*=', line: '  recordCodec = "opus"' }
-    - { regexp: 'inactivity[ ]*=', line: '  inactivity = 7200' }
+    - { regexp: 'inactivity[ ]*=', line: '  inactivity = 3600' }
   notify: restart bigbluebutton
 
 # TODO move this to a new role/task
@@ -485,7 +486,7 @@
     state: present
     regexp: '^bind\s'
     line: 'bind {{ bigbluebutton_redis_bind | join(" ") }}'
-  when: bigbluebutton_redis_bind
+  when: bigbluebutton_redis_bind|length > 0
   notify: restart redis
 
 - name: Close redis to localhost
@@ -495,7 +496,7 @@
     state: present
     regexp: '^bind\s'
     line: 'bind 127.0.0.1'
-  when: not bigbluebutton_redis_bind
+  when: bigbluebutton_redis_bind|length == 0
   notify: restart redis
 
 - name: Copy presentation

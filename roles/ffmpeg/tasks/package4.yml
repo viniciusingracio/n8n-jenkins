@@ -15,6 +15,7 @@
   become: yes
   apt_repository:
     repo: ppa:bigbluebutton/support
+    mode: '0644'
     state: present
   register: aptrepos
 

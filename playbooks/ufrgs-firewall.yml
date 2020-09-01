@@ -3,11 +3,17 @@
     - name: reload firewall
       become: yes
       service: name=firewall state=restarted
+  vars:
+    iptables_file:
   tasks:
+
+    - fail:
+        msg: "iptables_file not specified"
+      when: iptables_file is none
 
     - name: Copy iptables file
       become: yes
       copy:
-        src: files/ufrgs-firewall.iptables
+        src: '{{ iptables_file }}'
         dest: /etc/default/firewall
       notify: reload firewall

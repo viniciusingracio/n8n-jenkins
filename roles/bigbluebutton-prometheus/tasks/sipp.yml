@@ -10,6 +10,10 @@
   copy:
     src: files/bbb_sipp_check.xml
     dest: /opt/freeswitch/conf/dialplan/default/bbb_sipp_check.xml
+    owner: freeswitch
+    group: daemon
+    mode: '0644'
+
   notify:
     - reload freeswitch
 

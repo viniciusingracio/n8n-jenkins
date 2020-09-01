@@ -1,0 +1,22 @@
+---
+
+- hosts: all
+
+  vars:
+    ansible_user: mconf
+
+  tasks:
+  - name: Copy recordings list
+    copy:
+      src: files/20200819-recordings.txt
+      dest: /tmp/recordings.txt
+      mode: 0644
+
+  - name: Repost events
+    shell: |
+      for i in `cat /tmp/recordings.txt`; do
+        if [ -d /var/bigbluebutton/published/presentation/$i ] || [ -d /var/bigbluebutton/unpublished/presentation/$i ] || [ -d /var/bigbluebutton/deleted/presentation/$i ]; then
+          ruby /usr/local/bigbluebutton/core/scripts/utils/repost-published-event.rb -m $i
+          sleep 5
+        fi
+      done

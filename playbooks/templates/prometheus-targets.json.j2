@@ -3,7 +3,7 @@
         "targets":
         [
 {% for item in nodes %}
-          "{{ item }}:443",
+            "{{ item }}:443"{{ "," if not loop.last else "" }}
 {% endfor %}
         ]
     }

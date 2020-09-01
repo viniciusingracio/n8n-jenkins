@@ -14,7 +14,16 @@
       - mysql-client
       - libmysqlclient-dev
       - libhiredis-dev
+      - libmicrohttpd-dev
     state: present
+
+- name: More dependencies
+  become: yes
+  apt:
+    deb: '{{ item }}'
+  with_items:
+    - https://github.com/digitalocean/prometheus-client-c/releases/download/v0.1.1/libprom-dev-0.1.1-Linux.deb
+    - https://github.com/digitalocean/prometheus-client-c/releases/download/v0.1.1/libpromhttp-dev-0.1.1-Linux.deb
 
 - name: Download and extract
   become: yes

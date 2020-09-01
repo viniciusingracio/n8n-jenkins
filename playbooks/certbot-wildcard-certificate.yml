@@ -1,7 +1,7 @@
 ---
 
 # run with:
-# ansible-playbook -vv --extra-vars digitalocean_token=XXX playbooks/certbot-wildcard-certificate.yml
+# ansible-playbook -vv --extra-vars '{ "digitalocean_token": "XXX", "certbot_all_domains": [ "*.d.elos.vc" ] }' playbooks/certbot-wildcard-certificate.yml
 
 # and then:
 # sudo su
@@ -12,9 +12,12 @@
 
 - hosts: localhost
   vars:
-    certbot_all_domains:
-      - '*.elos.vc'
+    certbot_all_domains: []
   tasks:
+  - fail:
+      msg: "No domain defined"
+    when: certbot_all_domains|length == 0
+
   - file:
       path: '{{ ansible_env.HOME }}/.secrets/certbot'
       state: directory

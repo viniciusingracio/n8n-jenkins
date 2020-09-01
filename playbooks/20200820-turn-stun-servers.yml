@@ -1,0 +1,20 @@
+---
+
+- hosts: all
+
+  vars:
+    ansible_user: mconf
+    bigbluebutton_artificial_ice_candidates: []
+
+  tasks:
+  - name: Patch stun list
+    template:
+      src: ../roles/bigbluebutton/templates/turn-stun-servers.xml.j2
+      dest: /usr/share/bbb-web/WEB-INF/classes/spring/turn-stun-servers.xml
+    become: yes
+
+  - name: Update yml values
+    become: yes
+    command: yq w -i /usr/share/meteor/bundle/programs/server/assets/app/config/settings.yml {{ item.key }} "{{ item.value }}"
+    with_items:
+      - { key: "public.media.fallbackStunServer", value: "" }

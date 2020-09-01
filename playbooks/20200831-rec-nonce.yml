@@ -1,0 +1,73 @@
+---
+
+- hosts: all
+  handlers:
+    - name: reload nginx
+      become: yes
+      service: name=nginx state=reloaded
+  vars:
+    ansible_user: mconf
+    rec_proxy_image: mconf/mconf-rec
+    rec_proxy_image_version: local-nossl-0.1.5-5ae046f
+    container_volumes:
+      - /etc/nginx/ssl:/etc/nginx/ssl
+      - /var/cache/nginx:/var/cache/nginx
+      - /var/www:/usr/local/openresty/nginx/html
+      - /var/bigbluebutton:/var/bigbluebutton
+      - /var/log/openresty:/usr/local/openresty/nginx/logs
+    rec_proxy_ports:
+      - 8091:80
+    rec_proxy_app_host: '{{ inventory_hostname }}'
+    rec_proxy_jwt_secret: 12a9d9e971ab1adf0247955a0fa3e730d43f62e324b0a3178877a25b3e3ede744a69626bfcf2ae031999871cdbc52b42e707c2c63d6d30c5cc76de4b42c29326
+    rec_proxy_certs_path: /etc/nginx/ssl/live
+    rec_proxy_redirect_unauthorized: https://conferenciaweb.rnp.br
+
+  roles:
+    - docker-host
+  tasks:
+  - name: Copy nginx file
+    become: yes
+    copy:
+      src: files/20200831-presentation.nginx
+      dest: /etc/bigbluebutton/nginx/presentation.nginx
+    notify: reload nginx
+
+  - docker_container:
+      name: '{{ item }}'
+      state: absent
+    with_items:
+      - mconf-rec-proxy-nonce
+      - mconf-rec-proxy
+
+  - name: Get BigBlueButton secret
+    shell: cat /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
+    register: bbb_secret_raw
+
+  - set_fact:
+      rec_proxy_api_secret: '{{ bbb_secret_raw.stdout }}'
+
+  - name: Register Docker host IP
+    shell: "ifconfig docker0 | grep 'inet addr:' | cut -d: -f2 | awk '{print $1}'"
+    register: docker_ip_raw
+
+  - set_fact:
+      docker_ip: '{{ docker_ip_raw.stdout }}'
+
+  - name: Start the rec-proxy container
+    docker_container:
+      name: mconf-rec-proxy
+      image: '{{ rec_proxy_image }}:{{ rec_proxy_image_version }}'
+      pull: yes
+      restart_policy: always
+      volumes: '{{ container_volumes }}'
+      published_ports: '{{ rec_proxy_ports }}'
+      env:
+        APP_HOST: '{{ rec_proxy_app_host | string }}'
+        CERTS_PATH: '{{ rec_proxy_certs_path | string }}'
+        API_SECRET: '{{ rec_proxy_api_secret | string }}'
+        JWT_SECRET: '{{ rec_proxy_jwt_secret | string }}'
+        REDIRECT_UNAUTHORIZED: '{{ rec_proxy_redirect_unauthorized | string }}'
+        AUTH_NONCE_REDIS_HOST: '{{ docker_ip }}'
+        TZ: '{{ lookup("file", "/etc/timezone") }}'
+      labels:
+        hostname: '{{ inventory_hostname }}'

@@ -1,0 +1,13 @@
+# Uninstalls instana's agent.
+
+- name: Uninstall instana's agent
+  hosts: all
+  tasks:
+
+  - apt:
+      name:
+        - instana-agent-static
+        - instana-agent-dynamic
+      state: absent
+      purge: yes
+    become: yes
