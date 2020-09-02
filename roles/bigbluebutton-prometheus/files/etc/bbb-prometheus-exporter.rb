@@ -481,10 +481,11 @@ results[:bbb_total_time] = Benchmark.measure do
 
   results[:bbb_client_success] = requester.is_responding?('client') ? 1 : 0
 
-  unhealthy_kurento = all_containers.select{ |container| container.info["Names"].first.match(/^\/kurento_\d+/) && ( container.info["State"] != "running" || container.info["Status"].match(/ \(unhealthy\)$/) ) }.length
-  results[:bbb_kurento_success] = unhealthy_kurento  > 0 ? 0 : 1
-
   all_containers = Docker::Container.all(:all => true)
+
+  unhealthy_kurento = all_containers.select{ |container| container.info["Names"].first.match(/^\/kurento_\d+/) && ( container.info["State"] != "running" || container.info["Status"].match(/ \(unhealthy\)$/) ) }.length
+  results[:bbb_kurento_success] = unhealthy_kurento > 0 ? 0 : 1
+
   # make sure we the docker container is running if we're running the webooks on docker
   container = all_containers.select{ |container| container.info["Names"].first == "/webhooks" }
   if container.empty? || container.first.info["State"] == "running"
