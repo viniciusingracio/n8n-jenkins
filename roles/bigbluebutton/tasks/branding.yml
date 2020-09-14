@@ -141,6 +141,7 @@
   copy:
     src: /var/www/bigbluebutton-default/favicon.ico
     dest: /var/bigbluebutton/playback/presentation/2.3/favicon.ico
+    mode: '0644'
     remote_src: yes
   become: yes
   when: reg_playback_23.stat.exists
@@ -154,6 +155,14 @@
   command: ruby -e 'require "json"; path = "/var/bigbluebutton/playback/presentation/2.3/manifest.json"; doc = JSON.parse(File.read(path), :symbolize_names => true); doc[:name] = "{{ bigbluebutton_branding_playback_title }}"; file = File.new(path, "w"); file.write(JSON.pretty_generate(doc)); file.close'
   become: yes
   when: reg_playback_23.stat.exists
+
+- name:
+  copy:
+    src: '{{ bigbluebutton_branding_playback_style_file }}'
+    dest: /var/bigbluebutton/playback/presentation/2.3/custom.css
+    mode: '0644'
+  become: yes
+  when: reg_playback_23.stat.exists and not bigbluebutton_branding_playback_style_file is none
 
 - name:
   command: "ruby -e 'require \"nokogiri\"; path = \"/var/www/bigbluebutton-default/guest/index.html\"; doc = Nokogiri::HTML(File.open(path)) { |x| x.noblanks }; node = doc.at_xpath(\"/html/body/@style\"); exit 0 if node.nil?; node.content.gsub!(/background-color:[^;]*/, \"background-color: {{ bigbluebutton_branding_background_color }}\"); file = File.new(path, \"w\"); file.write(doc.to_html(:indent => 2)); file.close'"

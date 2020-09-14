@@ -35,15 +35,12 @@ bigbluebutton_stun_server:
   - stun:stun.l.google.com:19302
 
 bigbluebutton_docker_webrtc_sfu_enabled: false
-bigbluebutton_docker_webrtc_sfu_image: mconf/bbb-webrtc-sfu:v2.4.14.95b01a
+bigbluebutton_docker_webrtc_sfu_image: mconf/bbb-webrtc-sfu:v2.4.16
 # it can be VP8, H264 or ANY
 bigbluebutton_docker_webrtc_sfu_codec: ANY
 bigbluebutton_docker_webrtc_sfu_ip_public:
 bigbluebutton_docker_webrtc_sfu_ip_private:
 bigbluebutton_docker_webrtc_sfu_ip_local:
-bigbluebutton_docker_webrtc_sfu_k8s_enabled: false
-bigbluebutton_docker_webrtc_sfu_k8s_local_config_file: files/kube-config
-bigbluebutton_docker_webrtc_sfu_k8s_config_file: /usr/local/bigbluebutton/bbb-webrtc-sfu/config/kube-config
 bigbluebutton_docker_mcs_sip_enabled: false
 bigbluebutton_docker_mcs_sip_image: mconf/mcs-sip:v2.2.15
 bigbluebutton_docker_mcs_sip_intraframe_interval: 0
@@ -57,10 +54,18 @@ bigbluebutton_docker_suite_image: mconf/suite:new-interface
 bigbluebutton_docker_suite_password: suite
 
 bigbluebutton_docker_kurento_enabled: false
-bigbluebutton_docker_kurento_instances: 1
-bigbluebutton_docker_kurento_first_port: 3100
-bigbluebutton_docker_kurento_image: mconf/kurento:6.14.0-1
+bigbluebutton_docker_kurento_instances:
+  - { port: 3100, media_type: 'audio' }
+  - { port: 3101, media_type: 'main' }
+  - { port: 3102, media_type: 'content' }
+bigbluebutton_docker_kurento_image: mconf/kurento:6.14.0-5
 bigbluebutton_docker_kurento_allowed_candidates:
+
+bigbluebutton_docker_streaming_controller_enabled: true
+bigbluebutton_docker_streaming_controller_image: mconf/mconf-streaming-controller:v1.0.0
+bigbluebutton_docker_streaming_controller_k8s_enabled: false
+bigbluebutton_docker_streaming_controller_k8s_local_config_file: files/kube-config
+bigbluebutton_docker_streaming_controller_k8s_config_file: /usr/local/bigbluebutton/bbb-webrtc-sfu/config/kube-config
 
 bigbluebutton_allow_transfer: false
 
@@ -77,15 +82,14 @@ bigbluebutton_sip_invite_with_sdp: true
 bigbluebutton_kurento_use_internal_ip: false
 
 bigbluebutton_sfu_auth_enabled: true
-# TODO set it to true or remove it completely when everyone is using mcs-sip 2.2.15 or greater
-bigbluebutton_sip_auth_enabled: false
 
 bigbluebutton_streaming_enabled: false
-bigbluebutton_streaming_secret: {}
-
 bigbluebutton_video_rnp_endpoint_hostname: video--approval.rnp.br
 bigbluebutton_video_rnp_client_id:
 bigbluebutton_video_rnp_client_secret:
+bigbluebutton_streaming_google_client_id:
+bigbluebutton_streaming_google_client_secret:
+bigbluebutton_streaming_google_redirect_uri:
 
 external_ip:
 stun_server_ip:

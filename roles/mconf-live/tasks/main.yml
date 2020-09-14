@@ -93,6 +93,12 @@
     - transfer
     - docker
 
+- include: docker-streaming.yml
+  when: bigbluebutton_docker_streaming_controller_enabled
+  tags:
+    - streaming
+    - docker
+
 - name: Remove basic stats
   become: yes
   apt:

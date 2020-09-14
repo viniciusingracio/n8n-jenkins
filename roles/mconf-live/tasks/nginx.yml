@@ -20,6 +20,7 @@
   with_items:
     - presentation
     - presentation_video
+    - playback
   when: item in mconf_live_enabled_recording_formats
   notify: reload nginx
 

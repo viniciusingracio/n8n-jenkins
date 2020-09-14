@@ -68,20 +68,4 @@ location /presentation {
     root   /var/bigbluebutton/published;
     index  index.html index.htm;
 }
-
-location ~* /playback/presentation/2.3/(?<meeting_id>[0-9a-z]+-[0-9]+) {
-{% if mconf_live_rec_fallback is not none %}
-    if (!-f /var/bigbluebutton/published/presentation/$meeting_id/shapes.svg) {
-        return 301 {{ mconf_live_rec_fallback }}$request_uri;
-    }
-
-{% endif %}
-    root /var/bigbluebutton;
-    try_files $uri /playback/presentation/2.3/index.html;
-}
-
-location /playback/presentation/2.3 {
-    root /var/bigbluebutton;
-    try_files $uri /playback/presentation/2.3/index.html;
-}
 {% endif %}

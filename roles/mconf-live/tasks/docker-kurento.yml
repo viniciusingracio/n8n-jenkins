@@ -11,25 +11,14 @@
   set_fact:
     kurento_memory: '{{ ( memory_raw.stdout|int / 4096 )|int }}'
 
-- name: Get number of cores
-  shell: "grep -c ^processor /proc/cpuinfo"
-  register: num_proc_auto_raw
-
-- name: Determine number of kurento instances, in case it isn't set
+- name: Determine kurento URLs to configure bbb-webrtc-sfu
   set_fact:
-    num_proc_auto: '{{ [ num_proc_auto_raw.stdout|int, 2 ] | min }}'
-
-- name: Determine number of kurento instances
-  set_fact:
-    num_proc: '{{ bigbluebutton_docker_kurento_instances | default(num_proc_auto, true) }}'
-
-- name: Determine kurento ports
-  set_fact:
-    kurento_ports: '{{ kurento_ports|default([]) + [ (bigbluebutton_docker_kurento_first_port|int + item|int)|string ] }}'
-  with_sequence: start=0 count={{ num_proc }}
+    kurento_config: "{{ kurento_config|default([]) + [ { 'ip': kurento_ip, 'url': 'ws://' + docker_ip + ':' + item.port|string + '/kurento', 'mediaType': item.media_type } | combine( { 'ipClassMapping': ip_mappings } ) ] }}"
+    kurento_ports: "{{ kurento_ports|default([]) + [ item.port ] }}"
+  with_items: '{{ bigbluebutton_docker_kurento_instances }}'
 
 - name: Determine kurento running instances
-  shell: docker ps -a | grep 'kurento_' | sed 's:.*kurento_\(.*\)$:\1:g' | sort
+  shell: docker ps -a | grep 'kurento_' | sed 's:.*kurento_\([0-9]*\).*:\1:g' | sort
   register: running_kurento_raw
 
 - name: Stop kurento instances that we don't need
@@ -37,11 +26,6 @@
     name: kurento_{{ item }}
     state: absent
   with_items: '{{ running_kurento_raw.stdout_lines | difference(kurento_ports) }}'
-
-- name: Determine kurento URLs to configure bbb-webrtc-sfu
-  set_fact:
-    kurento_config: "{{ kurento_config|default([]) + [ { 'ip': kurento_ip, 'url': 'ws://' + docker_ip + ':' + item + '/kurento' } | combine( { 'ipClassMapping': ip_mappings } ) ] }}"
-  with_items: '{{ kurento_ports }}'
 
 - name: Determine default network interface
   shell: route -n | grep "^0.0.0.0" | tr -s ' ' | cut -d' ' -f 8
@@ -61,7 +45,7 @@
 
 - name: Start kurento containers
   docker_container:
-    name: kurento_{{ item }}
+    name: kurento_{{ item.port }}_{{ item.media_type }}
     image: '{{ bigbluebutton_docker_kurento_image }}'
     pull: yes
     restart_policy: always
@@ -70,8 +54,9 @@
     volumes:
       - /var/kurento:/var/kurento
       - /var/log/kurento-media-server:/var/log/kurento-media-server
+      - /etc/mconf/dtls-srtp.pem:/etc/mconf/dtls-srtp.pem
     env:
-      PORT: '{{ item }}'
+      PORT: '{{ item.port }}'
       RTP_MIN_PORT: '{{ bigbluebutton_kms_udp_range_begin | string }}'
       RTP_MAX_PORT: '{{ ( bigbluebutton_kms_udp_range_end - bigbluebutton_docker_mcs_bfcp_num_ports ) | string }}'
       KURENTO_LOGS_PATH: /var/log/kurento-media-server
@@ -80,9 +65,10 @@
       GST_DEBUG: '3,Kurento*:4,kms*:4,KurentoWebSocketTransport:5'
       TZ: '{{ lookup("file", "/etc/timezone") }}'
       NETWORK_INTERFACES: '{{ default_route_raw.stdout }}'
+      PEM_CERTIFICATE_RSA: /etc/mconf/dtls-srtp.pem
     labels:
       hostname: '{{ inventory_hostname }}'
-  with_items: '{{ kurento_ports }}'
+  with_items: '{{ bigbluebutton_docker_kurento_instances }}'
   notify: restart docker components
 
 - name: Start kurento health monitor

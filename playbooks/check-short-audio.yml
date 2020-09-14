@@ -10,9 +10,9 @@
         dest: /tmp/check-short-audio.rb
 
     - name: Run script
-      shell: ruby /tmp/check-short-audio.rb | tee /tmp/check-short-audio.log > /dev/null
+      shell: ruby /tmp/check-short-audio.rb | tee /tmp/check-short-audio.csv > /dev/null
 
     - name: Gather logs
       fetch:
-        src: /tmp/check-short-audio.log
+        src: /tmp/check-short-audio.csv
         dest: /tmp/check-short-audio

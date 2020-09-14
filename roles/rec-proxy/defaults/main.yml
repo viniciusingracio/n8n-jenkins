@@ -37,3 +37,6 @@ rec_proxy_cache_path: /var/cache/nginx
 rec_proxy_cache_num_keys: 10m
 rec_proxy_cache_expire_after: 30d
 rec_proxy_cache_max_size: 10g
+
+rec_proxy_lb_endpoint: ''
+rec_proxy_lb_secret: ''

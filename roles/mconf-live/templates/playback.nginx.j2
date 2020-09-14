@@ -1,0 +1,17 @@
+{% if not mconf_live_rec_proxy_enabled %}
+{% if mconf_live_rec_fallback is not none %}
+location ~* /playback/presentation/2.3/(?<meeting_id>[0-9a-z]+-[0-9]+) {
+    if (!-f /var/bigbluebutton/published/presentation/$meeting_id/shapes.svg) {
+        return 301 {{ mconf_live_rec_fallback }}$request_uri;
+    }
+
+    root /var/bigbluebutton;
+    try_files $uri /playback/presentation/2.3/index.html;
+}
+
+{% endif %}
+location /playback/presentation/2.3 {
+    root /var/bigbluebutton;
+    try_files $uri /playback/presentation/2.3/index.html;
+}
+{% endif %}

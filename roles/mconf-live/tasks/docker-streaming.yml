@@ -1,0 +1,82 @@
+---
+
+- name: Pull streaming image
+  docker_image:
+    name: '{{ mconf_live_presentation_recorder_image }}:{{ mconf_live_presentation_recorder_version }}'
+    source: pull
+    force_source: yes
+
+- name: Create directory for config files
+  become: yes
+  file:
+    path: /etc/mconf/mconf-streaming-controller
+    state: directory
+    mode: '0755'
+  when: bigbluebutton_streaming_enabled
+
+- name:
+  become: yes
+  file:
+    path: /etc/mconf/mconf-streaming-controller/client_secret.json
+    state: absent
+
+- name:
+  become: yes
+  copy:
+    src: '{{ bigbluebutton_docker_streaming_controller_k8s_local_config_file }}'
+    dest: '{{ bigbluebutton_docker_streaming_controller_k8s_config_file }}'
+
+- name: Start streaming-controller container
+  docker_container:
+    name: streaming-controller
+    image: '{{ bigbluebutton_docker_streaming_controller_image }}'
+    pull: yes
+    restart_policy: always
+    memory: 256M
+    ports:
+      - 3010:3010
+    env:
+      REDIS_HOST: '{{ docker_ip }}'
+      LOG_LEVEL: info
+      STREAM_CONTAINER_TYPE: '{% if bigbluebutton_docker_streaming_controller_k8s_enabled %}kubernetes{% else %}docker{% endif %}'
+      STREAM_IMAGE_NAME: '{{ mconf_live_presentation_recorder_image }}:{{ mconf_live_presentation_recorder_version }}'
+      STREAM_BIGBLUEBUTTON_URL: '{{ bbb_api_entry_point | regex_replace("/api") }}'
+      STREAM_BIGBLUEBUTTON_SECRET: '{{ bbb_secret }}'
+      STREAM_BOT_NAME: 'Streaming'
+      STREAM_K8S_NAMESPACE: streaming
+      VIDEO_RNP_BASE_URL: '{{ bigbluebutton_video_rnp_endpoint_hostname }}'
+      VIDEO_RNP_CLIENT_ID: '{{ bigbluebutton_video_rnp_client_id | string }}'
+      VIDEO_RNP_CLIENT_SECRET: '{{ bigbluebutton_video_rnp_client_secret | string }}'
+      VIDEO_RNP_REDIRECT_URI: 'https://{{ inventory_hostname }}/oauth2_redirect'
+      VIDEO_RNP_HOST_IP: '{{ external_ip }}'
+      GOOGLE_CLIENT_ID: '{{ bigbluebutton_streaming_google_client_id | string }}'
+      GOOGLE_CLIENT_SECRET: '{{ bigbluebutton_streaming_google_client_secret | string }}'
+      GOOGLE_REDIRECT_URI: '{{ bigbluebutton_streaming_google_redirect_uri | string }}'
+      LOG_FILENAME: /var/log/mconf-streaming-controller/mconf-streaming-controller.log
+      TZ: '{{ lookup("file", "/etc/timezone") }}'
+      KUBECONFIG: '{% if bigbluebutton_docker_streaming_controller_k8s_enabled %}/app/kube-config{% endif %}'
+    volumes:
+      - /var/log/mconf-streaming-controller:/var/log/mconf-streaming-controller
+      - /var/run/docker.sock:/var/run/docker.sock
+      - '{{ bigbluebutton_docker_streaming_controller_k8s_config_file }}:/app/kube-config'
+    labels:
+      hostname: '{{ inventory_hostname }}'
+
+- name: Remove old images
+  shell: docker images {{ bigbluebutton_docker_streaming_controller_image.split(":")[0] }} --filter 'before={{ bigbluebutton_docker_streaming_controller_image }}' -q | xargs -r docker rmi --force
+  notify: clean docker
+
+- name: Copy nginx file
+  copy:
+    src: files/streaming-controller.nginx
+    dest: /etc/bigbluebutton/nginx/streaming-controller.nginx
+  become: yes
+  notify: reload nginx
+
+# - name: Remove nginx file
+#   file:
+#     path: /etc/bigbluebutton/nginx/streaming-controller.nginx
+#     state: absent
+#   become: yes
+#   when: not bigbluebutton_allow_transfer
+#   notify: reload nginx

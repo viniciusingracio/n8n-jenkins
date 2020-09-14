@@ -1,0 +1,7 @@
+#!/bin/bash
+
+for i in `find /var/bigbluebutton/deleted/ -name metadata.xml -mtime +20`; do
+  DIR=$(dirname $i)
+  sudo -u bigbluebutton rm -r $DIR
+  echo "$(date) $DIR"
+done | sudo -u bigbluebutton tee -a /var/log/bigbluebutton/purge-deleted.log

@@ -139,6 +139,12 @@
   when: bigbluebutton_apt_state == 'latest'
   notify: restart bigbluebutton
 
+- name: Install bbb-playback
+  become: yes
+  apt:
+    name: bbb-playback
+    state: '{{ bigbluebutton_apt_state }}'
+
 - name: Check if bbb-web is running on a standalone app
   stat:
     path: /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
@@ -623,6 +629,8 @@
   notify: reload systemctl daemon
 
 - include: nginx.yml
+
+- include: dtls-srtp.yml
 
 # - name: Check if reboot is required
 #   stat:

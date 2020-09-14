@@ -1,0 +1,13 @@
+location ~* /playback/presentation/2.3/(?<meeting_id>[0-9a-z]+-[0-9]+) {
+    if (!-f /var/bigbluebutton/published/presentation/$meeting_id/shapes.svg) {
+        return 301 https://rec.mconf.com$request_uri;
+    }
+
+    root /var/bigbluebutton;
+    try_files $uri /playback/presentation/2.3/index.html;
+}
+
+location /playback/presentation/2.3 {
+  root /var/bigbluebutton;
+  try_files $uri /playback/presentation/2.3/index.html;
+}

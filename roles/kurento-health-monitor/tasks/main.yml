@@ -17,7 +17,7 @@
     docker_ip: '{{ docker_ip_raw.stdout }}'
 
 - name: Determine kurento running instances
-  shell: docker ps -a | grep 'kurento_' | sed 's:.*kurento_\(.*\)$:\1:g' | sort
+  shell: docker ps -a | grep 'kurento_' | sed 's:.*kurento_\([0-9]*\).*:\1:g' | sort
   register: running_kurento_raw
 
 - set_fact:

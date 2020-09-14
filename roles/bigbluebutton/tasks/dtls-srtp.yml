@@ -1,0 +1,47 @@
+---
+
+- name: Create mconf config directory
+  file:
+    path: /etc/mconf
+    state: directory
+    mode: '0755'
+  become: yes
+
+- name: Figure out if certificate exists
+  stat:
+    path: /etc/mconf/dtls-srtp.pem
+  register: reg_dtls_file
+
+- name: Figure out if generate certificate is needed
+  set_fact:
+    generate_certificate: '{{ not reg_dtls_file.stat.exists }}'
+
+- name: Create temporary directory for the certificate
+  tempfile:
+    state: directory
+  register: tmpdir_cert
+  when: generate_certificate
+
+- name: Generate certificate
+  shell: openssl req -x509 -new -nodes -newkey rsa:2048 -sha256 -days 3650 -subj "/C=BR/ST=Porto Alegre/O=Mconf Tecnologia/OU=Live/CN={{ inventory_hostname }}" {% if inventory_hostname is match("\d+\.\d+\.\d+\.\d+") %}-reqexts SAN -extensions SAN -config <(cat /etc/ssl/openssl.cnf <(printf "[SAN]\nsubjectAltName=IP:{{ inventory_hostname }}")){% endif %} -keyout {{ tmpdir_cert.path }}/dtls-srtp-key.pem -out {{ tmpdir_cert.path }}/dtls-srtp-cert.pem
+  when: generate_certificate
+
+- name: Concat certificate and key
+  shell: cat {{ tmpdir_cert.path }}/dtls-srtp-key.pem {{ tmpdir_cert.path }}/dtls-srtp-cert.pem > /etc/mconf/dtls-srtp.pem
+  when: generate_certificate
+  become: yes
+
+- name: Copy certificate to FreeSWITCH
+  copy:
+    src: /etc/mconf/dtls-srtp.pem
+    dest: /opt/freeswitch/etc/freeswitch/tls/dtls-srtp.pem
+    remote_src: yes
+  become: yes
+  when: generate_certificate
+  notify: restart bigbluebutton
+
+- name: Remove temporary directory
+  file:
+    path: '{{ tmpdir_cert.path }}'
+    state: absent
+  when: generate_certificate
