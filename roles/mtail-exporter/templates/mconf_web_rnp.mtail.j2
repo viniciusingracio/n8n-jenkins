@@ -1,8 +1,9 @@
 counter mconf_web_http_requests_total by request_method, status, path
-counter mconf_web_http_requests_total_overall
+
+
+histogram mconf_web_http_requests_duration_ms by request_method, status, controller, action, type buckets 10, 25, 50, 75, 100, 150, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000, 1500, 2500, 5000, 10000, 15000, 20000
 
 getfilename() =~ /mconf-web-access.log$/ {
-  mconf_web_http_requests_total_overall++
 
   /^(?P<remote_addr>\S+) - (?P<remote_user>\S+) \[(?P<time_local>[^\]]+)\] "(?P<request_method>\S+) (?P<request_uri>[^ ]+) (?P<http_version>HTTP[^"]+)" (?P<status>\S+) (?P<body_bytes_sent>[\d-]+) "(?P<http_referer>[^"]+)" "(?P<http_user_agent>[^"]+)"/ {
 
@@ -60,4 +61,19 @@ getfilename() =~ /mconf-web-access.log$/ {
 
     }
   }
+}
+
+getfilename() =~ /lograge_production.log$/ {
+
+  # Example:
+  # 2020-08-16 02:14:41.249 [INFO ] {"method":"GET","path":"/conference/rooms/mec/running.json","format":"json","controller":"custom_bigbluebutton_rooms","action":"running","status":200,"duration":66.72,"view":0.19,"db":17.54,"time":"2020-08-16T02:14:40.957+00:00","current_user":{"id":11404,"email":"melisacal@gmail.com","username":"maria-elisa-calcagnotto","name":"Maria Elisa Calcagnotto","superuser":false,"can_record":true},"params":{"id":"mec","format":"json","custom_bigbluebutton_room":{}},"session":{"id":"5c5e4385e865926664577fce66a32581","ldap_session":false,"shib_session":false},"@timestamp":"2020-08-16T02:14:41.024Z","@version":"1","message":"[200] GET /conference/rooms/mec/running.json (custom_bigbluebutton_rooms#running)"} (pid:2787)
+
+  # mconf_web_http_requests_duration_total++
+
+  /method.:.(?P<request_method>[^"]+).*path.:.(?P<request_uri>[^"]+).*controller.:.(?P<controller>[^"]+).*action.:.(?P<action>[^"]+).*status.:(?P<status>[^,]+).*duration.:(?P<duration>[^,]+).*view.:(?P<duration_view>[^,]+).*db.:(?P<duration_db>[^,]+)/ {
+    mconf_web_http_requests_duration_ms[$request_method][$status][$controller][$action]["overall"] = float($duration)
+    mconf_web_http_requests_duration_ms[$request_method][$status][$controller][$action]["db"] = float($duration_db)
+    mconf_web_http_requests_duration_ms[$request_method][$status][$controller][$action]["view"] = float($duration_view)
+  }
+
 }
