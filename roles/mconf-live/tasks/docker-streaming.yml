@@ -48,7 +48,7 @@
       VIDEO_RNP_CLIENT_ID: '{{ bigbluebutton_video_rnp_client_id | string }}'
       VIDEO_RNP_CLIENT_SECRET: '{{ bigbluebutton_video_rnp_client_secret | string }}'
       VIDEO_RNP_REDIRECT_URI: 'https://{{ inventory_hostname }}/oauth2_redirect'
-      VIDEO_RNP_HOST_IP: '{{ external_ip }}'
+      VIDEO_RNP_HOST_IP: '{{ external_ipv4 }}'
       GOOGLE_CLIENT_ID: '{{ bigbluebutton_streaming_google_client_id | string }}'
       GOOGLE_CLIENT_SECRET: '{{ bigbluebutton_streaming_google_client_secret | string }}'
       GOOGLE_REDIRECT_URI: '{{ bigbluebutton_streaming_google_redirect_uri | string }}'

@@ -1,11 +1,13 @@
-- name: Determine external IP
+- name: Determine external IPv4
   set_fact:
-    external_ip: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | grep \"[0-9]*\\.[0-9]*\\.[0-9]*\\.[0-9]*\" | head -n 1') }}"
-  when: external_ip is none
-- name: Set external IP as internal IP if nothing returns from dig
+    # external_ipv4: "{{ lookup('dig', inventory_hostname, 'qtype=A', '@8.8.8.8') | default(ansible_default_ipv4.address, true) }}"
+    external_ipv4: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | head -n 1') | default(ansible_default_ipv4.address, true) }}"
+  when: external_ipv4 is none
+- name: Determine external IPv6
   set_fact:
-    external_ip: '{{ ansible_default_ipv4.address }}'
-  when: external_ip is none or external_ip | trim == ""
+    # external_ipv6: "{{ lookup('dig', inventory_hostname, 'qtype=AAAA', '@8.8.8.8') | default(none, true) }}"
+    external_ipv6: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 AAAA +short | head -n 1') | default(none, true) }}"
+  when: external_ipv6 is none
 
 - name: Check if bbb-web is running on a standalone app
   stat:
@@ -48,7 +50,7 @@
   when: ( stun_server_ip is none or stun_server_port is none ) and not bigbluebutton_stun_server | length == 0
 
 - set_fact:
-    kurento_ip: "{% if bigbluebutton_kurento_use_internal_ip %}{{ ansible_default_ipv4.address }}{% else %}{{ external_ip }}{% endif %}"
+    kurento_ip: "{% if bigbluebutton_kurento_use_internal_ip %}{{ ansible_default_ipv4.address }}{% else %}{{ external_ipv4 }}{% endif %}"
 
 - name: Determine IPs used for exchange with private, public and local network. Used for FreeSWITCH and Kurento
   set_fact:

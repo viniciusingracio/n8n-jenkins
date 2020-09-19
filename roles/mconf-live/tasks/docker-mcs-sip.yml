@@ -35,7 +35,7 @@
   when: not bigbluebutton_sip_registrar_enabled
 
 - set_fact:
-    contact_ip: "{% if bigbluebutton_sip_registrar_use_internal_ip %}{{ ansible_default_ipv4.address }}{% else %}{{ external_ip }}{% endif %}"
+    contact_ip: "{% if bigbluebutton_sip_registrar_use_internal_ip %}{{ ansible_default_ipv4.address }}{% else %}{{ external_ipv4 }}{% endif %}"
 
 - name: Start mcs-sip container
   docker_container:

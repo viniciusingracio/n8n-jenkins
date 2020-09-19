@@ -1,0 +1,4 @@
+map $remote_addr $freeswitch_addr {
+    "~:"    [{{ external_ipv6 }}];
+    default    {{ external_ipv4 }};
+}

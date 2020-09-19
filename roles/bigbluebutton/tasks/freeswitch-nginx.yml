@@ -1,0 +1,31 @@
+- name: Determine nginx address for FreeSWITCH if IPv6 is enabled
+  set_fact:
+    freeswitch_nginx_address: '$freeswitch_addr'
+  when: enable_freeswitch_ipv6
+
+- name: Determine nginx address for FreeSWITCH if IPv6 is disabled
+  set_fact:
+    freeswitch_nginx_address: '{{ external_ipv4 }}'
+  when: not enable_freeswitch_ipv6
+
+- name: Set freeswitch address on sip.nginx
+  replace:
+    path: '/etc/bigbluebutton/nginx/sip.nginx'
+    regexp: 'http[s]?:\/\/[^:]+:\d+'
+    replace: 'https://{{ freeswitch_nginx_address }}:7443'
+  become: yes
+  notify: reload nginx
+
+- template:
+    src: templates/bigbluebutton_sip_addr_map.conf.j2
+    dest: /etc/nginx/conf.d/bigbluebutton_sip_addr_map.conf
+  become: yes
+  notify: reload nginx
+  when: enable_freeswitch_ipv6
+
+- file:
+    path: /etc/nginx/conf.d/bigbluebutton_sip_addr_map.conf
+    state: absent
+  become: yes
+  notify: reload nginx
+  when: not enable_freeswitch_ipv6

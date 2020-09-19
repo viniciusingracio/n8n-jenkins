@@ -195,7 +195,8 @@ bigbluebutton_html5_remote_default_logo:
 
 bigbluebutton_docker_webrtc_sfu_enabled: false
 
-external_ip:
+external_ipv4:
+external_ipv6:
 
 bigbluebutton_zabbix_copy_scripts: false
 bigbluebutton_zabbix_conf_dir: /etc/zabbix/zabbix_agentd.conf.d

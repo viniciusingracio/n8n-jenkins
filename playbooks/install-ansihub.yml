@@ -120,9 +120,9 @@
     tags:
       - verify
 
-  - name: Print
-    debug:
-      msg: '{{ reg_status.stdout }}'
+  - name: Fail
+    fail:
+    when: reg_status.stdout != "0"
     tags:
       - verify
 

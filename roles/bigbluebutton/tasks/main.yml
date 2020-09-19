@@ -402,88 +402,48 @@
   become: yes
   notify: restart bigbluebutton
 
-- name: Determine external IP
+- name: Determine external IPv4
   set_fact:
-    external_ip: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | grep \"[0-9]*\\.[0-9]*\\.[0-9]*\\.[0-9]*\" | head -n 1') }}"
-  when: external_ip is none
-- name: Set external IP as internal IP if nothing returns from dig
+    # external_ipv4: "{{ lookup('dig', inventory_hostname, 'qtype=A', '@8.8.8.8') | default(ansible_default_ipv4.address, true) }}"
+    external_ipv4: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | head -n 1') | default(ansible_default_ipv4.address, true) }}"
+  when: external_ipv4 is none
+- name: Determine external IPv6
   set_fact:
-    external_ip: '{{ ansible_default_ipv4.address }}'
-  when: external_ip is none or external_ip | trim == ""
+    # external_ipv6: "{{ lookup('dig', inventory_hostname, 'qtype=AAAA', '@8.8.8.8') | default(none, true) }}"
+    external_ipv6: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 AAAA +short | head -n 1') | default(none, true) }}"
+  when: external_ipv6 is none
 
-# http://docs.bigbluebutton.org/install/install.html#configure-a-dummy-nic-if-required
-- name: Check if external IP is accessible
-  command: 'curl --max-time 5 --trace-ascii - -k https://{{ external_ip }}:443/favicon.ico'
-  ignore_errors: yes
-  register: reg_external_ip_access
+- name: Check if the external IP is mapped in any of the interfaces
+  set_fact:
+    dummy_nic_needed: '{{ not external_ipv4 in ansible_all_ipv4_addresses }}'
+
+- name: Add dummy NIC
+  command: 'ip addr add {{ external_ipv4 }}/32 dev lo'
+  become: yes
+  when: dummy_nic_needed
+
+- name: Add dummy NIC to network interfaces
+  blockinfile:
+    dest: /etc/network/interfaces
+    block: |2
+              post-up ip addr add {{ external_ipv4 }}/32 dev lo
+              pre-down ip addr del {{ external_ipv4 }}/32 dev lo
+    insertafter: 'iface lo inet loopback'
+    marker: '        # {mark} ANSIBLE MANAGED BLOCK'
+  become: yes
+  when: dummy_nic_needed
+
+- setup:
 
 - name: Restart nginx just to make sure
   become: yes
   service:
     name: nginx
     state: restarted
-  when: reg_external_ip_access is failed
-
-- name: Check if external IP is accessible again
-  command: 'curl --max-time 5 --trace-ascii - -k https://{{ external_ip }}:443/favicon.ico'
-  ignore_errors: yes
-  register: reg_external_ip_access
-  when: reg_external_ip_access is failed
-
-- name: Check if external IP is assigned to any interface
-  shell: ip addr | grep 'inet {{ external_ip }}'
-  ignore_errors: yes
-  register: reg_external_ip_assigned
-
-- name: Add dummy NIC
-  command: 'ip addr add {{ external_ip }}/32 dev lo'
-  become: yes
-  when: reg_external_ip_assigned is failed or reg_external_ip_access is failed
-
-- name: Add dummy NIC to network interfaces
-  blockinfile:
-    dest: /etc/network/interfaces
-    block: |2
-              post-up ip addr add {{ external_ip }}/32 dev lo
-              pre-down ip addr del {{ external_ip }}/32 dev lo
-    insertafter: 'iface lo inet loopback'
-    marker: '        # {mark} ANSIBLE MANAGED BLOCK'
-  become: yes
-  when: reg_external_ip_assigned is failed or reg_external_ip_access is failed
+  when: dummy_nic_needed
 
 - name: Confirm if external IP is accessible
-  command: 'curl --max-time 5 --trace-ascii - -k https://{{ external_ip }}:443/favicon.ico'
-
-- name: Set HTTPS on sip.nginx
-  replace:
-    path: '/etc/bigbluebutton/nginx/sip.nginx'
-    regexp: 'http[s]?:\/\/[0-9\.]*:\d+'
-    replace: 'https://{{ external_ip }}:7443'
-  become: yes
-  notify: reload nginx
-
-- name: Update bbb-webrtc-sfu config
-  yedit:
-    src: /usr/local/bigbluebutton/bbb-webrtc-sfu/config/default.yml
-    edits:
-    - { key: 'minVideoPort', value: '{{ bigbluebutton_html5_udp_range_begin }}' }
-    - { key: 'maxVideoPort', value: '{{ bigbluebutton_html5_udp_range_end }}' }
-    - { key: 'kurentoIp', value: '{{ external_ip }}' }
-    - { key: 'localIpAddress', value: '{{ external_ip }}' }
-    - { key: 'acceptSelfSignedCertificate', value: '{{ use_self_signed_certificate }}' }
-    - { key: 'mediaFlowTimeoutDuration', value: '15000' }
-    - { key: 'websocketPongTimeout', value: '15000' }
-    - { key: 'common-message-version', value: '{% if bigbluebutton_html5 %}2.x{% else %}1.x{% endif %}' }
-    - { key: 'freeswitch.ip', value: '{{ ansible_default_ipv4.address }}' }
-    - { key: 'kurentoUrl', value: 'ws://{{ ansible_default_ipv4.address }}:8888/kurento' }
-    - { key: 'recordScreenSharing', value: '{% if bigbluebutton_html5 %}true{% else %}false{% endif %}' }
-    - { key: 'recordWebcams', value: '{% if bigbluebutton_html5 %}true{% else %}false{% endif %}' }
-    - { key: 'kurento-websocket-pool-size', value: '1' }
-    - { key: 'maxAudioConnections', value: '300' }
-    state: present
-  become: yes
-  when: not bigbluebutton_docker_webrtc_sfu_enabled
-  notify: restart bbb-webrtc-sfu
+  command: 'curl --max-time 5 --trace-ascii - -k https://{{ external_ipv4 }}:443/favicon.ico'
 
 - name: Open/close redis
   become: yes
@@ -526,9 +486,6 @@
 
 - include: html5.yml
   when: bigbluebutton_html5
-
-- include: sip.yml
-  when: bigbluebutton_sip and not bigbluebutton_docker_mcs_sip_enabled
 
 - include: branding.yml
   tags:

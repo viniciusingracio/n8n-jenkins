@@ -1,0 +1,45 @@
+- set_fact:
+    external_props:
+      - { name: "ws-binding" }
+      - { name: "wss-binding" }
+      - { name: "rtcp-audio-interval-msec" }
+      - { name: "rtcp-video-interval-msec" }
+      - { name: "dtmf-type" }
+      - { name: "liberal-dtmf" }
+      - { name: "enable-3pcc" }
+
+- name: Read external_props IPv4
+  xml:
+    path: "/opt/freeswitch/conf/sip_profiles/external.xml"
+    xpath: '/profile/settings/param[@name="{{ item.name }}"]'
+    content: attribute
+  with_items: '{{ external_props }}'
+  register: external_props_read_ipv4
+  ignore_errors: yes
+  become: yes
+
+- name: Read external_props IPv6
+  xml:
+    path: "/opt/freeswitch/conf/sip_profiles/external-ipv6.xml"
+    xpath: '/profile/settings/param[@name="{{ item.name }}"]'
+    content: attribute
+  with_items: '{{ external_props }}'
+  register: external_props_read_ipv6
+  ignore_errors: yes
+  become: yes
+
+- name: Add external_prop if it doesn't exist
+  xml:
+    path: /opt/freeswitch/conf/sip_profiles/external-ipv6.xml
+    xpath: /profile/settings
+    add_children:
+      - param:
+          name: '{{ external_props_read_ipv4.results[idx].matches[0].param.name }}'
+          value: '{{ external_props_read_ipv4.results[idx].matches[0].param.value }}'
+    pretty_print: yes
+  loop: '{{ external_props_read_ipv6.results }}'
+  loop_control:
+    index_var: idx
+  when: item is failed and external_props_read_ipv4.results[idx] is succeeded
+  become: yes
+  notify: restart bigbluebutton

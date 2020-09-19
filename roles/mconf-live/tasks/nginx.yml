@@ -21,7 +21,7 @@
     - presentation
     - presentation_video
     - playback
-  when: item in mconf_live_enabled_recording_formats
+  when: item in ( mconf_live_enabled_recording_formats + [ "playback" ] )
   notify: reload nginx
 
 - set_fact:

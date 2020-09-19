@@ -38,10 +38,15 @@
   ignore_errors: yes
 
 - set_fact:
-    kms_need_stun: '{{ ansible_default_ipv4.address != external_ip }}'
+    kms_need_stun: '{{ ansible_default_ipv4.address != external_ipv4 }}'
 - set_fact:
     kms_stun_server_ip: '{% if kms_need_stun %}{{ stun_server_ip | default("") }}{% endif %}'
     kms_stun_server_port: '{% if kms_need_stun %}{{ stun_server_port | default("") }}{% endif %}'
+
+- set_fact:
+    kms_ignore_list: "{{ kms_ignore_list | default([]) + [ item ] }}"
+  with_items: '{{ ansible_all_ipv4_addresses + ansible_all_ipv6_addresses }}'
+  when: not item in [ external_ipv4, external_ipv6 ] and not item is match("^(fe80::|172.)")
 
 - name: Start kurento containers
   docker_container:
@@ -66,6 +71,8 @@
       TZ: '{{ lookup("file", "/etc/timezone") }}'
       NETWORK_INTERFACES: '{{ default_route_raw.stdout }}'
       PEM_CERTIFICATE_RSA: /etc/mconf/dtls-srtp.pem
+      IP_IGNORE_LIST: '{{ kms_ignore_list | join(",") }}'
+      NICE_AGENT_ICE_TCP: '0'
     labels:
       hostname: '{{ inventory_hostname }}'
   with_items: '{{ bigbluebutton_docker_kurento_instances }}'

@@ -29,11 +29,6 @@
     state: latest
   become: yes
 
-- name:
-  set_fact:
-    bigbluebutton_docker_kurento_allowed_candidates: "{{ [ external_ip, ansible_default_ipv4.address ] | unique }}"
-  when: bigbluebutton_docker_kurento_allowed_candidates is none
-
 - name: Start webrtc-sfu container
   docker_container:
     name: webrtc-sfu
@@ -62,11 +57,13 @@
       CODEC_VIDEO_CONTENT: '{{ bigbluebutton_docker_webrtc_sfu_codec }}'
       VIDEO_SUBSCRIBER_SLAVE: 'true'
       SCREENSHARE_SUBSCRIBER_SLAVE: 'true'
-      KURENTO_ALLOWED_CANDIDATE_IPS: '{{ bigbluebutton_docker_kurento_allowed_candidates | default("", true) | to_json }}'
       LOG_FILENAME: /var/log/bbb-webrtc-sfu/bbb-webrtc-sfu.log
       TZ: '{{ lookup("file", "/etc/timezone") }}'
       FREESWITCH_IP_MAPPINGS: '{{ ip_mappings | to_json }}'
       BALANCING_STRATEGY: MEDIA_TYPE
+      GLOBAL_MEDIA_THRESHOLD: '0'
+      ROOM_MEDIA_THRESHOLD: '{{ bigbluebutton_docker_webrtc_sfu_streams_meeting | string }}'
+      USER_MEDIA_THRESHOLD: '0'
     volumes:
       - /var/log/bbb-webrtc-sfu:/var/log/bbb-webrtc-sfu
     labels:

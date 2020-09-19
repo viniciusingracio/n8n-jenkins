@@ -1,6 +1,13 @@
+- set_fact:
+    # enable_freeswitch_ipv6: '{{ not external_ipv6 is none }}'
+    # disable configs for ipv6 on freeswitch
+    enable_freeswitch_ipv6: false
+
+- include: freeswitch-nginx.yml
+
 - name: Determine wss_binding value
   set_fact:
-    wss_binding_value: '{% if ansible_default_ipv4.address == external_ip %}:7443{% else %}{{ external_ip }}:7443{% endif %}'
+    wss_binding_value: '{% if ansible_default_ipv4.address == external_ipv4 %}:7443{% else %}{{ external_ipv4 }}:7443{% endif %}'
     ws_binding_value: :5066
 
 - name: Define FreeSWITCH external SIP port
@@ -32,8 +39,8 @@
     attribute: '{{ item.attribute }}'
     value: '{{ item.value }}'
   with_items:
-    - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "external_rtp_ip=")]', attribute: 'data', value: 'external_rtp_ip={{ external_ip }}' }
-    - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "external_sip_ip=")]', attribute: 'data', value: 'external_sip_ip={{ external_ip }}' }
+    - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "external_rtp_ip=")]', attribute: 'data', value: 'external_rtp_ip={{ external_ipv4 }}' }
+    - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "external_sip_ip=")]', attribute: 'data', value: 'external_sip_ip={{ external_ipv4 }}' }
     - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "sound_prefix=")]', attribute: 'data', value: 'sound_prefix={{ bigbluebutton_sounds_prefix }}' }
     - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "local_ip_v4=")]', attribute: 'data', value: 'local_ip_v4={{ ansible_default_ipv4.address }}' }
     - { xpath: '//X-PRE-PROCESS[@cmd="set" and starts-with(@data, "rtp_liberal_dtmf=")]', attribute: 'data', value: 'rtp_liberal_dtmf=true' }
@@ -148,11 +155,6 @@
   when: item is failed
   notify: restart bigbluebutton
 
-- name: Check if IPv6 is supported
-  shell: ip addr | grep inet6
-  ignore_errors: yes
-  register: reg_ipv6
-
 - name: Remove IPv6 configuration from FreeSWITCH profiles
   become: yes
   command: mv {{ item }} {{ item }}_
@@ -162,7 +164,19 @@
   with_items:
     - /opt/freeswitch/etc/freeswitch/sip_profiles/internal-ipv6.xml
     - /opt/freeswitch/etc/freeswitch/sip_profiles/external-ipv6.xml
-  when: reg_ipv6 is failed
+  when: not enable_freeswitch_ipv6
+  notify: restart bigbluebutton
+
+- name: Restore IPv6 configuration from FreeSWITCH profiles
+  become: yes
+  command: mv {{ item }}_ {{ item }}
+  args:
+    creates: '{{ item }}'
+    removes: '{{ item }}_'
+  with_items:
+    - /opt/freeswitch/etc/freeswitch/sip_profiles/internal-ipv6.xml
+    - /opt/freeswitch/etc/freeswitch/sip_profiles/external-ipv6.xml
+  when: enable_freeswitch_ipv6
   notify: restart bigbluebutton
 
 - name: Determine properties to modify event_socket.conf.xml
@@ -215,3 +229,5 @@
   notify: restart bigbluebutton
 
 - include: sounds.yml
+- include: freeswitch-ipv6.yml
+  when: enable_freeswitch_ipv6
