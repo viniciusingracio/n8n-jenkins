@@ -1,0 +1,34 @@
+---
+
+- hosts:
+  - mconf-live220
+  tasks:
+    - command: docker run --rm -v /:/host -e AWS_ACCESS_KEY_ID={{ aws_key }} -e AWS_SECRET_ACCESS_KEY={{ aws_secret }} -e AWS_DEFAULT_REGION={{ aws_region }} amazon/aws-cli --endpoint={{ aws_endpoint }} s3 cp s3://{{ backup_bucket }}/{{ backup_date }}/{{ inventory_hostname }}/metadata.tar.gz /host{{ ansible_env.HOME }}/metadata.tar.gz
+      register: result
+      until: result is succeeded
+      retries: 120
+      delay: 30
+
+    - file:
+        path: '{{ ansible_env.HOME }}/metadata-{{ backup_date }}'
+        state: directory
+
+    - unarchive:
+        src: '{{ ansible_env.HOME }}/metadata.tar.gz'
+        dest: '{{ ansible_env.HOME }}/metadata-{{ backup_date }}'
+        remote_src: yes
+
+    - shell: |
+        cp -r {{ ansible_env.HOME }}/metadata-{{ backup_date }}/* /var/bigbluebutton/
+        chown -R bigbluebutton:bigbluebutton /var/bigbluebutton/published /var/bigbluebutton/unpublished /var/bigbluebutton/deleted
+      become: yes
+      tags:
+        - copy
+
+    - file:
+        path: '{{ item }}'
+        state: absent
+      with_items:
+        - '{{ ansible_env.HOME }}/metadata-{{ backup_date }}'
+        - '{{ ansible_env.HOME }}/metadata.tar.gz'
+      become: yes

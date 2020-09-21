@@ -81,4 +81,4 @@
       BBB_AWS_KEEP_DELETED: '{{ aws_publisher_keep_deleted | string }}'
     labels:
       hostname: '{{ inventory_hostname }}'
-    state: '{% if aws_publisher_run_resync %}started{% else %}stopped{% endif %}'
+    state: '{% if aws_publisher_run_resync %}started{% else %}present{% endif %}'

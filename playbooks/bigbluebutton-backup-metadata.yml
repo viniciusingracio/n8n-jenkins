@@ -1,0 +1,47 @@
+---
+
+- hosts:
+  - mconf-live220
+  tasks:
+    - set_fact:
+        to_copy:
+          - { archive: "/metadata.tar.gz", path: [ "/var/bigbluebutton/published", "/var/bigbluebutton/unpublished", "/var/bigbluebutton/deleted" ] }
+          - { archive: "/events.tar.gz", path: [ "/var/bigbluebutton/events" ] }
+          - { archive: "/logs.tar.gz", path: [ "/var/log/bigbluebutton", "/var/log/nginx", "/var/log/bbb-apps-akka" ] }
+
+    - name:
+      shell: find /var/bigbluebutton/recording/status/processed /var/bigbluebutton/recording/status/published -name "*.fail" -exec basename {} \; | cut -d"-" -f1-2 | sort -u
+      register: reg_failed_ids
+
+    - name:
+      shell: find /var/bigbluebutton/recording/status/sanity -name "*.done" -exec basename {} \; | cut -d"." -f1 | sort -u
+      register: reg_sanity_ids
+
+    - stat:
+        path: '/var/bigbluebutton/recording/raw/{{ item }}'
+      with_items: '{{ ( reg_failed_ids.stdout_lines + reg_sanity_ids.stdout_lines ) | unique }}'
+      register: reg_raw_paths
+
+    - set_fact:
+        raw_path: '{{ raw_path | default([]) + [ item.stat.path ] }}'
+      with_items: '{{ reg_raw_paths.results }}'
+      when: item.stat.isdir is defined and item.stat.isdir
+
+    - set_fact:
+        to_copy: '{{ to_copy + [ { "archive": "/raw.tar.gz", "path": raw_path } ]}}'
+      when: raw_path is defined and raw_path | length > 0
+
+    - archive:
+        path: '{{ item.path }}'
+        dest: '{{ item.archive }}'
+      with_items: '{{ to_copy }}'
+      become: yes
+      async: 3600
+      poll: 15
+
+    - shell: docker run --rm -v /:/host:ro -e AWS_ACCESS_KEY_ID={{ aws_key }} -e AWS_SECRET_ACCESS_KEY={{ aws_secret }} -e AWS_DEFAULT_REGION={{ aws_region }} amazon/aws-cli --endpoint={{ aws_endpoint }} s3 cp --only-show-errors /host{{ item.archive }} s3://{{ backup_bucket }}/{{ backup_date }}/{{ inventory_hostname }}{{ item.archive }} && sleep 30
+      with_items: '{{ to_copy }}'
+      register: result
+      until: result is succeeded
+      retries: 120
+      delay: 30
