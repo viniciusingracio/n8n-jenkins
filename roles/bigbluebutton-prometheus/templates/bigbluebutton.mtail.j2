@@ -1,3 +1,6 @@
+# test with:
+# docker run --rm -it -v /tmp:/var/log -v $(pwd)/roles/bigbluebutton-prometheus/templates/bigbluebutton.mtail.j2:/progs/bigbluebutton.mtail mconf/mtail:v3.0.0-rc36 --one_shot -logtostderr -progs /progs/bigbluebutton.mtail -logs /var/log/syslog
+
 counter bbb_nginx_http_requests_total by request_method, status, api_method
 
 histogram bbb_nginx_http_request_duration_seconds by request_method, status, api_method buckets 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10, 15
@@ -18,5 +21,28 @@ getfilename() =~ /bigbluebutton.access.log$/ {
         }
       }
     }
+  }
+}
+
+counter bbb_sfu_media_threshold_exceeded_total by scope
+
+getfilename() =~ /bbb-webrtc-sfu.log$/ {
+  /"message":"\[mcs-room\] Room has exceeded the media threshold"/ {
+    bbb_sfu_media_threshold_exceeded_total["room"]++
+  }
+}
+
+counter bbb_apps_ejected_total by reason
+
+getfilename() =~ /bbb-apps-akka.log$/ {
+  /"ejectedBy":"SYSTEM","reason":"(?P<reason>[^"]+)"/ {
+    bbb_apps_ejected_total[$reason]++
+  }
+}
+
+# count ejections skipped
+getfilename() =~ /syslog$/ {
+  /Skipping violation ejection of user .*\. Reason: (?P<reason>.*)/ {
+    bbb_apps_ejected_total[$reason]++
   }
 }

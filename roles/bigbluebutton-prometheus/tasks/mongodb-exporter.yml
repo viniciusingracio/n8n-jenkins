@@ -1,0 +1,16 @@
+---
+
+- name: Start mongodb exporter
+  docker_container:
+    name: mongodb-exporter
+    image: mconf/mongodb-exporter:af0a25f
+    command: --web.telemetry-path /mongodb_metrics --mongodb.uri mongodb://127.0.1.1:27017 --collect.database --collect.collection --collect.topmetrics --collect.indexusage --collect.connpoolstats
+    network_mode: host
+    pull: yes
+    restart_policy: always
+    # ports are ignored when network=host
+    # ports:
+    #   - 9216:9216
+    labels:
+      hostname: '{{ inventory_hostname }}'
+    state: '{% if bigbluebutton_prometheus_mongodb_exporter_enabled %}started{% else %}absent{% endif %}'

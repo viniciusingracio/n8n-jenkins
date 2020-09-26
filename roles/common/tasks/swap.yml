@@ -3,21 +3,16 @@
   register: free_swap
 
 - name: Check memory size
-  shell: free -h | grep 'Mem:' | head -1 | tr -s ' ' | cut -d' ' -f2
+  shell: free -m | grep 'Mem:' | head -1 | tr -s ' ' | cut -d' ' -f2
   register: free_mem
 
 - name: Determine if needs to create swap
   set_fact:
     create_swap: '{{ free_swap.stdout == "0B" }}'
-    swap_size: '{{ free_mem.stdout }}'
-
-- name: Convert swap size to integer
-  set_fact:
-    swap_size: '{{ swap_size[:-1]|float|round|int }}{{ swap_size[-1] }}'
-  when: ansible_distribution_release == "trusty"
+    swap_size: '{{ free_mem.stdout | int }}'
 
 - name: Create swap file
-  command: fallocate -l {{ swap_size }} /swapfile
+  command: dd if=/dev/zero of=/swapfile count={{ [ swap_size, 8192 ] | min }} bs=1MiB
   become: yes
   when: create_swap
 
@@ -35,17 +30,17 @@
   become: yes
   when: create_swap
 
-- name: Enable swap
-  command: swapon /swapfile
-  become: yes
-  when: create_swap
-
 - name: Make swap permanent
   blockinfile:
     dest: /etc/fstab
     block: |
       /swapfile none swap sw 0 0
     marker: '# {mark} ANSIBLE MANAGED BLOCK swapfile'
+  become: yes
+  when: create_swap
+
+- name: Enable swap
+  command: swapon -a
   become: yes
   when: create_swap
 

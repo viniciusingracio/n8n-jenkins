@@ -60,6 +60,7 @@ bigbluebutton_docker_kurento_instances:
   - { port: 3101, media_type: 'main' }
   - { port: 3102, media_type: 'content' }
 bigbluebutton_docker_kurento_image: mconf/kurento:6.14.0-6
+bigbluebutton_docker_kurento_ignore_ips: []
 
 bigbluebutton_docker_streaming_controller_enabled: true
 bigbluebutton_docker_streaming_controller_image: mconf/mconf-streaming-controller:v1.0.0

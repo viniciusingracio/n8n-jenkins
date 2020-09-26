@@ -1,8 +1,0 @@
-- name: Configure ufw rules for Kurento
-  become: yes
-  ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
-  with_items:
-    - { rule: 'allow', port: 443, proto: 'tcp' }
-    - { rule: 'allow', port: '1:65535', proto: 'udp' }
-  notify:
-    - restart ufw

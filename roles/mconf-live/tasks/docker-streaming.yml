@@ -12,7 +12,6 @@
     path: /etc/mconf/mconf-streaming-controller
     state: directory
     mode: '0755'
-  when: bigbluebutton_streaming_enabled
 
 - name:
   become: yes
@@ -61,6 +60,7 @@
       - '{{ bigbluebutton_docker_streaming_controller_k8s_config_file }}:/app/kube-config'
     labels:
       hostname: '{{ inventory_hostname }}'
+    state: '{% if bigbluebutton_streaming_enabled %}started{% else %}absent{% endif %}'
 
 - name: Remove old images
   shell: docker images {{ bigbluebutton_docker_streaming_controller_image.split(":")[0] }} --filter 'before={{ bigbluebutton_docker_streaming_controller_image }}' -q | xargs -r docker rmi --force

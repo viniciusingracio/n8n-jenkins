@@ -1,0 +1,29 @@
+---
+
+- hosts: all
+
+  vars:
+    ansible_user: mconf
+
+  tasks:
+    - name: Add Jonathon's ppa for ffmpeg
+      become: yes
+      apt_repository:
+        repo: ppa:jonathonf/ffmpeg-4
+        filename: ffmpeg
+        mode: '0644'
+        state: present
+
+    - name: Unhold ffmpeg package
+      command: apt-mark unhold ffmpeg
+      become: yes
+
+    - name: Unhold ffmpeg package (with aptitude)
+      command: aptitude -y unhold ffmpeg
+      become: yes
+
+    - name: Update ffmpeg
+      become: yes
+      apt:
+        name: ffmpeg
+        state: latest

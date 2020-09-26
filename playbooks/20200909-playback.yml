@@ -1,0 +1,16 @@
+---
+
+- hosts: all
+  handlers:
+    - name: reload nginx
+      become: yes
+      service: name=nginx state=reloaded
+  vars:
+    ansible_user: mconf
+  tasks:
+  - name: Copy nginx file
+    become: yes
+    copy:
+      src: files/20200909-playback.nginx
+      dest: /etc/bigbluebutton/nginx/playback.nginx
+    notify: reload nginx

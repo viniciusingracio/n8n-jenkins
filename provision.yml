@@ -90,27 +90,6 @@
   roles:
   - docker-registry
 
-# VTraining
-- hosts: vtraining
-  roles:
-  - vtraining-portal
-  - vtraining-mosaico
-  - vtraining-debriefing
-
-- hosts: vtraining-portal
-  roles:
-  - node
-  - ruby
-  - vtraining-portal
-
-- hosts: vtraining-mosaico
-  roles:
-  - vtraining-mosaico
-
-- hosts: vtraining-debriefing
-  roles:
-  - vtraining-debriefing
-
 - hosts: jenkins
   roles:
   - jenkins

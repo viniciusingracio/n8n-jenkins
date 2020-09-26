@@ -3,22 +3,27 @@
 - name: Setup mtail config
   become: yes
   template:
-    src: templates/bigbluebutton_nginx.mtail.j2
-    dest: /usr/local/etc/bigbluebutton-prometheus/bigbluebutton_nginx.mtail
+    src: templates/bigbluebutton.mtail.j2
+    dest: /usr/local/etc/bigbluebutton-prometheus/bigbluebutton.mtail
   notify: restart mtail exporter
 
 - name: Start mtail exporter
   docker_container:
     name: mtail-exporter
     image: mconf/mtail:v3.0.0-rc36
-    command: -logtostderr -progs /progs/bigbluebutton_nginx.mtail -logs /var/log/nginx/bigbluebutton.access.log
+    command: -logtostderr -progs /progs/bigbluebutton.mtail -logs /host/var/log/nginx/bigbluebutton.access.log,/host/var/log/bbb-webrtc-sfu/bbb-webrtc-sfu.log,/host/var/log/bbb-apps-akka/bbb-apps-akka.log,/host/var/log/syslog
     pull: yes
     restart_policy: always
     volumes:
-      - /usr/local/etc/bigbluebutton-prometheus/bigbluebutton_nginx.mtail:/progs/bigbluebutton_nginx.mtail
-      - /var/log/nginx:/var/log/nginx
+      - /usr/local/etc/bigbluebutton-prometheus/bigbluebutton.mtail:/progs/bigbluebutton.mtail
+      - /var/log:/host/var/log
     ports:
       - 3903:3903
     labels:
       hostname: '{{ inventory_hostname }}'
     state: '{% if bigbluebutton_prometheus_mtail_exporter_enabled %}started{% else %}absent{% endif %}'
+
+- file:
+    path: /usr/local/etc/bigbluebutton-prometheus/bigbluebutton_nginx.mtail
+    state: absent
+  become: yes

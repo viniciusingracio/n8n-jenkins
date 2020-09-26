@@ -94,24 +94,6 @@
   become: yes
   apt: update_cache=yes
 
-- name: Remove kurento-media-server-6.0
-  become: yes
-  apt:
-    name: kurento-media-server-6.0
-    state: absent
-    autoremove: yes
-
-- service:
-    name: kurento-media-server-6.0
-    state: stopped
-  become: yes
-  ignore_errors: yes
-
-- file:
-    name: /etc/init.d/kurento-media-server-6.0
-    state: absent
-  become: yes
-
 - name: Install BigBlueButton
   become: yes
   apt:

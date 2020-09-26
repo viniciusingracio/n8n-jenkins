@@ -1,0 +1,15 @@
+---
+
+- hosts: all
+
+  vars:
+    ansible_user: mconf
+
+  tasks:
+  - name: Copy presentation
+    copy:
+      src: files/20200907-fix-recordings.rb
+      dest: /tmp/fix-recordings.rb
+
+  - command: ruby /tmp/fix-recordings.rb
+    become: yes

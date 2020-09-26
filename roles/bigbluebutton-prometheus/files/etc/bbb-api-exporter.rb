@@ -228,17 +228,6 @@ class Recordings < MonitoredService
       :bbb_recordings_response_code => @@response_code,
       :bbb_recordings_total => @@recordings.length,
       :bbb_recordings_response_time => @@time,
-      :bbb_recordings_published_presentation_count => Dir.glob("/var/bigbluebutton/published/presentation/*").count,
-      :bbb_recordings_published_presentation_video_count => Dir.glob("/var/bigbluebutton/published/presentation_video/*").count,
-      :bbb_recordings_published_mconf_encrypted_count => Dir.glob("/var/bigbluebutton/published/mconf_encrypted/*").count,
-      :bbb_recordings_unpublished_presentation_count => Dir.glob("/var/bigbluebutton/unpublished/presentation/*").count,
-      :bbb_recordings_unpublished_presentation_video_count => Dir.glob("/var/bigbluebutton/unpublished/presentation_video/*").count,
-      :bbb_recordings_unpublished_mconf_encrypted_count => Dir.glob("/var/bigbluebutton/unpublished/mconf_encrypted/*").count,
-      :bbb_recordings_deleted_presentation_count => Dir.glob("/var/bigbluebutton/deleted/presentation/*").count,
-      :bbb_recordings_deleted_presentation_video_count => Dir.glob("/var/bigbluebutton/deleted/presentation_video/*").count,
-      :bbb_recordings_deleted_mconf_encrypted_count => Dir.glob("/var/bigbluebutton/deleted/mconf_encrypted/*").count,
-      :bbb_recordings_sanity_count => Dir.glob("/var/bigbluebutton/recording/status/sanity/*").count,
-      :bbb_recordings_fail_count => Dir.glob("/var/bigbluebutton/recording/status/**/*.fail").count,
     }
   end
 
@@ -344,26 +333,6 @@ def fill_template(results)
     # TYPE bbb_recordings_response_code gauge
     bbb_recordings_response_code <%= results[:bbb_recordings_response_code] %>
 
-    # HELP bbb_recordings_count The number of recordings for each visibility and format
-    # TYPE bbb_recordings_count gauge
-    bbb_recordings_count{visibility="published",format="presentation"} <%= results[:bbb_recordings_published_presentation_count] %>
-    bbb_recordings_count{visibility="published",format="presentation_video"} <%= results[:bbb_recordings_published_presentation_video_count] %>
-    bbb_recordings_count{visibility="published",format="mconf_encrypted"} <%= results[:bbb_recordings_published_mconf_encrypted_count] %>
-    bbb_recordings_count{visibility="unpublished",format="presentation"} <%= results[:bbb_recordings_unpublished_presentation_count] %>
-    bbb_recordings_count{visibility="unpublished",format="presentation_video"} <%= results[:bbb_recordings_unpublished_presentation_video_count] %>
-    bbb_recordings_count{visibility="unpublished",format="mconf_encrypted"} <%= results[:bbb_recordings_unpublished_mconf_encrypted_count] %>
-    bbb_recordings_count{visibility="deleted",format="presentation"} <%= results[:bbb_recordings_deleted_presentation_count] %>
-    bbb_recordings_count{visibility="deleted",format="presentation_video"} <%= results[:bbb_recordings_deleted_presentation_video_count] %>
-    bbb_recordings_count{visibility="deleted",format="mconf_encrypted"} <%= results[:bbb_recordings_deleted_mconf_encrypted_count] %>
-
-    # HELP bbb_recordings_sanity_count The number of pending recordings
-    # TYPE bbb_recordings_sanity_count gauge
-    bbb_recordings_sanity_count <%= results[:bbb_recordings_sanity_count] %>
-
-    # HELP bbb_recordings_fail_count The number of failed recordings
-    # TYPE bbb_recordings_fail_count gauge
-    bbb_recordings_fail_count <%= results[:bbb_recordings_fail_count] %>
-
     # HELP bbb_api_create_response_code Response code of the create endpoint of the API
     # TYPE bbb_api_create_response_code gauge
     bbb_api_create_response_code{method="get",messageKey="<%= results[:bbb_api_create_message_key] %>"} <%= results[:bbb_api_create_response_code] %>
@@ -424,10 +393,6 @@ def fill_template(results)
     # HELP bbb_streaming_count Number of containers running for streaming
     # TYPE bbb_streaming_count gauge
     bbb_streaming_count <%= results[:bbb_streaming_count] %>
-
-    # HELP bbb_recorder_count Number of containers running for presentation_video recording
-    # TYPE bbb_recorder_count gauge
-    bbb_recorder_count <%= results[:bbb_recorder_count] %>
   HEREDOC
 
   ERB.new(template).result
@@ -495,7 +460,6 @@ results[:bbb_total_time] = Benchmark.measure do
   end
 
   results[:bbb_streaming_count] = all_containers.select{ |container| container.info["Names"].first.start_with?("/streaming_") and container.info["State"] == "running" }.length
-  results[:bbb_recorder_count] = all_containers.select{ |container| container.info["Names"].first.start_with?("/record_") and container.info["State"] == "running" }.length
 
   if opts[:webhook]
     uri = URI.parse(opts[:webhook])

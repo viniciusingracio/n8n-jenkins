@@ -23,14 +23,33 @@
     - /usr/local/etc/bigbluebutton-prometheus
     - /usr/local/share/prometheus
 
-- name: Copy bbb-prometheus-exporter
+- name: Cleanup old code
+  file:
+    path: '{{ item }}'
+    state: absent
+  with_items:
+    - /usr/local/etc/bigbluebutton-prometheus/bbb-prometheus-exporter.rb
+    - /usr/local/share/prometheus/bbb-prometheus-exporter.prom
+  become: yes
+- cron:
+    name: '{{ item }}'
+    state: absent
+  with_items:
+    - bbb-prometheus-exporter
+    - bbb-prometheus-exporter-rec
+  become: yes
+
+- name: Copy exporters
   become: yes
   copy:
-    src: files/etc/bbb-prometheus-exporter.rb
-    dest: /usr/local/etc/bigbluebutton-prometheus/bbb-prometheus-exporter.rb
+    src: files/etc/{{ item }}
+    dest: /usr/local/etc/bigbluebutton-prometheus/{{ item }}
+  with_items:
+    - bbb-api-exporter.rb
+    - bbb-rec-exporter.rb
 
 - set_fact:
-    cmd: /usr/bin/ruby /usr/local/etc/bigbluebutton-prometheus/bbb-prometheus-exporter.rb --ssl true
+    cmd: /usr/bin/ruby /usr/local/etc/bigbluebutton-prometheus/bbb-api-exporter.rb --ssl true
 - set_fact:
     cmd: 'sleep {{ 30 | random }}; {{ cmd }} --webhook {{ bigbluebutton_prometheus_webhook_url | default(( bigbluebutton_docker_webhooks_permanent_hooks | first ).url, true) }}/health'
   when: bigbluebutton_docker_webhooks_permanent_hooks is defined and bigbluebutton_docker_webhooks_permanent_hooks | length > 0
@@ -38,13 +57,15 @@
 - name: Install cron job monitor metrics
   become: yes
   cron:
-    name: bbb-prometheus-exporter
-    job: '{{ cmd }} | sponge /usr/local/share/prometheus/bbb-prometheus-exporter.prom'
+    name: bbb-api-exporter
+    job: '{{ cmd }} | sponge /usr/local/share/prometheus/bbb-api-exporter.prom'
     user: root
-- cron:
-    name: bbb-prometheus-exporter-rec
-    state: absent
+- name: Install cron job monitor metrics
   become: yes
+  cron:
+    name: bbb-rec-exporter
+    job: 'sleep {{ 30 | random }}; /usr/bin/ruby /usr/local/etc/bigbluebutton-prometheus/bbb-rec-exporter.rb | sponge /usr/local/share/prometheus/bbb-rec-exporter.prom'
+    user: root
 
 - name: Install package for htpasswd
   become: yes
@@ -78,3 +99,4 @@
 - include: mtail-exporter.yml
   tags:
     - mtail
+- include: mongodb-exporter.yml

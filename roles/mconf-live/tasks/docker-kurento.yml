@@ -44,7 +44,7 @@
     kms_stun_server_port: '{% if kms_need_stun %}{{ stun_server_port | default("") }}{% endif %}'
 
 - set_fact:
-    kms_ignore_list: "{{ kms_ignore_list | default([]) + [ item ] }}"
+    bigbluebutton_docker_kurento_ignore_ips: "{{ bigbluebutton_docker_kurento_ignore_ips + [ item ] }}"
   with_items: '{{ ansible_all_ipv4_addresses + ansible_all_ipv6_addresses }}'
   when: not item in [ external_ipv4, external_ipv6 ] and not item is match("^(fe80::|172.)")
 
@@ -71,7 +71,7 @@
       TZ: '{{ lookup("file", "/etc/timezone") }}'
       NETWORK_INTERFACES: '{{ default_route_raw.stdout }}'
       PEM_CERTIFICATE_RSA: /etc/mconf/dtls-srtp.pem
-      IP_IGNORE_LIST: '{{ kms_ignore_list | join(",") }}'
+      IP_IGNORE_LIST: '{{ bigbluebutton_docker_kurento_ignore_ips | join(",") }}'
       NICE_AGENT_ICE_TCP: '0'
     labels:
       hostname: '{{ inventory_hostname }}'
