@@ -27,8 +27,8 @@
   file:
     path: /var/bigbluebutton/recording/status/published
     state: directory
-    owner: bigbluebutton
-    group: bigbluebutton
+    owner: '{{ bigbluebutton_user }}'
+    group: '{{ bigbluebutton_user }}'
   become: yes
 
 - set_fact:

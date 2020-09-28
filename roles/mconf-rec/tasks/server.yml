@@ -36,4 +36,11 @@
   template:
     src: templates/exports.j2
     dest: /etc/exports
-  notify: restart nfs-server
+  register: reg_update_exports
+
+- name: restart nfs-server
+  become: yes
+  service:
+    name: nfs-kernel-server
+    state: restarted
+  when: reg_update_exports is changed
