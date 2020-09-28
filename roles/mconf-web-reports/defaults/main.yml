@@ -16,29 +16,28 @@ mconf_web_reports_image_cmd: pdf
 mconf_web_reports_output_dir: /var/www/mconf-web/shared/private
 
 # Configurations for the cron jobs
+mconf_web_reports_cron_config_name: mconf-web-reports-run
 mconf_web_reports_cron_log_file: /var/log/mconf-web-reports.log
-mconf_web_reports_cron_log_file_previous_month: /var/log/mconf-web-reports-previous-month.log
 mconf_web_reports_cron_schedule_minute: '0'
 mconf_web_reports_cron_schedule_hour: '9,21'
 mconf_web_reports_cron_schedule_day: '*'
 mconf_web_reports_cron_schedule_weekday: '*'
+mconf_web_reports_cron_run_after: ''
 
-# run twice a day after the turn of the month
-# the last run is the one that really matters, must run before
-# around 7:00 UTC of the 3rd, the moment Iugu creates invoices
-# run more than once to make sure all meetings ended and all recordings are done
+# run the reports again for the previous month after the month ends
+# to make sure we get all data after the month really ended
+mconf_web_reports_cron_previous_month_config_name: mconf-web-reports-previous-month
+mconf_web_reports_cron_previous_month_log_file: /var/log/mconf-web-reports-previous-month.log
 mconf_web_reports_cron_previous_month_schedule_minute: '0'
 mconf_web_reports_cron_previous_month_schedule_hour: '10,22,23'
 mconf_web_reports_cron_previous_month_schedule_day: '1,2'
 mconf_web_reports_cron_previous_month_schedule_weekday: '*'
-
-# paths to the config files, passed when running the docker container
-# TODO: this was done to accommodate the migration to a .tsv config, remove after
-# we're only using it
-mconf_web_reports_config_extension: yml
-mconf_web_reports_remote_config_path: '/root/mconf-web-reports-config.{{ mconf_web_reports_config_extension }}'
-mconf_web_reports_docker_config_path: '/usr/src/app/config.{{ mconf_web_reports_config_extension }}'
+mconf_web_reports_cron_previous_month_run_after: ''
 
 # Configuration files used when running the container
+# where they are in ansible
 mconf_web_reports_env_file: '{{ inventory_dir }}/files/mconf-web-reports/.env.local'
 mconf_web_reports_config_file: '{{ inventory_dir }}/files/mconf-web-reports/config.{{ mconf_web_reports_config_extension }}'
+# where they should be in the host server
+mconf_web_reports_remote_config_path: /root/mconf-web-reports-config.tsv
+mconf_web_reports_remote_env_path: /root/mconf-web-reports.env.local
