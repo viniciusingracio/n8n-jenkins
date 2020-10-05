@@ -2,7 +2,7 @@
   become: yes
   copy:
     src: '{{ mconf_web_reports_env_file }}'
-    dest: '/root/mconf-web-reports.env.local'
+    dest: '{{ mconf_web_reports_remote_env_path }}'
     owner: 'root'
     group: 'root'
     mode: 0600
