@@ -40,9 +40,19 @@ getfilename() =~ /bbb-apps-akka.log$/ {
   }
 }
 
+histogram bbb_html5_rtt_seconds buckets 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.75, 1, 1.5, 2, 2.5, 5
+
 # count ejections skipped
 getfilename() =~ /syslog$/ {
   /Skipping violation ejection of user .*\. Reason: (?P<reason>.*)/ {
     bbb_apps_ejected_total[$reason]++
+  }
+
+  /"logCode":"timer_rtt".*"rtt":(?P<rtt>\d+)/ {
+    bbb_html5_rtt_seconds = float($rtt)/1000
+  }
+
+  /Ejecting rogue voice user/ {
+    bbb_apps_ejected_total['Ejecting rogue voice user.']++
   }
 }

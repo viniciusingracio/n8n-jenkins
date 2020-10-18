@@ -1,0 +1,33 @@
+---
+
+- hosts: all
+  roles:
+  - kwoodson.yedit
+
+- hosts:
+  - mconf-recw
+  tasks:
+  - name: Stop services for presentation and presentation_video
+    become: yes
+    command: systemctl stop bbb-rap* bbb-record* bbb_record* mconf-presentation*
+
+  - name: Stop recorders
+    become: yes
+    shell: docker ps --filter name=record_* -aq | xargs docker stop
+    ignore_errors: yes
+
+  - name: Stop nginx containers
+    become: yes
+    shell: docker ps --filter name=nginx_* -aq | xargs docker stop
+    ignore_errors: yes
+
+  - name: Stop nfs
+    become: yes
+    command: umount -a -t nfs4
+
+- hosts:
+  - mconf-rec
+  tasks:
+  - name: Stop services for presentation and presentation_video
+    become: yes
+    command: systemctl stop mconf-recording-decrypter.* nfs-server.service bbb-web.service

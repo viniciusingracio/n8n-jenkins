@@ -95,12 +95,13 @@
     - name: Stop UDP server
       docker_container:
         name: udp-server
-        state: absent
+        state: stopped
 
     - name: Stop UDP client
       docker_container:
         name: udp-client-{{ inventory_hostname }}
-        state: absent
+        state: stopped
+      delegate_to: 127.0.0.1
 
     - name: Check if UDP test failed
       set_fact:

@@ -202,3 +202,6 @@ bigbluebutton_zabbix_copy_scripts: false
 bigbluebutton_zabbix_conf_dir: /etc/zabbix/zabbix_agentd.conf.d
 
 bigbluebutton_skip_restart_if_meetings_running: false
+
+bigbluebutton_inactivity_seconds: 3600
+bigbluebutton_recording_freeswitch_split_minutes: 0

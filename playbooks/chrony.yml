@@ -26,12 +26,18 @@
         state: absent
       become: yes
 
+    - name: Remove config file that wasn't being used
+      file:
+        path: /etc/chrony.conf
+        state: absent
+      become: yes
+
 - hosts: '{{ dynamic_inventory_hostname | default("all") }}'
   become: true
   vars:
     chrony_package_name: chrony
     chrony_service_name: chrony
-    chrony_config_file_location: /etc/chrony.conf
+    chrony_config_file_location: /etc/chrony/chrony.conf
     chrony_driftfile_path: /var/lib/chrony/drift
     chrony_logdir_path: /var/log/chrony
     chrony_makestep: 1.0 3
@@ -42,5 +48,8 @@
     chrony_extra_options:
       - corrtimeratio 100
       - allow 127/8
+      - commandkey 1
+    chrony_keyfile_path: /etc/chrony/chrony.keys
+    chrony_log_options: tracking measurements statistics
   roles:
   - openstack.chrony

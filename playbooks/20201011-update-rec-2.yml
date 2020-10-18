@@ -1,0 +1,34 @@
+---
+
+- hosts: all
+  roles:
+  - kwoodson.yedit
+
+- hosts:
+  - mconf-rec
+  tasks:
+  - name: Start services
+    become: yes
+    command: systemctl start mconf-recording-decrypter.timer nfs-server.service bbb-web.service
+
+- hosts:
+  - mconf-recw
+  tasks:
+  - name: Start nfs
+    become: yes
+    command: mount -a
+
+  - name: Start recording services
+    become: yes
+    service:
+      name: bbb-record-core.timer
+      state: started
+      enabled: yes
+
+  - name: Start presentation recorder
+    become: yes
+    service:
+      name: mconf-presentation-recorder.timer
+      state: started
+      enabled: yes
+    ignore_errors: yes

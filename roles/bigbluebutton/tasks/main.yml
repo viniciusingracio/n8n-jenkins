@@ -297,12 +297,17 @@
     state: present
     regexp: '{{ item.regexp }}'
     line: '{{ item.line }}'
+    # do not add the config if it doesn't match
+    backrefs: yes
   with_items:
     - { regexp: 'bbbWebAPI[ ]*=', line: '  bbbWebAPI = "{{ bbb_url }}api"' }
     - { regexp: 'sharedSecret[ ]*=', line: '  sharedSecret = "{{ bbb_secret }}"' }
     - { regexp: 'deskshareip[ ]*=', line: '  deskshareip = "{{ inventory_hostname }}"' }
     - { regexp: 'recordCodec[ ]*=', line: '  recordCodec = "opus"' }
-    - { regexp: 'inactivity[ ]*=', line: '  inactivity = 3600' }
+    - { regexp: 'inactivity[ ]*=', line: '  inactivity = {{ bigbluebutton_inactivity_seconds }}' }
+    - { regexp: 'recordEnableFileSplitter[ ]*=', line: '  recordEnableFileSplitter = {{ "true" if bigbluebutton_recording_freeswitch_split_minutes > 0 else "false" }}' }
+    - { regexp: 'recordFileSplitterIntervalInMinutes[ ]*=', line: '  recordFileSplitterIntervalInMinutes = {{ bigbluebutton_recording_freeswitch_split_minutes }}' }
+    - { regexp: 'ejectRogueVoiceUsers[ ]*=', line: '  ejectRogueVoiceUsers = true' }
   notify: restart bigbluebutton
 
 # TODO move this to a new role/task

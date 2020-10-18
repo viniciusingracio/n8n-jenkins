@@ -37,7 +37,7 @@
 - name: Start the mconf-editor container
   docker_container:
     name: mconf-editor
-    image: mconf/mconf-editor:master
+    image: mconf/mconf-editor:v2.0.5
     pull: yes
     restart_policy: always
     published_ports:
