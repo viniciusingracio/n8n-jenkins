@@ -23,13 +23,6 @@
     - bbb-html5
   ignore_errors: yes
 
-- name: Make sure status/published exists before trying to mount it
-  file:
-    path: /var/bigbluebutton/recording/status/published
-    state: directory
-    owner: '{{ bigbluebutton_user }}'
-    group: '{{ bigbluebutton_user }}'
-  become: yes
 
 - set_fact:
     nfs_ip: '{{ ansible_default_ipv4.address }}'

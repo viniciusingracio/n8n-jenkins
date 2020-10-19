@@ -22,10 +22,29 @@
     name: rec-proxy-network
     state: absent
 
+- name: Check if redis exists
+  command: systemctl status redis-server
+  ignore_errors: true
+  register: reg_redis_present
+
+- name: Launch redis
+  docker_container:
+    name: redis
+    image: redis
+    pull: yes
+    restart_policy: always
+    published_ports:
+      - 6379:6379
+    labels:
+      hostname: '{{ inventory_hostname }}'
+  notify: clean docker
+  when: reg_redis_present is failed
+
 - name: Launch redis
   docker_container:
     name: redis
     state: absent
+  when: reg_redis_present is succeeded
 
 - name: Create directory for nginx cache
   file:

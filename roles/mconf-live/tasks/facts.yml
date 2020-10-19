@@ -1,12 +1,12 @@
 - name: Determine external IPv4
   set_fact:
     # external_ipv4: "{{ lookup('dig', inventory_hostname, 'qtype=A', '@8.8.8.8') | default(ansible_default_ipv4.address, true) }}"
-    external_ipv4: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | head -n 1') | default(ansible_default_ipv4.address, true) }}"
+    external_ipv4: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | grep -v \"\\.$\" | head -n 1') | default(ansible_default_ipv4.address, true) }}"
   when: external_ipv4 is none
 - name: Determine external IPv6
   set_fact:
     # external_ipv6: "{{ lookup('dig', inventory_hostname, 'qtype=AAAA', '@8.8.8.8') | default(none, true) }}"
-    external_ipv6: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 AAAA +short | head -n 1') | default(none, true) }}"
+    external_ipv6: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 AAAA +short | grep -v \"\\.$\" | head -n 1') | default(none, true) }}"
   when: external_ipv6 is none
 
 - name: Check if bbb-web is running on a standalone app
