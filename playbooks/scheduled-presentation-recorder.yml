@@ -8,8 +8,10 @@
       - { hour: '12', simultaneous_meetings: '1' }
       - { hour: '13', simultaneous_meetings: '0' }
       - { hour: '18', simultaneous_meetings: '1' }
-      - { hour: '22', simultaneous_meetings: '2' }
-      - { hour: '0', simultaneous_meetings: '3' }
+      - { hour: '21', simultaneous_meetings: '2' }
+      - { hour: '22', simultaneous_meetings: '3' }
+      - { hour: '23', simultaneous_meetings: '4' }
+      - { hour: '0', simultaneous_meetings: '5' }
       - { hour: '1', simultaneous_meetings: '6' }
       - { hour: '5', simultaneous_meetings: '2' }
   tasks:

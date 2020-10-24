@@ -1,0 +1,12 @@
+#!/bin/bash -x
+
+echo "ARGS: $@"
+
+ARGS=$(echo $@ | sed "s:127.0.0.1:0.0.0.0:g")
+HOST=$(ifconfig docker0 | grep 'inet addr:' | cut -d: -f2 | awk '{print $1}')
+PORT=$(echo $ARGS | sed "s:.*,port=\([0-9]*\).*:\1:g")
+
+# stop if it's running
+docker ps -q --filter "name=libreoffice_${PORT}" | grep -q . && docker stop libreoffice_${PORT}
+# launch
+docker run --rm -i --name libreoffice_${PORT} --memory="1g" --cpus="2" -u $(id -u ${USER}):$(id -g ${USER}) -p 127.0.0.1:${PORT}:${PORT} -v /tmp:/tmp -v /var/bigbluebutton:/var/bigbluebutton mconf/bbb-libreoffice:buster /usr/lib/libreoffice/program/soffice.bin $ARGS

@@ -1,0 +1,35 @@
+---
+
+- hosts: mconf-live220
+  gather_facts: no
+  vars:
+    start_presentation: 12
+    stop_presentation: 9
+  tasks:
+    - shell: echo '{{ start_presentation }}' | ruby -e "require 'date'; puts DateTime.new(1970,1,1,gets.chomp.to_i,0,0,'-03:00').new_offset(DateTime.now.zone).strftime('%k').strip"
+      register: reg_start_presentation
+
+    - name: Schedule start presentation
+      cron:
+        name: start-presentation
+        hour: '{{ reg_start_presentation.stdout }}'
+        minute: '0'
+        weekday: '1-4'
+        job: systemctl start bbb-record-core.timer
+        user: root
+        state: present
+      become: yes
+
+    - shell: echo '{{ stop_presentation }}' | ruby -e "require 'date'; puts DateTime.new(1970,1,1,gets.chomp.to_i,0,0,'-03:00').new_offset(DateTime.now.zone).strftime('%k').strip"
+      register: reg_stop_presentation
+
+    - name: Schedule stop presentation
+      cron:
+        name: stop-presentation
+        hour: '{{ reg_stop_presentation.stdout }}'
+        minute: '0'
+        weekday: '1-4'
+        job: systemctl stop bbb-rap-process-worker.service bbb-record-core.timer
+        user: root
+        state: present
+      become: yes

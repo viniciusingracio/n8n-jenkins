@@ -21,6 +21,23 @@
     shell: docker ps --filter name=nginx_* -aq | xargs docker stop
     ignore_errors: yes
 
+  - cron:
+      name: '{{ item }}'
+      state: absent
+    with_items:
+      - remove norecord
+      - remove archived
+      - remove encrypted
+      - restart mconf
+      - cleanup published done
+      - enable audio-stats, sleep 30)
+      - enable audio-stats, sleep 60)
+      - generate list of recordings
+      - audio-stats to fluentd, sleep 30
+      - audio-stats to fluentd, sleep 60
+      - bbb-prometheus-exporter
+    become: yes
+
   - name: Stop nfs
     become: yes
     command: umount -a -t nfs4
@@ -48,16 +65,8 @@
       - enable audio-stats, sleep 30)
       - enable audio-stats, sleep 60)
       - generate list of recordings
-      - bbb-prometheus-exporter
-      - bbb-prometheus-exporter-rec
     become: yes
 
-  - file:
-      path: /var/bigbluebutton/recording/status/published
-      owner: bigbluebutton
-      group: bigbluebutton
-      state: directory
-    become: yes
 
   - name: Start nfs
     become: yes

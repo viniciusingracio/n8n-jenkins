@@ -33,7 +33,7 @@
     restart_policy: always
     memory: 256M
     ports:
-      - 3010:3010
+      - 8009:8009
     env:
       REDIS_HOST: '{{ docker_ip }}'
       LOG_LEVEL: info

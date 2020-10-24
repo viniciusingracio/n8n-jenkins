@@ -1,0 +1,14 @@
+- hosts: all
+  gather_facts: no
+  tasks:
+    - name: Copy script
+      copy:
+        src: files/20201022-video.rb
+        dest: /usr/local/bigbluebutton/core/lib/recordandplayback/generators/video.rb
+        mode: 0755
+        backup: yes
+      become: yes
+
+    # - name: Update simultaneous recorders
+    #   command: yq w -i /usr/local/bigbluebutton/core/scripts/mconf-presentation-recorder.yml "simultaneous_meetings" "2"
+    #   become: yes

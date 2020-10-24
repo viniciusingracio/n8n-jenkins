@@ -1,0 +1,25 @@
+---
+
+- hosts: mconf-live220
+  tasks:
+    - copy:
+        src: files/20201022-libreoffice-docker-soffice
+        dest: /usr/lib/libreoffice/program/soffice.bin
+        backup: yes
+        mode: 0755
+      become: yes
+      register: reg_restart
+
+    - name: Add bigbluebutton user to docker group
+      become: yes
+      command: usermod -aG docker bigbluebutton
+
+    - name: Pull libreoffice image
+      docker_image:
+        name: mconf/bbb-libreoffice:buster
+        source: pull
+
+    - name: Restart libreoffice
+      command: pkill soffice.bin
+      become: yes
+      when: reg_restart is changed

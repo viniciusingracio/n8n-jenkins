@@ -8,6 +8,10 @@ Dir.glob("/var/bigbluebutton/recording/status/published/*-presentation.fail").ea
   next if match.nil?
   record_id = match[1]
   events_xml = "/var/bigbluebutton/recording/raw/#{record_id}/events.xml"
+  if ! File.exists? events_xml
+    puts "Cannot fix #{record_id} because raw isn't available any more"
+    next
+  end
 
   data = {}
   modified = false
@@ -47,6 +51,10 @@ Dir.glob("/var/bigbluebutton/recording/status/processed/*-presentation.fail").ea
   next if match.nil?
   record_id = match[1]
   events_xml = "/var/bigbluebutton/recording/raw/#{record_id}/events.xml"
+  if ! File.exists? events_xml
+    puts "Cannot fix #{record_id} because raw isn't available any more"
+    next
+  end
 
   data = []
   modified = false

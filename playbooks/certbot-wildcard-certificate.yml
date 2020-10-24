@@ -5,10 +5,11 @@
 
 # and then:
 # sudo su
+# mkdir -p envs/prod/com/files/elos.vc/ envs/prod/com-staging/files/elos.dev/
 # cp -L /etc/letsencrypt/live/elos.vc/* envs/prod/com/files/elos.vc/
-# cp -L /etc/letsencrypt/live/elos.app/* envs/prod/com/files/elos.app/
+# cp -L /etc/letsencrypt/live/elos.dev/* envs/prod/com-staging/files/elos.dev/
 # exit
-# sudo chown -R $USER:$USER envs/prod/com/files/
+# sudo chown -R $USER:$USER envs/prod/com/files/elos.vc envs/prod/com-staging/files/elos.dev
 
 - hosts: localhost
   vars:
