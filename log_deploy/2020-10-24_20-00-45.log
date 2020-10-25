@@ -1,0 +1,3 @@
+/usr/local/bin/ansible-playbook -i envs/prod/com-staging/hosts -l h.mconf.dev playbooks/jekyll.yml
+
+h.mconf.dev: 29 OK, 15 changed, 0 unreachable, 0 failed
