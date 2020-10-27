@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  mtail:
+    image: mconf/mtail:v3.0.0-rc36
+    container_name: mtail-exporter
+    command: -logtostderr -progs /progs/coturn.mtail -logs /host/var/log/syslog
+    restart: always
+    volumes:
+      - /var/log:/host/var/log
+      - ./coturn.mtail:/progs/coturn.mtail
+
+  node-exporter:
+    image: quay.io/prometheus/node-exporter:v1.0.1
+    container_name: node-exporter
+    command: --path.rootfs /host
+    restart: always
+    network_mode: host
+    pid: host
+    volumes:
+      - /:/host:ro,rslave
+
+  nginx:
+    image: nginx
+    container_name: nginx
+    restart: always
+    ports:
+      - 8443:443
+    links:
+      - mtail
+    volumes:
+      - {{ coturn_ssl_certificate | dirname }}:/etc/nginx/ssl
+      - ./dhp-2048.pem:/etc/nginx/ssl/dhp-2048.pem
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - /etc/apache2/prometheus.htpasswd:/etc/apache2/prometheus.htpasswd

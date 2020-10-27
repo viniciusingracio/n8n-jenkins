@@ -13,3 +13,5 @@ coturn_ssl_port: 5349
 
 coturn_domain_name: '{{ inventory_hostname }}'
 coturn_secret:
+
+coturn_monitoring_enabled: true

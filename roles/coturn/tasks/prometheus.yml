@@ -1,0 +1,57 @@
+---
+
+- file:
+    path: /etc/coturn-prometheus
+    state: directory
+    recurse: yes
+    owner: '{{ ansible_user }}'
+    group: '{{ ansible_user }}'
+  become: yes
+
+- file:
+    path: /etc/apache2
+    state: directory
+    recurse: yes
+  become: yes
+
+- name: Install package for htpasswd and ifconfig
+  become: yes
+  apt:
+    name:
+      - apache2-utils
+      - net-tools
+
+- name: Create password file
+  shell: echo {{ bigbluebutton_prometheus_password }} | htpasswd -i -c /etc/apache2/prometheus.htpasswd prometheus
+  args:
+    creates: /etc/apache2/prometheus.htpasswd
+  become: yes
+
+- name: Register Docker host IP
+  shell: "ifconfig docker0 | grep 'inet ' | tr -s ' ' | cut -d' ' -f3 | awk '{print $1}'"
+  register: docker_ip_raw
+
+- set_fact:
+    docker_ip: '{{ docker_ip_raw.stdout }}'
+
+- template:
+    src: templates/nginx.conf.j2
+    dest: /etc/coturn-prometheus/nginx.conf
+
+- name: Generate dhparam
+  command: openssl dhparam -out /etc/coturn-prometheus/dhp-2048.pem 2048
+  args:
+    creates: /etc/coturn-prometheus/dhp-2048.pem
+  become: yes
+
+- copy:
+    src: files/coturn.mtail
+    dest: /etc/coturn-prometheus/coturn.mtail
+
+- template:
+    src: templates/docker-compose.yml.j2
+    dest: /etc/coturn-prometheus/docker-compose.yml
+
+- docker_compose:
+    project_src: /etc/coturn-prometheus
+    restarted: yes

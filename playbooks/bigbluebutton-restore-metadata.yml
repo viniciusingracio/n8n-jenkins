@@ -2,8 +2,14 @@
 
 - hosts:
   - mconf-live220
+  vars:
+    aws_region: us-east-1
+    aws_endpoint: https://nyc3.digitaloceanspaces.com
+    backup_bucket: elos-backup-live-metadata
+    backup_date: 2020-10-19
+    backup_dir: '{{ inventory_hostname }}'
   tasks:
-    - command: docker run --rm -v /:/host -e AWS_ACCESS_KEY_ID={{ aws_key }} -e AWS_SECRET_ACCESS_KEY={{ aws_secret }} -e AWS_DEFAULT_REGION={{ aws_region }} amazon/aws-cli --endpoint={{ aws_endpoint }} s3 cp s3://{{ backup_bucket }}/{{ backup_date }}/{{ inventory_hostname }}/metadata.tar.gz /host{{ ansible_env.HOME }}/metadata.tar.gz
+    - command: docker run --rm -v /:/host -e AWS_ACCESS_KEY_ID={{ aws_key }} -e AWS_SECRET_ACCESS_KEY={{ aws_secret }} -e AWS_DEFAULT_REGION={{ aws_region }} amazon/aws-cli --endpoint={{ aws_endpoint }} s3 cp s3://{{ backup_bucket }}/{{ backup_date }}/{{ backup_dir }}/metadata.tar.gz /host{{ ansible_env.HOME }}/metadata.tar.gz
       register: result
       until: result is succeeded
       retries: 120

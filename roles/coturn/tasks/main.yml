@@ -88,3 +88,11 @@
 - include: ufw.yml
   when: common_ufw_enabled
   tags: [ufw,firewall]
+
+- include: prometheus.yml
+  when: coturn_monitoring_enabled
+  tags: [monitoring]
+
+- include: ufw-prometheus.yml
+  when: common_ufw_enabled and coturn_monitoring_enabled
+  tags: [ufw,firewall]

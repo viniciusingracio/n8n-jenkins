@@ -1,0 +1,11 @@
+---
+
+- hosts: mconf-live220
+  tasks:
+    - name: Reinstall libreoffice
+      become: yes
+      command: apt install --reinstall libreoffice-core
+
+    - name: Restart libreoffice
+      command: pkill soffice.bin
+      become: yes

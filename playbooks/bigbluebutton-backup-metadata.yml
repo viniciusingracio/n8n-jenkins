@@ -2,6 +2,11 @@
 
 - hosts:
   - mconf-live220
+  vars:
+    aws_region: us-east-1
+    aws_endpoint: https://nyc3.digitaloceanspaces.com
+    backup_bucket: elos-backup-live-metadata
+    backup_date: 2020-10-19
   tasks:
     - set_fact:
         to_copy:
