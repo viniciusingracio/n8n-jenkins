@@ -1,7 +1,7 @@
 - name: Start mconf-live-transfer container
   docker_container:
     name: mconf-live-transfer
-    image: mconf/mconf-live-transfer:v1.0.0
+    image: '{{ bigbluebutton_docker_live_transfer_image }}'
     pull: yes
     restart_policy: always
     memory: 512M

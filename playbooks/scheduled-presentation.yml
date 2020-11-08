@@ -14,7 +14,7 @@
         name: start-presentation
         hour: '{{ reg_start_presentation.stdout }}'
         minute: '0'
-        weekday: '1-4'
+        weekday: '1-5'
         job: systemctl start bbb-record-core.timer
         user: root
         state: present
@@ -28,7 +28,7 @@
         name: stop-presentation
         hour: '{{ reg_stop_presentation.stdout }}'
         minute: '0'
-        weekday: '1-4'
+        weekday: '1-5'
         job: systemctl stop bbb-rap-process-worker.service bbb-record-core.timer
         user: root
         state: present

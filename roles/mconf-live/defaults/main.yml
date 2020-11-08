@@ -69,6 +69,7 @@ bigbluebutton_docker_streaming_controller_k8s_local_config_file: files/kube-conf
 bigbluebutton_docker_streaming_controller_k8s_config_file: /usr/local/bigbluebutton/bbb-webrtc-sfu/config/kube-config
 
 bigbluebutton_allow_transfer: false
+bigbluebutton_docker_live_transfer_image: mconf/mconf-live-transfer:v1.0.0
 
 bigbluebutton_sip_default_gateway: []
 bigbluebutton_sip_registrar_enabled: false
