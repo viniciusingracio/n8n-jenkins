@@ -35,9 +35,20 @@ mconf_web_reports_cron_previous_month_schedule_weekday: '*'
 mconf_web_reports_cron_previous_month_run_after: ''
 
 # Configuration files used when running the container
+mconf_web_reports_remote_config_dir: '/etc/mconf-web-reports'
 # where they are in ansible
 mconf_web_reports_env_file: '{{ inventory_dir }}/files/mconf-web-reports/.env.local'
-mconf_web_reports_config_file: '{{ inventory_dir }}/files/mconf-web-reports/config.{{ mconf_web_reports_config_extension }}'
+mconf_web_reports_config_file: '{{ inventory_dir }}/files/mconf-web-reports/config.tsv'
 # where they should be in the host server
-mconf_web_reports_remote_config_path: /root/mconf-web-reports-config.tsv
-mconf_web_reports_remote_env_path: /root/mconf-web-reports.env.local
+mconf_web_reports_remote_config_path: '{{ mconf_web_reports_remote_config_dir }}/config.tsv'
+mconf_web_reports_remote_env_path: '{{ mconf_web_reports_remote_config_dir }}/.env.local'
+
+# Turn on to upload all generated files to S3/Spaces
+mconf_web_reports_s3_upload_enabled: false
+mconf_web_reports_s3_config_dir: '{{ mconf_web_reports_remote_config_dir }}/.aws'
+mconf_web_reports_s3_key: <change-me>
+mconf_web_reports_s3_secret: <change-me>
+mconf_web_reports_s3_bucket: <bucket-name>
+mconf_web_reports_s3_endpoint: https://nyc3.digitaloceanspaces.com
+mconf_web_reports_s3_aws_cli_version: 2.1.0
+mconf_web_reports_s3_run_cmd:

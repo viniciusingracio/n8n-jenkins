@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Run the reports for the previous month
+
+# keep the previous log
+cp {{ mconf_web_reports_cron_previous_month_log_file }} {{ mconf_web_reports_cron_previous_month_log_file }}.1
+
+# run the reports
+docker run --rm -e TARGET_MONTH=$(date -d "-1 month -$(expr $(date +%d) - 1) days" +"%Y-%m") -v {{ mconf_web_reports_remote_config_path }}:/usr/src/app/config.tsv -v {{ mconf_web_reports_remote_env_path }}:/usr/src/app/.env.local -v {{ mconf_web_reports_output_dir }}:/usr/src/app/output -e SAVE_TO=/usr/src/app/output {{ mconf_web_reports_image }}:{{ mconf_web_reports_image_version }} {{ mconf_web_reports_image_cmd }}
+
+{{ mconf_web_reports_s3_run_cmd }}
+
+# run anything configured to run after it
+{{ mconf_web_reports_cron_previous_month_run_after }}

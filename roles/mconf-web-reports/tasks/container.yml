@@ -12,7 +12,7 @@
     day: "{{ mconf_web_reports_cron_schedule_day }}"
     weekday: "{{ mconf_web_reports_cron_schedule_weekday }}"
     user: root
-    job: "cp {{ mconf_web_reports_cron_log_file }} {{ mconf_web_reports_cron_log_file }}.1; docker run --rm -v {{ mconf_web_reports_remote_config_path }}:/usr/src/app/config.tsv -v {{ mconf_web_reports_remote_env_path }}:/usr/src/app/.env.local -v {{ mconf_web_reports_output_dir }}:/usr/src/app/output -e SAVE_TO=/usr/src/app/output {{ mconf_web_reports_image }}:{{ mconf_web_reports_image_version }} {{ mconf_web_reports_image_cmd }} > {{ mconf_web_reports_cron_log_file }} 2>&1; {{ mconf_web_reports_cron_run_after }}"
+    job: "{{ mconf_web_reports_remote_config_dir }}/run.sh > {{ mconf_web_reports_cron_log_file }} 2>&1"
     cron_file: '{{ mconf_web_reports_cron_config_name }}'
 
 - name: Setup cron to update the report of the previous month
@@ -24,5 +24,5 @@
     day: "{{ mconf_web_reports_cron_previous_month_schedule_day }}"
     weekday: "{{ mconf_web_reports_cron_previous_month_schedule_weekday }}"
     user: root
-    job: "cp {{ mconf_web_reports_cron_previous_month_log_file }} {{ mconf_web_reports_cron_previous_month_log_file }}.1; docker run --rm -e TARGET_MONTH=$(date -d \"-1 month -$(expr $(date +\\%d) - 1) days\" +\"\\%Y-\\%m\") -v {{ mconf_web_reports_remote_config_path }}:/usr/src/app/config.tsv -v {{ mconf_web_reports_remote_env_path }}:/usr/src/app/.env.local -v {{ mconf_web_reports_output_dir }}:/usr/src/app/output -e SAVE_TO=/usr/src/app/output {{ mconf_web_reports_image }}:{{ mconf_web_reports_image_version }} {{ mconf_web_reports_image_cmd }} > {{ mconf_web_reports_cron_previous_month_log_file }} 2>&1; {{ mconf_web_reports_cron_previous_month_run_after }}"
+    job: "{{ mconf_web_reports_remote_config_dir }}/run-previous.sh > {{ mconf_web_reports_cron_previous_month_log_file }} 2>&1"
     cron_file: '{{ mconf_web_reports_cron_previous_month_config_name }}'
