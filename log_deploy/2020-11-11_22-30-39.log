@@ -1,0 +1,4 @@
+/usr/local/bin/ansible-playbook -i envs/rnp/prod/hosts -l mconf-db playbooks/node-exporter.yml
+
+vm-mysql-master-hmg: 13 OK, 4 changed, 0 unreachable, 0 failed
+vm-mysql-replica-hmg: 13 OK, 4 changed, 0 unreachable, 0 failed
