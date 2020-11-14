@@ -35,7 +35,7 @@ bigbluebutton_stun_server:
   - stun:stun.l.google.com:19302
 
 bigbluebutton_docker_webrtc_sfu_enabled: false
-bigbluebutton_docker_webrtc_sfu_image: mconf/bbb-webrtc-sfu:v2.4.22
+bigbluebutton_docker_webrtc_sfu_image: mconf/bbb-webrtc-sfu:v2.4.23
 # it can be VP8, H264 or ANY
 bigbluebutton_docker_webrtc_sfu_codec: ANY
 bigbluebutton_docker_webrtc_sfu_ip_public:
@@ -59,8 +59,9 @@ bigbluebutton_docker_kurento_instances:
   - { port: 3100, media_type: 'audio' }
   - { port: 3101, media_type: 'main' }
   - { port: 3102, media_type: 'content' }
-bigbluebutton_docker_kurento_image: mconf/kurento:6.14.0-6
+bigbluebutton_docker_kurento_image: mconf/kurento:6.15.0-1
 bigbluebutton_docker_kurento_ignore_ips: []
+bigbluebutton_docker_kurento_use_stun: false
 
 bigbluebutton_docker_streaming_controller_enabled: true
 bigbluebutton_docker_streaming_controller_image: mconf/mconf-streaming-controller:v1.1.0

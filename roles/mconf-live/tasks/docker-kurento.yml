@@ -37,11 +37,19 @@
     state: stopped
   ignore_errors: yes
 
+# intranet + internet: STUN
+# NAT normal, internet: externalIPv4, externalIPv6
+# sem NAT: nada
 - set_fact:
-    kms_need_stun: '{{ ansible_default_ipv4.address != external_ipv4 }}'
+    kms_behind_nat: '{{ ansible_default_ipv4.address != external_ipv4 }}'
 - set_fact:
-    kms_stun_server_ip: '{% if kms_need_stun %}{{ stun_server_ip | default("") }}{% endif %}'
-    kms_stun_server_port: '{% if kms_need_stun %}{{ stun_server_port | default("") }}{% endif %}'
+    kms_external_ipv4: '{{ external_ipv4 }}'
+    kms_external_ipv6: '{{ external_ipv6 }}'
+  when: kms_behind_nat and not bigbluebutton_docker_kurento_use_stun
+- set_fact:
+    kms_stun_server_ip: '{{ stun_server_ip | default("") }}'
+    kms_stun_server_port: '{{ stun_server_port | default("") }}'
+  when: bigbluebutton_docker_kurento_use_stun
 
 - set_fact:
     bigbluebutton_docker_kurento_ignore_ips: "{{ bigbluebutton_docker_kurento_ignore_ips + [ item ] }}"
@@ -66,7 +74,9 @@
       RTP_MAX_PORT: '{{ ( bigbluebutton_kms_udp_range_end - bigbluebutton_docker_mcs_bfcp_num_ports ) | string }}'
       KURENTO_LOGS_PATH: /var/log/kurento-media-server
       STUN_IP: '{{ kms_stun_server_ip | default(omit) }}'
-      STUN_PORT: '{{ kms_stun_server_port | string | default(omit, true) }}'
+      STUN_PORT: '{{ kms_stun_server_port | default(omit) }}'
+      EXTERNAL_IPV4: '{{ kms_external_ipv4 | default(omit) }}'
+      EXTERNAL_IPV6: '{{ kms_external_ipv6 | default(omit) }}'
       GST_DEBUG: '3,Kurento*:4,kms*:4,KurentoWebSocketTransport:5'
       TZ: '{{ lookup("file", "/etc/timezone") }}'
       NETWORK_INTERFACES: '{{ default_route_raw.stdout }}'
