@@ -12,3 +12,6 @@ kamailio_db_password:
 kamailio_gateway_ip: ""
 kamailio_external_ip: '{{ ansible_host }}'
 kamailio_advertised_route: '{{ ansible_host }}'
+kamailio_sip_client_enabled: false
+kamailio_siremis_ip_allowed: []
+kamailio_siremis_ip_denied: []

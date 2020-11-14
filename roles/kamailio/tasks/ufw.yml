@@ -1,10 +1,17 @@
 - name: Configure ufw rules
   become: yes
-  command: ufw route allow proto {{ item.proto }} to any port {{ item.port }}
+  ufw:
+    rule: '{{ item.rule }}'
+    port: '{{ item.port | default(omit) }}'
+    proto: '{{ item.proto | default(omit) }}'
+    from_ip: '{{ item.from_ip | default(omit) }}'
+    route: '{{ item.route | default(omit) }}'
+    direction: '{{ item.direction | default(omit) }}'
+    interface: '{{ item.interface | default(omit) }}'
   with_items:
-    - { port: 5060, proto: 'tcp' }
-    - { port: 5060, proto: 'udp' }
-    - { port: 80, proto: 'tcp' }
-    - { port: 443, proto: 'tcp' }
+    - { rule: 'allow', port: 443, proto: 'tcp', route: yes }
+    - { rule: 'allow', port: 5060, proto: 'tcp', route: yes }
+    - { rule: 'allow', port: 5060, proto: 'udp', route: yes }
+    - { rule: 'allow', direction: 'in', interface: 'docker0' }
   notify:
     - restart ufw
