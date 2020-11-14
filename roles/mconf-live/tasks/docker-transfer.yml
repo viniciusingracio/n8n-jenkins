@@ -9,7 +9,7 @@
       - 3013:9090
       - 3014:9091
     env:
-      REDIS_HOST: '{{ docker_ip }}'
+      REDIS_HOST: '{{ ansible_docker0.ipv4.address }}'
       BIGBLUEBUTTON_URL: '{{ bbb_api_entry_point | regex_replace("/api") }}'
       BIGBLUEBUTTON_SECRET: '{{ bbb_secret }}'
       TZ: '{{ lookup("file", "/etc/timezone") }}'

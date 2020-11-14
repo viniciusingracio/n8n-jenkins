@@ -16,13 +16,6 @@
   register: bbb_secret_raw
   when: bigbluebutton_prometheus_password is none
 
-- name: Register Docker host IP
-  shell: "ifconfig docker0 | grep 'inet addr:' | cut -d: -f2 | awk '{print $1}'"
-  register: docker_ip_raw
-
-- set_fact:
-    docker_ip: '{{ docker_ip_raw.stdout }}'
-
 - name: Determine external IP
   set_fact:
     external_ip: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | grep \"[0-9]*\\.[0-9]*\\.[0-9]*\\.[0-9]*\" | head -n 1') }}"

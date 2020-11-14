@@ -70,13 +70,6 @@
   set_fact:
     rec_proxy_ports: '{% if rec_proxy_local_playback %}[ "{{ rec_proxy_http_port }}:80" ]{% else %}[ "80:80", "443:443" ]{% endif %}'
 
-- name: Register Docker host IP
-  shell: "ifconfig docker0 | grep 'inet addr:' | cut -d: -f2 | awk '{print $1}'"
-  register: docker_ip_raw
-
-- set_fact:
-    docker_ip: '{{ docker_ip_raw.stdout }}'
-
 - name: Start the rec-proxy container
   docker_container:
     name: mconf-rec-proxy
@@ -104,7 +97,7 @@
       CACHE_MAX_SIZE: '{{ rec_proxy_cache_max_size | string }}'
       LB_ENDPOINT: '{{ rec_proxy_lb_endpoint | string }}'
       LB_SECRET: '{{ rec_proxy_lb_secret | string }}'
-      AUTH_NONCE_REDIS_HOST: '{{ docker_ip }}'
+      AUTH_NONCE_REDIS_HOST: '{{ ansible_docker0.ipv4.address }}'
       TZ: '{{ lookup("file", "/etc/timezone") }}'
     labels:
       hostname: '{{ inventory_hostname }}'

@@ -27,13 +27,6 @@
     creates: /etc/apache2/prometheus.htpasswd
   become: yes
 
-- name: Register Docker host IP
-  shell: "ifconfig docker0 | grep 'inet ' | tr -s ' ' | cut -d' ' -f3 | awk '{print $1}'"
-  register: docker_ip_raw
-
-- set_fact:
-    docker_ip: '{{ docker_ip_raw.stdout }}'
-
 - template:
     src: templates/nginx.conf.j2
     dest: /etc/coturn-prometheus/nginx.conf

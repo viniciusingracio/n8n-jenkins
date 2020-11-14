@@ -13,7 +13,7 @@
 
 - name: Determine kurento URLs to configure bbb-webrtc-sfu
   set_fact:
-    kurento_config: "{{ kurento_config|default([]) + [ { 'ip': kurento_ip, 'url': 'ws://' + docker_ip + ':' + item.port|string + '/kurento', 'mediaType': item.media_type } | combine( { 'ipClassMapping': ip_mappings } ) ] }}"
+    kurento_config: "{{ kurento_config|default([]) + [ { 'ip': kurento_ip, 'url': 'ws://' + ansible_docker0.ipv4.address + ':' + item.port|string + '/kurento', 'mediaType': item.media_type } | combine( { 'ipClassMapping': ip_mappings } ) ] }}"
     kurento_ports: "{{ kurento_ports|default([]) + [ item.port ] }}"
   with_items: '{{ bigbluebutton_docker_kurento_instances }}'
 

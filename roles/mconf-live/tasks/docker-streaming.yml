@@ -35,7 +35,7 @@
     ports:
       - 8009:8009
     env:
-      REDIS_HOST: '{{ docker_ip }}'
+      REDIS_HOST: '{{ ansible_docker0.ipv4.address }}'
       LOG_LEVEL: info
       STREAM_CONTAINER_TYPE: '{% if bigbluebutton_docker_streaming_controller_k8s_enabled %}kubernetes{% else %}docker{% endif %}'
       STREAM_IMAGE_NAME: '{{ mconf_live_presentation_recorder_image }}:{{ mconf_live_presentation_recorder_version }}'

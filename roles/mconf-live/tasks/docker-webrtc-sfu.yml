@@ -41,16 +41,16 @@
       - 3009:3009
     env:
       KURENTO: '{{ kurento_config | to_json }}'
-      REDIS_HOST: '{{ docker_ip }}'
+      REDIS_HOST: '{{ ansible_docker0.ipv4.address }}'
       MCS_PORT: "3009"
       MCS_HOST: 0.0.0.0
       CLIENT_HOST: 0.0.0.0
-      MCS_ADDRESS: '{{ docker_ip }}'
+      MCS_ADDRESS: '{{ ansible_docker0.ipv4.address }}'
       # this can be removed when everyone is using v2.4 or above
       FREESWITCH_IP: '{{ ansible_default_ipv4.address }}'
       FREESWITCH_SIP_IP: '{{ ansible_default_ipv4.address }}'
       FREESWITCH_CONN_IP: '{{ kurento_ip }}'
-      ESL_IP: '{{ docker_ip }}'
+      ESL_IP: '{{ ansible_docker0.ipv4.address }}'
       ESL_PORT: "8021"
       LOG_LEVEL: info
       CODEC_VIDEO_MAIN: '{{ bigbluebutton_docker_webrtc_sfu_codec }}'

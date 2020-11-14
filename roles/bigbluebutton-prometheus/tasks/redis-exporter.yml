@@ -4,7 +4,7 @@
   docker_container:
     name: redis-exporter
     image: oliver006/redis_exporter:v1.5.3-alpine
-    command: --redis.addr redis://{{ docker_ip }}:6379 --web.telemetry-path /redis_metrics --redis-only-metrics true
+    command: --redis.addr redis://{{ ansible_docker0.ipv4.address }}:6379 --web.telemetry-path /redis_metrics --redis-only-metrics true
     pull: yes
     restart_policy: always
     ports:

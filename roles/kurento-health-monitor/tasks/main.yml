@@ -9,13 +9,6 @@
     external_ip: '{{ ansible_default_ipv4.address }}'
   when: external_ip is none or external_ip | trim == ""
 
-- name: Register Docker host IP
-  shell: "ifconfig docker0 | grep 'inet addr:' | cut -d: -f2 | awk '{print $1}'"
-  register: docker_ip_raw
-
-- set_fact:
-    docker_ip: '{{ docker_ip_raw.stdout }}'
-
 - name: Determine kurento running instances
   shell: docker ps -a | grep 'kurento_' | sed 's:.*kurento_\([0-9]*\).*:\1:g' | sort
   register: running_kurento_raw
@@ -27,7 +20,7 @@
 
 - name: Determine kurento URLs to configure kurento health monitor
   set_fact:
-    kurento_config: "{{ kurento_config|default([]) + [ { 'ip': kurento_ip, 'url': 'ws://' + docker_ip + ':' + item + '/kurento' } ] }}"
+    kurento_config: "{{ kurento_config|default([]) + [ { 'ip': kurento_ip, 'url': 'ws://' + ansible_docker0.ipv4.address + ':' + item + '/kurento' } ] }}"
   with_items: '{{ kurento_ports }}'
 
 - name: Start kurento health monitor
@@ -41,7 +34,7 @@
       KURENTO: '{{ kurento_config | to_json }}'
       WEBHOOK_URL: '{{ kurento_health_monitor_webhook }}'
       HOST_ADDRESS: '{{ inventory_hostname }}'
-      ESL_IP: '{{ docker_ip }}'
+      ESL_IP: '{{ ansible_docker0.ipv4.address }}'
       ESL_PORT: '8021'
     labels:
       hostname: '{{ inventory_hostname }}'

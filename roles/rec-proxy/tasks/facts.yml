@@ -1,6 +1,0 @@
-- name: Register Docker host IP
-  shell: "ifconfig docker0 | grep 'inet addr:' | cut -d: -f2 | awk '{print $1}'"
-  register: docker_ip_raw
-
-- set_fact:
-    docker_ip: '{{ docker_ip_raw.stdout }}'

@@ -8,10 +8,10 @@
     ports:
       - 3011:3011
     env:
-      REDIS_HOST: '{{ docker_ip }}'
+      REDIS_HOST: '{{ ansible_docker0.ipv4.address }}'
       MCS_PORT: "3009"
-      MCS_HOST: '{{ docker_ip }}'
-      SIP_API_ADDRESS: ws://{{ docker_ip }}:3012/mcs-sip
+      MCS_HOST: '{{ ansible_docker0.ipv4.address }}'
+      SIP_API_ADDRESS: ws://{{ ansible_docker0.ipv4.address }}:3012/mcs-sip
       ENABLE_REGISTER: '{{ bigbluebutton_sip_registrar_enabled | lower }}'
       ENABLE_FLOOR_N: 'true'
       LOG_FILENAME: /var/log/sfu-phone/sfu-phone.log

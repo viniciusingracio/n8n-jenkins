@@ -51,7 +51,7 @@
     env:
       EXTERNAL_IP: '{{ contact_ip }}'
       BIND_IP: 0.0.0.0
-      MCS_HOST: 'ws://{{ docker_ip }}:3009/mcs'
+      MCS_HOST: 'ws://{{ ansible_docker0.ipv4.address }}:3009/mcs'
       SIP_API_PORT: "3012"
       SIP_API_PATH: /mcs-sip
       ENABLE_EXTERNAL_API: "true"

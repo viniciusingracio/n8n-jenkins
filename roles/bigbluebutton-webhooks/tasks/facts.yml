@@ -26,10 +26,3 @@
 - set_fact:
     bbb_secret: '{{ bbb_secret_raw.stdout }}'
     bbb_api_entry_point: '{{ bbb_api_entry_point_raw.stdout }}'
-
-- name: Register Docker host IP
-  shell: "ifconfig docker0 | grep 'inet addr:' | cut -d: -f2 | awk '{print $1}'"
-  register: docker_ip_raw
-
-- set_fact:
-    docker_ip: '{{ docker_ip_raw.stdout }}'

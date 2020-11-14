@@ -7,7 +7,7 @@
     ports:
       - "3006:9001"
     env:
-      SETTINGS_MODIFIER: '.dbSettings.host = "{{ docker_ip }}"'
+      SETTINGS_MODIFIER: '.dbSettings.host = "{{ ansible_docker0.ipv4.address }}"'
     state: '{% if bigbluebutton_docker_etherpad_enabled %}started{% else %}absent{% endif %}'
     labels:
       hostname: '{{ inventory_hostname }}'

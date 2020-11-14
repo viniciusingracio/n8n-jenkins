@@ -16,10 +16,6 @@
     force: true
   when: aws_publisher_build_from_source and aws_publisher_code.changed
 
-- name: Register Docker host IP
-  shell: "ifconfig docker0 | grep 'inet addr:' | cut -d: -f2 | awk '{print $1}'"
-  register: docker_ip
-
 # it doesn't work to send a symlink to the container, so we need to figure that out
 - stat:
     path: /var/bigbluebutton
@@ -49,7 +45,7 @@
       BBB_AWS_REMOTE_PLAYBACK_URL: '{{ aws_publisher_remote_playback_url | string }}'
       BBB_AWS_AVAILABLE_FORMATS: '{{ aws_publisher_available_formats | string }}'
       BBB_AWS_KEEP_LOCAL: '{{ aws_publisher_keep_local | string }}'
-      BBB_AWS_REDIS_HOST: '{{ docker_ip.stdout | string }}'
+      BBB_AWS_REDIS_HOST: '{{ ansible_docker0.ipv4.address }}'
       BBB_AWS_FAST_RESYNC: '{{ aws_publisher_fast_resync | string }}'
       BBB_AWS_KEEP_DELETED: '{{ aws_publisher_keep_deleted | string }}'
       BBB_AWS_RESYNC: '0'
@@ -76,7 +72,7 @@
       BBB_AWS_REMOTE_PLAYBACK_URL: '{{ aws_publisher_remote_playback_url | string }}'
       BBB_AWS_AVAILABLE_FORMATS: '{{ aws_publisher_available_formats | string }}'
       BBB_AWS_KEEP_LOCAL: '{{ aws_publisher_keep_local | string }}'
-      BBB_AWS_REDIS_HOST: '{{ docker_ip.stdout | string }}'
+      BBB_AWS_REDIS_HOST: '{{ ansible_docker0.ipv4.address }}'
       BBB_AWS_FAST_RESYNC: '{{ aws_publisher_fast_resync | string }}'
       BBB_AWS_KEEP_DELETED: '{{ aws_publisher_keep_deleted | string }}'
     labels:

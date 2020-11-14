@@ -46,13 +46,6 @@
   - set_fact:
       rec_proxy_api_secret: '{{ bbb_secret_raw.stdout }}'
 
-  - name: Register Docker host IP
-    shell: "ifconfig docker0 | grep 'inet addr:' | cut -d: -f2 | awk '{print $1}'"
-    register: docker_ip_raw
-
-  - set_fact:
-      docker_ip: '{{ docker_ip_raw.stdout }}'
-
   - name: Start the rec-proxy container
     docker_container:
       name: mconf-rec-proxy
@@ -67,7 +60,7 @@
         API_SECRET: '{{ rec_proxy_api_secret | string }}'
         JWT_SECRET: '{{ rec_proxy_jwt_secret | string }}'
         REDIRECT_UNAUTHORIZED: '{{ rec_proxy_redirect_unauthorized | string }}'
-        AUTH_NONCE_REDIS_HOST: '{{ docker_ip }}'
+        AUTH_NONCE_REDIS_HOST: '{{ ansible_docker0.ipv4.address }}'
         TZ: '{{ lookup("file", "/etc/timezone") }}'
       labels:
         hostname: '{{ inventory_hostname }}'
