@@ -1,0 +1,9 @@
+---
+
+- shell: "lscpu | grep '^Flags: ' | cut -d':' -f2"
+  register: reg_lscpu
+
+- set_fact:
+    cpu_flags: "{{ ( reg_lscpu.stdout | trim ).split(' ') }}"
+- set_fact:
+    cpu_support_sse4_2: "{{ cpu_flags | select('match', '^sse4_2$') | list | length > 0 }}"
