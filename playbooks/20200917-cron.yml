@@ -1,0 +1,20 @@
+---
+
+- hosts: all
+  tasks:
+  - name: Configure retention
+    become: yes
+    lineinfile:
+      dest: /etc/cron.daily/bigbluebutton
+      state: present
+      regexp: '{{ item.regexp }}'
+      line: '{{ item.line }}'
+    with_items:
+    - { regexp: '^published_days=', line: 'published_days=4' }
+
+  - command: chmod +x /etc/cron.daily/bigbluebutton
+    become: yes
+
+  - name: Run cron
+    become: yes
+    command: /etc/cron.daily/bigbluebutton

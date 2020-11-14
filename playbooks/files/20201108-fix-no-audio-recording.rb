@@ -98,6 +98,8 @@ def format_date_from_record_id(r)
   format_date_time(timestamp_to_date(record_id_to_timestamp(r)))
 end
 
+to_rebuild = []
+
 Dir.glob("/var/bigbluebutton/recording/raw/*/events.xml").each do |events_xml|
   record_id = File.basename(File.dirname(events_xml))
 
@@ -105,6 +107,7 @@ Dir.glob("/var/bigbluebutton/recording/raw/*/events.xml").each do |events_xml|
   next if doc.xpath("/recording/event").length == 0
   next if doc.xpath("/recording/event[@module='PARTICIPANT' and @eventname='RecordStatusEvent']").length == 0
 
+  mark_to_rebuild = false
   last_timestamp = doc.at_xpath('/recording/event[position() = last()]/@timestamp').text.to_i
   doc.xpath("/recording/event[@module='VOICE' and @eventname='StartRecordingEvent']").each do |event|
     filename = event.at_xpath("filename").text
@@ -112,29 +115,22 @@ Dir.glob("/var/bigbluebutton/recording/raw/*/events.xml").each do |events_xml|
     file_path = "#{File.dirname(events_xml)}/audio/#{File.basename(filename)}"
     next if ! File.exists? file_path
     info = audio_info(file_path)
-    info[:duration] = 0 if info[:duration].nil?
-    node = doc.xpath("/recording/event[@module='VOICE' and @eventname='StopRecordingEvent' and ./filename='#{filename}']").first
-    event_stop = node.nil? ? last_timestamp : node.at_xpath("./recordingTimestamp").text.to_i
-    data[filename] = {
-      :record_id => record_id,
-      :filename => File.basename(filename),
-      :date => format_date_from_record_id(record_id),
-      :file_duration => info[:duration],
-      :event_start => event_start,
-      :event_stop => event_stop,
-      :event_duration => event_stop - event_start
-    }
+
+    if info[:duration].nil?
+      node = doc.xpath("/recording/event[@module='VOICE' and @eventname='StopRecordingEvent' and ./filename='#{filename}']").first
+      event_stop = node.nil? ? last_timestamp : node.at_xpath("./recordingTimestamp").text.to_i
+      event_duration = event_stop - event_start
+
+      # do not consider events shorter than 10s
+      next if event_duration < 10000
+
+      mark_to_rebuild = true
+      break
+    end
   end
+  to_rebuild << record_id if mark_to_rebuild
 end
 
-puts "date,record_id,filename,event_duration,file_duration,difference,second_every,every_hour"
-data.values.each do |value|
-  difference = (value[:event_duration] - value[:file_duration]).abs
-  if difference == 0
-    puts "#{value[:date]},#{value[:record_id]},#{value[:filename]},#{format_duration(value[:event_duration])},#{format_duration(value[:file_duration])},#{format_duration(difference)},00:00:00.000,00:00:00.000"
-  else
-    second_every = value[:event_duration] / (difference.to_f / 1000)
-    every_hour = difference / (value[:event_duration].to_f / 3600000)
-    puts "#{value[:date]},#{value[:record_id]},#{value[:filename]},#{format_duration(value[:event_duration])},#{format_duration(value[:file_duration])},#{format_duration(difference)},#{format_duration(second_every)},#{format_duration(every_hour)}"
-  end
+to_rebuild.each do |record_id|
+  puts `bbb-record --rebuild #{record_id}`
 end

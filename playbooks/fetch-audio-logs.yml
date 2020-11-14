@@ -1,0 +1,25 @@
+---
+
+- hosts:
+    - all
+
+  tasks:
+    - name: Create temporary directory
+      tempfile:
+        state: directory
+      register: tmpdir
+
+    - name: Tar logs
+      command: tar -czvf {{ tmpdir.path }}/logs.tar.gz /var/log/syslog /opt/freeswitch/log/freeswitch.log
+      ignore_errors: yes
+
+    - name: Gather logs
+      fetch:
+        src: '{{ tmpdir.path }}/logs.tar.gz'
+        dest: /tmp/audio-logs-{{ inventory_hostname }}/
+        flat: yes
+
+    - name: Remove temporary directory
+      file:
+        path: '{{ tmpdir.path }}'
+        state: absent

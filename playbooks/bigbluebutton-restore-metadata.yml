@@ -27,6 +27,8 @@
     - shell: |
         cp -r {{ ansible_env.HOME }}/metadata-{{ backup_date }}/* /var/bigbluebutton/
         chown -R bigbluebutton:bigbluebutton /var/bigbluebutton/published /var/bigbluebutton/unpublished /var/bigbluebutton/deleted
+        find {{ ansible_env.HOME }}/metadata-{{ backup_date }}/ -name metadata.xml | xargs -I{} dirname {} | xargs -I{} basename {} > {{ ansible_env.HOME }}/metadata-{{ backup_date }}.txt
+        cat {{ ansible_env.HOME }}/metadata-{{ backup_date }}.txt | xargs -I{} ruby /usr/local/bigbluebutton/core/scripts/utils/repost-published-event.rb --meeting-id {} --sanity-only
       become: yes
       tags:
         - copy

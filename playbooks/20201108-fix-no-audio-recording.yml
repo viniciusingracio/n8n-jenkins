@@ -1,0 +1,27 @@
+---
+
+- hosts: all
+
+  vars:
+    ansible_user: mconf
+
+  tasks:
+  - name: Copy script
+    copy:
+      src: files/20201109-sanity.rb
+      dest: /usr/local/bigbluebutton/core/scripts/sanity/sanity.rb
+      mode: 0755
+    become: yes
+
+  - name: Copy script to fix recordings
+    copy:
+      src: files/20201108-fix-no-audio-recording.rb
+      dest: /tmp/fix-recordings.rb
+
+  - command: ruby /tmp/fix-recordings.rb
+    become: yes
+    register: reg_recordings
+
+  - debug:
+      msg: '{{ reg_recordings.stdout_lines }}'
+    when: reg_recordings.stdout_lines | length > 0
