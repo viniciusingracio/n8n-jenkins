@@ -7,7 +7,6 @@
 
 - name: Determine wss_binding value
   set_fact:
-    wss_binding_value: '{% if ansible_default_ipv4.address == external_ipv4 %}:7443{% else %}{{ external_ipv4 }}:7443{% endif %}'
     ws_binding_value: :5066
 
 - name: Define FreeSWITCH external SIP port
@@ -57,10 +56,10 @@
       - { name: "disable-rtp-auto-adjust" }
       - { name: "rtp-autofix-timing" }
       - { name: "ws-binding", value: "{{ ws_binding_value }}" }
-      - { name: "wss-binding", value: "{{ wss_binding_value }}" }
       - { name: "apply-candidate-acl", value: "0.0.0.0/0" }
       - { name: "dtmf_type" }
       - { name: "dtmf-type" }
+      - { name: "rtp-timeout-sec", value: "30" } # default is 300
 
 - name: Read external_props
   xml:

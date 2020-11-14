@@ -12,7 +12,7 @@
   replace:
     path: '/etc/bigbluebutton/nginx/sip.nginx'
     regexp: 'http[s]?:\/\/[^:]+:\d+'
-    replace: 'https://{{ freeswitch_nginx_address }}:7443'
+    replace: 'http://{{ freeswitch_nginx_address }}:5066'
   become: yes
   notify: reload nginx
 

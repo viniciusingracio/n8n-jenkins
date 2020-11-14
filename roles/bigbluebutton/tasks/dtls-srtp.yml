@@ -12,9 +12,14 @@
     path: /etc/mconf/dtls-srtp.pem
   register: reg_dtls_file
 
+- name:
+  shell: openssl rsa -in /etc/mconf/dtls-srtp.pem -text -noout | grep "Private-Key" | cut -d" " -f2 | sed 's|(||g'
+  when: reg_dtls_file.stat.exists
+  register: reg_dtls_length
+
 - name: Figure out if generate certificate is needed
   set_fact:
-    generate_certificate: '{{ not reg_dtls_file.stat.exists }}'
+    generate_certificate: '{{ not reg_dtls_file.stat.exists or (reg_dtls_length is defined and reg_dtls_length.stdout != "4096") }}'
 
 - name: Create temporary directory for the certificate
   tempfile:
@@ -23,7 +28,7 @@
   when: generate_certificate
 
 - name: Generate certificate
-  shell: openssl req -x509 -new -nodes -newkey rsa:2048 -sha256 -days 3650 -subj "/C=BR/ST=Porto Alegre/O=Mconf Tecnologia/OU=Live/CN={{ inventory_hostname }}" {% if inventory_hostname is match("\d+\.\d+\.\d+\.\d+") %}-reqexts SAN -extensions SAN -config <(cat /etc/ssl/openssl.cnf <(printf "[SAN]\nsubjectAltName=IP:{{ inventory_hostname }}")){% endif %} -keyout {{ tmpdir_cert.path }}/dtls-srtp-key.pem -out {{ tmpdir_cert.path }}/dtls-srtp-cert.pem
+  shell: openssl req -x509 -new -nodes -newkey rsa:4096 -sha256 -days 3650 -subj "/C=BR/ST=Porto Alegre/O=Mconf Tecnologia/OU=Live/CN={{ inventory_hostname }}" -keyout {{ tmpdir_cert.path }}/dtls-srtp-key.pem -out {{ tmpdir_cert.path }}/dtls-srtp-cert.pem
   when: generate_certificate
 
 - name: Concat certificate and key
