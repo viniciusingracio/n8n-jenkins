@@ -64,7 +64,7 @@ bigbluebutton_docker_kurento_ignore_ips: []
 bigbluebutton_docker_kurento_use_stun: false
 
 bigbluebutton_docker_streaming_controller_enabled: true
-bigbluebutton_docker_streaming_controller_image: mconf/mconf-streaming-controller:v1.1.0
+bigbluebutton_docker_streaming_controller_image: mconf/mconf-streaming-controller:v1.1.1
 bigbluebutton_docker_streaming_controller_k8s_enabled: false
 bigbluebutton_docker_streaming_controller_k8s_local_config_file: files/kube-config
 bigbluebutton_docker_streaming_controller_k8s_config_file: /usr/local/bigbluebutton/bbb-webrtc-sfu/config/kube-config
