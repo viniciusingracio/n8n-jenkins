@@ -50,7 +50,7 @@
 
 - name: Set the S3 upload command
   set_fact:
-    mconf_web_reports_s3_run_cmd: 'docker run --rm -it -v {{ mconf_web_reports_s3_config_dir }}:/root/.aws -v {{ mconf_web_reports_output_dir }}:/tmp/reports:ro amazon/aws-cli:{{ mconf_web_reports_s3_aws_cli_version }} s3 sync --no-follow-symlinks --acl private --endpoint {{ mconf_web_reports_s3_endpoint }} /tmp/reports s3://{{ mconf_web_reports_s3_bucket }}'
+    mconf_web_reports_s3_run_cmd: 'docker run --rm -v {{ mconf_web_reports_s3_config_dir }}:/root/.aws -v {{ mconf_web_reports_output_dir }}:/tmp/reports:ro amazon/aws-cli:{{ mconf_web_reports_s3_aws_cli_version }} s3 sync --no-follow-symlinks --acl private --endpoint {{ mconf_web_reports_s3_endpoint }} /tmp/reports s3://{{ mconf_web_reports_s3_bucket }}'
   when: mconf_web_reports_s3_upload_enabled
 
 - name: Create the run.sh file
