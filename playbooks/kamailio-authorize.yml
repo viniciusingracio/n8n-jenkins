@@ -1,3 +1,9 @@
+- hosts: localhost
+  tasks:
+    - file:
+        name: /tmp/authorize-ip.sh
+        state: absent
+
 - hosts: mconf-live220
   vars:
     external_ipv4:
@@ -11,5 +17,13 @@
         external_ipv4: '{{ ansible_default_ipv4.address }}'
       when: external_ipv4 is none or external_ipv4 | trim == ""
 
-    - command: docker exec kamailio authorize-ip.sh {{ inventory_hostname }} {{ external_ipv4 }}
-      delegate_to: '{{ groups["kamailio"] | first }}'
+    - shell: echo "docker exec kamailio authorize-ip.sh {{ inventory_hostname }} {{ external_ipv4 }}" | tee -a /tmp/authorize-ip.sh
+      delegate_to: localhost
+
+- hosts: kamailio
+  tasks:
+    - copy:
+        src: /tmp/authorize-ip.sh
+        dest: /tmp/authorize-ip.sh
+
+    - command: bash /tmp/authorize-ip.sh
