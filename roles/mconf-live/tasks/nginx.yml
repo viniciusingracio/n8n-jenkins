@@ -38,10 +38,12 @@
     name: generate list of recordings
     job: /usr/bin/ruby /usr/local/bigbluebutton/core/scripts/utils/gen-all-recordings.rb | ifne sponge /var/www/bigbluebutton-default/all_recordings.xml
     user: root
+    state: '{% if bigbluebutton_serve_all_recordings_file %}present{% else %}absent{% endif %}'
   become: yes
 
 - template:
     src: templates/get_recordings_from_file.nginx.j2
     dest: /etc/bigbluebutton/nginx/get_recordings_from_file.nginx
+    state: '{% if bigbluebutton_serve_all_recordings_file %}present{% else %}absent{% endif %}'
   become: yes
   notify: reload nginx

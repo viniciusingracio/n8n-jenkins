@@ -101,3 +101,5 @@ external_ipv4:
 external_ipv6:
 stun_server_ip:
 stun_server_port:
+
+bigbluebutton_serve_all_recordings_file: true
