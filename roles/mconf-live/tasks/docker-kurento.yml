@@ -27,15 +27,14 @@
     state: absent
   with_items: '{{ running_kurento_raw.stdout_lines | difference(kurento_ports) }}'
 
-- name: Determine default network interface
-  shell: route -n | grep "^0.0.0.0" | tr -s ' ' | cut -d' ' -f 8
-  register: default_route_raw
-
 - name: Stop kurento health monitor
   docker_container:
     name: kurento-health-monitor
     state: stopped
   ignore_errors: yes
+
+- debug:
+    msg: 'External IPv4 is {{ external_ipv4 }}, default IPv4 is {{ ansible_default_ipv4.address }}'
 
 # intranet + internet: STUN
 # NAT normal, internet: externalIPv4, externalIPv6
@@ -54,7 +53,12 @@
 - set_fact:
     bigbluebutton_docker_kurento_ignore_ips: "{{ bigbluebutton_docker_kurento_ignore_ips + [ item ] }}"
   with_items: '{{ ansible_all_ipv4_addresses + ansible_all_ipv6_addresses }}'
-  when: not item in [ external_ipv4, external_ipv6 ] and not item is match("^(fe80::|172.)")
+  when:
+    not item is match("^(fe80::|172.)")
+    and (
+      (not kms_behind_nat and not item in [ external_ipv4, external_ipv6 ]) or
+      (kms_behind_nat and not item in [ external_ipv4, external_ipv6, ansible_default_ipv4.address|default(omit), ansible_default_ipv6.address|default(omit) ])
+    )
 
 - name: Start kurento containers
   docker_container:
@@ -79,7 +83,7 @@
       EXTERNAL_IPV6: '{{ kms_external_ipv6 | default(omit) }}'
       GST_DEBUG: '3,Kurento*:4,kms*:4,KurentoWebSocketTransport:5'
       TZ: '{{ lookup("file", "/etc/timezone") }}'
-      NETWORK_INTERFACES: '{{ default_route_raw.stdout }}'
+      NETWORK_INTERFACES: '{{ ansible_default_ipv4.interface }}'
       PEM_CERTIFICATE_RSA: /etc/mconf/dtls-srtp.pem
       IP_IGNORE_LIST: '{{ bigbluebutton_docker_kurento_ignore_ips | join(",") }}'
       NICE_AGENT_ICE_TCP: '0'

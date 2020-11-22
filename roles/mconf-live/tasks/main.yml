@@ -99,6 +99,12 @@
     - streaming
     - docker
 
+- include: docker-nginx-rtmp.yml
+  when: bigbluebutton_docker_nginx_rtmp_enabled
+  tags:
+    - streaming
+    - docker
+
 - name: Remove basic stats
   become: yes
   apt:

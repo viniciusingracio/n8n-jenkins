@@ -156,6 +156,7 @@ bigbluebutton_sounds_profile:
   - { name: 'moh-sound', value: 'silence' }
   - { name: 'comfort-noise', value: 'true' }
 
+bigbluebutton_freeswitch_energy_level: 100
 bigbluebutton_freeswitch_udp_range_begin: 6000
 bigbluebutton_freeswitch_udp_range_end: 6999
 bigbluebutton_kms_udp_range_begin: 7000

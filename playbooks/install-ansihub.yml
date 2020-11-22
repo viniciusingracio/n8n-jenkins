@@ -115,8 +115,9 @@
       - cleanup
 
   - name: Verify installation
-    command: cat /var/www/bigbluebutton-default/status
+    command: curl -s https://{{ inventory_hostname }}/status
     register: reg_status
+    delegate_to: localhost
     tags:
       - verify
 

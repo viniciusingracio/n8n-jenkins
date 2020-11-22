@@ -48,7 +48,8 @@
       MCS_ADDRESS: '{{ ansible_docker0.ipv4.address }}'
       # this can be removed when everyone is using v2.4 or above
       FREESWITCH_IP: '{{ ansible_default_ipv4.address }}'
-      FREESWITCH_SIP_IP: '{{ ansible_default_ipv4.address }}'
+      # should always be the same as ws-binding
+      FREESWITCH_SIP_IP: '{{ external_ipv4 }}'
       FREESWITCH_CONN_IP: '{{ kurento_ip }}'
       ESL_IP: '{{ ansible_docker0.ipv4.address }}'
       ESL_PORT: "8021"

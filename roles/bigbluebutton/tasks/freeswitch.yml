@@ -7,7 +7,7 @@
 
 - name: Determine wss_binding value
   set_fact:
-    ws_binding_value: :5066
+    ws_binding_value: '{% if ansible_default_ipv4.address == external_ipv4 %}:5066{% else %}{{ external_ipv4 }}:5066{% endif %}'
 
 - name: Define FreeSWITCH external SIP port
   set_fact:
@@ -230,3 +230,12 @@
 - include: sounds.yml
 - include: freeswitch-ipv6.yml
   when: enable_freeswitch_ipv6
+
+- name: Reset energy level
+  xml:
+    path: /opt/freeswitch/etc/freeswitch/autoload_configs/conference.conf.xml
+    xpath: /configuration/profiles/profile[@name='cdquality']/param[@name='energy-level']
+    attribute: value
+    value: '{{ bigbluebutton_freeswitch_energy_level | string }}'
+  become: yes
+  notify: restart bigbluebutton

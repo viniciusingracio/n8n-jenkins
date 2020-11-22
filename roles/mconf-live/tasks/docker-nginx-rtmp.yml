@@ -1,0 +1,23 @@
+- name: Start nginx-rtmp container
+  docker_container:
+    name: nginx-rtmp
+    image: '{{ bigbluebutton_docker_nginx_rtmp_image }}'
+    pull: yes
+    restart_policy: always
+    ports:
+      - 1935:1935
+      - 3015:80
+    labels:
+      hostname: '{{ inventory_hostname }}'
+    state: '{% if bigbluebutton_docker_nginx_rtmp_enabled %}started{% else %}absent{% endif %}'
+
+- name: Remove old images
+  shell: docker images {{ bigbluebutton_docker_nginx_rtmp_image.split(":")[0] }} --filter 'before={{ bigbluebutton_docker_nginx_rtmp_image }}' -q | xargs -r docker rmi --force
+  notify: clean docker
+
+- name: Copy nginx file
+  copy:
+    src: files/nginx-rtmp.nginx
+    dest: /etc/bigbluebutton/nginx/nginx-rtmp.nginx
+  become: yes
+  notify: reload nginx

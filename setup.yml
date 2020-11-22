@@ -1,6 +1,6 @@
 - hosts: all
   roles:
   - common
-  - { role: GTI.basic.security, when: inventory_hostname is search(".*\.rnp\.br"), become: yes }
+  - { role: GTI.basic.security, when: inventory_hostname is search(".*\.rnp\.br"), become: yes, tags: [ "rnp", "rnp-basic-security" ] }
 
 - import_playbook: playbooks/chrony.yml

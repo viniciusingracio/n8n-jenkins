@@ -16,9 +16,9 @@
 - set_fact:
     task_files:
       - { src: 'files/10-update-db.rb', dest: '/usr/local/bigbluebutton/core/scripts/post_publish/10-update-db.rb', template: false }
-      - { src: 'files/10-update-db.yml', dest: '/usr/local/bigbluebutton/core/scripts/post_publish/10-update-db.yml', template: true }
+      - { src: 'templates/10-update-db.yml.j2', dest: '/usr/local/bigbluebutton/core/scripts/post_publish/10-update-db.yml', template: true }
       - { src: 'files/11-moodle-callback.rb', dest: '/usr/local/bigbluebutton/core/scripts/post_publish/11-moodle-callback.rb', template: false }
-      - { src: 'files/11-moodle-callback.yml', dest: '/usr/local/bigbluebutton/core/scripts/post_publish/11-moodle-callback.yml', template: true }
+      - { src: 'templates/11-moodle-callback.yml.j2', dest: '/usr/local/bigbluebutton/core/scripts/post_publish/11-moodle-callback.yml', template: true }
 
 - copy:
     src: '{{ item.src }}'

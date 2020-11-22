@@ -1,4 +1,8 @@
 {% if mconf_live_rec_proxy_enabled %}
+location ~* /playback/presentation/2.3/(?<meeting_id>[0-9a-z]+-[0-9]+)$ {
+    return 302 /playback/presentation/2.0/playback.html?meetingId=$meeting_id&$query_string;
+}
+
 location /playback/presentation {
     proxy_pass         http://127.0.0.1:{{ mconf_live_rec_proxy_http_port }};
     proxy_redirect     default;

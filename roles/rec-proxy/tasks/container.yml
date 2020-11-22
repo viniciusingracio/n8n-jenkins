@@ -46,12 +46,18 @@
     state: absent
   when: reg_redis_present is succeeded
 
-- name: Create directory for nginx cache
+- name: Determine if nginx cache directory already exists
+  stat:
+    path: '{{ rec_proxy_cache_path }}'
+  register: reg_cache_path
+
+- name: Create directory for nginx cache if it doesn't exist
   file:
     path: '{{ rec_proxy_cache_path }}'
     recurse: yes
     state: directory
   become: yes
+  when: not reg_cache_path.stat.exists
 
 - name: Determine default volumes for the container
   set_fact:
