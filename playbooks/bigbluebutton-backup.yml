@@ -1,42 +1,59 @@
 ---
 
+# The following attributes should be set somewhere:
+#
+# bigbluebutton_backup_aws_key
+# bigbluebutton_backup_aws_secret
+# bigbluebutton_backup_aws_region
+# bigbluebutton_backup_aws_endpoint
+# bigbluebutton_backup_aws_bucket
+
 - hosts:
   - mconf-live220
   vars:
-    aws_region: us-east-1
-    aws_endpoint: https://nyc3.digitaloceanspaces.com
-    backup_bucket: elos-backup-live-metadata
-    backup_date: 2020-10-19
+    backup_date: '{{ ansible_date_time.date }}'
   tasks:
-    - set_fact:
+    - name: Determine paths to archive
+      set_fact:
         to_copy:
           - { archive: "/metadata.tar.gz", path: [ "/var/bigbluebutton/published", "/var/bigbluebutton/unpublished", "/var/bigbluebutton/deleted" ] }
           - { archive: "/events.tar.gz", path: [ "/var/bigbluebutton/events" ] }
           - { archive: "/logs.tar.gz", path: [ "/var/log/bigbluebutton", "/var/log/nginx", "/var/log/bbb-apps-akka" ] }
 
-    - name:
+    - name: Figure out failed recordings during process or publish
       shell: find /var/bigbluebutton/recording/status/processed /var/bigbluebutton/recording/status/published -name "*.fail" -exec basename {} \; | cut -d"-" -f1-2 | sort -u
       register: reg_failed_ids
 
-    - name:
+    - name: Figure out failed recordings during sanity
       shell: find /var/bigbluebutton/recording/status/sanity -name "*.done" -exec basename {} \; | cut -d"." -f1 | sort -u
       register: reg_sanity_ids
 
-    - stat:
+    - name: Figure out raw path for failed recordings
+      stat:
         path: '/var/bigbluebutton/recording/raw/{{ item }}'
       with_items: '{{ ( reg_failed_ids.stdout_lines + reg_sanity_ids.stdout_lines ) | unique }}'
       register: reg_raw_paths
 
-    - set_fact:
+    - name: Check if raw path exists
+      set_fact:
         raw_path: '{{ raw_path | default([]) + [ item.stat.path ] }}'
       with_items: '{{ reg_raw_paths.results }}'
       when: item.stat.isdir is defined and item.stat.isdir
 
-    - set_fact:
+    - name: Add raw path to backup list
+      set_fact:
         to_copy: '{{ to_copy + [ { "archive": "/raw.tar.gz", "path": raw_path } ]}}'
       when: raw_path is defined and raw_path | length > 0
 
-    - archive:
+    - name: Make sure the archive file doesn't exist yet
+      file:
+        path: '{{ item.archive }}'
+        state: absent
+      with_items: '{{ to_copy }}'
+      become: yes
+
+    - name: Archive backup
+      archive:
         path: '{{ item.path }}'
         dest: '{{ item.archive }}'
       with_items: '{{ to_copy }}'
@@ -44,9 +61,17 @@
       async: 3600
       poll: 15
 
-    - shell: docker run --rm -v /:/host:ro -e AWS_ACCESS_KEY_ID={{ aws_key }} -e AWS_SECRET_ACCESS_KEY={{ aws_secret }} -e AWS_DEFAULT_REGION={{ aws_region }} amazon/aws-cli --endpoint={{ aws_endpoint }} s3 cp --only-show-errors /host{{ item.archive }} s3://{{ backup_bucket }}/{{ backup_date }}/{{ inventory_hostname }}{{ item.archive }} && sleep 30
+    - name: Upload backup to the cloud
+      shell: docker run --rm -v /:/host:ro -e AWS_ACCESS_KEY_ID={{ bigbluebutton_backup_aws_key }} -e AWS_SECRET_ACCESS_KEY={{ bigbluebutton_backup_aws_secret }} -e AWS_DEFAULT_REGION={{ bigbluebutton_backup_aws_region }} amazon/aws-cli --endpoint={{ bigbluebutton_backup_aws_endpoint }} s3 cp --only-show-errors /host{{ item.archive }} s3://{{ bigbluebutton_backup_aws_bucket }}/{{ backup_date }}/{{ inventory_hostname }}{{ item.archive }} && sleep 30
       with_items: '{{ to_copy }}'
       register: result
       until: result is succeeded
       retries: 120
       delay: 30
+
+    - name: Remove backup file after copy is finished
+      file:
+        path: '{{ item.archive }}'
+        state: absent
+      with_items: '{{ to_copy }}'
+      become: yes

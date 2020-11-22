@@ -1,15 +1,20 @@
 ---
 
+# The following attributes should be set somewhere:
+#
+# bigbluebutton_backup_aws_key
+# bigbluebutton_backup_aws_secret
+# bigbluebutton_backup_aws_region
+# bigbluebutton_backup_aws_endpoint
+# bigbluebutton_backup_aws_bucket
+
 - hosts:
   - mconf-live220
   vars:
-    aws_region: us-east-1
-    aws_endpoint: https://nyc3.digitaloceanspaces.com
-    backup_bucket: elos-backup-live-metadata
-    backup_date: 2020-10-19
+    backup_date: '{{ ansible_date_time.date }}'
     backup_dir: '{{ inventory_hostname }}'
   tasks:
-    - command: docker run --rm -v /:/host -e AWS_ACCESS_KEY_ID={{ aws_key }} -e AWS_SECRET_ACCESS_KEY={{ aws_secret }} -e AWS_DEFAULT_REGION={{ aws_region }} amazon/aws-cli --endpoint={{ aws_endpoint }} s3 cp s3://{{ backup_bucket }}/{{ backup_date }}/{{ backup_dir }}/metadata.tar.gz /host{{ ansible_env.HOME }}/metadata.tar.gz
+    - command: docker run --rm -v /:/host -e AWS_ACCESS_KEY_ID={{ bigbluebutton_backup_aws_key }} -e AWS_SECRET_ACCESS_KEY={{ bigbluebutton_backup_aws_secret }} -e AWS_DEFAULT_REGION={{ bigbluebutton_backup_aws_region }} amazon/aws-cli --endpoint={{ bigbluebutton_backup_aws_endpoint }} s3 cp s3://{{ bigbluebutton_backup_aws_bucket }}/{{ backup_date }}/{{ backup_dir }}/metadata.tar.gz /host{{ ansible_env.HOME }}/metadata.tar.gz
       register: result
       until: result is succeeded
       retries: 120
@@ -28,7 +33,7 @@
         cp -r {{ ansible_env.HOME }}/metadata-{{ backup_date }}/* /var/bigbluebutton/
         chown -R bigbluebutton:bigbluebutton /var/bigbluebutton/published /var/bigbluebutton/unpublished /var/bigbluebutton/deleted
         find {{ ansible_env.HOME }}/metadata-{{ backup_date }}/ -name metadata.xml | xargs -I{} dirname {} | xargs -I{} basename {} > {{ ansible_env.HOME }}/metadata-{{ backup_date }}.txt
-        cat {{ ansible_env.HOME }}/metadata-{{ backup_date }}.txt | xargs -I{} ruby /usr/local/bigbluebutton/core/scripts/utils/repost-published-event.rb --meeting-id {} --sanity-only
+        # cat {{ ansible_env.HOME }}/metadata-{{ backup_date }}.txt | xargs -I{} ruby /usr/local/bigbluebutton/core/scripts/utils/repost-published-event.rb --meeting-id {} --sanity-only
       become: yes
       tags:
         - copy

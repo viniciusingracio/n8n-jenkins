@@ -1,0 +1,39 @@
+---
+
+- hosts:
+  - mconf-recw
+  tasks:
+  - name: Stop services for presentation and presentation_video
+    become: yes
+    command: systemctl stop bbb-rap* bbb-record* bbb_record* mconf-presentation*
+
+  - name: Stop recorders
+    become: yes
+    shell: docker ps --filter name=record_* -aq | xargs docker stop
+    ignore_errors: yes
+
+  - name: Stop nginx containers
+    become: yes
+    shell: docker ps --filter name=nginx_* -aq | xargs docker stop
+    ignore_errors: yes
+
+  - cron:
+      name: '{{ item }}'
+      state: absent
+    with_items:
+      - remove norecord
+      - remove archived
+      - remove encrypted
+      - restart mconf
+      - cleanup published done
+      - enable audio-stats, sleep 30)
+      - enable audio-stats, sleep 60)
+      - generate list of recordings
+      - audio-stats to fluentd, sleep 30
+      - audio-stats to fluentd, sleep 60
+      - bbb-prometheus-exporter
+    become: yes
+
+  - name: Stop nfs
+    become: yes
+    command: umount -a -t nfs4
