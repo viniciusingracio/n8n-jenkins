@@ -44,6 +44,13 @@
 - template:
     src: templates/get_recordings_from_file.nginx.j2
     dest: /etc/bigbluebutton/nginx/get_recordings_from_file.nginx
-    state: '{% if bigbluebutton_serve_all_recordings_file %}present{% else %}absent{% endif %}'
   become: yes
+  when: bigbluebutton_serve_all_recordings_file
+  notify: reload nginx
+
+- file:
+    path: /etc/bigbluebutton/nginx/get_recordings_from_file.nginx
+    state: absent
+  become: yes
+  when: not bigbluebutton_serve_all_recordings_file
   notify: reload nginx
