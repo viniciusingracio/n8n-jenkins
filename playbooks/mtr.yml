@@ -1,0 +1,19 @@
+---
+
+- hosts: all
+  gather_facts: no
+  vars:
+    ansible_user: mconf
+    target: webhook-lb.elos.vc
+  tasks:
+  - name: Install mtr
+    apt:
+      name: mtr
+    become: yes
+
+  - name: Run mtr
+    command: mtr {{ target }} --report-wide --show-ips
+    register: reg_mtr
+
+  - debug:
+      msg: '{{ reg_mtr.stdout_lines }}'

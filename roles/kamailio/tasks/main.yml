@@ -55,6 +55,9 @@
     SSL_CERTIFICATE: '{{ kamailio_ssl_certificate }}'
     SSL_CERTIFICATE_KEY: '{{ kamailio_ssl_certificate_key }}'
     GATEWAY_IP: '{{ kamailio_gateway_ip }}'
+    ANTIFLOOD_SAMPLING_TIME_SECONDS: '2'
+    ANTIFLOOD_REQUESTS_PER_SAMPLING_TIME: '64'
+    ANTIFLOOD_IP_BAN_TIME_SECONDS: '300'
   tags:
     - docker
 

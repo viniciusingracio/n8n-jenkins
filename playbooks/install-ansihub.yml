@@ -48,7 +48,7 @@
     command: pip install --upgrade pip pyopenssl docker zabbix-api
 
   - name: Copy ansihub
-    command: rsync -azm --delete -e 'ssh -p {{ ansible_port }} {{ ansible_ssh_common_args }} -o StrictHostKeyChecking=no' --include-from={{ inventory_dir }}/files/include_filter.txt {{ playbook_dir }}/.. {{ ansible_user }}@{{ external_ipv4 | default(inventory_hostname) }}:~/mconf-ansihub
+    command: rsync -azm --delete -e 'ssh -p {{ ansible_port }} {{ ansible_ssh_common_args }} -o StrictHostKeyChecking=no' --include-from={{ inventory_dir }}/files/include_filter.txt {{ playbook_dir }}/.. {{ ansible_user }}@{{ external_ip | default(inventory_hostname) }}:~/mconf-ansihub
     delegate_to: 127.0.0.1
     retries: 10
     delay: 2

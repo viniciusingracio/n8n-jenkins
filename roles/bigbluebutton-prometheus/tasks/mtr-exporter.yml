@@ -1,0 +1,23 @@
+---
+
+- name: Copy mtr exporter config
+  become: yes
+  copy:
+    src: files/mtr.yml
+    dest: /usr/local/etc/bigbluebutton-prometheus/mtr.yml
+  notify: restart mtr exporter
+
+- name: Start mtr exporter
+  docker_container:
+    name: mtr-exporter
+    image: smaftoul/mtr_exporter
+    command: -config /mtr.yaml
+    pull: yes
+    restart_policy: always
+    ports:
+      - 9116:9116
+    volumes:
+      - /var/log/nginx:/mtr.yaml:ro
+    labels:
+      hostname: '{{ inventory_hostname }}'
+    state: '{% if bigbluebutton_prometheus_mtr_exporter_enabled %}started{% else %}absent{% endif %}'

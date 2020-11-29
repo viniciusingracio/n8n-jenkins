@@ -100,3 +100,4 @@
   tags:
     - mtail
 - include: mongodb-exporter.yml
+- include: mtr-exporter.yml

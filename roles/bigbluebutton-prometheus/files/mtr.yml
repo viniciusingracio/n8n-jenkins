@@ -1,0 +1,6 @@
+cycles: 10
+hosts:
+  - name: "8.8.8.8"
+    alias: "Google DNS"
+  - name: "webhook-lb.elos.vc"
+    alias: "Elos Core"

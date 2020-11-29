@@ -16,7 +16,7 @@
     become: yes
 
   - name:
-    command: tar --warning=no-file-changed -czf /tmp/logs.tar.gz -C /var/log/bigbluebutton /var/log/bbb-apps-akka /var/log/nginx
+    command: tar --warning=no-file-changed -czf /tmp/logs.tar.gz -C /var/log/bigbluebutton /var/log/bbb-apps-akka /var/log/nginx /opt/freeswitch/log /var/log/syslog*
     ignore_errors: yes
 
   - name: Copy files

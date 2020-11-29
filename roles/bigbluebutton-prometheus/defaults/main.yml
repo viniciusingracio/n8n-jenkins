@@ -15,3 +15,4 @@ bigbluebutton_prometheus_ethtool_exporter_enabled: false
 bigbluebutton_prometheus_kong_exporter_enabled: false
 bigbluebutton_prometheus_mtail_exporter_enabled: false
 bigbluebutton_prometheus_mongodb_exporter_enabled: false
+bigbluebutton_prometheus_mtr_exporter_enabled: false

@@ -97,46 +97,12 @@ for processed_fail in `find /var/bigbluebutton/recording/status/processed/ -name
   fi
 done
 
-for published_fail in `find /var/bigbluebutton/recording/status/published/ -name "*-presentation_video.fail" -o -name "*-presentation_recorder.fail"`; do
-  record_id=`basename ${published_fail} | cut -d'.' -f1 | sed 's/-presentation_\(video\|recorder\)//g'`
-
-  # limit scope to recordings in which the presentation format has been processed in the same server
-  # scenario with multiple recw servers
-  if [ -f /var/log/bigbluebutton/presentation/process-${record_id}.log ]; then
-    if [ -d /var/bigbluebutton/published/presentation/${record_id} ] && [ ! -f /var/bigbluebutton/recording/status/sanity/${record_id}.done ]; then
-      # trigger rebuild of presentation_video
-      sudo -u bigbluebutton rm -rf /var/bigbluebutton/recording/process/presentation_recorder/${record_id}
-      sudo -u bigbluebutton rm -rf /var/bigbluebutton/recording/process/presentation_video/${record_id}
-      sudo -u bigbluebutton rm -f /var/bigbluebutton/recording/status/processed/${record_id}-presentation_video.done
-      sudo -u bigbluebutton rm -f /var/bigbluebutton/recording/status/processed/${record_id}-presentation_recorder.fail
-      sudo -u bigbluebutton rm -f /var/bigbluebutton/recording/status/processed/${record_id}-presentation_recorder.done
-      sudo -u bigbluebutton rm -f /var/bigbluebutton/recording/status/published/${record_id}-presentation_video.fail
-      sudo -u bigbluebutton rm -rf /var/bigbluebutton/recording/publish/presentation_video/${record_id}
-      sudo -u bigbluebutton touch /var/bigbluebutton/recording/status/sanity/${record_id}.done
-    fi
+for processed_fail in `find /var/bigbluebutton/recording/status/processed/ -name "*-presentation.fail"`; do
+  record_id=`basename ${processed_fail} | cut -d'.' -f1 | sed 's/-presentation//g'`
+  if [ -f /var/bigbluebutton/recording/status/processed/${record_id}-presentation.done ] || [ -f /var/bigbluebutton/recording/status/published/${record_id}-presentation.done ]; then
+    sudo -u bigbluebutton rm -f /var/bigbluebutton/recording/status/processed/${record_id}-presentation.fail
   fi
 done
-
-for published_path in `ls -1 /var/bigbluebutton/published/presentation/`; do
-  record_id=`basename ${published_path}`
-
-  # limit scope to recordings in which the presentation format has been processed in the same server
-  # scenario with multiple recw servers
-  if [ -f /var/log/bigbluebutton/presentation/process-${record_id}.log ]; then
-    if [ -d /var/bigbluebutton/published/presentation/${record_id} ] && [ ! -d /var/bigbluebutton/published/presentation_video/${record_id} ]; then
-      # trigger rebuild of presentation_video
-      # sudo -u bigbluebutton rm -rf /var/bigbluebutton/recording/process/presentation_recorder/${record_id}
-      # sudo -u bigbluebutton rm -rf /var/bigbluebutton/recording/process/presentation_video/${record_id}
-      # sudo -u bigbluebutton rm -f /var/bigbluebutton/recording/status/processed/${record_id}-presentation_video.done
-      # sudo -u bigbluebutton rm -f /var/bigbluebutton/recording/status/processed/${record_id}-presentation_recorder.fail
-      # sudo -u bigbluebutton rm -f /var/bigbluebutton/recording/status/processed/${record_id}-presentation_recorder.done
-      # sudo -u bigbluebutton rm -f /var/bigbluebutton/recording/status/published/${record_id}-presentation_video.fail
-      # sudo -u bigbluebutton rm -rf /var/bigbluebutton/recording/publish/presentation_video/${record_id}
-      # sudo -u bigbluebutton touch /var/bigbluebutton/recording/status/sanity/${record_id}.done
-      echo "Rebuild presentation_video"
-    fi
-  fi
-done | sort | uniq -c | sort -n -r
 
 ls -ahlt /var/bigbluebutton/recording/status/sanity* | grep ".done$" | tac | head
 

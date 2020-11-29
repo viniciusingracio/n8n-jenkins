@@ -174,3 +174,18 @@ location /mongodb_metrics {
     auth_basic_user_file /etc/apache2/prometheus.htpasswd;
 }
 {% endif %}
+{% if bigbluebutton_prometheus_mtr_exporter_enabled %}
+
+location /mtr_metrics {
+    rewrite /mtr_metrics /metrics  break;
+    proxy_pass         http://localhost:9116;
+    proxy_redirect     default;
+    proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+    proxy_set_header   X-Real-IP         $remote_addr;
+    proxy_set_header   Host              $http_host;
+    proxy_set_header   X-NginX-Proxy     true;
+
+    auth_basic           "Administrator's area";
+    auth_basic_user_file /etc/apache2/prometheus.htpasswd;
+}
+{% endif %}

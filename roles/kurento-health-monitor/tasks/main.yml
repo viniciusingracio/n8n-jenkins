@@ -38,7 +38,7 @@
       ESL_PORT: '8021'
     labels:
       hostname: '{{ inventory_hostname }}'
-    state: '{% if kurento_health_monitor_enabled %}started{% else %}absent{% endif %}'
+    state: '{% if kurento_health_monitor_enabled %}started{% else %}stopped{% endif %}'
 
 - name: Remove old images
   shell: docker images {{ kurento_health_monitor_image.split(":")[0] }} --filter 'before={{ kurento_health_monitor_image }}' -q | xargs -r docker rmi --force

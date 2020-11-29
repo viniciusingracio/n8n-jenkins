@@ -1,0 +1,18 @@
+- hosts: all
+  gather_facts: no
+  tasks:
+    - name: Copy script
+      copy:
+        src: files/20201125-video.rb
+        dest: /usr/local/bigbluebutton/core/lib/recordandplayback/generators/video.rb
+        mode: 0755
+        backup: yes
+      become: yes
+      register: reg_copy
+
+    - name: Restart process worker
+      service:
+        name: bbb-rap-process-worker
+        state: restarted
+      become: yes
+      when: reg_copy is changed

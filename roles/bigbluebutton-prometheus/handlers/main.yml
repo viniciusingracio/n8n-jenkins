@@ -15,3 +15,7 @@
 - name: restart mtail exporter
   command: docker restart mtail-exporter
   ignore_errors: yes
+
+- name: restart mtr exporter
+  command: docker restart mtr-exporter
+  ignore_errors: yes

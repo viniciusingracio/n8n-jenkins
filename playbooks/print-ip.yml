@@ -1,6 +1,17 @@
 ---
 
 - hosts: all
+  vars:
+    external_ipv4:
   tasks:
+    - name: Determine external IP
+      set_fact:
+        external_ipv4: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | grep \"[0-9]*\\.[0-9]*\\.[0-9]*\\.[0-9]*\" | head -n 1') }}"
+      when: external_ipv4 is none
+    - name: Set external IP as internal IP if nothing returns from dig
+      set_fact:
+        external_ipv4: '{{ ansible_default_ipv4.address }}'
+      when: external_ipv4 is none or external_ipv4 | trim == ""
+
     - debug:
-        msg: "{{ inventory_hostname }}: {{ ansible_default_ipv4.address }}"
+        msg: "{{ inventory_hostname }}: {{ ansible_default_ipv4.address }} (internal), {{ external_ipv4 }} (external)"

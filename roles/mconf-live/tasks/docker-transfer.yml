@@ -12,6 +12,7 @@
       REDIS_HOST: '{{ ansible_docker0.ipv4.address }}'
       BIGBLUEBUTTON_URL: '{{ bbb_api_entry_point | regex_replace("/api") }}'
       BIGBLUEBUTTON_SECRET: '{{ bbb_secret }}'
+      SHOW_JOIN_GUEST_BUTTON: 'true'
       TZ: '{{ lookup("file", "/etc/timezone") }}'
     labels:
       hostname: '{{ inventory_hostname }}'
