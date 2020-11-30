@@ -1,0 +1,19 @@
+---
+
+- hosts:
+  - mconf-live220
+  tasks:
+    # - name:
+    #   shell: find /var/bigbluebutton/{published,unpublished,deleted}/ -name "*.mp4" | cut -d"/" -f 6 | sort -u | tee /tmp/ids-to-repost.txt
+
+    - command: cat /tmp/ids-to-repost.txt
+      register: reg_update_ids
+
+    - include_role:
+        name: aws-publisher
+      vars:
+        aws_publisher_ids: '{{ reg_update_ids.stdout_lines }}'
+        aws_publisher_fast_resync: '0'
+
+    - command: ruby /usr/local/bigbluebutton/core/scripts/utils/repost-published-event.rb -m {{ item }}
+      with_items: '{{ reg_update_ids.stdout_lines }}'

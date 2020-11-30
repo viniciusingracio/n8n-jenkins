@@ -75,3 +75,13 @@
         state: absent
       with_items: '{{ to_copy }}'
       become: yes
+
+    - name: Cleanup
+      shell: |
+        rm -rf /var/bigbluebutton/published/ /var/bigbluebutton/unpublished/ /var/bigbluebutton/deleted/ /var/bigbluebutton/events/
+        mkdir -p /var/bigbluebutton/published/presentation/ /var/bigbluebutton/published/presentation_video/ /var/bigbluebutton/unpublished/presentation/ /var/bigbluebutton/unpublished/presentation_video/ /var/bigbluebutton/deleted/presentation/ /var/bigbluebutton/deleted/presentation_video/ /var/bigbluebutton/events/
+        chown -R bigbluebutton:bigbluebutton /var/bigbluebutton/published/ /var/bigbluebutton/unpublished/ /var/bigbluebutton/deleted/ /var/bigbluebutton/events/
+      become: yes
+      when: bigbluebutton_backup_cleanup is defined
+      tags:
+        - cleanup

@@ -24,3 +24,4 @@ aws_publisher_keep_deleted: 1
 aws_publisher_fast_resync: 0
 
 aws_publisher_run_resync: false
+aws_publisher_ids: []
