@@ -1,0 +1,4 @@
+cluster.name: "docker-cluster"
+network.host: 0.0.0.0
+indices.breaker.request.limit: 45%
+script.painless.regex.enabled: true

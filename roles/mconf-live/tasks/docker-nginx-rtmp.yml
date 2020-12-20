@@ -1,3 +1,20 @@
+- service:
+    name: red5
+    state: stopped
+    enabled: no
+  become: yes
+
+- file:
+    path: /etc/mconf/nginx-rtmp
+    state: directory
+  become: yes
+
+- name: Copy nginx template file
+  copy:
+    src: files/nginx-rtmp.conf.template
+    dest: /etc/mconf/nginx-rtmp/nginx-rtmp.conf.template
+  become: yes
+
 - name: Start nginx-rtmp container
   docker_container:
     name: nginx-rtmp
@@ -7,6 +24,8 @@
     ports:
       - 1935:1935
       - 3015:80
+    volumes:
+      - /etc/mconf/nginx-rtmp/nginx-rtmp.conf.template:/etc/nginx/nginx.conf.template:ro
     labels:
       hostname: '{{ inventory_hostname }}'
     state: '{% if bigbluebutton_docker_nginx_rtmp_enabled %}started{% else %}absent{% endif %}'

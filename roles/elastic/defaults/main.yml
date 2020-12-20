@@ -1,0 +1,9 @@
+---
+
+elastic_username:
+elastic_password:
+
+elastic_local_ssl_certificate:
+elastic_local_ssl_certificate_key:
+elastic_ssl_certificate: certificate.crt
+elastic_ssl_certificate_key: certificate.key

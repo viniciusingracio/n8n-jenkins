@@ -13,6 +13,12 @@
     state: directory
     mode: '0755'
 
+- name: Copy nginx file
+  become: yes
+  copy:
+    src: files/thumbnail-confweb.png
+    dest: /etc/mconf/mconf-streaming-controller/thumbnail-confweb.png
+
 - name:
   become: yes
   file:
@@ -48,6 +54,7 @@
       VIDEO_RNP_CLIENT_SECRET: '{{ bigbluebutton_video_rnp_client_secret | string }}'
       VIDEO_RNP_REDIRECT_URI: 'https://{{ inventory_hostname }}/oauth2_redirect'
       VIDEO_RNP_HOST_IP: '{{ external_ipv4 }}'
+      VIDEO_RNP_API_HOST: 'https://{{ inventory_hostname }}'
       GOOGLE_CLIENT_ID: '{{ bigbluebutton_streaming_google_client_id | string }}'
       GOOGLE_CLIENT_SECRET: '{{ bigbluebutton_streaming_google_client_secret | string }}'
       GOOGLE_REDIRECT_URI: '{{ bigbluebutton_streaming_google_redirect_uri | string }}'
@@ -61,6 +68,7 @@
       - /var/log/mconf-streaming-controller:/var/log/mconf-streaming-controller
       - /var/run/docker.sock:/var/run/docker.sock
       - '{{ bigbluebutton_docker_streaming_controller_k8s_config_file }}:/app/kube-config'
+      - /etc/mconf/mconf-streaming-controller/thumbnail-confweb.png:/app/thumbnail.png
     labels:
       hostname: '{{ inventory_hostname }}'
     state: '{% if bigbluebutton_streaming_enabled %}started{% else %}absent{% endif %}'

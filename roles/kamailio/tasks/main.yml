@@ -20,15 +20,8 @@
   ignore_errors: yes
   # notify: restart kamailio
 
-- name: Install package for htpasswd
-  become: yes
-  apt:
-    name: apache2-utils
-
-- name: Create password file
-  shell: echo {{ bigbluebutton_prometheus_password }} | htpasswd -i -c {{ kamailio_path }}/prometheus.htpasswd prometheus
-  args:
-    creates: '{{ kamailio_path }}/prometheus.htpasswd'
+- include: prometheus.yml
+  when: kamailio_prometheus_enabled
 
 - template:
     src: templates/nginx.conf.j2
@@ -38,10 +31,6 @@
   command: openssl dhparam -out {{ kamailio_path }}/dhp-2048.pem 2048
   args:
     creates: '{{ kamailio_path }}/dhp-2048.pem'
-
-- copy:
-    src: files/kamailio.mtail
-    dest: '{{ kamailio_path }}/kamailio.mtail'
 
 - docker_compose:
     project_src: '{{ kamailio_path }}'

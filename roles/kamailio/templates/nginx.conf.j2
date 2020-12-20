@@ -50,6 +50,7 @@ http {
         ssl_stapling on; # Requires nginx >= 1.3.7
         ssl_stapling_verify on; # Requires nginx => 1.3.7
         add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload";
+{% if kamailio_prometheus_enabled %}
 
         location /metrics {
             proxy_pass         http://{{ ansible_docker0.ipv4.address }}:9100;
@@ -75,6 +76,7 @@ http {
             auth_basic           "Administrator's area";
             auth_basic_user_file /etc/apache2/prometheus.htpasswd;
         }
+{% endif %}
 
         location /ws {
             proxy_pass http://kamailio:8080;

@@ -54,6 +54,8 @@
     delay: 2
     register: task_result
     until: task_result.rc == 0
+    tags:
+      - copy
 
   - setup:
 

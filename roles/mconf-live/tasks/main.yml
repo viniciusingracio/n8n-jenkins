@@ -104,6 +104,7 @@
   tags:
     - streaming
     - docker
+    - nginx-rtmp
 
 - name: Remove basic stats
   become: yes

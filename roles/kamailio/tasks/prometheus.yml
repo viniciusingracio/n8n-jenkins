@@ -1,0 +1,15 @@
+---
+
+- name: Install package for htpasswd
+  become: yes
+  apt:
+    name: apache2-utils
+
+- name: Create password file
+  shell: echo {{ bigbluebutton_prometheus_password }} | htpasswd -i -c {{ kamailio_path }}/prometheus.htpasswd prometheus
+  args:
+    creates: '{{ kamailio_path }}/prometheus.htpasswd'
+
+- copy:
+    src: files/kamailio.mtail
+    dest: '{{ kamailio_path }}/kamailio.mtail'

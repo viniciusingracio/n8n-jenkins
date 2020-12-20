@@ -1,0 +1,54 @@
+---
+
+- file:
+    path: '{{ item }}'
+    state: directory
+    recurse: yes
+    owner: '{{ ansible_user }}'
+    group: '{{ ansible_user }}'
+  become: yes
+  with_items:
+    - /etc/elastic
+    - /etc/elastic/certs
+
+- name: Install package for htpasswd and ifconfig
+  become: yes
+  apt:
+    name:
+      - apache2-utils
+      - net-tools
+
+- name: Encode password
+  shell: echo {{ elastic_password }} | htpasswd -i -n {{ elastic_username }}
+  register: reg_pass
+
+- set_fact:
+    elastic_password_hash: '{{ reg_pass.stdout | replace("$", "$$") }}'
+    # elastic_password_hash: '{{ reg_pass.stdout  }}'
+
+- copy:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+  with_items:
+    - { src: '{{ elastic_local_ssl_certificate }}', dest: '/etc/elastic/certs/{{ elastic_ssl_certificate }}' }
+    - { src: '{{ elastic_local_ssl_certificate_key }}', dest: '/etc/elastic/certs/{{ elastic_ssl_certificate_key }}' }
+    - { src: 'files/elasticsearch.yml', dest: '/etc/elastic/elasticsearch.yml' }
+
+- template:
+    src: templates/docker-compose.yml.j2
+    dest: /etc/elastic/docker-compose.yml
+
+- name: Set max_map_count
+  command: sysctl -w vm.max_map_count=262144
+  become: yes
+
+- name: Make max_map_count permanent
+  blockinfile:
+    dest: /etc/sysctl.conf
+    block: |
+      vm.max_map_count=262144
+    marker: '# {mark} ANSIBLE MANAGED BLOCK elastic'
+  become: yes
+
+- docker_compose:
+    project_src: /etc/elastic

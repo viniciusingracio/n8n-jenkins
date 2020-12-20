@@ -62,7 +62,7 @@
       poll: 15
 
     - name: Upload backup to the cloud
-      shell: docker run --rm -v /:/host:ro -v /var/log:/var/log -e AWS_ACCESS_KEY_ID={{ bigbluebutton_backup_aws_key }} -e AWS_SECRET_ACCESS_KEY={{ bigbluebutton_backup_aws_secret }} -e AWS_DEFAULT_REGION={{ bigbluebutton_backup_aws_region }} amazon/aws-cli --endpoint={{ bigbluebutton_backup_aws_endpoint }} s3 cp /host{{ item.archive }} s3://{{ bigbluebutton_backup_aws_bucket }}/{{ backup_date }}/{{ inventory_hostname }}{{ item.archive }} | tee -a /var/log/bigbluebutton-backup.log && sleep 30
+      shell: docker run --rm -v /:/host:ro -e AWS_ACCESS_KEY_ID={{ bigbluebutton_backup_aws_key }} -e AWS_SECRET_ACCESS_KEY={{ bigbluebutton_backup_aws_secret }} -e AWS_DEFAULT_REGION={{ bigbluebutton_backup_aws_region }} amazon/aws-cli --endpoint={{ bigbluebutton_backup_aws_endpoint }} s3 cp /host{{ item.archive }} s3://{{ bigbluebutton_backup_aws_bucket }}/{{ backup_date }}/{{ inventory_hostname }}{{ item.archive }} && sleep 30
       with_items: '{{ to_copy }}'
       register: result
       until: result is succeeded

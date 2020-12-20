@@ -65,6 +65,7 @@
       GLOBAL_MEDIA_THRESHOLD: '0'
       ROOM_MEDIA_THRESHOLD: '{{ bigbluebutton_docker_webrtc_sfu_streams_meeting | string }}'
       USER_MEDIA_THRESHOLD: '0'
+      LOG_STDOUT_ENABLED: 'false'
     volumes:
       - /var/log/bbb-webrtc-sfu:/var/log/bbb-webrtc-sfu
     labels:

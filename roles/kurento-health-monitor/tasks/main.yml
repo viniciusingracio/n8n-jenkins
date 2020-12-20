@@ -23,6 +23,11 @@
     kurento_config: "{{ kurento_config|default([]) + [ { 'ip': kurento_ip, 'url': 'ws://' + ansible_docker0.ipv4.address + ':' + item + '/kurento' } ] }}"
   with_items: '{{ kurento_ports }}'
 
+- name: Pull kurento health monitor image
+  docker_image:
+    name: '{{ kurento_health_monitor_image }}'
+    source: pull
+
 - name: Start kurento health monitor
   docker_container:
     name: kurento-health-monitor
@@ -38,7 +43,7 @@
       ESL_PORT: '8021'
     labels:
       hostname: '{{ inventory_hostname }}'
-    state: '{% if kurento_health_monitor_enabled %}started{% else %}stopped{% endif %}'
+    state: '{% if kurento_health_monitor_enabled %}started{% else %}absent{% endif %}'
 
 - name: Remove old images
   shell: docker images {{ kurento_health_monitor_image.split(":")[0] }} --filter 'before={{ kurento_health_monitor_image }}' -q | xargs -r docker rmi --force
