@@ -11,11 +11,20 @@
         ok_udp: yes
         ok_http: yes
         ok_https: yes
+        ok_filesystem: yes
 
     - name: Check if OS meets the requirements
       set_fact:
         ok_operational_system: no
       when: not ( ansible_distribution == "Ubuntu" and ansible_distribution_release == "xenial" )
+
+    - name: Test if filesystem is read-only
+      command: /tmp/teste
+      register: filesystem_raw
+
+    - set_fact:
+        ok_filesystem: no
+      when: filesystem_raw is failed
 
     - name: Get memory
       shell: cat /proc/meminfo | grep 'MemTotal:' | tr -s ' ' | cut -d' ' -f2

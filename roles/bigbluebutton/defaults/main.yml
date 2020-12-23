@@ -206,3 +206,4 @@ bigbluebutton_skip_restart_if_meetings_running: false
 
 bigbluebutton_inactivity_seconds: 3600
 bigbluebutton_recording_freeswitch_split_minutes: 0
+bigbluebutton_eject_rogue_voice_users: true

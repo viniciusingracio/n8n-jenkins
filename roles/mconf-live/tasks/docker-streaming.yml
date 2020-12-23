@@ -59,8 +59,6 @@
       GOOGLE_CLIENT_SECRET: '{{ bigbluebutton_streaming_google_client_secret | string }}'
       GOOGLE_REDIRECT_URI: '{{ bigbluebutton_streaming_google_redirect_uri | string }}'
       SELF_HOSTED_HOST: '{{ inventory_hostname }}'
-      # remove it after v1.1.3
-      SELF_HOSTED_HOSTN: '{{ inventory_hostname }}'
       LOG_FILENAME: /var/log/mconf-streaming-controller/mconf-streaming-controller.log
       TZ: '{{ lookup("file", "/etc/timezone") }}'
       KUBECONFIG: '{% if bigbluebutton_docker_streaming_controller_k8s_enabled %}/app/kube-config{% endif %}'

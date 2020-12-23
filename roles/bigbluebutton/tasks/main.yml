@@ -307,7 +307,7 @@
     - { regexp: 'inactivity[ ]*=', line: '  inactivity = {{ bigbluebutton_inactivity_seconds }}' }
     - { regexp: 'recordEnableFileSplitter[ ]*=', line: '  recordEnableFileSplitter = {{ "true" if bigbluebutton_recording_freeswitch_split_minutes > 0 else "false" }}' }
     - { regexp: 'recordFileSplitterIntervalInMinutes[ ]*=', line: '  recordFileSplitterIntervalInMinutes = {{ bigbluebutton_recording_freeswitch_split_minutes }}' }
-    - { regexp: 'ejectRogueVoiceUsers[ ]*=', line: '  ejectRogueVoiceUsers = true' }
+    - { regexp: 'ejectRogueVoiceUsers[ ]*=', line: '  ejectRogueVoiceUsers = {{ bigbluebutton_eject_rogue_voice_users }}' }
   notify: restart bigbluebutton
 
 # TODO move this to a new role/task

@@ -82,5 +82,25 @@
   become: yes
   ufw: state=enabled
 
+- name: Get ufw service path
+  shell: systemctl show -p FragmentPath ufw.service | cut -d'=' -f2
+  register: reg_ufw
+
+# https://devtidbits.com/2019/07/31/ufw-service-not-loading-after-a-reboot/
+- name: Make sure ufw will work on reboot
+  become: yes
+  lineinfile:
+    path: '{{ reg_ufw.stdout }}'
+    regexp: '^After='
+    insertafter: '^Before='
+    line: After=netfilter-persistent.service
+  register: reg_ufw_service
+
+- name: Systemd daemon reload
+  become: yes
+  systemd:
+    daemon_reload: yes
+  when: reg_ufw_service is changed
+
 - include_role:
     name: ufw.docker

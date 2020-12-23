@@ -3,5 +3,5 @@
 - import_tasks: '{{ awd | default(playbook_dir) }}/playbooks/docker-daemon-config.yml'
   vars:
     docker_daemon_config_add:
-      - { key: 'mtu', value: '{{ ansible_default_ipv4.mtu }}', cast_int: true }
+      - { key: 'mtu', value: '{{ [ ansible_default_ipv4.mtu, 1500 ] | min }}', cast_int: true }
   when: ansible_default_ipv4.mtu is defined

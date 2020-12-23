@@ -22,7 +22,7 @@ mconf_live_rec_proxy_jwt_secret:
 mconf_live_sounds_hold_music:
 
 mconf_live_presentation_recorder_image: mconf/mconf-presentation-recorder
-mconf_live_presentation_recorder_version: 0.0.14-2ae375e
+mconf_live_presentation_recorder_version: 0.0.17-a035a9e
 
 # these attributes are optional and will be set to default values if empty
 mconf_live_recording_auth_entry_point:
@@ -64,13 +64,13 @@ bigbluebutton_docker_kurento_ignore_ips: []
 bigbluebutton_docker_kurento_use_stun: false
 
 bigbluebutton_docker_streaming_controller_enabled: true
-bigbluebutton_docker_streaming_controller_image: mconf/mconf-streaming-controller:v1.1.3
+bigbluebutton_docker_streaming_controller_image: mconf/mconf-streaming-controller:v1.1.4
 bigbluebutton_docker_streaming_controller_k8s_enabled: false
 bigbluebutton_docker_streaming_controller_k8s_local_config_file: files/kube-config
 bigbluebutton_docker_streaming_controller_k8s_config_file: /usr/local/bigbluebutton/bbb-webrtc-sfu/config/kube-config
 
 bigbluebutton_allow_transfer: false
-bigbluebutton_docker_live_transfer_image: mconf/mconf-live-transfer:v1.1.6
+bigbluebutton_docker_live_transfer_image: mconf/mconf-live-transfer:v1.1.8
 
 bigbluebutton_docker_nginx_rtmp_enabled: false
 bigbluebutton_docker_nginx_rtmp_image: alfg/nginx-rtmp:1.1

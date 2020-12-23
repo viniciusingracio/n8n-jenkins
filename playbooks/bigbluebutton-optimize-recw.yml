@@ -1,0 +1,29 @@
+---
+
+- hosts:
+  - mconf-recw
+  tasks:
+  - name: Stop services not needed
+    become: yes
+    service:
+      name: '{{ item }}'
+      state: stopped
+    with_items:
+      - bbb-web
+      - freeswitch
+      - bbb-apps-akka
+      - bbb-fsesl-akka
+
+  - cron:
+      name: '{{ item }}'
+      state: absent
+    with_items:
+      - remove norecord
+      - remove archived
+      - remove encrypted
+      - restart mconf
+      - cleanup published done
+      - generate list of recordings
+      - audio-stats to fluentd, sleep 30
+      - audio-stats to fluentd, sleep 60
+    become: yes
