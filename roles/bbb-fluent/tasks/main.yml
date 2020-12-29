@@ -1,14 +1,5 @@
 ---
 
-- name: Create reindex files
-  file:
-    path: '{{ item }}'
-    state: touch
-  with_items:
-    - /var/log/nginx/html5-client-reindex.log
-    - /var/log/bigbluebutton/audio-stats-reindex.log
-  become: yes
-
 - name: Create bbb-fluent directory
   file:
     path: /etc/bbb-fluent
@@ -17,11 +8,17 @@
     state: directory
   become: yes
 
+- set_fact:
+    fluentd_conf: "fluent-elastic-s3.conf"
+  when: bbb_fluent_elastic_enabled and bbb_fluent_s3_enabled
+- set_fact:
+    fluentd_conf: "fluent-elastic.conf"
+  when: bbb_fluent_elastic_enabled and ! bbb_fluent_s3_enabled
+
 - name: Start fluentd container
   docker_container:
     name: fluentd
     image: '{{ bbb_fluent_image_version }}'
-    command: -c /fluentd/etc/fluent-light.conf
     pull: yes
     restart_policy: unless-stopped
     user: root
@@ -29,25 +26,36 @@
     memory: 512M
     volumes:
       - /:/host:ro
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/containers/:/var/lib/docker/containers/:ro
       - /var/log/td-agent:/var/log/td-agent
+      - /var/log/fluent:/var/log/fluent
     ports:
       - 5044:5044
       - 9880:9880
       - 24231:24231
     env:
       TZ: '{{ lookup("file", "/etc/timezone") }}'
-      ELASTIC_SCHEME: "{{ bbb_fluent_elastic_scheme | string }}"
-      ELASTIC_PATH: "{{ bbb_fluent_elastic_path | string }}"
-      ELASTIC_HOST: "{{ bbb_fluent_elastic_host | string }}"
-      ELASTIC_PORT: "{{ bbb_fluent_elastic_port | string }}"
-      ELASTIC_AUTH_USER: "{{ bbb_fluent_elastic_auth_user | string }}"
-      ELASTIC_AUTH_PASS: "{{ bbb_fluent_elastic_auth_pass | string }}"
-      READ_LOGS_FROM_HEAD: "false"
-      REAL_TIME_SUMMARY_UPDATES: "true"
-      FLUENTD_CONF: "fluent-light.conf"
+      FLUENTD_ELASTIC_ENABLED: "{{ bbb_fluent_elastic_enabled | string }}"
+      FLUENTD_ELASTIC_SCHEME: "{{ bbb_fluent_elastic_scheme | string }}"
+      FLUENTD_ELASTIC_PATH: "{{ bbb_fluent_elastic_path | string }}"
+      FLUENTD_ELASTIC_HOST: "{{ bbb_fluent_elastic_host | string }}"
+      FLUENTD_ELASTIC_PORT: "{{ bbb_fluent_elastic_port | string }}"
+      FLUENTD_ELASTIC_AUTH_USER: "{{ bbb_fluent_elastic_auth_user | string }}"
+      FLUENTD_ELASTIC_AUTH_PASS: "{{ bbb_fluent_elastic_auth_pass | string }}"
+      FLUENTD_ELASTIC_REAL_TIME_UPDATES: "false"
+      FLUENTD_S3_ENABLED: "{{ bbb_fluent_s3_enabled | string }}"
+      FLUENTD_S3_KEY_ID: "{{ bbb_fluent_s3_key_id | string }}"
+      FLUENTD_S3_SECRET_KEY: "{{ bbb_fluent_s3_secret_key | string }}"
+      FLUENTD_S3_ENDPOINT: "{{ bbb_fluent_s3_endpoint | string }}"
+      FLUENTD_S3_BUCKET_NAME: "{{ bbb_fluent_s3_bucket_name | string }}"
+      FLUENTD_S3_REGION: "{{ bbb_fluent_s3_region | string }}"
+      FLUENTD_S3_FORCE_PATH_STYLE: "{{ bbb_fluent_s3_force_path_style | string | lower }}"
+      FLUENTD_S3_UPLOAD_TIME_KEY: "{{ ( 3600 * 24 ) | string }}"
+      FLUENTD_S3_UPLOAD_WAIT: "60s"
+      FLUENTD_CONF: '{{ fluentd_conf }}'
     labels:
       hostname: '{{ inventory_hostname }}'
+  when: fluentd_conf is defined
   notify: clean docker
   tags:
     - docker

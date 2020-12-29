@@ -1,9 +1,17 @@
 ---
 
-bbb_fluent_image_version: mconf/bbb-fluent:latest
+bbb_fluent_image_version: mconf/bbb-fluent:v1.1.0
+bbb_fluent_elastic_enabled: false
 bbb_fluent_elastic_scheme: https
 bbb_fluent_elastic_path:
 bbb_fluent_elastic_host:
 bbb_fluent_elastic_port:
 bbb_fluent_elastic_auth_user:
 bbb_fluent_elastic_auth_pass:
+bbb_fluent_s3_enabled: false
+bbb_fluent_s3_key_id:
+bbb_fluent_s3_secret_key:
+bbb_fluent_s3_endpoint:
+bbb_fluent_s3_bucket_name:
+bbb_fluent_s3_region:
+bbb_fluent_s3_force_path_style: false
