@@ -5,6 +5,13 @@
     dest: /etc/nginx/conf.d/bbb-log.conf
   notify: reload nginx
 
+- name: Setup file for timed combined log
+  become: yes
+  copy:
+    src: files/time_local_ms.conf
+    dest: /etc/nginx/conf.d/time_local_ms.conf
+  notify: reload nginx
+
 - name: Configure log format
   become: yes
   lineinfile:
