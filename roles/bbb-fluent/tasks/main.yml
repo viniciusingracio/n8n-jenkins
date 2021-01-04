@@ -13,7 +13,7 @@
   when: bbb_fluent_elastic_enabled and bbb_fluent_s3_enabled
 - set_fact:
     fluentd_conf: "fluent-elastic.conf"
-  when: bbb_fluent_elastic_enabled and ! bbb_fluent_s3_enabled
+  when: bbb_fluent_elastic_enabled and not bbb_fluent_s3_enabled
 
 - name: Start fluentd container
   docker_container:
@@ -51,7 +51,7 @@
       FLUENTD_S3_REGION: "{{ bbb_fluent_s3_region | string }}"
       FLUENTD_S3_FORCE_PATH_STYLE: "{{ bbb_fluent_s3_force_path_style | string | lower }}"
       FLUENTD_S3_UPLOAD_TIME_KEY: "{{ ( 3600 * 24 ) | string }}"
-      FLUENTD_S3_UPLOAD_WAIT: "60s"
+      FLUENTD_S3_UPLOAD_WAIT: "10m"
       FLUENTD_CONF: '{{ fluentd_conf }}'
     labels:
       hostname: '{{ inventory_hostname }}'
