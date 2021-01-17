@@ -75,5 +75,18 @@ http {
             auth_basic           "Administrator's area";
             auth_basic_user_file /etc/apache2/prometheus.htpasswd;
         }
+
+        location /coturn_metrics {
+            rewrite /coturn_metrics /metrics  break;
+            proxy_pass         http://{{ ansible_docker0.ipv4.address }}:9641;
+            proxy_redirect     default;
+            proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+            proxy_set_header   X-Real-IP         $remote_addr;
+            proxy_set_header   Host              $http_host;
+            proxy_set_header   X-NginX-Proxy     true;
+
+            auth_basic           "Administrator's area";
+            auth_basic_user_file /etc/apache2/prometheus.htpasswd;
+        }
     }
 }

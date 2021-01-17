@@ -2,7 +2,3 @@
 - name: restart coturn
   become: yes
   service: name=coturn state=restarted
-
-- name: reload systemctl
-  become: yes
-  command: systemctl daemon-reload

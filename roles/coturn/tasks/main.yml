@@ -5,7 +5,6 @@
   apt:
     name:
       - sqlite
-      - redis-server
       - build-essential
       - libssl-dev
       - libsqlite3-dev
@@ -13,8 +12,8 @@
       - libpq-dev
       - mysql-client
       - libmysqlclient-dev
-      - libhiredis-dev
       - libmicrohttpd-dev
+      - pkg-config
     state: present
 
 - name: More dependencies
@@ -22,8 +21,8 @@
   apt:
     deb: '{{ item }}'
   with_items:
-    - https://github.com/digitalocean/prometheus-client-c/releases/download/v0.1.1/libprom-dev-0.1.1-Linux.deb
-    - https://github.com/digitalocean/prometheus-client-c/releases/download/v0.1.1/libpromhttp-dev-0.1.1-Linux.deb
+    - https://github.com/digitalocean/prometheus-client-c/releases/download/v0.1.3/libprom-dev-0.1.3-Linux.deb
+    - https://github.com/digitalocean/prometheus-client-c/releases/download/v0.1.3/libpromhttp-dev-0.1.3-Linux.deb
 
 - name: Download and extract
   become: yes
@@ -55,9 +54,13 @@
   copy:
     src: files/coturn.service
     dest: /etc/systemd/system/coturn.service
-  notify:
-    - reload systemctl
-    - restart coturn
+  register: reg_systemd
+  notify: restart coturn
+
+- name: Reload systemctl
+  become: yes
+  command: systemctl daemon-reload
+  when: reg_systemd is changed
 
 - include: ssl.yml
   when: coturn_ssl_enabled
@@ -82,7 +85,7 @@
   become: yes
   service:
     name: coturn
-    state: started
+    state: restarted
     enabled: yes
 
 - include: ufw.yml

@@ -1,6 +1,6 @@
 counter coturn_mtail_total by reason
 
-getfilename() =~ /syslog$/ {
+getfilename() =~ /coturn.log$/ {
   /create_relay_ioa_sockets: no available ports/ {
     coturn_mtail_total["No available ports"]++
   }

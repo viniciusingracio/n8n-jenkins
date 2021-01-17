@@ -4,7 +4,7 @@ services:
   mtail:
     image: mconf/mtail:v3.0.0-rc36
     container_name: mtail-exporter
-    command: -logtostderr -progs /progs/coturn.mtail -logs /host/var/log/syslog
+    command: -logtostderr -progs /progs/coturn.mtail -logs /host/var/log/coturn.log
     restart: always
     volumes:
       - /var/log:/host/var/log
