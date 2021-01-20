@@ -1,0 +1,4 @@
+/usr/local/bin/ansible-playbook -i envs/prod/com-staging/hosts -l mconf-web --tags kong playbooks/mconf-web.yml
+
+d.elos.dev: 20 OK, 9 changed, 0 unreachable, 0 failed
+h.elos.dev: 20 OK, 9 changed, 0 unreachable, 0 failed
