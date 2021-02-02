@@ -42,7 +42,7 @@
       FLUENTD_ELASTIC_PORT: "{{ bbb_fluent_elastic_port | string }}"
       FLUENTD_ELASTIC_AUTH_USER: "{{ bbb_fluent_elastic_auth_user | string }}"
       FLUENTD_ELASTIC_AUTH_PASS: "{{ bbb_fluent_elastic_auth_pass | string }}"
-      FLUENTD_ELASTIC_REAL_TIME_UPDATES: "false"
+      FLUENTD_ELASTIC_REAL_TIME_UPDATES: "true"
       FLUENTD_S3_ENABLED: "{{ bbb_fluent_s3_enabled | string }}"
       FLUENTD_S3_KEY_ID: "{{ bbb_fluent_s3_key_id | string }}"
       FLUENTD_S3_SECRET_KEY: "{{ bbb_fluent_s3_secret_key | string }}"

@@ -36,6 +36,7 @@
       command[check_dns]=/usr/lib/nagios/plugins/check_dns -H $ARG1$ -w $ARG2$ -c $ARG3$
       command[check_recw2nfs]=sudo /usr/lib/nagios/plugins/check_recw2nfs.pl
       command[check_rpc]=/usr/lib/nagios/plugins/check_rpc -H 200.130.35.187 -p 2049 -t -C nfs
+      command[check_mconf_db]=sudo /usr/lib/nagios/plugins/check_mconf_db.pl
     marker: '# {mark} ANSIBLE MANAGED BLOCK'
   notify: restart nrpe
 
@@ -66,7 +67,7 @@
   lineinfile:
     dest: /etc/sudoers
     regex: '^Cmnd_Alias NAGIOS\s'
-    line: 'Cmnd_Alias NAGIOS = /usr/lib/nagios/plugins/check_mconf.pl, /usr/lib/nagios/plugins/check_recw2nfs.pl, /usr/lib/nagios/plugins/check_passenger.pl'
+    line: 'Cmnd_Alias NAGIOS = /usr/lib/nagios/plugins/check_mconf.pl, /usr/lib/nagios/plugins/check_recw2nfs.pl, /usr/lib/nagios/plugins/check_passenger.pl, /usr/lib/nagios/plugins/check_mconf_db.pl'
     backup: yes
     state: present
     validate: visudo -cf %s

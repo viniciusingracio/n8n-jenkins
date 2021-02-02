@@ -13,8 +13,8 @@ INSERT INTO servers_to_add(name, secret, subnet) VALUES
 DO $$
 BEGIN
     IF NOT EXISTS(SELECT name FROM servers WHERE name IN (SELECT name FROM servers_to_add)) THEN    -- Se não há servidor a ser adicionado na tabela atual de servidores
-        INSERT INTO servers(name, secret)    -- basta adicionar os servidores na tabela de servidores.
-        SELECT name, secret FROM servers_to_add;
+        INSERT INTO servers(name, secret, enabled)    -- basta adicionar os servidores na tabela de servidores.
+        SELECT name, secret, false FROM servers_to_add;
     ELSE    -- Senão, é necessário atualizar a senha dos servidores que já foram adicionados anteriormente
         UPDATE servers
         SET secret = (SELECT secret FROM servers_to_add WHERE servers_to_add.name = servers.name)

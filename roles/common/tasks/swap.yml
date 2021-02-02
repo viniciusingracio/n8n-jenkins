@@ -12,7 +12,7 @@
     swap_size: '{{ free_mem.stdout | int }}'
 
 - name: Create swap file
-  command: dd if=/dev/zero of=/swapfile count={{ [ swap_size, 2048 ] | min }} bs=1MiB
+  command: dd if=/dev/zero of=/swapfile count={{ [ swap_size | int, 2048 ] | min }} bs=1MiB
   become: yes
   when: create_swap
 
