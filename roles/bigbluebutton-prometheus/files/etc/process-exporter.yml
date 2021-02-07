@@ -41,3 +41,26 @@ process_names:
     - node
     cmdline:
     - node_modules/ep_etherpad_lite/node/server.js
+  - name: ffmpeg
+    exe:
+    - ffmpeg
+  - name: gstreamer
+    exe:
+    - gst-launch-1.0
+  - name: firefox
+    exe:
+    - /usr/lib/firefox/firefox
+  - name: node-exporter
+    exe:
+    - /bin/node_exporter
+  - name: packetbeat
+    exe:
+    - packetbeat
+  - name: fluentd
+    exe:
+    - /usr/bin/ruby
+    cmdline:
+    - /usr/bin/fluentd -c /fluentd/etc/fluent-elastic-s3.conf -p /fluentd/plugins
+  - name: libreoffice
+    exe:
+    - /usr/lib/libreoffice/program/soffice.bin

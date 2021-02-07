@@ -1,0 +1,22 @@
+---
+
+# The following attributes should be set somewhere:
+#
+# bbb_s3_key
+# bbb_s3_secret
+# bbb_s3_endpoint
+# bbb_s3_region
+# bbb_s3_bucket
+
+- hosts:
+  - mconf-live220
+  roles:
+    - docker-host
+  tasks:
+    - name: Figure out raw
+      shell: ls -1 /var/bigbluebutton/recording/raw/
+      register: reg_raw_ids
+
+    - name: Upload raw to the cloud
+      shell: docker run --rm -e BBB_S3_KEY={{ bbb_s3_key }} -e BBB_S3_SECRET={{ bbb_s3_secret }} -e BBB_S3_REGION={{ bbb_s3_region }} -e BBB_S3_ENDPOINT={{ bbb_s3_endpoint }} -e BBB_S3_BUCKET={{ bbb_s3_bucket }} -v /var/bigbluebutton/recording/raw:/var/bigbluebutton/recording/raw mconf/mconf-rec-worker:1.0.0 ruby upload-raw-s3.rb -m {{ item }}
+      with_items: '{{ reg_raw_ids.stdout_lines }}'

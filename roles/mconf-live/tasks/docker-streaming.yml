@@ -53,16 +53,17 @@
       STREAM_BIGBLUEBUTTON_URL: '{{ bbb_api_entry_point | regex_replace("/api") }}'
       STREAM_BOT_NAME: 'Streaming'
       STREAM_CONTAINER_TYPE: '{% if bigbluebutton_docker_streaming_controller_k8s_enabled %}kubernetes{% else %}docker{% endif %}'
+      STREAM_IMAGE_NAME: '{{ bigbluebutton_docker_streaming_controller_streaming_image }}'
       STREAM_K8S_CONTAINERS: "{{ [ { 'name': bigbluebutton_docker_streaming_controller_k8s_job_name, 'image': bigbluebutton_docker_streaming_controller_k8s_streaming_image } ] | to_json }}"
       STREAM_K8S_IMAGE_PULL_SECRETS: "{{ [ { 'name': bigbluebutton_docker_streaming_controller_k8s_image_pull_secret } ] | to_json }}"
       STREAM_K8S_NAMESPACE: '{{ bigbluebutton_docker_streaming_controller_k8s_namespace }}'
       TZ: '{{ lookup("file", "/etc/timezone") }}'
+      VIDEO_RNP_API: 'videornp' # videornp or eduplay
       VIDEO_RNP_API_HOST: 'https://{{ inventory_hostname }}'
       VIDEO_RNP_BASE_URL: '{{ bigbluebutton_video_rnp_endpoint_hostname }}'
       VIDEO_RNP_CLIENT_ID: '{{ bigbluebutton_video_rnp_client_id | string }}'
       VIDEO_RNP_CLIENT_SECRET: '{{ bigbluebutton_video_rnp_client_secret | string }}'
       VIDEO_RNP_HOST_IP: '{{ external_ipv4 }}'
-      VIDEO_RNP_NEW_API: 'false'
       VIDEO_RNP_REDIRECT_URI: 'https://{{ inventory_hostname }}/oauth2_redirect'
     volumes:
       - /var/log/mconf-streaming-controller:/var/log/mconf-streaming-controller

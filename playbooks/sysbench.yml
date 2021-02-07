@@ -1,0 +1,15 @@
+- name: Run sysbench
+  hosts: all
+  tasks:
+
+  - apt:
+      name: sysbench
+    become: yes
+
+  - shell: |
+      # sysbench --time=10 --threads=1 cpu run | tr -s ' ' | grep '^ .*: .*' | grep 'events per second' | cut -d':' -f2 | sed 's/^[[:space:]]*\(.*\)[[:space:]]*$/\1/g'
+      sysbench --test=cpu --max-time=10 --max-requests=100000 run | tr -s ' ' | grep '^ .*: .*' | grep 'total number of events' | cut -d':' -f2 | sed 's/^[[:space:]]*\(.*\)[[:space:]]*$/\1/g'
+    register: reg_sysbench
+
+  - debug:
+      msg: '{{ inventory_hostname}}: {{ reg_sysbench.stdout }}'

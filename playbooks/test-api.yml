@@ -1,0 +1,16 @@
+- hosts: mconf-live220
+  gather_facts: no
+  tasks:
+    - shell: curl -s https://{{ inventory_hostname }}/bigbluebutton/api/create
+      delegate_to: localhost
+      register: reg_out
+
+    - set_fact:
+        success: '{{ reg_out is succeeded and reg_out.stdout | regex_search("You did not pass the checksum security check") }}'
+
+    - debug:
+        msg: '{{ reg_out.stdout }}'
+      when: not success
+
+    - fail:
+      when: not success

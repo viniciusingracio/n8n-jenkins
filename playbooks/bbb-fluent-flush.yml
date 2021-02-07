@@ -1,0 +1,5 @@
+---
+
+- hosts: bbb-fluent
+  tasks:
+    - command: docker kill --signal="SIGUSR1" fluentd
