@@ -15,3 +15,6 @@ coturn_domain_name: '{{ inventory_hostname }}'
 coturn_secret:
 
 coturn_monitoring_enabled: true
+# disabled by default since it seems to be responsible for a memory leak
+# https://github.com/coturn/coturn/issues/666
+coturn_exporter_enabled: false

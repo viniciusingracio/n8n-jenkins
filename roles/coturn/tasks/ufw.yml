@@ -16,6 +16,7 @@
     delete: '{{ not coturn_ssl_enabled }}'
   with_items:
     - { rule: 'allow', port: '{{ coturn_ssl_port }}', proto: 'tcp' }
+    - { rule: 'allow', port: '{{ coturn_ssl_port }}', proto: 'udp' }
   notify:
     - restart ufw
 

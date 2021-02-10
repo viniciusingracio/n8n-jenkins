@@ -75,6 +75,7 @@ http {
             auth_basic           "Administrator's area";
             auth_basic_user_file /etc/apache2/prometheus.htpasswd;
         }
+{% if coturn_exporter_enabled %}
 
         location /coturn_metrics {
             rewrite /coturn_metrics /metrics  break;
@@ -88,5 +89,6 @@ http {
             auth_basic           "Administrator's area";
             auth_basic_user_file /etc/apache2/prometheus.htpasswd;
         }
+{% endif %}
     }
 }

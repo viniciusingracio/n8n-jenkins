@@ -19,4 +19,6 @@ static-auth-secret={{ coturn_secret }}
 log-file=/var/log/coturn.log
 simple-log
 
+{% if coturn_exporter_enabled %}
 prometheus
+{% endif %}

@@ -2,6 +2,23 @@ counter coturn_mtail_total by reason
 
 getfilename() =~ /coturn.log$/ {
   /create_relay_ioa_sockets: no available ports/ {
-    coturn_mtail_total["No available ports"]++
+    coturn_mtail_total["create_relay_ioa_sockets: no available ports"]++
+  }
+
+  /ERROR: (session \d+: )?((TLS\/)?TCP )?(?P<reason>.*) (\[[0-9a-z:]*\]+:\d+|[0-9\.]+:\d+|<\d+:\w+>)$/ {
+    $reason !~ /Connection reset by peer/ {
+      coturn_mtail_total[$reason]++
+    }
   }
 }
+
+# matches:
+# 27055: : ERROR: session 000000000000259662: TCP socket error: Connection reset by peer [2804:38a:a05c:6737:a5e2:f6d9:fca3:a2b0]:55030
+# 27003: : ERROR: session 000000000000261477: TLS/TCP socket error: Connection reset by peer 177.58.234.77:10357
+# 2025591: : create_relay_ioa_sockets: no available ports 3
+#
+# analyze log with:
+# cat /tmp/coturn.log | sed 's|^[0-9]*: : ||g' | sed 's|session [0-9]*: ||g' | sed 's| \[*[0-9a-f\.:]*\]*:[0-9]*$||g' | sed 's| of user <[^>]*>$| of user|g' | sort | uniq -c | sort -n -r
+#
+# test with:
+# docker run --rm -it -v /tmp:/host/var/log -v $(pwd)/roles/coturn/files/coturn.mtail:/progs/coturn.mtail mconf/mtail:v3.0.0-rc36 --one_shot -logtostderr -progs /progs/coturn.mtail -logs /host/var/log/coturn.log

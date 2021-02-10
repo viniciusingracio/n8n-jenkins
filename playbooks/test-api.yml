@@ -1,8 +1,9 @@
 - hosts: mconf-live220
   gather_facts: no
   tasks:
-    - shell: curl -s https://{{ inventory_hostname }}/bigbluebutton/api/create
+    - shell: curl -s --max-time 10 https://{{ inventory_hostname }}/bigbluebutton/api/create
       delegate_to: localhost
+      ignore_errors: yes
       register: reg_out
 
     - set_fact:
