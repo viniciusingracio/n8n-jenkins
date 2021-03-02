@@ -2,7 +2,7 @@
   roles:
   - { role: nrpe, tags: [ nrpe ] }
 
-- hosts: kong
+- hosts: kong,!kong-disabled
   roles:
   - { role: kong, tags: [ kong ] }
 

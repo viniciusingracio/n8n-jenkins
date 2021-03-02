@@ -58,7 +58,7 @@
       STREAM_K8S_IMAGE_PULL_SECRETS: "{{ [ { 'name': bigbluebutton_docker_streaming_controller_k8s_image_pull_secret } ] | to_json }}"
       STREAM_K8S_NAMESPACE: '{{ bigbluebutton_docker_streaming_controller_k8s_namespace }}'
       TZ: '{{ lookup("file", "/etc/timezone") }}'
-      VIDEO_RNP_API: 'videornp' # videornp or eduplay
+      VIDEO_RNP_API: '{{ bigbluebutton_video_rnp_version }}' # videornp or eduplay
       VIDEO_RNP_API_HOST: 'https://{{ inventory_hostname }}'
       VIDEO_RNP_BASE_URL: '{{ bigbluebutton_video_rnp_endpoint_hostname }}'
       VIDEO_RNP_CLIENT_ID: '{{ bigbluebutton_video_rnp_client_id | string }}'

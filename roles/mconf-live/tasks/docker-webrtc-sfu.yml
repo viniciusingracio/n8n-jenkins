@@ -50,6 +50,8 @@
       FREESWITCH_IP_MAPPINGS: '{{ ip_mappings | to_json }}'
       FREESWITCH_SIP_IP: '{{ external_ipv4 }}' # should always be the same as ws-binding
       GLOBAL_MEDIA_THRESHOLD: '0'
+      KURENTO_ALLOW_MDNS: 'false'
+      KURENTO_TRACK_ICE_STATE_CHANGES: 'true'
       KURENTO: '{{ kurento_config | to_json }}'
       LOG_FILENAME: /var/log/bbb-webrtc-sfu/bbb-webrtc-sfu.log
       LOG_LEVEL: info

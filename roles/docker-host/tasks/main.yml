@@ -57,7 +57,7 @@
 - name: Reset SSH
   # if ansible_ssh_user is root, it will close the daemon, not only the session
   # shell: sleep 1; pkill -u {{ ansible_ssh_user }} sshd
-  shell: "ps -aux | grep 'sshd: {{ ansible_ssh_user }}@' | head -n 1 | tr -s ' ' | cut -d' ' -f2 | xargs --no-run-if-empty -I{} kill -9 {}"
+  shell: "ps -aux | grep 'sshd: {{ ansible_ssh_user }}@' | tr -s ' ' | cut -d' ' -f2 | xargs --no-run-if-empty -I{} kill -9 {}"
   ignore_errors: yes
   async: 3
   poll: 2

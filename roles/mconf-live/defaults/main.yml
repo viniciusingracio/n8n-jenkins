@@ -96,6 +96,7 @@ bigbluebutton_sfu_auth_enabled: true
 
 bigbluebutton_streaming_enabled: false
 bigbluebutton_video_rnp_endpoint_hostname: video--approval.rnp.br
+bigbluebutton_video_rnp_version: videornp # videornp or eduplay
 bigbluebutton_video_rnp_client_id:
 bigbluebutton_video_rnp_client_secret:
 bigbluebutton_streaming_google_client_id:

@@ -10,12 +10,8 @@
     - command: cat /tmp/ids-to-repost.txt
       register: reg_update_ids
 
-    - include_role:
-        name: aws-publisher
-      vars:
-        aws_publisher_ids: '{{ reg_update_ids.stdout_lines }}'
-        aws_publisher_fast_resync: '0'
-      when: reg_update_ids.stdout_lines|length > 0
+    - command: docker exec mconf-aws-publisher bundle exec ruby s3.rb --meeting {{ item }}
+      with_items: '{{ reg_update_ids.stdout_lines }}'
 
     - command: ruby /usr/local/bigbluebutton/core/scripts/utils/repost-published-event.rb -m {{ item }}
       with_items: '{{ reg_update_ids.stdout_lines }}'

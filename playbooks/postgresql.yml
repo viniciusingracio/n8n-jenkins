@@ -1,38 +1,78 @@
 - hosts: postgresql
+  # set it to mount on a volume:
+  # postgresql_external_dir
+  tasks:
+    - stat:
+        path: '{{ item }}'
+      with_items:
+        - /var/lib/postgresql
+      register: reg_dir
+
+    - debug:
+        msg: '{{ postgresql_external_dir }}'
+
+    - name: Create directory if it doesn't exist yet
+      become: yes
+      file:
+        path: '{{ item.item }}'
+        state: directory
+      with_items: '{{ reg_dir.results }}'
+      when: not item.stat.exists
+
+    - name: Create parent directories to move
+      become: yes
+      file:
+        path: '{{ postgresql_external_dir }}{{ item.item | dirname }}'
+        state: directory
+      with_items: '{{ reg_dir.results }}'
+      when: not postgresql_external_dir is none and reg_dir is defined
+
+    - name: Copy directories to storage
+      become: yes
+      command: rsync -aqxP {{ item.item }} {{ postgresql_external_dir }}{{ item.item | dirname }}
+      with_items: '{{ reg_dir.results }}'
+      when: not postgresql_external_dir is none and item.stat.exists and not item.stat.islnk
+
+    - name: Remove directories from local disk
+      become: yes
+      command: rm -r {{ item.item }}
+      with_items: '{{ reg_dir.results }}'
+      when: not postgresql_external_dir is none and item.stat.exists and not item.stat.islnk
+
+    - name: Create links to storage
+      become: yes
+      file:
+        src: '{{ postgresql_external_dir }}{{ item.item }}'
+        dest: '{{ item.item }}'
+        state: link
+      with_items: '{{ reg_dir.results }}'
+      when: not postgresql_external_dir is none and item.stat.exists and not item.stat.islnk
+
+- hosts: postgresql
   roles:
     - role: geerlingguy.postgresql
       become: yes
+  tasks:
+    - set_fact:
+        superuser_list: '{{ postgresql_users | rejectattr("role_attr_flags", "undefined") | selectattr("role_attr_flags", "match", "SUPERUSER") | list }}'
+    - fail:
+        msg: "No SUPERUSER user defined"
+      when: superuser_list | length == 0
+    - set_fact:
+        superuser: '{{ superuser_list | first }}'
+        any_database: '{{ postgresql_databases | map(attribute="name") | first }}'
+
+    - postgresql_query:
+        db: '{{ any_database }}'
+        login_host: localhost
+        login_user: '{{ superuser["name"] }}'
+        login_password: '{{ superuser["password"] }}'
+        query: 'CREATE EXTENSION IF NOT EXISTS pg_stat_statements;'
 
 - hosts: postgres_exporter
   roles:
     - docker-host
   tasks:
-    #- set_fact:
-    #    user_list: '{{ postgresql_users | selectattr("name", "match", "^postgres_exporter$") | list }}'
-    #- fail:
-    #    msg: "No postgres_exporter user defined"
-    #  when: user_list | length == 0
-    #- set_fact:
-    #    user: '{{ user_list | first}}'
-
-    #- set_fact:
-    #    dbname: '{{ ( postgresql_databases | first )["name"] }}'
-
-    #- name: Start postgres exporter
-    #  docker_container:
-    #    name: postgres_exporter
-    #    image: wrouesnel/postgres_exporter
-    #    pull: yes
-    #    restart_policy: always
-    #    network_mode: host
-    #    env:
-    #      DATA_SOURCE_URI: localhost
-    #      DATA_SOURCE_USER: '{{ user["name"] }}'
-    #      DATA_SOURCE_PASS: '{{ user["password"] }}'
-    #      PG_EXPORTER_AUTO_DISCOVER_DATABASES: 'true'
-    #    labels:
-    #      hostname: '{{ inventory_hostname }}'
-
     - name: Start node-exporter
       docker_container:
         name: node-exporter
@@ -46,3 +86,5 @@
           - /:/host:ro,rslave
         labels:
           hostname: '{{ inventory_hostname }}'
+
+- include: '{{ awd | default(playbook_dir) }}/playbooks/postgresql-exporter.yml'

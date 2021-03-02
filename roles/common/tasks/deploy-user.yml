@@ -21,6 +21,15 @@
   with_file: '{{ public_keys }}'
   tags: ssh-keys
 
+- name: Unauthorize keys
+  become: yes
+  authorized_key:
+    user: '{{ deploy_user }}'
+    state: absent
+    key: '{{ item }}'
+  with_file: '{{ public_keys_purge | default([]) }}'
+  tags: ssh-keys
+
 - name: Add to sudoers
   become: yes
   template:
