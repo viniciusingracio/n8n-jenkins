@@ -25,10 +25,15 @@ getfilename() =~ /bigbluebutton.access.log$/ {
 }
 
 counter bbb_sfu_media_threshold_exceeded_total by scope
+counter bbb_sfu_error by code, cause
 
 getfilename() =~ /bbb-webrtc-sfu.log$/ {
   /"message":"\[mcs-room\] Room has exceeded the media threshold"/ {
     bbb_sfu_media_threshold_exceeded_total["room"]++
+  }
+
+  /"message":"\[mcs-kurento-adapter\] Stack trace for error (?P<code>[^ ]+) \| (?P<cause>[^ ]+)/ {
+    bbb_sfu_error[$code][$cause]++
   }
 }
 
