@@ -1,13 +1,19 @@
-- name: Set log retention
-  xml:
+- stat:
     path: '{{ item }}'
-    xpath: //MaxHistory
-    value: '{{ bigbluebutton_log_retention | string }}'
-  become: yes
   with_items:
     - /usr/share/bbb-apps-akka/conf/logback.xml
     - /usr/share/bbb-fsesl-akka/conf/logback.xml
     - /usr/share/bbb-transcode-akka/conf/logback.xml
+  register: reg_logback
+
+- name: Set log retention
+  xml:
+    path: '{{ item.item }}'
+    xpath: //MaxHistory
+    value: '{{ bigbluebutton_log_retention | string }}'
+  become: yes
+  with_items: '{{ reg_logback.results }}'
+  when: item.stat.exists
   notify: restart bigbluebutton
 
 - name: Set log retention

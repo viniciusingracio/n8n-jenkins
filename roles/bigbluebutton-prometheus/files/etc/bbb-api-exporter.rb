@@ -12,6 +12,9 @@ require 'date'
 require 'open4'
 require 'json'
 
+# Install dependencies:
+# gem install docker-api
+
 # Manage BBB properties such as server address and salt.
 # These informations can be loaded from file (bigbluebutton.properties) or
 # externally set (for instance, from command line).
@@ -480,11 +483,17 @@ results[:bbb_total_time] = Benchmark.measure do
   end
 
   begin
-    results[:bbb_freeswitch_clock_drift] = (DateTime.parse(`/opt/freeswitch/bin/fs_cli -x "strftime"`) - DateTime.now).to_i
+    filename = "/opt/freeswitch/conf/autoload_configs/event_socket.conf.xml"
+    doc = Nokogiri::XML(File.open(filename)) { |x| x.noblanks }
+    password_node = doc.at_xpath("/configuration/settings/param[@name='password']/@value")
+    fs_cli = "/opt/freeswitch/bin/fs_cli"
+    fs_cli += " --password=#{password_node.text}" unless password_node.nil?
+
+    results[:bbb_freeswitch_clock_drift] = (DateTime.parse(`#{fs_cli} -x "strftime"`) - DateTime.now).to_i
     results[:bbb_freeswitch_cli_success] = 1
 
     output = ""
-    command = "/opt/freeswitch/bin/fs_cli -x 'show channels as json'"
+    command = "#{fs_cli} -x 'show channels as json'"
     Open4::popen4(command) do |pid, stdin, stdout, stderr|
       output = stdout.readlines
     end
@@ -503,7 +512,7 @@ results[:bbb_total_time] = Benchmark.measure do
           'uuid' => row[:uuid]
         }
       }
-      command = "/opt/freeswitch/bin/fs_cli -x 'json #{JSON.dump(stats_query)}'"
+      command = "#{fs_cli} -x 'json #{JSON.dump(stats_query)}'"
       Open4::popen4(command) do |pid, stdin, stdout, stderr|
         output = stdout.readlines
       end

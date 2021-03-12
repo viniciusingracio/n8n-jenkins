@@ -8,13 +8,14 @@
     ports:
       - 3011:3011
     env:
-      REDIS_HOST: '{{ ansible_docker0.ipv4.address }}'
-      MCS_PORT: "3009"
-      MCS_HOST: '{{ ansible_docker0.ipv4.address }}'
-      SIP_API_ADDRESS: ws://{{ ansible_docker0.ipv4.address }}:3012/mcs-sip
-      ENABLE_REGISTER: '{{ bigbluebutton_sip_registrar_enabled | lower }}'
       ENABLE_FLOOR_N: 'true'
+      ENABLE_REGISTER: '{{ bigbluebutton_sip_registrar_enabled | lower }}'
       LOG_FILENAME: /var/log/sfu-phone/sfu-phone.log
+      MCS_HOST: '{{ ansible_docker0.ipv4.address }}'
+      MCS_PORT: "3009"
+      PRESENTATION_TRANSCODER_ENABLED: 'true'
+      REDIS_HOST: '{{ ansible_docker0.ipv4.address }}'
+      SIP_API_ADDRESS: ws://{{ ansible_docker0.ipv4.address }}:3012/mcs-sip
       TZ: '{{ lookup("file", "/etc/timezone") }}'
     volumes:
       - /var/log/sfu-phone:/var/log/sfu-phone

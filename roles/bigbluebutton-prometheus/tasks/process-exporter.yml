@@ -11,7 +11,7 @@
   docker_container:
     name: process-exporter
     image: ncabatoff/process-exporter:0.6.0
-    command: -procfs /host/proc -config.path /config/config.yml -web.telemetry-path /process_metrics
+    command: -procfs /host/proc -config.path /config/config.yml -web.telemetry-path /process_metrics -threads false
     pull: yes
     privileged: yes
     restart_policy: always

@@ -35,6 +35,7 @@
   lineinfile:
     dest: /etc/nginx/nginx.conf
     state: present
+    regexp: '^worker_rlimit_nofile\s+\d+;'
     insertafter: '^pid '
     line: 'worker_rlimit_nofile 60000;'
   notify: reload nginx

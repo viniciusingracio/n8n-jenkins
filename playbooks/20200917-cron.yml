@@ -10,7 +10,8 @@
       regexp: '{{ item.regexp }}'
       line: '{{ item.line }}'
     with_items:
-    - { regexp: '^published_days=', line: 'published_days=4' }
+    - { regexp: '^published_days=', line: 'published_days=3' }
+    - { regexp: '^history=', line: 'history=4' }
 
   - command: chmod +x /etc/cron.daily/bigbluebutton
     become: yes

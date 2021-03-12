@@ -91,6 +91,8 @@
 - include: nginx-exporter.yml
 - include: nginx-logs-exporter.yml
 - include: process-exporter.yml
+  tags:
+    - process-exporter
 - include: redis-exporter.yml
 - include: sipp.yml
   when: bigbluebutton_prometheus_sipp_exporter_enabled

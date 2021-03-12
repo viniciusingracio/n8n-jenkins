@@ -1,7 +1,7 @@
 - include_role:
     name: bigbluebutton-etherpad
     tasks_from: etherpad-dummy
-  when: bigbluebutton_html5
+  when: bigbluebutton_html5 and bigbluebutton_docker_etherpad_enabled is defined and bigbluebutton_docker_etherpad_enabled
 
 - stat:
     path: /etc/apt/sources.list.d/mconf-live.list
