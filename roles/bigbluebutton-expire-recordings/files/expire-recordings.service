@@ -1,0 +1,11 @@
+[Unit]
+Description=Expire recordings
+Wants=expire-recordings.timer
+
+[Service]
+ExecStart=/usr/bin/ruby /var/lib/mconf/expire-recordings/expire-recordings.rb --conf /etc/mconf/expire-recordings/expire-recordings.yml
+WorkingDirectory=/var/lib/mconf/expire-recordings
+User=bigbluebutton
+
+[Install]
+WantedBy=multi-user.target

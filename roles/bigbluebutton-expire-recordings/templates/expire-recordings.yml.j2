@@ -1,0 +1,6 @@
+{% if bigbluebutton_expire_recordings_conditions | length > 0 %}
+conditions:
+{{ bigbluebutton_expire_recordings_conditions | to_nice_yaml }}
+{% else %}
+conditions: []
+{% endif %}

@@ -1,0 +1,12 @@
+[Unit]
+Description=Run expire-recordings every day
+Requires=expire-recordings.service
+
+[Timer]
+Unit=expire-recordings.service
+OnActiveSec=0
+OnUnitInactiveSec=1d
+AccuracySec=1h
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,39 @@
+---
+
+- name: Create directories
+  become: yes
+  file:
+    path: '{{ item }}'
+    recurse: yes
+    state: directory
+  with_items:
+    - /var/lib/mconf/expire-recordings
+    - /etc/mconf/expire-recordings
+
+- name: Copy services
+  copy:
+    src: files/{{ item }}
+    dest: /etc/systemd/system/{{ item }}
+  become: yes
+  with_items:
+    - expire-recordings.service
+    - expire-recordings.timer
+
+- name: Copy script
+  copy:
+    src: files/expire-recordings.rb
+    dest: /var/lib/mconf/expire-recordings/expire-recordings.rb
+  become: yes
+
+- name: Create config file
+  template:
+    src: templates/expire-recordings.yml.j2
+    dest: /etc/mconf/expire-recordings/expire-recordings.yml
+  become: yes
+
+- name: Enable service
+  become: yes
+  service: name={{ item }} enabled=yes daemon_reload=yes state=started
+  with_items:
+    - expire-recordings.service
+    - expire-recordings.timer
