@@ -53,6 +53,7 @@ bigbluebutton_docker_mcs_bfcp_num_ports: 40
 bigbluebutton_docker_suite_enabled: false
 bigbluebutton_docker_suite_image: mconf/suite:new-interface
 bigbluebutton_docker_suite_password: suite
+bigbluebutton_docker_akka_transcode_enabled: false
 
 bigbluebutton_docker_kurento_enabled: false
 bigbluebutton_docker_kurento_instances:

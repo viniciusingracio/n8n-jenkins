@@ -77,3 +77,34 @@
 - name: Remove old images
   shell: docker images {{ bigbluebutton_docker_mcs_sip_image.split(":")[0] }} --filter 'before={{ bigbluebutton_docker_mcs_sip_image }}' -q | xargs -r docker rmi --force
   notify: clean docker
+
+- name: Remove bbb-transcode-akka package
+  apt:
+    name: bbb-transcode-akka
+    state: absent
+  become: yes
+  when: bigbluebutton_docker_akka_transcode_enabled
+
+- stat:
+    path: /var/bigbluebutton
+  register: reg_var_bigbluebutton
+
+- set_fact:
+    recordings_dir: '{% if reg_var_bigbluebutton.stat.islnk is defined and reg_var_bigbluebutton.stat.islnk %}{{ reg_var_bigbluebutton.stat.lnk_source }}{% else %}{{ reg_var_bigbluebutton.stat.path }}{% endif %}'
+
+- name: Start bbb-transcode-akka container
+  docker_container:
+    name: bbb-transcode-akka
+    image: mconf/bbb-transcode-akka:latest
+    pull: yes
+    restart_policy: always
+    network_mode: host
+    memory: 768M
+    env:
+      JAVA_OPTS: -Dredis.host={{ ansible_docker0.ipv4.address }}
+      TZ: '{{ lookup("file", "/etc/timezone") }}'
+    volumes:
+      - '{{ recordings_dir }}:/var/bigbluebutton'
+    labels:
+      hostname: '{{ inventory_hostname }}'
+  when: bigbluebutton_docker_akka_transcode_enabled
