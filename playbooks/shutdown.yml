@@ -1,0 +1,10 @@
+---
+
+- hosts:
+  - all
+  tasks:
+
+  # shutdown after a minute
+  - name: Shutdown server
+    become: yes
+    command: shutdown -h 1
