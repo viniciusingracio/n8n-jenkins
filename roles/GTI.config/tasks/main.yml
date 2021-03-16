@@ -1,0 +1,111 @@
+#Criando usuários
+
+- name: Criando usuário gtiadm e adicionando ao sudo
+  become: yes
+  user:
+    name: gtiadm
+    shell: /bin/bash
+    password: $6$.2TKNcBaWx/c6T$PQ7ihdmtIkcBZqg4LHfk3UZw4He97LnPbrYTJ.Qzq3T2Y6lmle11VibtNWCoP4om6sHoBTjbyYwtyBi/Oc4FG.
+    groups: sudo
+
+#Adicionando o usuário mconf aos sudoers.d para retirar a necessidade de senha
+
+- name: criando arquivo sudo
+  become: yes
+  file:
+    path: /etc/sudoers.d/mconf
+    state: touch
+
+- name: Editando o arquivo sudoers.d do user mconf
+  become: yes
+  blockinfile:
+    path: /etc/sudoers.d/mconf
+    block: |
+      mconf ALL=(ALL) NOPASSWD: ALL
+
+#Criando diretorio .ssh e adicionando as chaves de acesso do mconf
+
+- name: criando diretorio .ssh e adicionando as chaves de acesso
+  become: yes
+  authorized_key:
+    user: mconf
+    state: present
+    key: '{{ item }}'
+  with_file:
+    - public_keys
+
+#Instalando e configurando o SNMP
+#
+- name: Instalando o SNMP
+  become: yes
+  apt:
+    name: snmpd*
+    state: latest
+
+- name: Copiando novo arquivo de config SNMP
+  become: yes
+  command:
+    cp /etc/snmp/snmpd.conf  /etc/snmp/snmpd.conf_original
+
+- name: Adicionado infos no arquivo de config
+  become: yes
+  template:
+    src: snmpd.conf
+    dest: /etc/snmp/snmpd.conf
+  notify: restart snmp
+
+#Instalando e configurando o NRPE
+
+- name: Instalando o NRPE
+  become: yes
+  apt:
+    name:
+      - nagios-nrpe-server
+      - nagios-plugins
+    state: latest
+
+- name: Alterando linha allowed_hosts do nrpe conf
+  become: yes
+  lineinfile:
+    path: /etc/nagios/nrpe.cfg
+    state: present
+    regexp: '^allowed_hosts='
+    line: 'allowed_hosts= 127.0.0.1, 200.139.7.155, 200.17.116.88, 200.129.156.99, 200.139.34.217, 200.129.167.57, 200.128.2.8, 138.121.69.33, 200.129.0.78, 200.133.241.143, 200.130.35.155, 200.130.35.156, 200.137.76.148, 200.18.160.21, 200.137.129.30, 200.131.2.173, 200.129.207.181, 200.129.240.123, 200.129.149.55, 200.129.64.151, 200.133.0.40, 200.137.160.141, 200.134.255.33, 200.159.254.108, 200.143.193.89, 200.137.0.199, 200.129.139.172, 200.129.143.210, 200.132.1.92, 200.237.193.28, 200.17.118.192, 200.133.192.42, 200.139.26.32'
+  notify: restart nrpe
+
+- name: Alterando linha dont_blame do nrpe conf
+  become: yes
+  lineinfile:
+    path: /etc/nagios/nrpe.cfg
+    state: present
+    regexp: '^dont_blame_nrpe='
+    line: 'dont_blame_nrpe=1'
+  notify: restart nrpe
+
+- name: Adicionando as linhas check ao nrpe conf
+  become: yes
+  blockinfile:
+    path: /etc/nagios/nrpe.cfg
+    block: |
+      command[check_rpc]=/usr/lib/nagios/plugins/check_rpc -H 200.130.35.187 -p 2049 -t -C nfs:
+      command[check_mconf]=/usr/lib/nagios/plugins/check_mconf.pl
+      command[check_lb2db]=/usr/lib/nagios/plugins/check_lb2db.pl
+      command[check_recw2nfs]=/usr/lib/nagios/plugins/check_recw2nfs.pl
+      command[check_error_499]=/usr/lib/nagios/plugins/check_error_499.pl
+      command[check_dns]=/usr/lib/nagios/plugins/check_dns -H $ARG1$ -w $ARG2$ -c $ARG3$
+    marker: '# {mark} ANSIBLE MANAGED BLOCK'
+  notify: restart nrpe
+
+- name: Adicionando plugins check nrpe
+  become: yes
+  copy:
+      src: files/{{item}}
+      dest: /usr/lib/nagios/plugins/
+      owner: root
+      group: root
+      mode: 0755
+  with_items:
+      - check_mconf.pl
+      - check_recw2nfs.pl
+  notify: restart nrpe
+

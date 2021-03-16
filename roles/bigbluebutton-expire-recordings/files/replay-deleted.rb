@@ -37,5 +37,4 @@ BigBlueButton.redis_publisher = BigBlueButton::RedisWrapper.new(redis_host, redi
     BigBlueButton.redis_publisher.put_message("deleted", record_id)
     # give some time to trigger the redis message
     sleep 0.2
-  end
 end
