@@ -188,7 +188,7 @@ expired.each do |obj|
     # publish the news to redis
     BigBlueButton.redis_publisher.put_message("deleted", obj[:record_id])
     # give some time to trigger the redis message
-    sleep 0.2
+    sleep 0.1
   end
 end
 

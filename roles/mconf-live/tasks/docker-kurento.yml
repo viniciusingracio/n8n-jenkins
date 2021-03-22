@@ -81,8 +81,8 @@
       STUN_PORT: '{{ kms_stun_server_port | default(omit) }}'
       EXTERNAL_IPV4: '{{ kms_external_ipv4 | default(omit) }}'
       EXTERNAL_IPV6: '{{ kms_external_ipv6 | default(omit) }}'
-      # GST_DEBUG: '3,Kurento*:4,kms*:4,KurentoWebSocketTransport:5'
-      GST_DEBUG: '3'
+      GST_DEBUG: '3,Kurento*:4,kms*:4,KurentoWebSocketTransport:5'
+      # GST_DEBUG: '3'
       TZ: '{{ lookup("file", "/etc/timezone") }}'
       NETWORK_INTERFACES: '{{ ansible_default_ipv4.interface }}'
       PEM_CERTIFICATE_RSA: /etc/mconf/dtls-srtp.pem
