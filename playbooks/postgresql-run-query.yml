@@ -1,0 +1,52 @@
+# run with:
+# ansible-playbook -i envs/prod/com-staging/hosts -l db.h.elos.dev --extra-vars "path_to_script=$(pwd)/playbooks/files/20210323-recordings.sql database=mconf_api_production" playbooks/postgresql-run-query.yml
+
+- hosts: postgresql
+  tasks:
+    - fail:
+        msg: 'Variable database must be defined'
+      when: database is undefined
+
+    - fail:
+        msg: 'Variable path_to_script must be defined'
+      when: path_to_script is undefined
+
+    - set_fact:
+        superuser_list: '{{ postgresql_users | rejectattr("role_attr_flags", "undefined") | selectattr("role_attr_flags", "match", "SUPERUSER") | list }}'
+    - fail:
+        msg: "No SUPERUSER user defined"
+      when: superuser_list | length == 0
+    - set_fact:
+        superuser: '{{ superuser_list | first }}'
+        dest_script: '/tmp/{{ path_to_script | basename }}'
+        content: "{{ lookup('file', path_to_script) }}"
+
+    - template:
+        src: templates/postgresql-run-query.sql.j2
+        dest: '{{ dest_script }}'
+
+    - postgresql_query:
+        db: '{{ database }}'
+        login_host: localhost
+        login_user: '{{ superuser["name"] }}'
+        login_password: '{{ superuser["password"] }}'
+        path_to_script: '{{ dest_script }}'
+        encoding: UTF-8
+
+    - name: Gather results
+      fetch:
+        src: /tmp/results.csv
+        dest: /tmp
+      register: reg_results
+
+    - name: Remove files from remote
+      become: yes
+      file:
+        path: '{{ item }}'
+        state: absent
+      with_items:
+        - /tmp/results.csv
+        - '{{ dest_script }}'
+
+    - debug:
+        msg: 'Result copied to {{ reg_results.dest }}'

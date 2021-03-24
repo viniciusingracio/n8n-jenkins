@@ -1,0 +1,3 @@
+COPY (
+{{ content }}
+) TO '/tmp/results.csv' WITH DELIMITER E'\t' CSV HEADER;

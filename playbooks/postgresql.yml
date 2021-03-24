@@ -60,14 +60,14 @@
       when: superuser_list | length == 0
     - set_fact:
         superuser: '{{ superuser_list | first }}'
-        any_database: '{{ postgresql_databases | map(attribute="name") | first }}'
 
     - postgresql_query:
-        db: '{{ any_database }}'
+        db: '{{ item["name"] }}'
         login_host: localhost
         login_user: '{{ superuser["name"] }}'
         login_password: '{{ superuser["password"] }}'
         query: 'CREATE EXTENSION IF NOT EXISTS pg_stat_statements;'
+      with_items: '{{ postgresql_databases }}'
 
 - hosts: postgres_exporter
   roles:
