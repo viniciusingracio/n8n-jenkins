@@ -1,5 +1,15 @@
 ---
 
+- name: Install ruby dependencies
+  become: yes
+  community.general.gem:
+    name: '{{ item }}'
+    state: present
+    user_install: no
+  with_items:
+    - optimist
+    - tz
+
 - name: Create directories
   become: yes
   file:
@@ -29,6 +39,13 @@
   template:
     src: templates/expire-recordings.yml.j2
     dest: /etc/mconf/expire-recordings/expire-recordings.yml
+  become: yes
+
+- name: Copy purge deleted
+  template:
+    src: templates/purge-deleted.j2
+    dest: /etc/cron.daily/purge-deleted
+    mode: 0755
   become: yes
 
 - name: Enable service

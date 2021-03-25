@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for i in `find /var/bigbluebutton/deleted/ -name metadata.xml -mtime +14`; do
+for i in `find /var/bigbluebutton/deleted/ -name metadata.xml -mtime +{{ bigbluebutton_expire_recordings_delete_days }}`; do
   DIR=$(dirname $i)
   sudo -u bigbluebutton rm -r $DIR
   echo "$(date) $DIR"

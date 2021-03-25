@@ -1,3 +1,4 @@
 ---
 
 bigbluebutton_expire_recordings_conditions: []
+bigbluebutton_expire_recordings_delete_days: 14

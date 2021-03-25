@@ -79,6 +79,12 @@ else
   conditions = [ { "xpath" => opts[:xpath], "age" => opts[:age] } ]
 end
 
+# make sure unpublished and deleted directories exist for all formats
+Dir.glob("/var/bigbluebutton/published/*").map{ |dir| File.basename(dir) }.each do |format|
+  FileUtils.mkdir_p "/var/bigbluebutton/unpublished/#{format}"
+  FileUtils.mkdir_p "/var/bigbluebutton/deleted/#{format}"
+end
+
 expired = []
 
 `find /var/bigbluebutton/published/presentation/ /var/bigbluebutton/unpublished/presentation/ -name metadata.xml`.split("\n").each do |filename|
