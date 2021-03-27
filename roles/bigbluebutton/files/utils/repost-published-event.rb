@@ -1,3 +1,6 @@
+#!/usr/bin/ruby
+# encoding: UTF-8
+
 require '/usr/local/bigbluebutton/core/lib/recordandplayback.rb'
 require 'trollop'
 

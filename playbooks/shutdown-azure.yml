@@ -1,0 +1,16 @@
+---
+
+- hosts: all
+  gather_facts: no
+  tasks:
+    - copy:
+        src: files/local-shutdown.yml
+        dest: /etc/mconf/local-shutdown.yml
+      become: yes
+
+    - cron:
+        name: "Shutdown if I can"
+        hour: "0-4,20-23"
+        minute: "*/2"
+        job: 'ansible-playbook /etc/mconf/local-shutdown.yml | tee -a /var/log/local_shutdown.log'
+      become: yes

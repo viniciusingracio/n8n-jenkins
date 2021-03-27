@@ -44,6 +44,7 @@
       CLIENT_HOST: 0.0.0.0
       CODEC_VIDEO_CONTENT: '{{ bigbluebutton_docker_webrtc_sfu_codec }}'
       CODEC_VIDEO_MAIN: '{{ bigbluebutton_docker_webrtc_sfu_codec }}'
+      EJECT_ON_USER_LEFT: 'false'
       ESL_IP: '{{ ansible_docker0.ipv4.address }}'
       ESL_PORT: "8021"
       FREESWITCH_CONN_IP: '{{ kurento_ip }}'
@@ -59,6 +60,7 @@
       MCS_ADDRESS: '{{ ansible_docker0.ipv4.address }}'
       MCS_HOST: 0.0.0.0
       MCS_PORT: "3009"
+      PERMISSION_PROBES: 'false'
       REDIS_HOST: '{{ ansible_docker0.ipv4.address }}'
       ROOM_MEDIA_THRESHOLD: '{{ bigbluebutton_docker_webrtc_sfu_streams_meeting | string }}'
       SCREENSHARE_PLAY_START_ENABLED: 'true'
