@@ -1,0 +1,33 @@
+---
+
+- hosts: all
+  gather_facts: no
+  tasks:
+    - name: Abort if there are meetings running
+      command: ruby /usr/local/bigbluebutton/core/scripts/utils/abort-if-meetings-running.rb
+
+    - name: Fail if queues aren't empty
+      shell: grep 'state="\(processing\|publishing\|queued\)"' /usr/local/share/prometheus/bbb-rec-exporter.prom | grep -v ' 0$'
+      register: reg_recordings_count
+      failed_when:
+        - reg_recordings_count.stdout_lines | length > 0
+
+- include: '{{ awd | default(playbook_dir) }}/playbooks/bigbluebutton-publish-pending-recordings.yml'
+- include: '{{ awd | default(playbook_dir) }}/playbooks/bbb-fluent-flush.yml'
+
+- hosts: all
+  gather_facts: no
+  tasks:
+    - copy:
+        src: files/shutdown-oci.sh
+        dest: /usr/local/bin/shutdown-oci.sh
+        mode: '0755'
+      become: yes
+
+    - name: Install oci-cli
+      become: yes
+      pip:
+        name: oci-cli
+        executable: pip3
+
+    - command: /usr/local/bin/shutdown-oci.sh

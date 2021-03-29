@@ -61,14 +61,13 @@
 - name: Pull mconf-presentation-recorder
   docker_image:
     name: '{{ mconf_live_presentation_recorder_image }}:{{ mconf_live_presentation_recorder_version }}'
-    pull: yes
     source: pull
   when: presentation_video_enabled | bool
 
 - name: Pull nginx
   docker_image:
     name: nginx
-    pull: yes
+    source: pull
   when: presentation_video_enabled | bool
 
 # tag is needed because the rap script always use latest

@@ -1,0 +1,19 @@
+---
+
+- hosts: all
+
+  vars:
+    ansible_user: mconf
+    script_path:
+
+  tasks:
+  - name: Copy recordings list
+    copy:
+      src: '{{ script_path }}'
+      dest: /tmp/{{ script_path | basename }}
+      mode: 0644
+
+  - name: Repost events
+    command: ruby /tmp/{{ script_path | basename }}
+    become: yes
+    become_user: bigbluebutton
