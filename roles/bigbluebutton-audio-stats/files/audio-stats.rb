@@ -197,7 +197,7 @@ class Hash
 end
 
 output = ""
-command = "/opt/freeswitch/bin/fs_cli -x 'show channels as json'"
+command = "/usr/local/bin/fs_clibbb -x 'show channels as json'"
 Open4::popen4(command) do |pid, stdin, stdout, stderr|
   output = stdout.readlines
 end
@@ -221,7 +221,7 @@ voice_data.each do |row|
       'uuid' => row[:uuid]
     }
   }
-  command = "/opt/freeswitch/bin/fs_cli -x 'json #{JSON.dump(stats_query)}'"
+  command = "/usr/local/bin/fs_clibbb -x 'json #{JSON.dump(stats_query)}'"
   Open4::popen4(command) do |pid, stdin, stdout, stderr|
     output = stdout.readlines
   end

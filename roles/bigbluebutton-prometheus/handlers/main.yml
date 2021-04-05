@@ -6,7 +6,7 @@
 
 - name: reload freeswitch
   become: yes
-  command: /opt/freeswitch/bin/fs_cli -x 'reloadxml'
+  command: /usr/local/bin/fs_clibbb -x 'reloadxml'
 
 - name: restart process exporter
   command: docker restart process-exporter

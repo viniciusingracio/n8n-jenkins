@@ -6,7 +6,22 @@
     name: mconf-data
     update_cache: yes
 
+- name: Stop worker and configure it properly
+  become: yes
+  service:
+    name: '{{ item }}'
+    state: stopped
+  with_items:
+    - mconf-data.service
+    - mconf-data.timer
+
 - name: Update yml values
   become: yes
   command: yq w -i /usr/local/bigbluebutton/core/scripts/mconf-data.yml "{{ item.key }}" "{{ item.value }}"
   with_items: '{{ mconf_data_yml }}'
+
+- name: Start worker
+  become: yes
+  service:
+    name: mconf-data.timer
+    state: started

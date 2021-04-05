@@ -1,0 +1,21 @@
+- hosts: all
+  tasks:
+    - service:
+        name: docker
+        state: stopped
+      become: yes
+
+    - become: yes
+      shell: >
+        bbb-conf --stop
+
+        rm -rf /var/bigbluebutton
+        rm -rf /var/freeswitch
+        rm -rf /var/kurento
+        rm -rf /var/log/bigbluebutton /var/log/bbb-*
+        rm -rf /var/log/mconf-* /var/log/sfu-phone /var/log/mcs-sip
+        rm -rf /var/log/nginx
+        rm -rf /var/log/redis
+        rm -rf /var/log/kurento-media-server
+        rm -rf /var/log/ansible-execution-*
+        rm -rf /var/lib/docker

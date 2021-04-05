@@ -32,6 +32,7 @@
         login_password: '{{ superuser["password"] }}'
         path_to_script: '{{ dest_script }}'
         encoding: UTF-8
+        as_single_query: yes
 
     - name: Gather results
       fetch:

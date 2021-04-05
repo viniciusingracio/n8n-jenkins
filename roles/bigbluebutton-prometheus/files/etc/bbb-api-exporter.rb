@@ -483,12 +483,7 @@ results[:bbb_total_time] = Benchmark.measure do
   end
 
   begin
-    filename = "/opt/freeswitch/conf/autoload_configs/event_socket.conf.xml"
-    doc = Nokogiri::XML(File.open(filename)) { |x| x.noblanks }
-    password_node = doc.at_xpath("/configuration/settings/param[@name='password']/@value")
-    fs_cli = "/opt/freeswitch/bin/fs_cli"
-    fs_cli += " --password=#{password_node.text}" unless password_node.nil?
-
+    fs_cli = "/usr/local/bin/fs_clibbb"
     results[:bbb_freeswitch_clock_drift] = (DateTime.parse(`#{fs_cli} -x "strftime"`) - DateTime.now).to_i
     results[:bbb_freeswitch_cli_success] = 1
 

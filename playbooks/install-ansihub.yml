@@ -15,6 +15,11 @@
 
 - hosts: '{{ dynamic_inventory_hostname | default("all") }}'
   tasks:
+  - name: Abort if there are meetings running
+    command: ruby /usr/local/bigbluebutton/core/scripts/utils/abort-if-meetings-running.rb
+    tags:
+      - test-empty
+
   - name: Update apt (if older than 60m)
     become: yes
     apt: update_cache=yes cache_valid_time=3600
