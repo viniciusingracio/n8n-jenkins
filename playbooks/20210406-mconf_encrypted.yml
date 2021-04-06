@@ -1,0 +1,20 @@
+- hosts: all
+  gather_facts: no
+  tasks:
+    - name: Copy script
+      become: yes
+      copy:
+        src: files/20210406-mconf_encrypted.rb
+        dest: /usr/local/bigbluebutton/core/scripts/publish/mconf_encrypted.rb
+        mode: 0755
+
+    - name: Find failed recordings
+      command: find /var/bigbluebutton/recording/status/published/ -name "*.fail"
+      register: reg_find
+
+    - name: Remove flags
+      become: yes
+      file:
+        path: '{{ item }}'
+        state: absent
+      with_items: '{{ reg_find.stdout_lines }}'
