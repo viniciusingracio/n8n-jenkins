@@ -87,4 +87,4 @@
         labels:
           hostname: '{{ inventory_hostname }}'
 
-- include: '{{ awd | default(playbook_dir) }}/playbooks/postgresql-exporter.yml'
+- import_playbook: '{{ awd | default(playbook_dir) }}/playbooks/postgresql-exporter.yml'

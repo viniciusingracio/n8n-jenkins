@@ -1,0 +1,50 @@
+- hosts: postgres_exporter
+  roles:
+    - name: docker-host
+      tags:
+        - docker-host
+  tasks:
+    - copy:
+        src: files/postgresql-exporter.sql
+        dest: '{{ ansible_env.HOME }}/postgresql-exporter.sql'
+
+    - set_fact:
+        superuser_list: '{{ postgresql_users | rejectattr("role_attr_flags", "undefined") | selectattr("role_attr_flags", "match", "SUPERUSER") | list }}'
+    - fail:
+        msg: "No SUPERUSER user defined"
+      when: superuser_list | length == 0
+    - set_fact:
+        superuser: '{{ superuser_list | first }}'
+        any_database: '{{ postgresql_databases | map(attribute="name") | first }}'
+
+    - postgresql_query:
+        db: '{{ any_database }}'
+        login_host: localhost
+        login_user: '{{ superuser["name"] }}'
+        login_password: '{{ superuser["password"] }}'
+        path_to_script: '{{ ansible_env.HOME }}/postgresql-exporter.sql'
+        encoding: UTF-8
+        as_single_query: yes
+
+    - set_fact:
+        user_list: '{{ postgresql_users | selectattr("name", "match", "^postgres_exporter$") | list }}'
+    - fail:
+        msg: "No postgres_exporter user defined"
+      when: user_list | length == 0
+    - set_fact:
+        user: '{{ user_list | first }}'
+
+    - name: Start postgres exporter
+      docker_container:
+        name: postgres_exporter
+        image: wrouesnel/postgres_exporter
+        pull: yes
+        restart_policy: always
+        network_mode: host
+        env:
+          DATA_SOURCE_NAME: 'postgresql://{{ user["name"] }}:{{ user["password"] }}@localhost:5432/postgres?sslmode=disable'
+          PG_EXPORTER_AUTO_DISCOVER_DATABASES: 'true'
+          # for some reason we couldn't ignore the following templates
+          PG_EXPORTER_EXCLUDE_DATABASES: 'template0,template1'
+        labels:
+          hostname: '{{ inventory_hostname }}'
