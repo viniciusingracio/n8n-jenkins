@@ -94,12 +94,12 @@
     - name: Upload MP4 files to S3
       command: docker exec mconf-aws-publisher bundle exec ruby s3.rb --meeting {{ item }}
       with_items: '{{ reg_update_ids.stdout_lines | default([]) }}'
-      when: reg_update_ids is succeded
+      when: reg_update_ids is succeeded
 
     - name: Repost event of pending recordings
       command: ruby /usr/local/bigbluebutton/core/scripts/utils/repost-published-event.rb -m {{ item }}
       with_items: '{{ reg_update_ids.stdout_lines | default([]) }}'
-      when: reg_update_ids is succeded
+      when: reg_update_ids is succeeded
 
     - name: Flush fluentd
       shell: docker kill --signal="SIGUSR1" fluentd && sleep 30
