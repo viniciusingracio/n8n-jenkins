@@ -1,0 +1,3 @@
+---
+
+{{ vars | dict2items | selectattr("key", "match", "^bigbluebutton_scheduled_shutdown") | list | items2dict | to_nice_yaml }}

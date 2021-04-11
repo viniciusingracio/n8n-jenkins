@@ -9,7 +9,7 @@
       - 3011:3011
     env:
       ENABLE_FLOOR_N: 'true'
-      ENABLE_REGISTER: '{{ bigbluebutton_sip_registrar_enabled | lower }}'
+      ENABLE_REGISTER: '{{ ( not bigbluebutton_sip_selective_register_enabled ) | string | lower }}'
       LOG_FILENAME: /var/log/sfu-phone/sfu-phone.log
       MCS_HOST: '{{ ansible_docker0.ipv4.address }}'
       MCS_PORT: "3009"

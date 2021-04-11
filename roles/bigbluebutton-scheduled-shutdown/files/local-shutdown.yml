@@ -1,0 +1,123 @@
+---
+
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Read vars
+      include_vars: vars.yml
+
+    - name: Gather only enough to read ansible_date_time
+      setup:
+        gather_subset:
+          - min
+
+    - name: Check if there are meetings running
+      command: ruby /usr/local/bigbluebutton/core/scripts/utils/abort-if-meetings-running.rb
+      register: reg_meetings_running
+      failed_when: not reg_meetings_running.rc in [ 0, 1 ]
+
+    - name: Define meetings_running
+      set_fact:
+        meetings_running: '{{ reg_meetings_running.rc == 1 }}'
+
+    - debug:
+        msg: 'Meetings running?: {{ meetings_running }}'
+
+    - name: Check if there are recordings being processed
+      shell: grep 'state="\(processing\|publishing\|queued\)"\|state="published",format="mconf_encrypted"' /usr/local/share/prometheus/bbb-rec-exporter.prom | grep -v ' 0$'
+      register: reg_recordings_count
+      failed_when: not reg_recordings_count.rc in [ 0, 1 ]
+
+    - name: Define processing_recordings
+      set_fact:
+        processing_recordings: '{{ reg_recordings_count.rc == 0 }}'
+
+    - debug:
+        msg: 'Processing recordings?: {{ processing_recordings }}'
+
+    - name: Set presentation_recorder workers to maximum
+      become: yes
+      command: yq w -i /usr/local/bigbluebutton/core/scripts/mconf-presentation-recorder.yml "simultaneous_meetings" "{{ bigbluebutton_scheduled_shutdown_turbo_presentation_recorder_workers_max }}"
+      when: not meetings_running and processing_recordings and bigbluebutton_scheduled_shutdown_turbo_presentation_recorder_enabled
+
+    - name: Retrieve information on no_meetings file
+      stat:
+        path: '/var/run/no_meetings'
+      register: reg_no_meetings_file
+
+    - debug:
+        msg: '/var/run/no_meetings exists? {{ reg_no_meetings_file.stat.exists }}'
+
+    - name: Define age of no_meetings file
+      set_fact:
+        no_meetings_file_seconds: '{{ ansible_date_time.epoch | int - reg_no_meetings_file.stat.mtime | int }}'
+      when: reg_no_meetings_file.stat.exists
+
+    - debug:
+        msg: '/var/run/no_meetings created {{ no_meetings_file_seconds }} seconds ago'
+      when: reg_no_meetings_file.stat.exists
+
+    - name: Determine if it's time to shutdown
+      set_fact:
+        ready_to_shutdown: '{{ not meetings_running and not processing_recordings and no_meetings_file_seconds is defined and no_meetings_file_seconds | int > bigbluebutton_scheduled_shutdown_wait }}'
+
+    - debug:
+        msg: 'Time to shutdown? {{ ready_to_shutdown }}'
+
+    - name: Create no_meetings file
+      file:
+        path: '/var/run/no_meetings'
+        state: touch
+      when: not meetings_running and not processing_recordings and not reg_no_meetings_file.stat.exists
+      become: yes
+
+    - name: Remove no_meetings file
+      file:
+        path: '/var/run/no_meetings'
+        state: absent
+      when: ready_to_shutdown or ( ( meetings_running or processing_recordings ) and reg_no_meetings_file.stat.exists )
+      become: yes
+
+    - name: Remove cron job if single shot
+      become: yes
+      cron:
+        name: '{{ bigbluebutton_scheduled_shutdown_cron_name }}'
+        state: absent
+      when: ready_to_shutdown and bigbluebutton_scheduled_shutdown_single_shot
+
+    - name: Find MP4 files to publish
+      shell: >
+        find /var/bigbluebutton/published/ /var/bigbluebutton/unpublished/ /var/bigbluebutton/deleted/ -name "*.mp4" | cut -d"/" -f 6 | sort -u | tee /tmp/ids-to-repost.txt
+      register: reg_update_ids
+      when: ready_to_shutdown and bigbluebutton_scheduled_shutdown_push_mp4
+
+    - name: Upload MP4 files to S3
+      command: docker exec mconf-aws-publisher bundle exec ruby s3.rb --meeting {{ item }}
+      with_items: '{{ reg_update_ids.stdout_lines | default([]) }}'
+      when: reg_update_ids is succeded
+
+    - name: Repost event of pending recordings
+      command: ruby /usr/local/bigbluebutton/core/scripts/utils/repost-published-event.rb -m {{ item }}
+      with_items: '{{ reg_update_ids.stdout_lines | default([]) }}'
+      when: reg_update_ids is succeded
+
+    - name: Flush fluentd
+      shell: docker kill --signal="SIGUSR1" fluentd && sleep 30
+      when: ready_to_shutdown and bigbluebutton_scheduled_shutdown_flush_fluentd
+
+    - name: Run cron.daily manually
+      become: yes
+      command: run-parts /etc/cron.daily
+      # run-parts can return 127
+      ignore_errors: true
+      when: ready_to_shutdown and bigbluebutton_scheduled_shutdown_run_cron_daily
+
+    - name: Set presentation_recorder workers to minimum
+      become: yes
+      command: yq w -i /usr/local/bigbluebutton/core/scripts/mconf-presentation-recorder.yml "simultaneous_meetings" "{{ bigbluebutton_scheduled_shutdown_turbo_presentation_recorder_workers_min }}"
+      when: ready_to_shutdown and bigbluebutton_scheduled_shutdown_turbo_presentation_recorder_enabled
+
+    - name: Bye!
+      command: '{{ bigbluebutton_scheduled_shutdown_command }}'
+      become: '{{ bigbluebutton_scheduled_shutdown_command_become }}'
+      when: ready_to_shutdown

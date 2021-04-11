@@ -46,7 +46,7 @@ bigbluebutton_docker_mcs_sip_enabled: false
 bigbluebutton_docker_mcs_sip_image: mconf/mcs-sip:v2.2.16
 bigbluebutton_docker_mcs_sip_intraframe_interval: 0
 bigbluebutton_docker_mcs_sip_alert_url:
-bigbluebutton_docker_sfu_phone_image: mconf/sfu-phone:v2.1.10
+bigbluebutton_docker_sfu_phone_image: mconf/sfu-phone:v2.1.11
 bigbluebutton_docker_mcs_bfcp_enabled: false
 bigbluebutton_docker_mcs_bfcp_image: mconf/mcs-bfcp:v0.0.5
 bigbluebutton_docker_mcs_bfcp_num_ports: 40
@@ -60,7 +60,7 @@ bigbluebutton_docker_kurento_instances:
   - { port: 3100, media_type: 'audio' }
   - { port: 3101, media_type: 'main' }
   - { port: 3102, media_type: 'content' }
-bigbluebutton_docker_kurento_image: mconf/kurento:6.15.0-1
+bigbluebutton_docker_kurento_image: mconf/kurento:6.16.0-1
 bigbluebutton_docker_kurento_ignore_ips: []
 bigbluebutton_docker_kurento_use_stun: false
 
@@ -83,6 +83,7 @@ bigbluebutton_docker_nginx_rtmp_image: alfg/nginx-rtmp:1.1
 
 bigbluebutton_sip_default_gateway: []
 bigbluebutton_sip_registrar_enabled: false
+bigbluebutton_sip_selective_register_enabled: false
 bigbluebutton_sip_registrar_use_internal_ip: false
 bigbluebutton_sip_registrar_transport: WS
 bigbluebutton_sip_registrar_address:

@@ -1,0 +1,17 @@
+---
+# defaults file for bigbluebutton-scheduled-shutdown
+
+bigbluebutton_scheduled_shutdown_cron_name: local-shutdown
+bigbluebutton_scheduled_shutdown_cron_minute: '*/2'
+bigbluebutton_scheduled_shutdown_wait: 300
+bigbluebutton_scheduled_shutdown_command: /sbin/shutdown -h now
+bigbluebutton_scheduled_shutdown_command_become: true
+bigbluebutton_scheduled_shutdown_single_shot: true
+bigbluebutton_scheduled_shutdown_run_cron_daily: true
+
+bigbluebutton_scheduled_shutdown_abort: false
+bigbluebutton_scheduled_shutdown_push_mp4: false
+bigbluebutton_scheduled_shutdown_flush_fluentd: false
+bigbluebutton_scheduled_shutdown_turbo_presentation_recorder_enabled: false
+bigbluebutton_scheduled_shutdown_turbo_presentation_recorder_workers_min: 0
+bigbluebutton_scheduled_shutdown_turbo_presentation_recorder_workers_max: 6

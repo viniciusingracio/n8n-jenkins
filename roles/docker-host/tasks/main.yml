@@ -51,16 +51,8 @@
     append: yes
   register: reg_docker
 
-# after installing docker, the docker command doesn't work within the current ssh session,
-# so we need to quit and log again
-# https://github.com/ansible/ansible-modules-core/issues/921#issuecomment-220513111
-- name: Reset SSH
-  # if ansible_ssh_user is root, it will close the daemon, not only the session
-  # shell: sleep 1; pkill -u {{ ansible_ssh_user }} sshd
-  shell: "ps -aux | grep 'sshd: {{ ansible_ssh_user }}@' | head -n 1 | tr -s ' ' | cut -d' ' -f2 | xargs --no-run-if-empty -I{} kill -9 {}"
-  ignore_errors: yes
-  async: 3
-  poll: 2
+- name: Reset ssh connection to allow user changes to affect 'current login user'
+  meta: reset_connection
   when: reg_docker is changed
 
 - name: Load local docker authentication variables
