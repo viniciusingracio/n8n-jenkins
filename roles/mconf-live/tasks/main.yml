@@ -1,3 +1,11 @@
+- fail:
+    msg: 'external_ipv4 should be set'
+  when: external_ipv4 | length == 0
+
+- fail:
+    msg: 'external_ipv6 should be set'
+  when: require_ipv6 and external_ipv6 | length == 0
+
 - include_role:
     name: bigbluebutton-etherpad
     tasks_from: etherpad-dummy

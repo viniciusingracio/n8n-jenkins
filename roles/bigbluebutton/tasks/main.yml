@@ -1,4 +1,12 @@
 - fail:
+    msg: 'external_ipv4 should be set'
+  when: external_ipv4 | length == 0
+
+- fail:
+    msg: 'external_ipv6 should be set'
+  when: require_ipv6 and external_ipv6 | length == 0
+
+- fail:
     msg: "Unsupported OS version: {{ ansible_lsb.codename }}"
   when: not ansible_lsb.codename in [ "xenial", "bionic" ]
 
@@ -395,17 +403,6 @@
   when: not item.value is none
   become: yes
   notify: restart bigbluebutton
-
-- name: Determine external IPv4
-  set_fact:
-    # external_ipv4: "{{ lookup('dig', inventory_hostname, 'qtype=A', '@8.8.8.8') | default(ansible_default_ipv4.address, true) }}"
-    external_ipv4: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | grep -v \"\\.$\" | head -n 1') | default(ansible_default_ipv4.address, true) }}"
-  when: external_ipv4 is none
-- name: Determine external IPv6
-  set_fact:
-    # external_ipv6: "{{ lookup('dig', inventory_hostname, 'qtype=AAAA', '@8.8.8.8') | default(none, true) }}"
-    external_ipv6: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 AAAA +short | grep -v \"\\.$\" | head -n 1') | default(none, true) }}"
-  when: external_ipv6 is none
 
 - name: Check if the external IP is mapped in any of the interfaces
   set_fact:
