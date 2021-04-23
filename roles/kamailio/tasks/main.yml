@@ -17,38 +17,13 @@
     - { src: '{{ kamailio_local_ssl_certificate }}', dest: '{{ kamailio_ssl_certificate }}' }
     - { src: '{{ kamailio_local_ssl_certificate_key }}', dest: '{{ kamailio_ssl_certificate_key }}' }
   when: not kamailio_local_ssl_certificate is none and not kamailio_local_ssl_certificate_key is none
-  ignore_errors: yes
   # notify: restart kamailio
 
-- include: prometheus.yml
-  when: kamailio_prometheus_enabled
+- include: kamailio.yml
+  when: mode == "kamailio"
 
-- template:
-    src: templates/nginx.conf.j2
-    dest: '{{ kamailio_path }}/nginx.conf'
-
-- name: Generate dhparam
-  command: openssl dhparam -out {{ kamailio_path }}/dhp-2048.pem 2048
-  args:
-    creates: '{{ kamailio_path }}/dhp-2048.pem'
-
-- docker_compose:
-    project_src: '{{ kamailio_path }}'
-    build: yes
-  environment:
-    FQDN: '{{ inventory_hostname }}'
-    EXTERNAL_IP: '{{ kamailio_external_ip }}'
-    ADVERTISED_ROUTE: '{{ kamailio_advertised_route }}'
-    DB_ROOT_PASSWORD: '{{ kamailio_db_password }}'
-    SSL_ENABLED: '{{ kamailio_ssl_enabled }}'
-    SSL_CERTIFICATE: '{{ kamailio_ssl_certificate }}'
-    SSL_CERTIFICATE_KEY: '{{ kamailio_ssl_certificate_key }}'
-    GATEWAY_IP: '{{ kamailio_gateway_ip }}'
-    ANTIFLOOD_SAMPLING_TIME_SECONDS: '2'
-    ANTIFLOOD_REQUESTS_PER_SAMPLING_TIME: '64'
-    ANTIFLOOD_IP_BAN_TIME_SECONDS: '300'
-  tags:
-    - docker
+- include: homer.yml
+  when: mode == "homer"
 
 - include: ufw.yml
   when: common_ufw_enabled

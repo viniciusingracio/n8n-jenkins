@@ -1,0 +1,20 @@
+---
+
+- name: Generate dhparam
+  command: openssl dhparam -out {{ kamailio_path }}/homer/dhp-2048.pem 2048
+  args:
+    creates: '{{ kamailio_path }}/homer/dhp-2048.pem'
+
+- docker_compose:
+    project_src: '{{ kamailio_path }}/homer'
+    build: yes
+  environment:
+    FQDN: '{{ inventory_hostname }}'
+    HEPLIFY_SERVER_PORT: '9060'
+    HEPLIFYSERVER_DBDROPDAYSCALL: '10'
+    HEPLIFYSERVER_DBDROPDAYSREGISTER: '10'
+    HEPLIFYSERVER_DBROTATE: 'true'
+    SSL_CERTIFICATE_KEY: '{{ kamailio_ssl_certificate_key }}'
+    SSL_CERTIFICATE: '{{ kamailio_ssl_certificate }}'
+  tags:
+    - docker

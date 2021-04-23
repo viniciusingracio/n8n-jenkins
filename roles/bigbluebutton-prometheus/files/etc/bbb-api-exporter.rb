@@ -69,7 +69,7 @@ class URIBuilder
   end
 
   def self.client_uri
-    @@client_uri ||= build_uri "/html5client"
+    @@client_uri ||= build_uri "/html5client/"
   end
 
   def self.api_method_uri(method, params = nil)

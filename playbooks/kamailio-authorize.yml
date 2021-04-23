@@ -9,19 +9,15 @@
   vars:
     external_ipv4:
   tasks:
-    - shell: dig {{ inventory_hostname }} @8.8.8.8 A +short
-      delegate_to: localhost
-      register: reg_ip
-      when: external_ipv4 is none
-
     - name: Determine external IP
       set_fact:
-        external_ipv4: '{{ reg_ip.stdout_lines[0] }}'
-      when: external_ipv4 is none and reg_ip.stdout_lines|length > 0
+        external_ipv4: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | grep -v \"\\.$\" | head -n 1') | regex_search('[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}') }}"
+      delegate_to: localhost
+      when: external_ipv4 is none
 
     - shell: echo "docker exec kamailio authorize-ip.sh {{ inventory_hostname }} {{ external_ipv4 }}" | tee -a /tmp/authorize-ip.sh
       delegate_to: localhost
-      when: external_ipv4 is not none
+      when: external_ipv4 | length > 0
 
 - hosts: kamailio
   tasks:

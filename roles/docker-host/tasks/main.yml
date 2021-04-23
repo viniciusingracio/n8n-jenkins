@@ -66,7 +66,6 @@
 
 - name: Log in DockerHub
   docker_login:
-    email: '{{ docker_auth.email }}'
     username: '{{ docker_auth.user }}'
     password: '{{ docker_auth.password }}'
     reauthorize: yes

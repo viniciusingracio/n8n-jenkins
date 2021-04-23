@@ -413,16 +413,34 @@
   become: yes
   when: dummy_nic_needed
 
-- name: Add dummy NIC to network interfaces
+- name: Check if the loopback interface is configured
+  command: grep 'iface lo inet loopback' /etc/network/interfaces
+  when: dummy_nic_needed
+  register: reg_configured
+  failed_when: not reg_configured.rc in [ 0, 1 ]
+
+- name: Add dummy NIC to network interfaces (part 1)
   blockinfile:
     dest: /etc/network/interfaces
     block: |2
               post-up ip addr add {{ external_ipv4 }}/32 dev lo
               pre-down ip addr del {{ external_ipv4 }}/32 dev lo
-    insertafter: 'iface lo inet loopback'
     marker: '        # {mark} ANSIBLE MANAGED BLOCK'
   become: yes
-  when: dummy_nic_needed
+  when: dummy_nic_needed and reg_configured.rc == 0
+
+- name: Add dummy NIC to network interfaces (part 2)
+  blockinfile:
+    dest: /etc/network/interfaces
+    block: |2
+
+      auto lo
+      iface lo inet loopback
+              post-up ip addr add {{ external_ipv4 }}/32 dev lo
+              pre-down ip addr del {{ external_ipv4 }}/32 dev lo
+    marker: '# {mark} ANSIBLE MANAGED BLOCK'
+  become: yes
+  when: dummy_nic_needed and reg_configured.rc == 1
 
 - setup:
 

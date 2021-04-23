@@ -10,9 +10,30 @@ kamailio_ssl_certificate:
 kamailio_ssl_certificate_key:
 kamailio_db_password:
 kamailio_gateway_ip: ""
-kamailio_external_ip: '{{ ansible_host }}'
+kamailio_external_ip: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | grep -v \"\\.$\" | head -n 1') | regex_search('[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}') }}"
 kamailio_advertised_route: '{{ ansible_host }}'
 kamailio_sip_client_enabled: false
 kamailio_siremis_ip_allowed: []
 kamailio_siremis_ip_denied: []
 kamailio_prometheus_enabled: '{{ bigbluebutton_prometheus_password is defined }}'
+heplify_server_address:
+heplify_server_port: 9060
+kamailio_server_address:
+
+mode: kamailio # or homer
+
+kamailio_ufw_rules:
+  - { rule: 'allow', port: 80, proto: 'tcp', route: yes }
+  - { rule: 'allow', port: 443, proto: 'tcp', route: yes }
+  - { rule: 'allow', port: 5060, proto: 'tcp', route: yes }
+  - { rule: 'allow', port: 5060, proto: 'udp', route: yes }
+  - { rule: 'allow', port: 5061, proto: 'tcp', route: yes }
+  - { rule: 'allow', direction: 'in', interface: 'docker0' }
+
+homer_ufw_rules:
+  - { rule: 'allow', port: 80, proto: 'tcp', route: yes }
+  - { rule: 'allow', port: 443, proto: 'tcp', route: yes }
+  - { rule: 'allow', port: 9060, proto: 'tcp', route: yes, from_ip: '{{ kamailio_server_address }}' }
+  - { rule: 'allow', direction: 'in', interface: 'docker0' }
+
+ufw_rules: '{% if mode == "kamailio"%}{{ kamailio_ufw_rules }}{% else %}{{ homer_ufw_rules }}{% endif %}'

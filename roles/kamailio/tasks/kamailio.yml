@@ -1,0 +1,38 @@
+---
+
+- include: prometheus.yml
+  when: kamailio_prometheus_enabled
+
+- template:
+    src: templates/nginx.conf.j2
+    dest: '{{ kamailio_path }}/nginx.conf'
+
+- name: Generate dhparam
+  command: openssl dhparam -out {{ kamailio_path }}/dhp-2048.pem 2048
+  args:
+    creates: '{{ kamailio_path }}/dhp-2048.pem'
+
+- docker_compose:
+    project_src: '{{ kamailio_path }}'
+    build: yes
+  environment:
+    ADVERTISED_ROUTE: '{{ kamailio_advertised_route }}'
+    ANTIFLOOD_IP_BAN_TIME_SECONDS: '300'
+    ANTIFLOOD_REQUESTS_PER_SAMPLING_TIME: '16'
+    ANTIFLOOD_SAMPLING_TIME_SECONDS: '2'
+    DB_ROOT_PASSWORD: '{{ kamailio_db_password }}'
+    ENABLE_TCP_UDP_FALLBACK: 'yes'
+    EXTERNAL_IP: '{{ kamailio_external_ip }}'
+    FQDN: '{{ inventory_hostname }}'
+    GATEWAY_IP: '{{ kamailio_gateway_ip }}'
+    HEPLIFY_SERVER_ADDRESS: '{{ heplify_server_address | default(omit) }}'
+    HEPLIFY_SERVER_PORT: '{{ heplify_server_port | default(omit) }}'
+    RETRANSMISSION_TIMEOUT: '10000'
+    SSL_CERTIFICATE_KEY: '{{ kamailio_ssl_certificate_key }}'
+    SSL_CERTIFICATE: '{{ kamailio_ssl_certificate }}'
+    SSL_ENABLED: '{{ kamailio_ssl_enabled }}'
+    TLS_CERTIFICATE_KEY: '{{ kamailio_ssl_certificate_key }}'
+    TLS_CERTIFICATE: '{{ kamailio_ssl_certificate }}'
+    TLS_ENABLED: '{{ kamailio_ssl_enabled }}'
+  tags:
+    - docker
