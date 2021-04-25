@@ -78,13 +78,6 @@
       when: ready_to_shutdown or ( ( meetings_running or processing_recordings ) and reg_no_meetings_file.stat.exists )
       become: yes
 
-    - name: Remove cron job if single shot
-      become: yes
-      cron:
-        name: '{{ bigbluebutton_scheduled_shutdown_cron_name }}'
-        state: absent
-      when: ready_to_shutdown and bigbluebutton_scheduled_shutdown_single_shot
-
     - name: Find MP4 files to publish
       shell: >
         find /var/bigbluebutton/published/ /var/bigbluebutton/unpublished/ /var/bigbluebutton/deleted/ -name "*.mp4" | cut -d"/" -f 6 | sort -u | tee /tmp/ids-to-repost.txt
@@ -119,6 +112,13 @@
 
     - name: Last chance to abort
       command: ruby /usr/local/bigbluebutton/core/scripts/utils/abort-if-meetings-running.rb
+
+    - name: Remove cron job if single shot
+      become: yes
+      cron:
+        name: '{{ bigbluebutton_scheduled_shutdown_cron_name }}'
+        state: absent
+      when: ready_to_shutdown and bigbluebutton_scheduled_shutdown_single_shot
 
     - name: Bye!
       command: '{{ bigbluebutton_scheduled_shutdown_command }}'
