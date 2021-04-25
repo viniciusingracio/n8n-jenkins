@@ -11,6 +11,7 @@
     - name: Find failed recordings
       command: find /var/bigbluebutton/recording/status/published/ -name "*.fail"
       register: reg_find
+      failed_when: not reg_find.rc in [0, 1]
 
     - name: Remove flags
       become: yes

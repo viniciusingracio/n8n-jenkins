@@ -15,3 +15,7 @@ bbb_fluent_s3_endpoint:
 bbb_fluent_s3_bucket_name:
 bbb_fluent_s3_region:
 bbb_fluent_s3_force_path_style: false
+bbb_fluent_loki_enabled: false
+bbb_fluent_loki_url:
+bbb_fluent_loki_auth_user:
+bbb_fluent_loki_auth_pass:

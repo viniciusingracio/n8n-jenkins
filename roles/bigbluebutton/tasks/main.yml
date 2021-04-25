@@ -325,6 +325,23 @@
     - { regexp: 'ejectRogueVoiceUsers[ ]*=', line: '  ejectRogueVoiceUsers = {{ bigbluebutton_eject_rogue_voice_users }}' }
   notify: restart bigbluebutton
 
+- name: Fetch ESL password
+  command: xmlstarlet sel -t -m 'configuration/settings/param[@name="password"]' -v @value /opt/freeswitch/etc/freeswitch/autoload_configs/event_socket.conf.xml
+  register: reg_esl_password
+
+- name: Configure akka fs esl
+  become: yes
+  lineinfile:
+    dest: /usr/share/bbb-fsesl-akka/conf/application.conf
+    state: present
+    regexp: '{{ item.regexp }}'
+    line: '{{ item.line }}'
+    # do not add the config if it doesn't match
+    backrefs: yes
+  with_items:
+    - { regexp: '^        password=', line: '        password={{ reg_esl_password.stdout }}' }
+  notify: restart bigbluebutton
+
 # TODO move this to a new role/task
 - name: Install dependency for yedit library
   become: yes
