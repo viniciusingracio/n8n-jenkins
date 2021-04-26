@@ -5,6 +5,7 @@
   pip:
     name: oci-cli
     executable: pip3
+  when: bigbluebutton_scheduled_shutdown_install_oci_cli
 
 - name: Create directory for scheduled shutdown
   become: yes
@@ -25,7 +26,7 @@
     dest: /etc/mconf/scheduled-shutdown/vars.yml
 
 - set_fact:
-    job: 'cd /etc/mconf/scheduled-shutdown && /usr/bin/ansible-playbook local-shutdown.yml | tee -a /var/log/local_shutdown.log'
+    job: 'cd /etc/mconf/scheduled-shutdown && /usr/bin/ansible-playbook local-shutdown.yml | /usr/bin/tee -a /var/log/local_shutdown.log'
 
 - name: Remove cron job if abort
   become: yes

@@ -6,8 +6,9 @@ bigbluebutton_scheduled_shutdown_cron_minute: '*/2'
 bigbluebutton_scheduled_shutdown_wait: 300
 bigbluebutton_scheduled_shutdown_command: /sbin/shutdown -h now
 bigbluebutton_scheduled_shutdown_command_become: true
-bigbluebutton_scheduled_shutdown_single_shot: true
+bigbluebutton_scheduled_shutdown_single_shot: false
 bigbluebutton_scheduled_shutdown_run_cron_daily: true
+bigbluebutton_scheduled_shutdown_install_oci_cli: false
 
 bigbluebutton_scheduled_shutdown_abort: false
 bigbluebutton_scheduled_shutdown_push_mp4: false
