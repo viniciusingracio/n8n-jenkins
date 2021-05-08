@@ -1,8 +1,18 @@
 ---
 # defaults file for bigbluebutton-scheduled-shutdown
 
+# when single shot
 bigbluebutton_scheduled_shutdown_cron_name: local-shutdown
 bigbluebutton_scheduled_shutdown_cron_minute: '*/2'
+
+bigbluebutton_scheduled_shutdown_cron_weekday_name: local-shutdown-weekday
+bigbluebutton_scheduled_shutdown_cron_weekday_minute: '{{ bigbluebutton_scheduled_shutdown_cron_minute }}'
+bigbluebutton_scheduled_shutdown_cron_weekday_hour: '0-5,20-23'
+
+bigbluebutton_scheduled_shutdown_cron_weekend_name: local-shutdown-weekend
+bigbluebutton_scheduled_shutdown_cron_weekend_minute: '{{ bigbluebutton_scheduled_shutdown_cron_minute }}'
+bigbluebutton_scheduled_shutdown_cron_weekend_hour: '0-5,15-23'
+
 bigbluebutton_scheduled_shutdown_wait: 300
 bigbluebutton_scheduled_shutdown_command: /sbin/shutdown -h now
 bigbluebutton_scheduled_shutdown_command_become: true

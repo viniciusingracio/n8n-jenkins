@@ -1,0 +1,19 @@
+---
+
+- name: Start bigbluebutton exporter
+  docker_container:
+    name: bigbluebutton-exporter
+    image: greenstatic/bigbluebutton-exporter:latest
+    pull: yes
+    restart_policy: always
+    env:
+      API_SECRET: '{{ bbb_secret }}'
+      API_BASE_URL: '{{ bbb_api_entry_point }}/'
+      RECORDINGS_METRICS_READ_FROM_DISK: 'true'
+    volumes:
+      - /var/bigbluebutton:/var/bigbluebutton
+    ports:
+      - 9688:9688
+    labels:
+      hostname: '{{ inventory_hostname }}'
+    state: '{% if bigbluebutton_prometheus_bigbluebutton_exporter_enabled %}started{% else %}absent{% endif %}'

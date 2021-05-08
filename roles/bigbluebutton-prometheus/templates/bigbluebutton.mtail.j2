@@ -8,7 +8,7 @@ histogram bbb_nginx_http_upstream_response_duration_seconds by request_method, s
 
 getfilename() =~ /bigbluebutton.access.log$/ {
   /^(?P<remote_addr>\S+) - (?P<remote_user>\S+) \[(?P<time_local>[^\]]+)\] "(?P<request_method>\S+) (?P<request_uri>[^ ]+) (?P<http_version>HTTP[^"]+)" (?P<status>\S+) (?P<body_bytes_sent>\d+) "(?P<http_referer>[^"]+)" "(?P<http_user_agent>[^"]+)" "(?P<http_x_forwarded_for>[^"]+)" (?P<request_time>\S+) (?P<upstream_response_time>\S+) (?P<pipe>\S+) (?P<upstream_cache_status>\S+)$/ {
-    $remote_addr != "{{ external_ip }}" && $remote_addr != "127.0.0.1" {
+    $remote_addr != "{{ external_ipv4 }}" && $remote_addr != "127.0.0.1" {
       $request_uri =~ /\/bigbluebutton\/api\/(?P<api_method>\w+)/ {
         bbb_nginx_http_requests_total[$request_method][$status][$api_method]++
 

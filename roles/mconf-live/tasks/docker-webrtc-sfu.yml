@@ -29,6 +29,10 @@
     state: latest
   become: yes
 
+- name: Fetch ESL password
+  command: xmlstarlet sel -t -m 'configuration/settings/param[@name="password"]' -v @value /opt/freeswitch/etc/freeswitch/autoload_configs/event_socket.conf.xml
+  register: reg_esl_password
+
 - name: Start webrtc-sfu container
   docker_container:
     name: webrtc-sfu
@@ -39,6 +43,7 @@
     ports:
       - 3008:3008
       - 3009:3009
+      - 3010:3010
     env:
       BALANCING_STRATEGY: MEDIA_TYPE
       CLIENT_HOST: 0.0.0.0
@@ -46,6 +51,7 @@
       CODEC_VIDEO_MAIN: '{{ bigbluebutton_docker_webrtc_sfu_codec }}'
       EJECT_ON_USER_LEFT: 'false'
       ESL_IP: '{{ ansible_docker0.ipv4.address }}'
+      ESL_PASSWORD: '{{ reg_esl_password.stdout }}'
       ESL_PORT: "8021"
       FREESWITCH_CONN_IP: '{{ kurento_ip }}'
       FREESWITCH_IP_MAPPINGS: '{{ ip_mappings | to_json }}'
@@ -60,6 +66,11 @@
       MCS_ADDRESS: '{{ ansible_docker0.ipv4.address }}'
       MCS_HOST: 0.0.0.0
       MCS_PORT: "3009"
+      MCS_PROM_DEFAULT_MTS: '{{ bigbluebutton_docker_webrtc_sfu_prometheus_default_metrics_enabled | string | lower }}'
+      MCS_PROM_ENABLED: '{{ bigbluebutton_docker_webrtc_sfu_prometheus_enabled | string | lower }}'
+      MCS_PROM_HOST: '0.0.0.0'
+      MCS_PROM_PATH: '{{ bigbluebutton_docker_webrtc_sfu_prometheus_path }}'
+      MCS_PROM_PORT: '3010'
       PERMISSION_PROBES: 'false'
       REDIS_HOST: '{{ ansible_docker0.ipv4.address }}'
       ROOM_MEDIA_THRESHOLD: '{{ bigbluebutton_docker_webrtc_sfu_streams_meeting | string }}'

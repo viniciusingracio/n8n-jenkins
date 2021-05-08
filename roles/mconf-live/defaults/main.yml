@@ -42,6 +42,9 @@ bigbluebutton_docker_webrtc_sfu_ip_public:
 bigbluebutton_docker_webrtc_sfu_ip_private:
 bigbluebutton_docker_webrtc_sfu_ip_local:
 bigbluebutton_docker_webrtc_sfu_streams_meeting: 0
+bigbluebutton_docker_webrtc_sfu_prometheus_default_metrics_enabled: false
+bigbluebutton_docker_webrtc_sfu_prometheus_enabled: true
+bigbluebutton_docker_webrtc_sfu_prometheus_path: '/sfu_metrics'
 bigbluebutton_docker_mcs_sip_enabled: false
 bigbluebutton_docker_mcs_sip_image: mconf/mcs-sip:v2.2.16
 bigbluebutton_docker_mcs_sip_intraframe_interval: 0

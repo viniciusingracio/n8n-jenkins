@@ -91,6 +91,7 @@ bigbluebutton_sysctl:
   - { name: 'net.ipv6.conf.default.accept_source_route' , value: '0' }
   - { name: 'net.ipv6.conf.all.accept_redirects' , value: '0' }
   - { name: 'net.ipv6.conf.default.accept_redirects' , value: '0' }
+  - { name: 'kernel.pid_max' , value: '4194304' }
 
 bigbluebutton_config_xml:
   - { xpath: '//module[@name="ScreenshareModule"]', attribute: 'chromeExtensionLink', value: '{{ bigbluebutton_screenshare_extension_url }}', run: '{{ bigbluebutton_html5 }}' }

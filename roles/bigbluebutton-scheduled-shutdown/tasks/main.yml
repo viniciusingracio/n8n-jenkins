@@ -31,8 +31,12 @@
 - name: Remove cron job if abort
   become: yes
   cron:
-    name: '{{ bigbluebutton_scheduled_shutdown_cron_name }}'
+    name: '{{ item }}'
     state: absent
+  with_items:
+    - '{{ bigbluebutton_scheduled_shutdown_cron_name }}'
+    - '{{ bigbluebutton_scheduled_shutdown_cron_weekday_name }}'
+    - '{{ bigbluebutton_scheduled_shutdown_cron_weekend_name }}'
   when: bigbluebutton_scheduled_shutdown_abort
 
 - name: Remove no_meetings file if abort
@@ -42,6 +46,13 @@
     state: absent
   when: bigbluebutton_scheduled_shutdown_abort
 
+- name: Remove single shot cron job
+  become: yes
+  cron:
+    name: '{{ bigbluebutton_scheduled_shutdown_cron_name }}'
+    state: absent
+  when: not bigbluebutton_scheduled_shutdown_abort and not bigbluebutton_scheduled_shutdown_single_shot
+
 - name: Setup cron job for single shot
   become: yes
   cron:
@@ -50,11 +61,22 @@
     job: '{{ job }}'
   when: not bigbluebutton_scheduled_shutdown_abort and bigbluebutton_scheduled_shutdown_single_shot
 
-- name: Setup cron job to shutdown at night
+- name: Setup cron job to shutdown on weekdays
   become: yes
   cron:
-    name: '{{ bigbluebutton_scheduled_shutdown_cron_name }}'
-    hour: "0-4,20-23"
-    minute: '{{ bigbluebutton_scheduled_shutdown_cron_minute }}'
+    name: '{{ bigbluebutton_scheduled_shutdown_cron_weekday_name }}'
+    hour: '{{ bigbluebutton_scheduled_shutdown_cron_weekday_hour }}'
+    minute: '{{ bigbluebutton_scheduled_shutdown_cron_weekday_minute }}'
+    weekday: 1-5
+    job: '{{ job }}'
+  when: not bigbluebutton_scheduled_shutdown_abort and not bigbluebutton_scheduled_shutdown_single_shot
+
+- name: Setup cron job to shutdown on weekend
+  become: yes
+  cron:
+    name: '{{ bigbluebutton_scheduled_shutdown_cron_weekend_name }}'
+    hour: '{{ bigbluebutton_scheduled_shutdown_cron_weekend_hour }}'
+    minute: '{{ bigbluebutton_scheduled_shutdown_cron_weekend_minute }}'
+    weekday: 6-7
     job: '{{ job }}'
   when: not bigbluebutton_scheduled_shutdown_abort and not bigbluebutton_scheduled_shutdown_single_shot

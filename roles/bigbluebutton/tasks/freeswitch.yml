@@ -234,8 +234,11 @@
 - name: Reset energy level
   xml:
     path: /opt/freeswitch/etc/freeswitch/autoload_configs/conference.conf.xml
-    xpath: /configuration/profiles/profile[@name='cdquality']/param[@name='energy-level']
+    xpath: /configuration/profiles/profile[@name='cdquality']/param[@name='{{ item.param }}']
     attribute: value
-    value: '{{ bigbluebutton_freeswitch_energy_level | string }}'
+    value: '{{ item.value }}'
+  with_items:
+    - { param: 'energy-level', value: '{{ bigbluebutton_freeswitch_energy_level | string }}' }
+    - { param: 'video-auto-floor-msec', value: '2500' }
   become: yes
   notify: restart bigbluebutton

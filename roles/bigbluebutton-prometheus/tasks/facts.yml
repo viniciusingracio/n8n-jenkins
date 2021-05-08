@@ -12,15 +12,13 @@
   when: not reg_standalone.stat.exists
 
 - name: Get BigBlueButton secret
-  shell: cat {{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2  | hash('sha256')
+  shell: cat {{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties | grep '^securitySalt=' | cut -d'=' -f2
   register: bbb_secret_raw
-  when: bigbluebutton_prometheus_password is none
 
-- name: Determine external IP
-  set_fact:
-    external_ip: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | grep \"[0-9]*\\.[0-9]*\\.[0-9]*\\.[0-9]*\" | head -n 1') }}"
-  when: external_ip is undefined or external_ip is none
-- name: Set external IP as internal IP if nothing returns from dig
-  set_fact:
-    external_ip: '{{ ansible_default_ipv4.address }}'
-  when: external_ip is undefined or external_ip is none or external_ip | trim == ""
+- name: Get BigBlueButton URL
+  shell: cat {{ bigbluebutton_servlet_dir }}/WEB-INF/classes/bigbluebutton.properties | grep '^bigbluebutton.web.serverURL=' | cut -d'=' -f2 | awk '{print $1"/bigbluebutton/api"}'
+  register: bbb_api_entry_point_raw
+
+- set_fact:
+    bbb_secret: '{{ bbb_secret_raw.stdout }}'
+    bbb_api_entry_point: '{{ bbb_api_entry_point_raw.stdout }}'

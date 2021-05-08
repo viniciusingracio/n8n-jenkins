@@ -9,6 +9,18 @@ location /metrics {
     auth_basic           "Administrator's area";
     auth_basic_user_file /etc/apache2/prometheus.htpasswd;
 }
+
+location /sfu_metrics {
+    proxy_pass         http://localhost:3010;
+    proxy_redirect     default;
+    proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+    proxy_set_header   X-Real-IP         $remote_addr;
+    proxy_set_header   Host              $http_host;
+    proxy_set_header   X-NginX-Proxy     true;
+
+    auth_basic           "Administrator's area";
+    auth_basic_user_file /etc/apache2/prometheus.htpasswd;
+}
 {% if bigbluebutton_prometheus_nginx_exporter_enabled %}
 
 location /nginx_metrics {
@@ -179,6 +191,20 @@ location /mongodb_metrics {
 location /mtr_metrics {
     rewrite /mtr_metrics /metrics  break;
     proxy_pass         http://localhost:9116;
+    proxy_redirect     default;
+    proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+    proxy_set_header   X-Real-IP         $remote_addr;
+    proxy_set_header   Host              $http_host;
+    proxy_set_header   X-NginX-Proxy     true;
+
+    auth_basic           "Administrator's area";
+    auth_basic_user_file /etc/apache2/prometheus.htpasswd;
+}
+{% endif %}
+{% if bigbluebutton_prometheus_bigbluebutton_exporter_enabled %}
+
+location /bigbluebutton_metrics {
+    proxy_pass         http://localhost:9688;
     proxy_redirect     default;
     proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
     proxy_set_header   X-Real-IP         $remote_addr;

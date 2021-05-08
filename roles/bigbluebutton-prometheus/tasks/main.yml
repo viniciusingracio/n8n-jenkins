@@ -73,7 +73,7 @@
     name: apache2-utils
 
 - set_fact:
-    bigbluebutton_prometheus_password: '{{ bbb_secret_raw.stdout }}'
+    bigbluebutton_prometheus_password: "{{ bbb_secret | hash('sha256') }}"
   when: bigbluebutton_prometheus_password is none
 
 - name: Create password file
@@ -103,3 +103,4 @@
     - mtail
 - include: mongodb-exporter.yml
 - include: mtr-exporter.yml
+- include: bigbluebutton-exporter.yml

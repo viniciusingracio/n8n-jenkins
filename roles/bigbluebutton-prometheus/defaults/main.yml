@@ -16,3 +16,6 @@ bigbluebutton_prometheus_kong_exporter_enabled: false
 bigbluebutton_prometheus_mtail_exporter_enabled: false
 bigbluebutton_prometheus_mongodb_exporter_enabled: false
 bigbluebutton_prometheus_mtr_exporter_enabled: false
+bigbluebutton_prometheus_bigbluebutton_exporter_enabled: false
+
+external_ipv4: "{{ lookup('pipe', 'dig {{ inventory_hostname }} @8.8.8.8 A +short | grep -v \"\\.$\" | head -n 1') | regex_search('[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}') }}"

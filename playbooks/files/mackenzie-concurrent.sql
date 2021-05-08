@@ -7,7 +7,7 @@ WITH C1 AS
     name,
     internal_meeting_id,
     end_time AS tse
-  FROM meetings WHERE is_breakout = false AND test_meeting = false AND institution_name = 'Mackenzie' AND TO_CHAR(TO_TIMESTAMP(start_time / 1000)::date, 'YYYY-MM') = '2021-03'
+  FROM meetings WHERE is_breakout = false AND test_meeting = false AND institution_name = 'Mackenzie' AND TO_CHAR(TO_TIMESTAMP(start_time / 1000)::date, 'YYYY-MM') = '2021-04'
 
   UNION ALL
 
@@ -18,7 +18,7 @@ WITH C1 AS
     NULL,
     NULL,
     NULL
-  FROM meetings WHERE is_breakout = false AND test_meeting = false AND  institution_name = 'Mackenzie' AND TO_CHAR(TO_TIMESTAMP(start_time / 1000)::date, 'YYYY-MM') = '2021-03'
+  FROM meetings WHERE is_breakout = false AND test_meeting = false AND  institution_name = 'Mackenzie' AND TO_CHAR(TO_TIMESTAMP(start_time / 1000)::date, 'YYYY-MM') = '2021-04'
 ),
 C2 AS
 (
