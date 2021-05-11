@@ -34,6 +34,7 @@
     name: '{{ item }}'
     state: absent
   with_items:
+    - Shutdown if I can
     - '{{ bigbluebutton_scheduled_shutdown_cron_name }}'
     - '{{ bigbluebutton_scheduled_shutdown_cron_weekday_name }}'
     - '{{ bigbluebutton_scheduled_shutdown_cron_weekend_name }}'

@@ -3,3 +3,12 @@
 - hosts: mconf-live220
   roles:
   - mconf-data
+  # remove when package is updated
+  tasks:
+    - name: Copy script
+      become: yes
+      copy:
+        src: files/20210509-rap-mconf-data-worker.rb
+        dest: /usr/local/bigbluebutton/core/scripts/rap-mconf-data-worker.rb
+        mode: 0755
+

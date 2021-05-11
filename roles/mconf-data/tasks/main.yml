@@ -15,10 +15,11 @@
     - mconf-data.service
     - mconf-data.timer
 
-- name: Update yml values
+- name: Update config
   become: yes
-  command: yq w -i /usr/local/bigbluebutton/core/scripts/mconf-data.yml "{{ item.key }}" "{{ item.value }}"
-  with_items: '{{ mconf_data_yml }}'
+  template:
+    src: templates/mconf-data.yml.j2
+    dest: /usr/local/bigbluebutton/core/scripts/mconf-data.yml
 
 - name: Start worker
   become: yes

@@ -1,0 +1,34 @@
+---
+
+- hosts: all
+  tasks:
+    - set_fact:
+        backup_identifier: '{{ ansible_date_time.date }}-{{ inventory_hostname }}.tar.gz'
+
+    - name: Archive backup
+      archive:
+        path: /var/bigbluebutton/events
+        dest: /tmp/{{ backup_identifier }}
+
+    - name: Upload backup to the cloud
+      shell: docker run --rm -v /:/host:ro -e AWS_ACCESS_KEY_ID={{ mconf_data_s3_key }} -e AWS_SECRET_ACCESS_KEY={{ mconf_data_s3_secret }} -e AWS_DEFAULT_REGION={{ mconf_data_s3_region }} amazon/aws-cli s3 cp /host/tmp/{{ backup_identifier }} s3://{{ mconf_data_s3_bucket_name }}/backup_events/{{ backup_identifier }}
+
+    - name: Remove archived backup
+      file:
+        path: /tmp/{{ backup_identifier }}
+        state: absent
+
+    - name: Remove events directory
+      become: yes
+      file:
+        path: /var/bigbluebutton/events
+        state: absent
+
+    - name: Recreate events directory
+      become: yes
+      file:
+        path: /var/bigbluebutton/events
+        state: directory
+        owner: bigbluebutton
+        group: bigbluebutton
+

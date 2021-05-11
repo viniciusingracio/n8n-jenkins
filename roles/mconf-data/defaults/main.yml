@@ -1,16 +1,14 @@
 ---
 
-mconf_data_enabled: false
+mconf_data_s3_enabled: false
 mconf_data_s3_bucket_name:
 mconf_data_s3_region:
 mconf_data_s3_endpoint:
 mconf_data_s3_key:
 mconf_data_s3_secret:
+mconf_data_elements:
+  - activities
+  - chat
+  - notes
+  - presentations
 
-mconf_data_yml:
-  - { key: 's3.enabled', value: '{{ mconf_data_enabled }}' }
-  - { key: 's3.bucket_name', value: '{{ mconf_data_s3_bucket_name }}' }
-  - { key: 's3.region', value: '{{ mconf_data_s3_region }}' }
-  - { key: 's3.endpoint', value: '{{ mconf_data_s3_endpoint }}' }
-  - { key: 's3.key', value: '{{ mconf_data_s3_key }}' }
-  - { key: 's3.secret', value: '{{ mconf_data_s3_secret }}' }
