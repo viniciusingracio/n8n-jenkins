@@ -20,8 +20,21 @@ require 'json'
 # externally set (for instance, from command line).
 class BBBProperties
   def self.load_properties_from_file()
-      servlet_dir = File.exists?("/usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties") ? "/usr/share/bbb-web" : "/var/lib/tomcat7/webapps/bigbluebutton"
-      @@properties = Hash[File.read("#{servlet_dir}/WEB-INF/classes/bigbluebutton.properties", :encoding => "ISO-8859-1:UTF-8").scan(/(.+?)=(.+)/)]
+      properties_file = nil
+      # /etc/bigbluebutton/bbb-web.properties exists on bionic, but it's not used, so monitoring fails
+      # [ "/etc/bigbluebutton/bbb-web.properties",
+      #   "/usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties",
+      #   "/var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties" ].each do |candidate|
+      [ "/usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties",
+        "/var/lib/tomcat7/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties" ].each do |candidate|
+          if File.exists? candidate
+              properties_file = candidate
+              break
+          end
+      end
+      raise "Cannot find a suitable bigbluebutton.properties file" if properties_file.nil?
+
+      @@properties = Hash[File.read(properties_file, :encoding => "ISO-8859-1:UTF-8").scan(/(.+?)=(.+)/)]
   end
 
   def self.load_properties_from_cli(server_url, salt)

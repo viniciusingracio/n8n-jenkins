@@ -1,7 +1,7 @@
 ---
 
 bigbluebutton_webhooks: true
-bigbluebutton_docker_webhooks_image: mconf/bbb-webhooks:1.0.5-d0ff7d5
+bigbluebutton_docker_webhooks_image: mconf/bbb-webhooks:1.0.6-85849f9
 bigbluebutton_docker_webhooks_permanent_hooks: []
 bigbluebutton_docker_webhooks_include_events: []
 bigbluebutton_docker_webhooks_kafka_brokers: []

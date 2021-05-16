@@ -49,7 +49,7 @@ list.each do |metadata_xml_path|
       "success" => true,
       "step_time" => 0,
       "playback" => playback,
-      "metadata" => doc.dig(:recording, :meta) || {},
+      "metadata" => BigBlueButton.get_metadata_from_recording(doc[:recording]),
       "download" => doc.dig(:recording, :download) || {},
       "raw_size" => doc.dig(:recording, :raw_size) || {},
       "start_time" => doc.dig(:recording, :start_time) || {},

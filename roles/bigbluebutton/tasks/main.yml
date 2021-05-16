@@ -74,9 +74,9 @@
     - https://deb.nodesource.com/gpgkey/nodesource.gpg.key
 
 - name: Find repos to remove
-  command: grep -l 'jenkins-live.mconf.com' /etc/apt/sources.list.d -R
+  command: grep -l 'mconf.com\|elos.dev\|elos.vc' /etc/apt/sources.list.d -R
   register: jenkins_repos
-  ignore_errors: yes
+  failed_when: not jenkins_repos.rc in [ 0, 1 ]
 
 - name: Clear repos
   become: yes
@@ -95,6 +95,7 @@
     filename: '{{ item.filename }}'
     mode: '0644'
     state: present
+    update_cache: no
   with_items:
     - { repo: 'deb http://archive.ubuntu.com/ubuntu/ {{ ansible_lsb.codename }} universe multiverse', filename: 'ubuntu' }
     - { repo: 'deb http://archive.ubuntu.com/ubuntu/ {{ ansible_lsb.codename }}-security universe multiverse', filename: 'ubuntu_security' }
