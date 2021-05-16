@@ -340,7 +340,7 @@
     # do not add the config if it doesn't match
     backrefs: yes
   with_items:
-    - { regexp: '^        password=', line: '        password={{ reg_esl_password.stdout }}' }
+    - { regexp: '^        password=', line: '        password="{{ reg_esl_password.stdout }}"' }
   notify: restart bigbluebutton
 
 # TODO move this to a new role/task
