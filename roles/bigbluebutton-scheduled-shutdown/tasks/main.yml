@@ -1,5 +1,17 @@
 ---
 
+- name: Remove cron job if abort
+  become: yes
+  cron:
+    name: '{{ item }}'
+    state: absent
+  with_items:
+    - Shutdown if I can
+    - '{{ bigbluebutton_scheduled_shutdown_cron_name }}'
+    - '{{ bigbluebutton_scheduled_shutdown_cron_weekday_name }}'
+    - '{{ bigbluebutton_scheduled_shutdown_cron_weekend_name }}'
+  when: bigbluebutton_scheduled_shutdown_abort
+
 - name: Install oci-cli
   become: yes
   pip:
@@ -27,18 +39,6 @@
 
 - set_fact:
     job: 'cd /etc/mconf/scheduled-shutdown && /usr/bin/ansible-playbook local-shutdown.yml | /usr/bin/tee -a /var/log/local_shutdown.log'
-
-- name: Remove cron job if abort
-  become: yes
-  cron:
-    name: '{{ item }}'
-    state: absent
-  with_items:
-    - Shutdown if I can
-    - '{{ bigbluebutton_scheduled_shutdown_cron_name }}'
-    - '{{ bigbluebutton_scheduled_shutdown_cron_weekday_name }}'
-    - '{{ bigbluebutton_scheduled_shutdown_cron_weekend_name }}'
-  when: bigbluebutton_scheduled_shutdown_abort
 
 - name: Remove no_meetings file if abort
   become: yes
