@@ -68,7 +68,7 @@ bigbluebutton_docker_kurento_ignore_ips: []
 bigbluebutton_docker_kurento_use_stun: false
 
 bigbluebutton_docker_streaming_controller_enabled: true
-bigbluebutton_docker_streaming_controller_image: mconf/mconf-streaming-controller:v2.1.8
+bigbluebutton_docker_streaming_controller_image: mconf/mconf-streaming-controller:v2.1.4
 bigbluebutton_docker_streaming_controller_streaming_image: '{{ mconf_live_presentation_recorder_image }}:{{ mconf_live_presentation_recorder_version }}'
 bigbluebutton_docker_streaming_controller_k8s_enabled: false
 bigbluebutton_docker_streaming_controller_k8s_local_config_file: files/kube-config
