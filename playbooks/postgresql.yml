@@ -10,6 +10,7 @@
 
     - debug:
         msg: '{{ postgresql_external_dir }}'
+      when: postgresql_external_dir is defined
 
     - name: Create directory if it doesn't exist yet
       become: yes
@@ -25,19 +26,19 @@
         path: '{{ postgresql_external_dir }}{{ item.item | dirname }}'
         state: directory
       with_items: '{{ reg_dir.results }}'
-      when: not postgresql_external_dir is none and reg_dir is defined
+      when: postgresql_external_dir is defined and reg_dir is defined
 
     - name: Copy directories to storage
       become: yes
       command: rsync -aqxP {{ item.item }} {{ postgresql_external_dir }}{{ item.item | dirname }}
       with_items: '{{ reg_dir.results }}'
-      when: not postgresql_external_dir is none and item.stat.exists and not item.stat.islnk
+      when: postgresql_external_dir is defined and item.stat.exists and not item.stat.islnk
 
     - name: Remove directories from local disk
       become: yes
       command: rm -r {{ item.item }}
       with_items: '{{ reg_dir.results }}'
-      when: not postgresql_external_dir is none and item.stat.exists and not item.stat.islnk
+      when: postgresql_external_dir is defined and item.stat.exists and not item.stat.islnk
 
     - name: Create links to storage
       become: yes
@@ -46,7 +47,7 @@
         dest: '{{ item.item }}'
         state: link
       with_items: '{{ reg_dir.results }}'
-      when: not postgresql_external_dir is none and item.stat.exists and not item.stat.islnk
+      when: postgresql_external_dir is defined and item.stat.exists and not item.stat.islnk
 
 - hosts: postgresql
   roles:
@@ -55,11 +56,10 @@
   tasks:
     - set_fact:
         superuser_list: '{{ postgresql_users | rejectattr("role_attr_flags", "undefined") | selectattr("role_attr_flags", "match", "SUPERUSER") | list }}'
-    - fail:
-        msg: "No SUPERUSER user defined"
-      when: superuser_list | length == 0
+      when: postgresql_users | length > 0
     - set_fact:
         superuser: '{{ superuser_list | first }}'
+      when: superuser_list is defined and superuser_list | length == 0
 
     - postgresql_query:
         db: '{{ item["name"] }}'
@@ -68,6 +68,89 @@
         login_password: '{{ superuser["password"] }}'
         query: 'CREATE EXTENSION IF NOT EXISTS pg_stat_statements;'
       with_items: '{{ postgresql_databases }}'
+      when: superuser is defined
+
+    # review permissions
+    # drwxr-xr-x  2 postgres postgres 4.0K May 17 18:47 archive
+    # drwx------ 19 postgres postgres 4.0K May 17 18:45 main
+    - name: Create archive directory
+      become: yes
+      file:
+        path: /var/lib/postgresql/10/archive
+        state: directory
+        owner: postgres
+        group: postgres
+
+- hosts: postgres_replica
+  handlers:
+    - name: restart postgres
+      become: yes
+      service: name=postgresql state=restarted
+  tasks:
+    - fail:
+        msg: "master_ip is undefined"
+      when: master_ip is undefined
+    - fail:
+        msg: "master_user is undefined"
+      when: master_user is undefined
+
+    - name: Check if postgres-replicating exists
+      stat:
+        path: /var/run/postgres-replicating
+      register: reg_replicating
+
+    - name: Stop postgres
+      become: yes
+      service:
+        name: postgresql
+        state: stopped
+      when: not reg_replicating.stat.exists
+
+    - name: Remove main
+      become: yes
+      file:
+        path: /var/lib/postgresql/10/main
+        state: absent
+      when: not reg_replicating.stat.exists
+
+    - name: Recreate main
+      become: yes
+      file:
+        path: /var/lib/postgresql/10/main
+        state: directory
+        owner: postgres
+        group: postgres
+        mode: '0700'
+      when: not reg_replicating.stat.exists
+
+    - name: Run basebackup
+      become: yes
+      become_user: postgres
+      command: pg_basebackup -h {{ master_ip }} -D /var/lib/postgresql/10/main/ -U {{ master_user }} -w -P
+      when: not reg_replicating.stat.exists
+
+    - name: Create replicating
+      become: yes
+      file:
+        path: /var/run/postgres-replicating
+        state: touch
+      when: not reg_replicating.stat.exists
+
+    - name: Create recovery
+      become: yes
+      template:
+        src: templates/recovery.conf.j2
+        dest: /var/lib/postgresql/10/main/recovery.conf
+        owner: postgres
+        group: postgres
+      notify: restart postgres
+
+    - name: Start postgres
+      become: yes
+      service:
+        name: postgresql
+        state: started
+      when: not reg_replicating.stat.exists
 
 - hosts: postgres_exporter
   roles:
